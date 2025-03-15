@@ -153,6 +153,7 @@ namespace TerritoryWars.Dojo
         private void BoardUpdated(evolute_duel_BoardUpdated eventModel)
         {
             string board_id = eventModel.board_id.Hex();
+            if (LocalPlayerBoard.id.Hex() != board_id) return;
             CustomLogger.LogEvent($"[BoardUpdated] | BoardId: {board_id}");
             int cityScoreBlue = eventModel.blue_score.Item1;
             int cartScoreBlue = eventModel.blue_score.Item2;
