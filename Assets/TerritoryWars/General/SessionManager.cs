@@ -202,16 +202,14 @@ namespace TerritoryWars.General
                         PlayerSide.Red => 1,
                         _ => -1
                     };
-                    TileData tile = new TileData(OnChainBoardDataConverter.GetTopTile(move.tile));
+                    string tileConfig = OnChainBoardDataConverter.GetTopTile(move.tile);
+                    if (tileConfig == null) continue;
+                    TileData tile = new TileData(tileConfig);
                     int rotation = move.rotation;
                     int x = move.col + 1;
                     int y = move.row + 1;
 
                     tile.Rotate((rotation + 3) % 4);
-                    if (tile.id == "CFRR")
-                    {
-                        
-                    }
                     Board.PlaceTile(tile, x, y, owner);
                 }
                 

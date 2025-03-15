@@ -56,7 +56,8 @@ namespace TerritoryWars.ModelsDataConverters
             {
                 return TileTypes[some.value];
             }
-            return "None";
+
+            return null;
         }
         
         public static (byte, byte) GetTypeAndRotation(string config)
