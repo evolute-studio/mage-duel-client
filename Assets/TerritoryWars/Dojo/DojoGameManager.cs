@@ -270,7 +270,7 @@ namespace TerritoryWars.Dojo
         }
         
         
-        private async Task<bool> CreateAccount(bool createNew)
+        public async Task<bool> CreateAccount(bool createNew)
         {
             try
             {

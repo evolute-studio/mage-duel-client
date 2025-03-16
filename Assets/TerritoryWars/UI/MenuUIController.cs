@@ -44,6 +44,12 @@ namespace TerritoryWars.UI
             CustomLogger.LogWarning("MenuUIController.Initialize");
             _namePanelController.Initialize();
         }
+
+        public async void NewAccount()
+        {
+            await DojoGameManager.Instance.CreateAccount(true);
+            Initialize();
+        }
     }
 }
 
