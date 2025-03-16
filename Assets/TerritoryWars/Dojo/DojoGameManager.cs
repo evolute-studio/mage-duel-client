@@ -438,7 +438,7 @@ namespace TerritoryWars.Dojo
                 }
             }
         }
-        
+
         private void ModelUpdated(ModelInstance modelInstance)
         {
             if (modelInstance == null || modelInstance.transform == null) return;

@@ -19,9 +19,9 @@ namespace TerritoryWars.UI
         public Color[] brightness;
         public int[] order;
         public float animationDuration = 0.5f;
-        private int currentCharacterId = 0;
         public Button ApplyButton;
         public TextMeshProUGUI ApplyButtonText;
+        private int currentCharacterIndex = 0;
         public GameObject NotActiveButton;
         public GameObject CostTextParent;
         public TextMeshProUGUI CostText;
@@ -36,6 +36,7 @@ namespace TerritoryWars.UI
         private void Initialize()
         {
             int evoluteBalance = MenuUIController.Instance._namePanelController.EvoluteBalance;
+            currentCharacterIndex = PlayerCharactersManager.GetCurrentCharacterId();
             foreach (var character in characters)
             {
                 if (evoluteBalance >= character.CharacterId)
@@ -145,11 +146,10 @@ namespace TerritoryWars.UI
 
         public void ApplyButtonClicked()
         {
-            currentCharacterId = characters[1].CharacterId;
-            PlayerCharactersManager.ChangeCurrentCharacterId(characters[1].CharacterId);
-            UpdateButtons();
+            currentCharacterIndex = characters[1].CharacterId;
             characters[1].Locker?.Unlock();
             DojoGameManager.Instance.ChangePlayerSkin(characters[1].CharacterId);
+            UpdateButtons();
         }
         
         
@@ -167,7 +167,7 @@ namespace TerritoryWars.UI
                 ApplyButton.gameObject.SetActive(true);
                 NotActiveButton.SetActive(false);
                 CostTextParent.SetActive(false);
-                if (currentCharacterId == character.CharacterId)
+                if (currentCharacterIndex == character.CharacterId)
                 {
                     ApplyButton.interactable = false;
                     ApplyButtonText.text = "APPLY";
