@@ -12,6 +12,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
+using Sequence = DG.Tweening.Sequence;
 
 namespace TerritoryWars.Tile
 {
@@ -129,6 +130,8 @@ namespace TerritoryWars.Tile
             
             CustomLogger.LogInfo("Points count: " + points.Length);
             
+            float randomStartDelay = Random.Range(0f, 2f);
+            CustomLogger.LogInfo("Random start delay: " + randomStartDelay);
             RoadPin[] pins = new RoadPin[4];
             char[] id = TileConfig.ToCharArray();
             for (int i = 0; i < id.Length; i++)
@@ -142,7 +145,12 @@ namespace TerritoryWars.Tile
                     roadPin.Initialize(playerId, score);
                     pin.transform.parent = points[i];
                     roadPin.transform.localPosition = Vector3.zero;
-                    pin.transform.DOLocalMoveY(0.035f, 2f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutQuad);
+                    
+                    Sequence sequence = DOTween.Sequence();
+                    sequence.AppendInterval(randomStartDelay);
+                    sequence.Append(roadPin.transform.DOLocalMoveY(0.035f, 2f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutQuad));
+                    sequence.Play();
+                    
                     pins[i] = roadPin;
                 }
             }
