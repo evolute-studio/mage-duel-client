@@ -253,6 +253,21 @@ namespace TerritoryWars.General
                 }
             }
         }
+        
+        public void CloseAllStructures()
+        {
+            for(int x = 0; x < width; x++)
+            {
+                for(int y = 0; y < height; y++)
+                {
+                    GameObject tile = GetTileObject(x, y);
+                    if(tile == null) continue;
+                    TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
+                    List<Side> sides = CheckCityTileSidesToEmpty(x, y);
+                    tileGenerator.FencePlacerForCloserToBorderCity(sides);
+                }
+            }
+        }
 
         public List<Side> CheckCityTileSidesToBorder(int x, int y)
         {
@@ -272,6 +287,28 @@ namespace TerritoryWars.General
             if (IsEdgeTile(x - 1, y) && !GetTileData(x - 1, y).IsCity()) { closerSides.Add(Side.Bottom); }
 
             if (IsEdgeTile(x, y + 1) && !GetTileData(x, y + 1).IsCity()) { closerSides.Add(Side.Left); }
+
+            return closerSides;
+        }
+        
+        public List<Side> CheckCityTileSidesToEmpty(int x, int y)
+        {
+            // returns list int of sides that are closer to the border 
+            // 0 - TOP
+            // 1 - Right
+            // 2 - Bottom
+            // 3 - Left
+            
+            List<Side> closerSides = new List<Side>();
+            if(IsEdgeTile(x,y)) return closerSides;
+
+            if (GetTileData(x + 1, y) == null) { closerSides.Add(Side.Top); }
+
+            if (GetTileData(x, y - 1) == null) { closerSides.Add(Side.Right); }
+
+            if (GetTileData(x - 1, y) == null) { closerSides.Add(Side.Bottom); }
+
+            if (GetTileData(x, y + 1) == null) { closerSides.Add(Side.Left); }
 
             return closerSides;
         }

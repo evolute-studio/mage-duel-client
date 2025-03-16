@@ -432,6 +432,7 @@ namespace TerritoryWars.General
         public void SkipMove()
         {
             if (!IsLocalPlayerTurn) return;
+            GameUI.Instance.SetEndTurnButtonActive(false);
             TileSelector.ClearHighlights();
             TileSelector.tilePreview.ResetPosition();
             DojoGameManager.Instance.SessionManager.SkipMove();
@@ -441,7 +442,7 @@ namespace TerritoryWars.General
         {
             bool isLocalPlayer = lastMovePlayerAddress == LocalPlayer.Address.Hex();
             CurrentTurnPlayer = isLocalPlayer ? RemotePlayer : LocalPlayer;
-            gameUI.SetEndTurnButtonActive(isLocalPlayer);
+            gameUI.SetEndTurnButtonActive(!isLocalPlayer);
             Invoke(nameof(StartTurn), 1f);
         }
 

@@ -187,12 +187,13 @@ namespace TerritoryWars.Dojo
             {
                 CustomLogger.LogEvent($"[GameFinished]");
                 Coroutines.StartRoutine(GameFinishedDelayed());
+                CloseAllStructure();
             }
         }
 
         private IEnumerator GameFinishedDelayed()
         {
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(6f);
             SimpleStorage.ClearCurrentBoardId();
             GameUI.Instance.ShowResultPopUp();
         }
@@ -492,6 +493,11 @@ namespace TerritoryWars.Dojo
             }
             CustomLogger.LogWarning(s);
             
+        }
+
+        public void CloseAllStructure()
+        {
+            SessionManager.Instance.Board.CloseAllStructures();
         }
         
 

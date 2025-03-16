@@ -20,7 +20,7 @@ namespace TerritoryWars.Tile
         public TileConnector[] connectors;
         public SpriteRenderer RoadRenderer;
         public TileAssetsObject TileAssetsObject;
-
+        public TileRenderers TileRenderers;
         public TileJokerAnimator TileJokerAnimator;
 
         public TileRotator TileRotator;
@@ -162,7 +162,7 @@ namespace TerritoryWars.Tile
         
         public void InitializeTile()
         {
-            TileRenderers tileRenderers = CurrentTileGO.GetComponent<TileRenderers>();
+            TileRenderers = CurrentTileGO.GetComponent<TileRenderers>();
             
             var tileConfig = OnChainBoardDataConverter.GetTypeAndRotation(TileConfig);
             string id = OnChainBoardDataConverter.TileTypes[tileConfig.Item1];
@@ -172,12 +172,12 @@ namespace TerritoryWars.Tile
             AllCityRenderers = new List<SpriteRenderer>();
             AllCityLineRenderers = new List<LineRenderer>();
             
-            houseRenderers = tileRenderers.HouseRenderers;
-            List<SpriteRenderer> arcRenderers = tileRenderers.ArcRenderers;
-            TerritoryFiller territoryFiller = tileRenderers.TileTerritoryFiller;
-            FencePlacer fencePlacer = tileRenderers.TileFencePlacer;
+            houseRenderers = TileRenderers.HouseRenderers;
+            List<SpriteRenderer> arcRenderers = TileRenderers.ArcRenderers;
+            TerritoryFiller territoryFiller = TileRenderers.TileTerritoryFiller;
+            FencePlacer fencePlacer = TileRenderers.TileFencePlacer;
             List<Transform> pillars = null;
-            Transform[] pins = tileRenderers.PinsPositions;
+            Transform[] pins = TileRenderers.PinsPositions;
             if (fencePlacer != null)
             {
                 pillars = fencePlacer.pillars;
@@ -241,7 +241,7 @@ namespace TerritoryWars.Tile
             {
                 FencePlacerForCloserToBorderCity(SessionManager.Instance.Board.CheckCityTileSidesToBorder(
                     _placingTilePosition.x,
-                    _placingTilePosition.y), tileRenderers);
+                    _placingTilePosition.y));
                 
                 MinePlaceForCloserToBorderRoad(SessionManager.Instance.Board.CheckRoadTileSidesToBorder(_placingTilePosition.x,
                     _placingTilePosition.y));
@@ -332,15 +332,15 @@ namespace TerritoryWars.Tile
             }
         }
 
-        public void FencePlacerForCloserToBorderCity(List<Side> closerSides, TileRenderers tileRenderers)
+        public void FencePlacerForCloserToBorderCity(List<Side> closerSides)
         {
-            if (closerSides == null || tileRenderers.HouseRenderers == null) return;
+            if (closerSides == null || TileRenderers.HouseRenderers == null) return;
 
             foreach (var side in closerSides)
             {
                 if(_tileData.GetSide(side) != LandscapeType.City) continue;
                 
-                GameObject fence = tileRenderers.CloserToBorderFences.Find(x => x.Side == side).Fence;
+                GameObject fence = TileRenderers.CloserToBorderFences.Find(x => x.Side == side).Fence;
                 fence.SetActive(true);
                 fence.GetComponent<FencePlacer>().PlaceFence();
             }
