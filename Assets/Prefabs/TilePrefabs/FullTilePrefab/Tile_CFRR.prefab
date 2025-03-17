@@ -173,7 +173,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &413060843491674892
 GameObject:
   m_ObjectHideFlags: 0
@@ -260,7 +260,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &463863180624624981
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,7 +347,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &486957456298402430
 GameObject:
   m_ObjectHideFlags: 0
@@ -434,7 +434,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &528967351435695992
 GameObject:
   m_ObjectHideFlags: 0
@@ -608,7 +608,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &772574154628227792
 GameObject:
   m_ObjectHideFlags: 0
@@ -695,7 +695,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &964183988380173080
 GameObject:
   m_ObjectHideFlags: 0
@@ -1019,6 +1019,18 @@ MonoBehaviour:
     - {fileID: 6920840634293993158}
     - {fileID: 3907770153580774185}
     - {fileID: 6920840634293993158}
+  SpriteLayerSwapElements:
+  - LineRenderer: {fileID: 4574434758157310904}
+    Rules:
+    - LayerIndex: 15
+      RotationIndex: 0
+    - LayerIndex: 14
+      RotationIndex: 1
+    - LayerIndex: 14
+      RotationIndex: 2
+    - LayerIndex: 15
+      RotationIndex: 3
+    CurrentRotation: 0
   OnRotation:
     m_PersistentCalls:
       m_Calls:
@@ -1229,7 +1241,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &1840864552392414056
 GameObject:
   m_ObjectHideFlags: 0
@@ -1380,7 +1392,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &2136639278416664091
 GameObject:
   m_ObjectHideFlags: 0
@@ -1467,7 +1479,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &2247889497392137714
 GameObject:
   m_ObjectHideFlags: 0
@@ -1554,7 +1566,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &2678456361607953235
 GameObject:
   m_ObjectHideFlags: 0
@@ -1672,7 +1684,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &2841838738837592369
 GameObject:
   m_ObjectHideFlags: 0
@@ -1848,7 +1860,7 @@ LineRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 14
+  m_SortingOrder: 15
   m_Positions:
   - {x: 0.63, y: 0.08, z: 0}
   - {x: 0.526, y: 0.022999998, z: 0}
@@ -2890,7 +2902,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &4486986012969824087
 GameObject:
   m_ObjectHideFlags: 0
@@ -2977,7 +2989,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &4595001644439426473
 GameObject:
   m_ObjectHideFlags: 0
@@ -3064,7 +3076,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &4904422076756921938
 GameObject:
   m_ObjectHideFlags: 0
@@ -3151,7 +3163,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &4925826754255170629
 GameObject:
   m_ObjectHideFlags: 0
@@ -3325,7 +3337,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &5320890267580127030
 GameObject:
   m_ObjectHideFlags: 0
@@ -3412,7 +3424,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &5541039092926453929
 GameObject:
   m_ObjectHideFlags: 0
@@ -3499,7 +3511,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &5563923300859793717
 GameObject:
   m_ObjectHideFlags: 0
@@ -3576,7 +3588,7 @@ LineRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 14
+  m_SortingOrder: 15
   m_Positions:
   - {x: 0, y: -0.235, z: 0}
   - {x: -0.101, y: -0.196, z: 0}
@@ -3763,7 +3775,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &5972551422438315953
 GameObject:
   m_ObjectHideFlags: 0
@@ -3850,7 +3862,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &6113889624128639084
 GameObject:
   m_ObjectHideFlags: 0
@@ -3937,7 +3949,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &6287412981887838306
 GameObject:
   m_ObjectHideFlags: 0
@@ -4024,7 +4036,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &6305867118927798509
 GameObject:
   m_ObjectHideFlags: 0
@@ -4198,7 +4210,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &6619236146769490406
 GameObject:
   m_ObjectHideFlags: 0
@@ -4349,7 +4361,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &6785879710540031055
 GameObject:
   m_ObjectHideFlags: 0
@@ -4436,7 +4448,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &6859570425867440820
 GameObject:
   m_ObjectHideFlags: 0
@@ -4544,7 +4556,7 @@ LineRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 14
+  m_SortingOrder: 15
   m_Positions:
   - {x: 0.63, y: 0.08, z: 0}
   - {x: 0.52, y: 0.060999997, z: 0}
@@ -5360,7 +5372,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &9041713194230284721
 GameObject:
   m_ObjectHideFlags: 0
@@ -5447,4 +5459,4 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
