@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = System.Random;
 
 namespace TerritoryWars.Tools
 {
@@ -13,6 +14,8 @@ namespace TerritoryWars.Tools
         public bool loop = true;
         public float delay = 0f;
         public bool randomizeStart = false;
+        public bool randomSpriteStart = false;
+        private int _randomSpriteIndex = 0;
         public float maxRandomDelay = 0.5f;
         public float waitBetweenLoops = 0f;
         public bool playOnAwake = true;
@@ -106,12 +109,32 @@ namespace TerritoryWars.Tools
                 yield return new WaitForSeconds(delay);
             }
 
+            if (sprites != null && randomSpriteStart)
+            {
+                _randomSpriteIndex = UnityEngine.Random.Range(0, sprites.Length);
+            }
+
             while (true)
             {
-                foreach (var sprite in sprites)
+                if (randomSpriteStart)
                 {
-                    SetSprite(sprite);
-                    yield return new WaitForSeconds(duration / sprites.Length);
+                    if (sprites != null)
+                    {
+                        for(int i = _randomSpriteIndex; i < sprites.Length; i++)
+                        {
+                            SetSprite(sprites[i]);
+                            yield return new WaitForSeconds(duration / sprites.Length);
+                        }
+                        _randomSpriteIndex = 0;
+                    }
+                }
+                else
+                {
+                    foreach (var sprite in sprites)
+                    {
+                        SetSprite(sprite);
+                        yield return new WaitForSeconds(duration / sprites.Length);
+                    }
                 }
                 
                 OnAnimationEnd?.Invoke();
