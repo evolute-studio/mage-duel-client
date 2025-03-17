@@ -1,6 +1,6 @@
 #if USE_DATA_CACHING
 const cacheName = {{{JSON.stringify(COMPANY_NAME + "-" + PRODUCT_NAME + "-" + PRODUCT_VERSION )}}};
-// Додаємо версію до імені кешу для кращого контролю
+// Add version to cache name for better control
 const cacheVersion = '1.0.0';
 const fullCacheName = `${cacheName}-${cacheVersion}`;
 
@@ -27,39 +27,13 @@ self.addEventListener('install', function (e) {
     console.log('[Service Worker] Install');
     
 #if USE_DATA_CACHING
-    // Примусово активуємо новий Service Worker
+    // Force activate new Service Worker
     self.skipWaiting();
     
     e.waitUntil((async function () {
-        try {
-            const cache = await caches.open(fullCacheName);
-            console.log('[Service Worker] Caching all: app shell and content');
-            
-            // Перевіряємо доступність кожного файлу перед кешуванням
-            const failedUrls = [];
-            for (const url of contentToCache) {
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) {
-                        failedUrls.push(url);
-                    } else {
-                        await cache.put(url, response);
-                    }
-                } catch (error) {
-                    failedUrls.push(url);
-                    console.error(`Failed to cache ${url}:`, error);
-                }
-            }
-
-            if (failedUrls.length > 0) {
-                console.error('Failed to cache following files:', failedUrls);
-                // Якщо критичні файли не вдалося закешувати, відміняємо встановлення
-                throw new Error('Failed to cache critical files');
-            }
-        } catch (error) {
-            console.error('Installation failed:', error);
-            throw error;
-        }
+      const cache = await caches.open(fullCacheName);
+      console.log('[Service Worker] Caching all: app shell and content');
+      await cache.addAll(contentToCache);
     })());
 #endif
 });
@@ -68,11 +42,11 @@ self.addEventListener('activate', function(e) {
     console.log('[Service Worker] Activate');
     
 #if USE_DATA_CACHING
-    // Примусово перехоплюємо керування всіма клієнтами
+    // Force take control of all clients
     e.waitUntil(
         Promise.all([
             self.clients.claim(),
-            // Видаляємо всі старі кеші
+            // Remove all old caches
             caches.keys().then(function(keyList) {
                 return Promise.all(keyList.map(function(key) {
                     if (key !== fullCacheName) {
@@ -88,7 +62,7 @@ self.addEventListener('activate', function(e) {
 
 #if USE_DATA_CACHING
 self.addEventListener('fetch', function (e) {
-    // Перевіряємо, чи URL використовує підтримувану схему
+    // Check if URL uses supported scheme
     if (!e.request.url.startsWith('http')) {
         return;
     }
@@ -97,7 +71,7 @@ self.addEventListener('fetch', function (e) {
         try {
             const normalizedUrl = new URL(e.request.url);
             
-            // Завжди отримуємо свіжу версію основних файлів
+            // Always get fresh version of core files
             if (e.request.url.includes('Build/') || 
                 e.request.url.endsWith('index.html') ||
                 e.request.url.endsWith('manifest.json')) {
@@ -116,13 +90,13 @@ self.addEventListener('fetch', function (e) {
                 }
             }
 
-            // Для інших ресурсів спочатку перевіряємо кеш
+            // For other resources, check cache first
             let response = await caches.match(e.request);
             if (response) {
                 return response;
             }
 
-            // Якщо ресурс не знайдено в кеші, завантажуємо його
+            // If resource not found in cache, fetch it
             response = await fetch(e.request);
             if (!response || response.status !== 200 || response.type !== 'basic') {
                 return response;
@@ -149,3 +123,10 @@ self.addEventListener('fetch', function (e) {
     })());
 });
 #endif
+
+// Add message handler for forced activation
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
