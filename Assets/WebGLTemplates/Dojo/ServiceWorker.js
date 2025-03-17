@@ -1,5 +1,9 @@
 #if USE_DATA_CACHING
 const cacheName = {{{JSON.stringify(COMPANY_NAME + "-" + PRODUCT_NAME + "-" + PRODUCT_VERSION )}}};
+// Додаємо версію до імені кешу для кращого контролю
+const cacheVersion = '1.0.0';
+const fullCacheName = `${cacheName}-${cacheVersion}`;
+
 const contentToCache = [
     "./",
     "index.html",
@@ -23,10 +27,39 @@ self.addEventListener('install', function (e) {
     console.log('[Service Worker] Install');
     
 #if USE_DATA_CACHING
+    // Примусово активуємо новий Service Worker
+    self.skipWaiting();
+    
     e.waitUntil((async function () {
-      const cache = await caches.open(cacheName);
-      console.log('[Service Worker] Caching all: app shell and content');
-      await cache.addAll(contentToCache);
+        try {
+            const cache = await caches.open(fullCacheName);
+            console.log('[Service Worker] Caching all: app shell and content');
+            
+            // Перевіряємо доступність кожного файлу перед кешуванням
+            const failedUrls = [];
+            for (const url of contentToCache) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        failedUrls.push(url);
+                    } else {
+                        await cache.put(url, response);
+                    }
+                } catch (error) {
+                    failedUrls.push(url);
+                    console.error(`Failed to cache ${url}:`, error);
+                }
+            }
+
+            if (failedUrls.length > 0) {
+                console.error('Failed to cache following files:', failedUrls);
+                // Якщо критичні файли не вдалося закешувати, відміняємо встановлення
+                throw new Error('Failed to cache critical files');
+            }
+        } catch (error) {
+            console.error('Installation failed:', error);
+            throw error;
+        }
     })());
 #endif
 });
@@ -35,16 +68,21 @@ self.addEventListener('activate', function(e) {
     console.log('[Service Worker] Activate');
     
 #if USE_DATA_CACHING
-    e.waitUntil((async function() {
-        // Видаляємо всі старі кеші
-        const keyList = await caches.keys();
-        return Promise.all(keyList.map(function(key) {
-            if (key !== cacheName) {
-                console.log('[Service Worker] Removing old cache', key);
-                return caches.delete(key);
-            }
-        }));
-    })());
+    // Примусово перехоплюємо керування всіма клієнтами
+    e.waitUntil(
+        Promise.all([
+            self.clients.claim(),
+            // Видаляємо всі старі кеші
+            caches.keys().then(function(keyList) {
+                return Promise.all(keyList.map(function(key) {
+                    if (key !== fullCacheName) {
+                        console.log('[Service Worker] Removing old cache', key);
+                        return caches.delete(key);
+                    }
+                }));
+            })
+        ])
+    );
 #endif
 });
 
@@ -65,7 +103,7 @@ self.addEventListener('fetch', function (e) {
                 e.request.url.endsWith('manifest.json')) {
                 try {
                     const response = await fetch(e.request);
-                    const cache = await caches.open(cacheName);
+                    const cache = await caches.open(fullCacheName);
                     console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
                     cache.put(e.request, response.clone());
                     return response;
@@ -90,7 +128,7 @@ self.addEventListener('fetch', function (e) {
                 return response;
             }
 
-            const cache = await caches.open(cacheName);
+            const cache = await caches.open(fullCacheName);
             console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
             cache.put(e.request, response.clone());
             return response;
