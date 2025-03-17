@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace TerritoryWars.Tile
 {
@@ -13,6 +14,7 @@ namespace TerritoryWars.Tile
         public List<Transform> MirrorRotationObjects = new List<Transform>();
         public List<LineRenderer> LineRenderers = new List<LineRenderer>();
         public List<RoadSwapElement> SpriteSwapElements = new List<RoadSwapElement>();
+        public List<SpriteLayerSwapElement> SpriteLayerSwapElements = new List<SpriteLayerSwapElement>();
 
         public UnityEvent OnRotation;
 
@@ -65,6 +67,11 @@ namespace TerritoryWars.Tile
                     pins[i] = pinsParent.GetChild(i);
                 }
                 _tileRenderers.PinsPositions = pins;
+            }
+
+            foreach (var spriteLayerSwapElement in SpriteLayerSwapElements)
+            {
+                spriteLayerSwapElement.Rotate();
             }
             OnRotation?.Invoke();
         }
@@ -169,6 +176,14 @@ namespace TerritoryWars.Tile
                     _tileRenderers.PinsPositions = pins;
                 }
             }
+
+            if (SpriteLayerSwapElements != null)
+            {
+                foreach (var spriteLayerSwapElement in SpriteLayerSwapElements)
+                {
+                    spriteLayerSwapElement.Rotate(times);
+                }
+            }
         }
 
         private void Update()
@@ -236,11 +251,47 @@ namespace TerritoryWars.Tile
             PinObjects[newIndex].gameObject.SetActive(true);
         }
     }
-    
+
+    [Serializable]
+    public class SpriteLayerSwapElement
+    {
+        public LineRenderer LineRenderer;
+        public SpriteSwapLayerRule[] Rules;
+        public int CurrentRotation = 0;
+
+        public int GetCurrentRotation()
+        {
+            for(int i = 0; i < Rules.Length; i++)
+            {
+                if (CurrentRotation == Rules[i].RotationIndex)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        public void Rotate(int times = 1)
+        {
+            int currentIndex = GetCurrentRotation();
+            if (currentIndex == -1) return;
+            int newIndex = (currentIndex + times) % Rules.Length;
+            CurrentRotation = newIndex;
+            LineRenderer.sortingOrder = Rules[newIndex].LayerIndex;
+        }
+    }
+
     [Serializable]
     public class SpriteSwapRule
     {
         public Sprite Sprite;
         public Vector3 Scale;
+    }
+
+    [Serializable]
+    public class SpriteSwapLayerRule
+    {
+        public int LayerIndex;
+        public int RotationIndex;
     }
 }
