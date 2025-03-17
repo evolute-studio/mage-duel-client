@@ -94,7 +94,6 @@ namespace Dojo
                     // Add the model component to the entity
                     component = (ModelInstance)entityGameObject.AddComponent(model.GetType());
                     component.Initialize(entityModel);
-                    //OnModelUpdated?.Invoke(component);
                 }
                 component.OnUpdate(entityModel);
                 OnModelUpdated?.Invoke(component);
@@ -107,6 +106,14 @@ namespace Dojo
         // Handles spawning / updating entities as they are updated from the dojo world
         private void HandleEntityUpdate(FieldElement hashedKeys, Model[] entityModels)
         {
+            foreach (var model in entityModels)
+            {
+                if (model.Name == "evolute_duel_Board" || model.Name == "evolute_duel-Board")
+                {
+                    Debug.Log("Board model updated");
+                }
+            }
+            
             // Get the entity game object
             var entity = GameObject.Find(hashedKeys.Hex());
             if (entity == null)
@@ -171,6 +178,7 @@ namespace Dojo
         // Register event message callbacks
         public void RegisterEventMessageCallbacks()
         {
+            Debug.Log("Registering event message callbacks");
             ToriiEvents.Instance.OnEventMessageUpdated += HandleEventMessage;
         }
 
