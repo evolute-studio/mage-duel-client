@@ -160,48 +160,7 @@
 <script>
     window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
-            // Функція для видалення всіх Service Workers
-            async function unregisterOldWorkers() {
-                const registrations = await navigator.serviceWorker.getRegistrations();
-                for(let registration of registrations) {
-                    await registration.unregister();
-                }
-            }
-
-            // Спочатку видаляємо всі старі Service Workers
-            unregisterOldWorkers().then(() => {
-                // Потім реєструємо новий
-                navigator.serviceWorker.register("ServiceWorker.js").then(function(registration) {
-                    // Відслідковуємо стан Service Worker
-                    registration.addEventListener('activate', function(event) {
-                        // Даємо час на завершення всіх операцій
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
-                    });
-
-                    // Перевіряємо наявність оновлень кожні 60 хвилин
-                    setInterval(() => {
-                        registration.update();
-                    }, 60 * 60 * 1000);
-
-                    // Відслідковуємо оновлення Service Worker
-                    registration.addEventListener('updatefound', function() {
-                        // Отримуємо новий Service Worker
-                        const newWorker = registration.installing;
-
-                        newWorker.addEventListener('statechange', function() {
-                            // Коли новий Service Worker закінчить установку
-                            if (newWorker.state === 'activated') {
-                                // Перезавантажуємо сторінку
-                                window.location.reload();
-                            }
-                        });
-                    });
-                }).catch(function(error) {
-                    console.log('Service worker registration failed:', error);
-                });
-            });
+            navigator.serviceWorker.register("ServiceWorker.js");
         }
     });
 
@@ -307,18 +266,23 @@
     var dojoScript = document.createElement("script");
     dojoScript.src = "TemplateData/dojo.js/dojo_c.js";
     dojoScript.onload = async () => {
-        try {
-            // Чекаємо поки wasm модуль завантажиться
-            await wasm_bindgen("TemplateData/dojo.js/dojo_c_bg.wasm");
-            console.log("WASM module initialized successfully");
-        } catch (error) {
-            console.error("Failed to initialize WASM module:", error);
-        }
+        await wasm_bindgen();
     };
     document.body.appendChild(dojoScript);
 
-    // Переміщаємо код завантаження Unity після ініціалізації WASM
-    dojoScript.addEventListener('load', function() {
+    // var starknetScript = document.createElement("script");
+    // starknetScript.src = "TemplateData/starknet-5.24.3.js";
+    // document.body.appendChild(starknetScript);
+
+    var gameInstance = null;
+    // Initialize flag to potentially stop Unity loading
+    window.stopUnityLoading = false;
+
+    // Check orientation before loading Unity
+    checkOrientation();
+
+    // Only load Unity if we're not in portrait mode/incorrect aspect ratio
+    if (!window.stopUnityLoading) {
         var script = document.createElement("script");
         script.src = loaderUrl;
         script.onload = () => {
@@ -345,15 +309,9 @@
                 });
             }
         };
-        document.body.appendChild(script);
-    });
+    }
 
-    var gameInstance = null;
-    // Initialize flag to potentially stop Unity loading
-    window.stopUnityLoading = false;
-
-    // Check orientation before loading Unity
-    checkOrientation();
+    document.body.appendChild(script);
 
 </script>
 </body>
