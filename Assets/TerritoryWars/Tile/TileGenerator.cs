@@ -128,10 +128,7 @@ namespace TerritoryWars.Tile
                 ? SessionManager.Instance.CurrentTurnPlayer.LocalId
                 : -1;
             
-            CustomLogger.LogInfo("Points count: " + points.Length);
-            
             float randomStartDelay = Random.Range(0f, 2f);
-            CustomLogger.LogInfo("Random start delay: " + randomStartDelay);
             RoadPin[] pins = new RoadPin[4];
             char[] id = TileConfig.ToCharArray();
             for (int i = 0; i < id.Length; i++)

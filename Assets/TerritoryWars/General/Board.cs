@@ -219,7 +219,6 @@ namespace TerritoryWars.General
 
         private void TryConnectEdgeStructure(int owner, int x, int y)
         {
-            CustomLogger.LogInfo($"TryConnectEdgeStructure at {x}, {y}");
             GameObject[] neighborsGO = new GameObject[4];
             TileData[] neighborsData = new TileData[4];
             int[][] positions = new[] { new int[] {1, 0}, new int[] {0, -1}, new int[] {-1, 0}, new int[] {0, 1} };

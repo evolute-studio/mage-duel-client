@@ -181,7 +181,6 @@ namespace TerritoryWars.Tile
         {
             if (points == null || points.Length == 0)
             {
-                Debug.Log("No points to calculate bounds");
                 return new Bounds(Vector3.zero, Vector3.zero);
             }
 
@@ -189,10 +188,7 @@ namespace TerritoryWars.Tile
             for (int i = 1; i < points.Length; i++)
             {
                 bounds.Encapsulate(points[i]);
-                Debug.Log("Bound point: " + points[i]);
             }
-
-            Debug.Log("Center: " + bounds.center + "Size: " + bounds.size + "Min: " + bounds.min + "Max: " + bounds.max);
             return bounds;
         }
     }
