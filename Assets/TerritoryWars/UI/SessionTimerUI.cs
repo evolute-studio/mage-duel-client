@@ -33,9 +33,7 @@ namespace TerritoryWars.UI
         
         private bool _isLocalPlayerTurn => SessionManager.Instance.IsLocalPlayerTurn;
         private bool _isTimerActive => _currentTurnTime > 0;
-        private string _opponentPlayerName => SessionManager.Instance.LocalPlayer.LocalId == 0 
-            ? SessionManager.Instance.PlayersData[1].username 
-            : SessionManager.Instance.PlayersData[0].username;
+        private string _opponentPlayerName = "opponents";
 
         public void Update()
         {
@@ -47,6 +45,7 @@ namespace TerritoryWars.UI
         {
             RotateHourglass();
             _currentTurnTime = TurnDuration;
+            TimerText.color = Color.white;
         }
         
         private void UpdateTimer()
@@ -55,6 +54,11 @@ namespace TerritoryWars.UI
             
             _currentTurnTime -= Time.deltaTime;
             TimerText.text = $"{Mathf.FloorToInt(_currentTurnTime / 60):00}:{Mathf.FloorToInt(_currentTurnTime % 60):00}";
+
+            if (_currentTurnTime <= TurnDuration / 4)
+            {
+                TimerText.color = Color.red;
+            }
             
             if (_currentTurnTime <= 0)
             {
