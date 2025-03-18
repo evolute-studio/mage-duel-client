@@ -139,6 +139,11 @@ namespace TerritoryWars.General
                 PlaceTile(new TileData(fieldTile), startPos.x, startPos.y, -1);
                 // Don't place forests, only mountains at other corners
                 tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = tileAssets.GetRandomMountain();
+                if (swapOrderLayer)
+                {
+                    tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer")
+                        .GetComponent<SpriteRenderer>().sortingOrder = 20;
+                }
             }
 
             if (endPos != new Vector2Int(9, 0) && endPos != new Vector2Int(0, 9))
