@@ -427,7 +427,7 @@ namespace TerritoryWars.General
                     isPlacingTile = false;
                     if(isJokerMode) 
                     {
-                        SessionManager.Instance.CompleteJokerPlacement();
+                        SessionManager.Instance.JokerManager.CompleteJokerPlacement();
                     }
                     isJokerMode = false;
                     selectedPosition = null;

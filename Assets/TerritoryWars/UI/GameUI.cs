@@ -162,13 +162,13 @@ namespace TerritoryWars.UI
        
             if (jokerButton != null)
             {
-                jokerButton.interactable = _sessionManager.CanUseJoker();
+                jokerButton.interactable = _sessionManager.JokerManager.CanUseJoker();
             }
 
            
             if (jokerModeIndicator != null)
             {
-                jokerModeIndicator.SetActive(_sessionManager.IsJokerActive);
+                jokerModeIndicator.SetActive(_sessionManager.JokerManager.IsJokerActive);
             }
         }
 
@@ -234,7 +234,7 @@ namespace TerritoryWars.UI
             if (active)
             {
                 _toggleSpriteRenderer.sprite = _toggleMods[1];
-                _sessionManager.ActivateJoker();
+                _sessionManager.JokerManager.ActivateJoker();
                 
                 tilePreview._tileJokerAnimator.ShowIdleJokerAnimation();
                 tilePreviewUITileJokerAnimator.ShowIdleJokerAnimation();
@@ -243,7 +243,7 @@ namespace TerritoryWars.UI
             else
             {
                 _toggleSpriteRenderer.sprite = _toggleMods[0];
-                _sessionManager.DeactivateJoker();
+                _sessionManager.JokerManager.DeactivateJoker();
                 tilePreview._tileJokerAnimator.StopIdleJokerAnimation();
                 tilePreviewUITileJokerAnimator.StopIdleJokerAnimation();
                 SessionManager.Instance.TileSelector.CancelJokerMode();

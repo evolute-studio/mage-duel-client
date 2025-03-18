@@ -244,7 +244,7 @@ namespace TerritoryWars.General
                     {
                         if (SessionManager.Instance != null && !_isAnimating) return;
                         
-                        var jokerTile = SessionManager.Instance.GetGenerateJokerTile(x, y);
+                        var jokerTile = SessionManager.Instance.JokerManager.GetGenerateJokerTile(x, y);
                         if (jokerTile != null)
                         {
                             SessionManager.Instance.TileSelector.StartJokerTilePlacement(jokerTile, x, y);

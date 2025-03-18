@@ -64,10 +64,10 @@ namespace TerritoryWars.General
         [SerializeField] private GameUI gameUI;
         [SerializeField] private SessionUI sessionUI;
         [SerializeField] private DeckManager deckManager;
+        public JokerManager JokerManager;
         public TileSelector TileSelector;
 
         public Vector3[] SpawnPoints;
-        public AnimationCurve spawnCurve;
 
         public Character[] Players;
         public PlayerData[] PlayersData;
@@ -78,88 +78,9 @@ namespace TerritoryWars.General
         public bool IsLocalPlayerTurn => CurrentTurnPlayer == LocalPlayer;
         public bool IsLocalPlayerHost => LocalPlayer.LocalId == 0;
         
-        private bool isJokerActive = false;
         
-        public bool IsJokerActive => isJokerActive;
         
-        public void ActivateJoker()
-        {
-            if (Players[CurrentTurnPlayer.LocalId].JokerCount > 0)
-            {
-                isJokerActive = true;
-                Players[CurrentTurnPlayer.LocalId].JokerCount--;
-                TileSelector.StartJokerPlacement();
-            }
-        }
-        
-        public void DeactivateJoker()
-        {
-            isJokerActive = false;
-            Players[CurrentTurnPlayer.LocalId].JokerCount++;
-            gameUI.UpdateUI();
-        }
-        
-        public TileData GetGenerateJokerTile(int x, int y)
-        {
-            
-            Dictionary<Side, LandscapeType> neighborSides = new Dictionary<Side, LandscapeType>();
-            foreach (Side side in System.Enum.GetValues(typeof(Side)))
-            {
-                int newX = x + Board.GetXOffset(side);
-                int newY = y + Board.GetYOffset(side);
-                
-                if (Board.IsValidPosition(newX, newY) && Board.GetTileData(newX, newY) != null)
-                {
-                    var neighborTile = Board.GetTileData(newX, newY);
-                    neighborSides[side] = neighborTile.GetSide(Board.GetOppositeSide(side));
-                }
-            }
-            
-            char[] baseSides = new char[4];
-            char[] randomSides = new char[4];
-            for (int i = 0; i < 4; i++)
-            {
-                Side side = (Side)i;
-                if (neighborSides.ContainsKey(side))
-                {
-                    baseSides[i] = LandscapeToChar(neighborSides[side]);
-                    randomSides[i] = LandscapeToChar(neighborSides[side]);
-                }
-                else
-                {
-                    baseSides[i] = 'X';
-                    randomSides[i] = GetRandomLandscape();
-                }
-            }
-            
-            string baseTileConfig = new string(baseSides);
-            string randomTileConfig = new string(randomSides);
-            
-            (string tileConfig, int rotation) = OnChainBoardDataConverter.GetRandomTypeAndRotationFromDeck(baseTileConfig);
-            string configResult = String.IsNullOrEmpty(tileConfig) ? randomTileConfig : tileConfig;
-            TileData jokerTile = new TileData(randomTileConfig);
-            //jokerTile.Rotate((rotation + 2) % 4);
-            return jokerTile;
-        }
-        
-        private char GetRandomLandscape()
-        {
-            float random = Random.value;
-            if (random < 0.4f) return 'F';      
-            else if (random < 0.7f) return 'R';  
-            else return 'C';                     
-        }
-        
-        private char LandscapeToChar(LandscapeType type)
-        {
-            return type switch
-            {
-                LandscapeType.City => 'C',
-                LandscapeType.Road => 'R',
-                LandscapeType.Field => 'F',
-                _ => 'F'
-            };
-        }
+       
 
         public void Start()
         {
@@ -217,6 +138,7 @@ namespace TerritoryWars.General
             } 
             DojoGameManager.Instance.SessionManager.UpdateBoardAfterRoadContest();
             DojoGameManager.Instance.SessionManager.UpdateBoardAfterCityContest();
+            JokerManager = new JokerManager(this);
             gameUI.Initialize();
             sessionUI.Initialization();
             int cityScoreBlue = board.blue_score.Item1;
@@ -227,10 +149,8 @@ namespace TerritoryWars.General
             GameUI.Instance.SessionUI.SetRoadScores(cartScoreBlue, cartScoreRed);
             GameUI.Instance.SessionUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
             GameUI.Instance.SessionUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(SkipMove);
-            gameUI.SessionUI.ShowPlayerJokerCount(LocalPlayer.LocalId);
+            JokerManager.Initialize(board);
             SetTilesInDeck(board.available_tiles_in_deck.Length);
-            SetJokersCount(0, board.player1.Item3);
-            SetJokersCount(1, board.player2.Item3);
             StartGame();
         }
 
@@ -361,7 +281,7 @@ namespace TerritoryWars.General
                 PlayersData[1].UpdatePlayerData(player);
             }
             if (playerAddress == LocalPlayer.Address.Hex()) CompleteEndTurn(playerAddress);
-            else StartCoroutine(HandleOpponentMoveCoroutine(playerAddress, tile, position, rotation, isJoker));
+            else StartCoroutine(HandleOpponentMoveCoroutine(playerAddress, tile, position, rotation));
         }
         
         private void SkipMove(string playerAddress)
@@ -372,7 +292,7 @@ namespace TerritoryWars.General
             CompleteEndTurn(playerAddress);
         }
 
-        private IEnumerator HandleOpponentMoveCoroutine(string playerAddress, TileData tile, Vector2Int position, int rotation, bool isJoker)
+        private IEnumerator HandleOpponentMoveCoroutine(string playerAddress, TileData tile, Vector2Int position, int rotation)
         {
             tile.Rotate(rotation);
             tile.OwnerId = RemotePlayer.LocalId;
@@ -408,12 +328,6 @@ namespace TerritoryWars.General
         public void SetTilesInDeck(int count)
         {
             gameUI.SessionUI.SetDeckCount(count);
-        }
-        
-        public void SetJokersCount(int playerId, int count)
-        {
-            gameUI.SessionUI.SetJokersCount(playerId, count);
-            gameUI.SessionUI.ShowPlayerJokerCount(LocalPlayer.LocalId);
         }
 
         public void RotateCurrentTile()
@@ -452,65 +366,5 @@ namespace TerritoryWars.General
             DojoGameManager.Instance.SessionManager.OnSkipMoveReceived -= SkipMove;
             GameUI.Instance.SessionUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(SkipMove);
         }
-
-        public bool CanUseJoker()
-        {
-            int characterId = CurrentTurnPlayer == null ? 0 : CurrentTurnPlayer.LocalId;
-            return !isJokerActive && Players[characterId].JokerCount > 0;
-        }
-
-        public void CompleteJokerPlacement()
-        {
-            isJokerActive = false;
-            gameUI.SetJokerMode(false);
-            gameUI.UpdateUI();
-        }
-
-
-        // private void OnGUI()
-        // {
-        //     if (LocalPlayer == null || RemotePlayer == null) return;
-        //     GUIStyle style = new GUIStyle(GUI.skin.label)
-        //     {
-        //         fontSize = 20,
-        //         fontStyle = FontStyle.Bold,
-        //         normal = { textColor = Color.white },
-        //         alignment = TextAnchor.MiddleCenter
-        //     };
-        //
-        //     
-        //     Texture2D backgroundTexture = new Texture2D(1, 1);
-        //     backgroundTexture.SetPixel(0, 0, new Color(0, 0, 0, 0.7f));
-        //     backgroundTexture.Apply();
-        //     style.normal.background = backgroundTexture;
-        //
-        //     
-        //     int padding = 10;
-        //     int yPosition = 10;
-        //
-        //     
-        //     float screenCenterX = Screen.width / 2f;
-        //     float labelWidth = 300f;
-        //     float xPosition = screenCenterX - labelWidth / 2f;
-        //
-        //     
-        //     float time = Time.time;
-        //     string turnInfo;
-        //     string enemyNickname = IsLocalPlayerHost ? PlayersData[1].username : PlayersData[0].username;
-        //     
-        //     if (CurrentTurnPlayer != LocalPlayer)
-        //     {
-        //         turnInfo = $"Waiting for {enemyNickname} turn" + new string('.', (int)(time % 3) + 1);;
-        //     }
-        //     else
-        //     {
-        //         turnInfo = "Your turn now.";
-        //     }
-        //     GUI.Label(new Rect(xPosition, yPosition, labelWidth, 30), turnInfo, style);
-        //
-        //
-        //     
-        //     Destroy(backgroundTexture);
-        // }
     }
 }

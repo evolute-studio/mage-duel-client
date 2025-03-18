@@ -173,8 +173,8 @@ namespace TerritoryWars.Dojo
             CustomLogger.LogImportant($"BoardUpdated. TopTile: {tileData.id}");
             SessionManager.Instance.SetNextTile(tileData);
             SessionManager.Instance.SetTilesInDeck(availableTiles + 1);
-            SessionManager.Instance.SetJokersCount(0, hostPlayerJokers);
-            SessionManager.Instance.SetJokersCount(1, guestPlayerJokers);
+            SessionManager.Instance.JokerManager.SetJokersCount(0, hostPlayerJokers);
+            SessionManager.Instance.JokerManager.SetJokersCount(1, guestPlayerJokers);
         }
 
         private void GameFinished(FieldElement board_id, FieldElement hostPlayer)
