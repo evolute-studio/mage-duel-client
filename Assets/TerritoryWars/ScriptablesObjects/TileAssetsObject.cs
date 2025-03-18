@@ -100,9 +100,8 @@ namespace TerritoryWars.ScriptablesObjects
                     {
                         return SecondPlayerHousesAnimated[i].HousesSprites;
                     }
-
-                    i++;
                 }
+                i++;
             }
 
             return null;
