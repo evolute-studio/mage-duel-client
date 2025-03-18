@@ -2,5 +2,6 @@ public enum LandscapeType
 {
     City,
     Road,
-    Field
+    Field,
+    Universal
 }

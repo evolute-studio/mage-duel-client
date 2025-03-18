@@ -372,7 +372,7 @@ namespace TerritoryWars.General
             return closerSides;
         }
         
-        private bool IsEdgeTile(int x, int y)
+        public bool IsEdgeTile(int x, int y)
         {
             return x == 0 || x == width - 1 || y == 0 || y == height - 1;
         }
