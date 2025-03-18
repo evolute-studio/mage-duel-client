@@ -144,15 +144,15 @@ namespace TerritoryWars.UI
             sequence.Append(_resultPopupComponents.Player1HeroSpriteRenderer.DOFade(1f, _animationDuration).OnComplete(
                 () =>
                 {
-                    if (IsPlayer1Winner)
+                    if(IsDraw)
+                    {
+                        _resultPopupComponents.Player1Animator.SetBool("Lose", true);
+                    }
+                    else if(IsPlayer1Winner)
                     {
                         _resultPopupComponents.Player1Animator.SetBool("Win", true);
                     }
                     else if(!IsPlayer1Winner)
-                    {
-                        _resultPopupComponents.Player1Animator.SetBool("Lose", true);
-                    }
-                    else if(IsDraw)
                     {
                         _resultPopupComponents.Player1Animator.SetBool("Lose", true);
                     }
@@ -161,17 +161,17 @@ namespace TerritoryWars.UI
             sequence.Append(_resultPopupComponents.Player2HeroSpriteRenderer.DOFade(1f, _animationDuration).OnComplete(
                 () =>
                 {
-                    if (IsPlayer1Winner)
+                    if (IsDraw)
+                    {
+                        _resultPopupComponents.Player2Animator.SetBool("Lose", true);
+                    }
+                    else if (IsPlayer1Winner)
                     {
                         _resultPopupComponents.Player2Animator.SetBool("Lose", true);
                     }
                     else if(!IsPlayer1Winner)
                     {
                         _resultPopupComponents.Player2Animator.SetBool("Win", true);
-                    }
-                    else if (IsDraw)
-                    {
-                        _resultPopupComponents.Player2Animator.SetBool("Lose", true);
                     }
                 }));
             sequence.Append(_resultPopupComponents.Buttons.GetComponent<CanvasGroup>().DOFade(1f, _animationDuration));

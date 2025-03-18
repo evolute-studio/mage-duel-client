@@ -8728,11 +8728,13 @@ MonoBehaviour:
   - {fileID: 8347239604913921469, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
   - {fileID: -865441132166308843, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
   - {fileID: -8287474855559688952, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  IdleAnimationDuration: 1
   RotationAnimationSprites:
   - {fileID: 6405886353336040251, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
   - {fileID: -1317421925859679065, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
   - {fileID: 2976416689233105051, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
   - {fileID: -6235145408938448629, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  RotationAnimationDuration: 0.5
   TimerText: {fileID: 6943568270974491141}
   TurnDuration: 120
   OnLocalPlayerTurnEnd:
@@ -9256,6 +9258,7 @@ MonoBehaviour:
   loop: 1
   delay: 0
   randomizeStart: 0
+  randomSpriteStart: 0
   maxRandomDelay: 0.5
   waitBetweenLoops: 0
   playOnAwake: 1
@@ -10340,6 +10343,7 @@ MonoBehaviour:
   loop: 1
   delay: 0
   randomizeStart: 0
+  randomSpriteStart: 0
   maxRandomDelay: 0.5
   waitBetweenLoops: 0
   playOnAwake: 1
@@ -11625,6 +11629,7 @@ MonoBehaviour:
   loop: 1
   delay: 0
   randomizeStart: 0
+  randomSpriteStart: 0
   maxRandomDelay: 0.5
   waitBetweenLoops: 0
   playOnAwake: 1
@@ -11980,9 +11985,9 @@ RectTransform:
   - {fileID: 4057928666761826034}
   - {fileID: 4180605947194505070}
   - {fileID: 734067159294863154}
+  - {fileID: 6955129890665289875}
   - {fileID: 4605563198992912521}
   - {fileID: 5787527547131607458}
-  - {fileID: 6955129890665289875}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

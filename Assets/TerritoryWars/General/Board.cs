@@ -64,8 +64,8 @@ namespace TerritoryWars.General
         {
             GenerateBorderSide(new Vector2Int(0, 0), new Vector2Int(9, 0), 0, border[0..8],true);
             GenerateBorderSide(new Vector2Int(9, 0), new Vector2Int(9, 9), 3, border[8..16]);
-            GenerateBorderSide(new Vector2Int(9, 9), new Vector2Int(0, 9), 2, border[16..24]);
-            GenerateBorderSide(new Vector2Int(0, 9), new Vector2Int(0, 0), 1, border[24..32], true);
+            GenerateBorderSide(new Vector2Int(8, 9), new Vector2Int(0, 9), 2, border[16..24]);
+            GenerateBorderSide(new Vector2Int(0, 9), new Vector2Int(0, 1), 1, border[24..32], true);
         }
         
         public void GenerateBorderSide(Vector2Int startPos, Vector2Int endPos, int rotationTimes, char[] border, bool swapOrderLayer = false)
@@ -150,6 +150,11 @@ namespace TerritoryWars.General
             {
                 PlaceTile(new TileData(fieldTile), endPos.x, endPos.y, -1);
                 tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = tileAssets.GetRandomMountain();
+                if (swapOrderLayer)
+                {
+                    tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer")
+                        .GetComponent<SpriteRenderer>().sortingOrder = 20;
+                }
             }
 
             for (int i = 0; i < availablePositions.Count; i++)
