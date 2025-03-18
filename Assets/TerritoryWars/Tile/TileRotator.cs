@@ -69,10 +69,10 @@ namespace TerritoryWars.Tile
                 _tileRenderers.PinsPositions = pins;
             }
 
-            foreach (var spriteLayerSwapElement in SpriteLayerSwapElements)
-            {
-                spriteLayerSwapElement.Rotate();
-            }
+            // foreach (var spriteLayerSwapElement in SpriteLayerSwapElements) - this logic now disabled!
+            // {
+            //     spriteLayerSwapElement.Rotate();
+            // }
             OnRotation?.Invoke();
         }
 
@@ -177,13 +177,13 @@ namespace TerritoryWars.Tile
                 }
             }
 
-            if (SpriteLayerSwapElements != null)
-            {
-                foreach (var spriteLayerSwapElement in SpriteLayerSwapElements)
-                {
-                    spriteLayerSwapElement.Rotate(times);
-                }
-            }
+            // if (SpriteLayerSwapElements != null) - this logic now disabled!
+            // {
+            //     foreach (var spriteLayerSwapElement in SpriteLayerSwapElements)
+            //     {
+            //         spriteLayerSwapElement.Rotate(times);
+            //     }
+            // }
         }
 
         private void Update()
