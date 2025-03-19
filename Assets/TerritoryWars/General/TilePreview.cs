@@ -213,6 +213,11 @@ namespace TerritoryWars.General
             if (tileGenerator.CurrentTileGO != null)
             {
                 TileRenderers tileRenderers = tileGenerator.CurrentTileGO.GetComponent<TileRenderers>();
+
+                foreach (var spriteRenderer in tileRenderers.Enviroment.GetComponentsInChildren<SpriteRenderer>())
+                {
+                    spriteRenderer.sortingLayerName = "Default";
+                }
                 
                 if (tileRenderers.TileFencePlacer != null)
                 {

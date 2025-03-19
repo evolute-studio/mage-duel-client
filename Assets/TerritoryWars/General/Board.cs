@@ -146,6 +146,12 @@ namespace TerritoryWars.General
                     tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer")
                         .GetComponent<SpriteRenderer>().sortingOrder = 20;
                 }
+
+                tileObjects[startPos.x, startPos.y].GetComponentsInChildren<TileRenderers>().ToList().ForEach(
+                    renderer =>
+                    {
+                        renderer.Enviroment.SetActive(false);
+                    });
             }
 
             if (endPos != new Vector2Int(9, 0) && endPos != new Vector2Int(0, 9))
@@ -159,6 +165,11 @@ namespace TerritoryWars.General
                     tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer")
                         .GetComponent<SpriteRenderer>().sortingOrder = 20;
                 }
+                tileObjects[endPos.x, endPos.y].GetComponentsInChildren<TileRenderers>().ToList().ForEach(
+                    renderer =>
+                    {
+                        renderer.Enviroment.SetActive(false);
+                    });
             }
 
             for (int i = 0; i < availablePositions.Count; i++)
@@ -213,6 +224,12 @@ namespace TerritoryWars.General
                         }
                     });
                 }
+                
+                tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileRenderers>().ToList().ForEach(
+                    renderer =>
+                    {
+                        renderer.Enviroment.SetActive(false);
+                    });
             }
         }
         
