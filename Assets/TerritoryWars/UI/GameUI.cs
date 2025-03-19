@@ -174,6 +174,7 @@ namespace TerritoryWars.UI
 
         private void OnEndTurnClicked()
         {
+            SetEndTurnButtonActive(false);
             _sessionManager.EndTurn();
             UpdateUI();
             SetActiveDeckContainer(false);

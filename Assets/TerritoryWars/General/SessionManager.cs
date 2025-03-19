@@ -349,6 +349,7 @@ namespace TerritoryWars.General
             if (TileSelector.CurrentTile != null && CurrentTurnPlayer == LocalPlayer)
             {
                 TileSelector.PlaceCurrentTile();
+                TileSelector.ClearHighlights();
             }
         }
         
