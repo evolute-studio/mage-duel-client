@@ -39,9 +39,6 @@ namespace TerritoryWars.General
         public void Initialize()
         {
             structureChecker = new StructureChecker(this);
-            //var debugger = gameObject.AddComponent<StructureDebugger>();
-            //debugger.Initialize(structureChecker, this);
-            //Random.InitState(4);
             InitializeBoard();
             var onChainBoard = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
             char[] edgeTiles = OnChainBoardDataConverter.GetInitialEdgeState(onChainBoard.initial_edge_state);
@@ -297,10 +294,19 @@ namespace TerritoryWars.General
 
                     if (type == StructureType.All || type == StructureType.Road)
                     {
-                        foreach (var pin in tileGenerator.Pins)
+                        TileGenerator placedTileGenerator = tileObjects[x, y].GetComponent<TileGenerator>();
+                        List<Side> roadSides = neighborsData[i].GetRoadSides();
+                        if (roadSides.Count == 0) continue;
+                        
+                        for (int j = 0; j < tileGenerator.Pins.Count; j++)
                         {
-                            if (pin == null) continue;
-                            pin.SetPin(owner);
+                            if (tileGenerator.Pins[j] == null) continue;
+                            Side oppositeSide = GetOppositeSide((Side)j);
+                            RoadPin placedTilePin = placedTileGenerator.Pins[(int)oppositeSide];
+                            if (placedTilePin == null) continue;
+                            int ownerToSet = placedTilePin.OwnerId;
+                            tileGenerator.Pins[j].SetPin(ownerToSet);
+                            
                         }
                     }
                 }

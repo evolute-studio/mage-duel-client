@@ -5,6 +5,7 @@ namespace TerritoryWars
 {
     public class RoadPin : MonoBehaviour
     {
+        public int OwnerId = 0;
         public int PointsCount = 1;
         public SpriteRenderer SpriteRenderer;
         
@@ -21,6 +22,7 @@ namespace TerritoryWars
         
         public void SetPin(int playerIndex)
         {
+            OwnerId = playerIndex;
             playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex) + 1;
             int pinIndex = playerIndex + (PointsCount - 1) * 3;
             SpriteRenderer.sprite = PinsSprites[pinIndex];

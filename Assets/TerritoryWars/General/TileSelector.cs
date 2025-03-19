@@ -69,7 +69,7 @@ namespace TerritoryWars.General
                 }
                 
 
-                if (isPlacingTile)
+                if (isPlacingTile)// && SessionManager.Instance.IsLocalPlayerTurn)
                 {
                     HandleTilePlacement();
                     
@@ -105,7 +105,7 @@ namespace TerritoryWars.General
             var hit = Physics2D.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition).origin,
                 Vector2.zero, Mathf.Infinity, backgroundLayer);
 
-            if (hit.collider != null && hit.collider.name.StartsWith("Tile_"))
+            if (hit.collider != null && hit.collider.name.StartsWith("Highlight_"))
             {
                 string[] coordinates = hit.collider.name.Split('_');
                 if (coordinates.Length == 3 &&
@@ -175,9 +175,9 @@ namespace TerritoryWars.General
             highlighUpperBorderSpriteRenderer.sprite = highlightUpperBorderSprite;
             highlighUpperBorderSpriteRenderer.material = highlightMaterial;
             highlighUpperBorderSpriteRenderer.sortingOrder = 12;
-            if (spriteRenderer.gameObject.layer != LayerMask.NameToLayer("TileHover"))
+            if (spriteRenderer.gameObject.layer != LayerMask.NameToLayer("BackgroundBoard"))
             {
-                spriteRenderer.gameObject.layer = LayerMask.NameToLayer("TileHover");
+                spriteRenderer.gameObject.layer = LayerMask.NameToLayer("BackgroundBoard");
             }
      
             // add this points

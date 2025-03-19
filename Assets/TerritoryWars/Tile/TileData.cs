@@ -83,6 +83,19 @@ namespace TerritoryWars.Tile
             return id + ":" + rotationIndex;
         }
         
+        public List<Side> GetRoadSides()
+        {
+            List<Side> roadSides = new List<Side>();
+            for (int i = 0; i < 4; i++)
+            {
+                if (sides[i] == 'R')
+                {
+                    roadSides.Add((Side)((i + rotationIndex) % 4));
+                }
+            }
+            return roadSides;
+        }
+        
         public string GetConfigWithoutRotation()
         {
             return id;
