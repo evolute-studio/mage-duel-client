@@ -70,7 +70,7 @@ namespace TerritoryWars.General
         
         public void GenerateBorderSide(Vector2Int startPos, Vector2Int endPos, int rotationTimes, char[] border, bool swapOrderLayer = false)
         {
-            string roadTile = "FRFR";
+            string roadTile = "FFFR";
             string cityTile = "FFFC";
             string fieldTile = "FFFF";
             // eg Start (9, 9) end (9, 0)
@@ -177,6 +177,18 @@ namespace TerritoryWars.General
                     TileRotator.GetMirrorRotationStatic(borderArc, rotationTimes);
                     var pins = tileObjects[availablePositions[i].x, availablePositions[i].y]
                         .GetComponent<TileGenerator>().Pins;
+                    tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileRenderers>().ToList().ForEach(renderer =>
+                    {
+                        renderer.Mill.SetActive(false);
+                        renderer.Forest[rotationTimes].SetActive(true);
+                        if (swapOrderLayer)
+                        {
+                            renderer.Forest[rotationTimes].GetComponentsInChildren<SpriteRenderer>().ToList().ForEach(sr =>
+                            {
+                                sr.sortingOrder = 20;
+                            });
+                        }
+                    });
                     foreach (var pin in pins)
                     {
                         if (pin == null) continue;
