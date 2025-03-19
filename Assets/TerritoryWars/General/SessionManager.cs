@@ -365,7 +365,7 @@ namespace TerritoryWars.General
         {
             bool isLocalPlayer = lastMovePlayerAddress == LocalPlayer.Address.Hex();
             CurrentTurnPlayer = isLocalPlayer ? RemotePlayer : LocalPlayer;
-            gameUI.SetEndTurnButtonActive(!isLocalPlayer);
+            gameUI.SetEndTurnButtonActive(false);
             Invoke(nameof(StartTurn), 1f);
         }
 

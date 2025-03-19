@@ -64,8 +64,8 @@ namespace TerritoryWars.General
         {
             GenerateBorderSide(new Vector2Int(0, 0), new Vector2Int(9, 0), 0, border[0..8],true);
             GenerateBorderSide(new Vector2Int(9, 0), new Vector2Int(9, 9), 3, border[8..16]);
-            GenerateBorderSide(new Vector2Int(8, 9), new Vector2Int(0, 9), 2, border[16..24]);
-            GenerateBorderSide(new Vector2Int(0, 9), new Vector2Int(0, 1), 1, border[24..32], true);
+            GenerateBorderSide(new Vector2Int(9, 9), new Vector2Int(0, 9), 2, border[16..24]);
+            GenerateBorderSide(new Vector2Int(0, 9), new Vector2Int(0, 0), 1, border[24..32], true);
         }
         
         public void GenerateBorderSide(Vector2Int startPos, Vector2Int endPos, int rotationTimes, char[] border, bool swapOrderLayer = false)
@@ -135,6 +135,8 @@ namespace TerritoryWars.General
             }
             else
             {
+                if(GetTileObject(startPos.x, startPos.y) != null)
+                    Destroy(GetTileObject(startPos.x, startPos.y));
                 // Place mountains at start and end positions
                 PlaceTile(new TileData(fieldTile), startPos.x, startPos.y, -1);
                 // Don't place forests, only mountains at other corners
@@ -148,6 +150,8 @@ namespace TerritoryWars.General
 
             if (endPos != new Vector2Int(9, 0) && endPos != new Vector2Int(0, 9))
             {
+                if(GetTileObject(endPos.x, endPos.y) != null)
+                    Destroy(GetTileObject(endPos.x, endPos.y));
                 PlaceTile(new TileData(fieldTile), endPos.x, endPos.y, -1);
                 tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = tileAssets.GetRandomMountain();
                 if (swapOrderLayer)
@@ -225,16 +229,24 @@ namespace TerritoryWars.General
 
             return true;
         }
+        
+        public enum StructureType
+        {
+            City,
+            Road,
+            All,
+            None,
+        }
 
-        public void CheckAndConnectEdgeStructure(int ownerId, int x, int y)
+        public void CheckAndConnectEdgeStructure(int ownerId, int x, int y, StructureType type)
         {
             if( (x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
             {
-                TryConnectEdgeStructure(ownerId, x, y);
+                TryConnectEdgeStructure(ownerId, x, y, type);
             }
         }
 
-        private void TryConnectEdgeStructure(int owner, int x, int y)
+        private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All)
         {
             GameObject[] neighborsGO = new GameObject[4];
             TileData[] neighborsData = new TileData[4];
@@ -260,16 +272,22 @@ namespace TerritoryWars.General
                 if(IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
-                    foreach (var renderer in tileGenerator.houseRenderers)
+                    if (type == StructureType.All || type == StructureType.City)
                     {
-                        //renderer.sprite = tileAssets.GetHouseByReference(renderer.sprite, owner);
-                        tileGenerator.RecolorHouses(owner);
+                        foreach (var renderer in tileGenerator.houseRenderers)
+                        {
+                            //renderer.sprite = tileAssets.GetHouseByReference(renderer.sprite, owner);
+                            tileGenerator.RecolorHouses(owner);
+                        }
                     }
 
-                    foreach (var pin in tileGenerator.Pins)
+                    if (type == StructureType.All || type == StructureType.Road)
                     {
-                        if (pin == null) continue;
-                        pin.SetPin(owner);
+                        foreach (var pin in tileGenerator.Pins)
+                        {
+                            if (pin == null) continue;
+                            pin.SetPin(owner);
+                        }
                     }
                 }
             }
