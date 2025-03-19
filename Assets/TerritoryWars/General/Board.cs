@@ -199,6 +199,20 @@ namespace TerritoryWars.General
                         pin.Initialize(-1, 1);
                     }
                 }
+                else if (tilesToSpawn[i] == cityTile)
+                {
+                    tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileRenderers>().ToList().ForEach(renderer =>
+                    {
+                        renderer.Forest[rotationTimes].SetActive(true);
+                        if (swapOrderLayer)
+                        {
+                            renderer.Forest[rotationTimes].GetComponentsInChildren<SpriteRenderer>().ToList().ForEach(sr =>
+                            {
+                                sr.sortingOrder = 20;
+                            });
+                        }
+                    });
+                }
             }
         }
         
