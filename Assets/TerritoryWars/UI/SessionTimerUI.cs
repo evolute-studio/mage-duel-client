@@ -33,7 +33,7 @@ namespace TerritoryWars.UI
         
         private bool _isLocalPlayerTurn => SessionManager.Instance.IsLocalPlayerTurn;
         private bool _isTimerActive => _currentTurnTime > 0;
-        private string _opponentPlayerName = "opponent`s";
+        private string _opponentPlayerName = "opponent's";
 
         public void Update()
         {

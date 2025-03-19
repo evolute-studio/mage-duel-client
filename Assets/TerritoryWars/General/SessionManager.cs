@@ -212,7 +212,16 @@ namespace TerritoryWars.General
                 .DOPath(rightCharacterPath, 2.5f, PathType.CatmullRom)
                 .SetEase(Ease.OutQuad);
             
+            Camera camera = Camera.main;
+            float startOrthographicSize = 5.5f;
+            float endOrthographicSize = 4f;
+            camera.orthographicSize = startOrthographicSize;
+            Sequence sequence = DOTween.Sequence();
+            sequence.AppendInterval(0.5f);
+            sequence.Append(DOTween.To(() => camera.orthographicSize, x => camera.orthographicSize = x, endOrthographicSize, 2.5f));
+            sequence.Play();
             
+
         }
 
         public void StartGame()
