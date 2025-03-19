@@ -13,6 +13,7 @@ public class TileRenderers : MonoBehaviour
     public GameObject Mill;
     public List<CloserToBorderFence> CloserToBorderFences;
     public Transform[] PinsPositions;
+    public GameObject[] Forest;
 
     [Serializable]
     public class CloserToBorderFence

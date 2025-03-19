@@ -57,7 +57,7 @@ namespace TerritoryWars.UI
 
             if (_currentTurnTime <= TurnDuration / 4)
             {
-                TimerText.color = Color.red;
+                TimerText.color = new Color(220f,20f,60f);
             }
             
             if (_currentTurnTime <= 0)
