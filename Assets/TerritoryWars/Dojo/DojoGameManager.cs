@@ -365,6 +365,10 @@ namespace TerritoryWars.Dojo
             }
         }
         
+        public FieldElement SnapshotIdToLoad;
+
+        
+        
         public async void CreateGameFromSnapshot(FieldElement snapshotId)
         {
             try
@@ -390,6 +394,14 @@ namespace TerritoryWars.Dojo
                 if (BoardToShow != null)
                 {
                     LoadAndShowBoard(BoardToShow);
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                CustomLogger.LogInfo("S pressed");
+                if (SnapshotIdToLoad != null)
+                {
+                    CreateGameFromSnapshot(SnapshotIdToLoad);
                 }
             }
         }
