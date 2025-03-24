@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -70,6 +71,11 @@ namespace TerritoryWars.UI.Popups
         
         public void SetFirstOption(string text, UnityAction action)
         {
+            if(String.IsNullOrEmpty(text) || action == null)
+            {
+                FirstOptionButton.gameObject.SetActive(false);
+                return;
+            }
             FirstOptionButton.gameObject.SetActive(true);
             FirstOptionText.text = text;
             FirstOptionButton.onClick.AddListener(() =>
@@ -82,6 +88,11 @@ namespace TerritoryWars.UI.Popups
         
         public void SetSecondOption(string text, UnityAction action)
         {
+            if(String.IsNullOrEmpty(text) || action == null)
+            {
+                SecondOptionButton.gameObject.SetActive(false);
+                return;
+            }
             SecondOptionButton.gameObject.SetActive(true);
             SecondOptionText.text = text;
             SecondOptionButton.onClick.AddListener(() =>

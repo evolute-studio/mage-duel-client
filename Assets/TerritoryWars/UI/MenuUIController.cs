@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
+using TerritoryWars.UI.Popups;
 using UnityEngine;
 
 namespace TerritoryWars.UI
@@ -49,6 +50,11 @@ namespace TerritoryWars.UI
         {
             await DojoGameManager.Instance.CreateAccount(true);
             Initialize();
+        }
+
+        public void OpenNewAccountPopup()
+        {
+            PopupManager.Instance.ShowNewAccountPopup();
         }
     }
 }

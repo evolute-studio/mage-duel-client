@@ -23,14 +23,6 @@ namespace TerritoryWars.UI.Popups
         }
         
         public MessagePopupBase MessagePopup;
-
-        public void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.T))
-            {
-                ShowTestPopup();
-            }
-        }
         
         
         public void ShowOpponentCancelGame()
@@ -42,6 +34,23 @@ namespace TerritoryWars.UI.Popups
                 FirstOptionAction = () =>
                 {
                     CustomSceneManager.Instance.LoadLobby();
+                }
+            };
+            MessagePopup.Setup(popupConfig);
+            MessagePopup.SetActive(true);
+        }
+        
+        public void ShowNewAccountPopup()
+        {
+            PopupConfig popupConfig = new PopupConfig
+            {
+                Text = "Are you sure you want to create a new account?",
+                FirstOptionText = "Cancel",
+                FirstOptionAction = () => { },
+                SecondOptionText = "Create",
+                SecondOptionAction = () =>
+                {
+                    MenuUIController.Instance.NewAccount();
                 }
             };
             MessagePopup.Setup(popupConfig);
