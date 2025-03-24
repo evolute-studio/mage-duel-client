@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Dojo;
 using Dojo.Starknet;
 using TerritoryWars.General;
@@ -39,6 +40,13 @@ namespace TerritoryWars.Dojo
                 if (_localPlayerBoard == null)
                 {
                     _localPlayerBoard = GetLocalPlayerBoard();
+                }
+                // TODO: Delete this check
+                if (_localPlayerBoard == null)
+                {
+                    _localPlayerBoard = DojoGameManager.Instance.WorldManager.Entities<evolute_duel_Board>()
+                        .FirstOrDefault()
+                        ?.GetComponent<evolute_duel_Board>();
                 }
 
                 return _localPlayerBoard;
