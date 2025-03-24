@@ -101,7 +101,7 @@ namespace TerritoryWars.General
             OnModelPassed.Invoke(model);
         }
         
-        private static void DestroyModel(ModelInstance model)
+        public static void DestroyModel(ModelInstance model)
         {
             if(model == null || model.gameObject == null) return;
             CustomLogger.LogInfo($"Filter Mode: [{ApplicationState.CurrentState}] Destroying model. Model type: {model.GetType().Name} GameObject name: {model.gameObject.name}");

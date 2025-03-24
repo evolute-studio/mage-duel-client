@@ -91,15 +91,37 @@ namespace TerritoryWars.General
         public void Initialize()
         {
             CustomLogger.LogImportant("SessionManager.Initialize()");
+            InitializePlayers();
+            InitializeBoard();
+            DojoGameManager.Instance.SessionManager.UpdateBoardAfterRoadContest();
+            DojoGameManager.Instance.SessionManager.UpdateBoardAfterCityContest();
+            JokerManager = new JokerManager(this);
+            gameUI.Initialize();
+            sessionUI.Initialization();
             evolute_duel_Board board = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
+            int cityScoreBlue = board.blue_score.Item1;
+            int cartScoreBlue = board.blue_score.Item2;
+            int cityScoreRed = board.red_score.Item1;
+            int cartScoreRed = board.red_score.Item2;
+            GameUI.Instance.SessionUI.SetCityScores(cityScoreBlue, cityScoreRed);
+            GameUI.Instance.SessionUI.SetRoadScores(cartScoreBlue, cartScoreRed);
+            GameUI.Instance.SessionUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
+            GameUI.Instance.SessionUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(SkipMove);
+            JokerManager.Initialize(board);
+            SetTilesInDeck(board.available_tiles_in_deck.Length);
+            StartGame();
+        }
+
+        private void InitializeBoard()
+        {
+            evolute_duel_Board board = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
+            List<evolute_duel_Move> processedMoves = new List<evolute_duel_Move>();
             FieldElement lastMoveId = board.last_move_id switch
             {
                 Option<FieldElement>.Some some => some.value,
                 _ => null
             };
             SimpleStorage.SaveCurrentBoardId(board.id.Hex());
-            
-            InitializePlayers();
             Board.Initialize();
             if (lastMoveId != null)
             {
@@ -132,26 +154,17 @@ namespace TerritoryWars.General
 
                     tile.Rotate((rotation + 3) % 4);
                     Board.PlaceTile(tile, x, y, owner);
+                    processedMoves.Add(move);
                 }
-                
-                // set scores
+
+                GameObject[] allMoves = DojoGameManager.Instance.WorldManager.Entities<evolute_duel_Move>();
+                foreach (var move in allMoves)
+                {
+                    evolute_duel_Move moveComponent = move.GetComponent<evolute_duel_Move>();
+                    if (processedMoves.Contains(moveComponent)) continue;
+                    IncomingModelsFilter.DestroyModel(moveComponent);
+                }
             } 
-            DojoGameManager.Instance.SessionManager.UpdateBoardAfterRoadContest();
-            DojoGameManager.Instance.SessionManager.UpdateBoardAfterCityContest();
-            JokerManager = new JokerManager(this);
-            gameUI.Initialize();
-            sessionUI.Initialization();
-            int cityScoreBlue = board.blue_score.Item1;
-            int cartScoreBlue = board.blue_score.Item2;
-            int cityScoreRed = board.red_score.Item1;
-            int cartScoreRed = board.red_score.Item2;
-            GameUI.Instance.SessionUI.SetCityScores(cityScoreBlue, cityScoreRed);
-            GameUI.Instance.SessionUI.SetRoadScores(cartScoreBlue, cartScoreRed);
-            GameUI.Instance.SessionUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
-            GameUI.Instance.SessionUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(SkipMove);
-            JokerManager.Initialize(board);
-            SetTilesInDeck(board.available_tiles_in_deck.Length);
-            StartGame();
         }
 
         private void InitializePlayers()
