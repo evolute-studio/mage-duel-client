@@ -193,10 +193,12 @@ namespace TerritoryWars.General
                     {
                         renderer.Mill.SetActive(false);
                         renderer.Forest[rotationTimes].SetActive(true);
+                        renderer.RoadRenderers.gameObject.SetActive(false);
                         if (swapOrderLayer)
                         {
                             renderer.Forest[rotationTimes].GetComponentsInChildren<SpriteRenderer>().ToList().ForEach(sr =>
                             {
+                                if(sr.gameObject.name == "RoadRenderer") return;
                                 sr.sortingOrder = 20;
                             });
                         }

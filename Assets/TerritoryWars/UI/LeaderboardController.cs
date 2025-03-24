@@ -1,31 +1,83 @@
+using System.Collections.Generic;
+using Dojo;
+using TerritoryWars.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LeaderboardController : MonoBehaviour
 {
-    [SerializeField] private Image[] _leadersImages;
+    public GameObject PanelGameObject;
+    public GameObject ListItemPrefab;
+    [SerializeField] private Sprite[] _leadersImages;
     [SerializeField] private GameObject _placeHolder;
     [SerializeField] private Transform ListItemParent;
 
 
-    // public LeaderboardItem CreateLeaderboardItem()
-    // {
-    //     
-    // }
+    private List<LeaderboardItem> _leaderboardItems = new List<LeaderboardItem>();
+    private List<ModelInstance> _models = new List<ModelInstance>();
+    private List<GameObject> _leaderboardObjects = new List<GameObject>();
+
     
-    
-    
+    public void Start() => Initialize();
+
+    public void Initialize()
+    {
+        
+    }
+
+    public LeaderboardItem CreateLeaderboardItem()
+    {
+        GameObject listItem = Instantiate(ListItemPrefab, ListItemParent);
+        LeaderboardItem leaderboardItem = new LeaderboardItem(listItem);
+        _leaderboardItems.Add(leaderboardItem);
+        return leaderboardItem;
+    }
+
+    public async void SetActivePanel(bool isActive)
+    {
+        if (isActive && MenuUIController.Instance._namePanelController.IsDefaultName())
+        {
+            MenuUIController.Instance._changeNamePanelUIController.SetNamePanelActive(true);
+            return;
+        }
+        
+        PanelGameObject.SetActive(isActive);
+        
+        
+    }
+
+    private void ClearAllListItems()
+    {
+        foreach (var matchListItem in _leaderboardItems)
+        {
+            Destroy(matchListItem.ListItem);
+        }
+
+        _leaderboardItems.Clear();
+    }
+
+    public void FetchData()
+    {
+        
+    }
+
+    public void ModelUpdated(ModelInstance modelInstance)
+    {
+        
+    }
+
+
+
     public void SetActivePlaceHolder(bool isActive)
     {
         _placeHolder.SetActive(isActive);
     }
-    
-    
+}
 
 
-    public class LeaderboardItem
-    {
+public class LeaderboardItem
+{
         public GameObject ListItem;
         public string PlayerName;
         public int EvoluteCount;
@@ -52,5 +104,4 @@ public class LeaderboardController : MonoBehaviour
         {
             
         }
-    }
 }
