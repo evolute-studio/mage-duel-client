@@ -8,6 +8,7 @@ using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using TerritoryWars.UI.Popups;
 using UnityEngine;
 
 namespace TerritoryWars.Dojo
@@ -285,12 +286,9 @@ namespace TerritoryWars.Dojo
                hostPlayer != SessionManager.Instance.RemotePlayer.Address.Hex()) return;
             
             SimpleStorage.ClearCurrentBoardId();
-            CustomSceneManager.Instance.LoadLobby();
-            // AlertPopupUI.IsGameCanceled = true;
-            //GameUI.Instance.ShowResultPopUp();
+            PopupManager.Instance.ShowOpponentCancelGame();
         }
 
-        
         private ClashAnimation CreateContestAnimation()
         {
             Vector3 offset = new Vector3(0, 0.5f, 0);

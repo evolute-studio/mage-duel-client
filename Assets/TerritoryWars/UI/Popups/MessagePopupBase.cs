@@ -12,8 +12,8 @@ namespace TerritoryWars.UI.Popups
         public TextMeshProUGUI MessageText;
 
         public TextMeshProUGUI FirstOptionText;
-        public Button FirstOptionButton;
         public TextMeshProUGUI SecondOptionText;
+        public Button FirstOptionButton;
         public Button SecondOptionButton;
         
         public void SetActive(bool active)
@@ -45,11 +45,7 @@ namespace TerritoryWars.UI.Popups
 
         protected virtual void SetActiveFalseLogic()
         {
-            Popup.gameObject.SetActive(false);
-            FirstOptionButton.onClick.RemoveAllListeners();
-            SecondOptionButton.onClick.RemoveAllListeners();
-            FirstOptionButton.gameObject.SetActive(false);
-            SecondOptionButton.gameObject.SetActive(false);
+            Reset();
         }
 
         protected virtual void SetActiveFalseView()
@@ -58,6 +54,13 @@ namespace TerritoryWars.UI.Popups
             hideSequence.Append(Popup.DOScale(Vector3.zero, 0.2f).SetEase(Ease.InBack))
                 .Join(Popup.GetComponent<CanvasGroup>().DOFade(0f, 0.2f))
                 .OnComplete(SetActiveFalseLogic);
+        }
+
+        public void Setup(PopupConfig config)
+        {
+            SetMessage(config.Text);
+            SetFirstOption(config.FirstOptionText, config.FirstOptionAction);
+            SetSecondOption(config.SecondOptionText, config.SecondOptionAction);
         }
         
         public void SetMessage(string message)
@@ -72,7 +75,7 @@ namespace TerritoryWars.UI.Popups
             FirstOptionButton.onClick.AddListener(() =>
             {
                 action?.Invoke();
-                gameObject.SetActive(false);
+                SetActive(false);
                 
             });
         }
@@ -84,8 +87,20 @@ namespace TerritoryWars.UI.Popups
             SecondOptionButton.onClick.AddListener(() =>
             {
                 action?.Invoke();
-                gameObject.SetActive(false);
+                SetActive(false);
             });
+        }
+        
+        public void Reset()
+        {
+            SetMessage("");
+            SetFirstOption("", null);
+            SetSecondOption("", null);
+            Popup.gameObject.SetActive(false);
+            FirstOptionButton.onClick.RemoveAllListeners();
+            SecondOptionButton.onClick.RemoveAllListeners();
+            FirstOptionButton.gameObject.SetActive(false);
+            SecondOptionButton.gameObject.SetActive(false);
         }
     }
 }
