@@ -17,6 +17,13 @@ namespace TerritoryWars.UI.Popups
         public Button FirstOptionButton;
         public Button SecondOptionButton;
         
+        private Vector3 _initialPosition;
+
+        public void Start()
+        {
+            _initialPosition = Popup.localPosition;
+        }
+        
         public void SetActive(bool active)
         {
             if (active)
@@ -37,10 +44,11 @@ namespace TerritoryWars.UI.Popups
 
         protected virtual void SetActiveTrueView()
         {
-            Popup.localScale = Vector3.zero;
+            Popup.localScale = Vector3.one * 0.7f;
+            Popup.localPosition = _initialPosition;
             Sequence showSequence = DOTween.Sequence();
             showSequence.Append(Popup.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBack))
-                .Join(Popup.DOLocalMoveY(Popup.localPosition.y + 30f, 0.3f).From())
+                .Join(Popup.DOLocalMoveY(_initialPosition.y + 30f, 0.3f).From())
                 .Join(Popup.GetComponent<CanvasGroup>().DOFade(1f, 0.3f).From(0f));
         }
 
