@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using DG.Tweening;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace TerritoryWars.UI
@@ -28,7 +30,7 @@ namespace TerritoryWars.UI
         public GameObject AppliedText;
         public Image ApplyButtonImage;
         private bool isAnimating = false;
-        [SerializeField] private float AnimationDuration = 1.5f;
+        [SerializeField] private float WaitingForShift = 1.5f;
 
         public Sprite ActiveButtonSprite;
         public Sprite DisabledButtonSprite;
@@ -37,6 +39,12 @@ namespace TerritoryWars.UI
         {
             int evoluteBalance = MenuUIController.Instance._namePanelController.EvoluteBalance;
             currentCharacterIndex = PlayerCharactersManager.GetCurrentCharacterId();
+            
+            while(currentCharacterIndex != characters[1].CharacterId)
+            {
+                ShiftCharacters(true);
+            }
+
             foreach (var character in characters)
             {
                 if (evoluteBalance >= character.CharacterId)
@@ -49,6 +57,8 @@ namespace TerritoryWars.UI
                 }
             }
         }
+
+        
 
         public void Start()
         {
@@ -64,13 +74,6 @@ namespace TerritoryWars.UI
 
         public void ShiftCharacters(bool isRight)
         {
-            // shift array characters
-            if(isAnimating)
-                return;
-            
-            isAnimating = true;
-            StartCoroutine(SimpleTimer(AnimationDuration, () => { isAnimating = false; }));
-            
             if (isRight)
             {
                 Character temp = characters[characters.Length - 1];
@@ -111,15 +114,8 @@ namespace TerritoryWars.UI
                     sequence.AppendInterval(animationDuration * 0.5f);
                     sequence.AppendCallback(() =>
                     {
-                        Debug.Log("Play. I");
-                        characters[1].CharacterAnimator.Play(characters[1].SelectedSprites);
+                        characters[1].CharacterAnimator.PlaySpecial(characters[1].SelectedSprites);
                     });
-                    sequence.AppendInterval(characters[i].CharacterAnimator.duration);
-                    sequence.AppendCallback(() =>
-                    {
-                        characters[1].CharacterAnimator.Play(characters[1].IdleSprites);
-                    });
-
                     sequence.Play();
                 }
 
@@ -153,11 +149,11 @@ namespace TerritoryWars.UI
         }
         
         
-        private IEnumerator SimpleTimer(float duration, Action callback)
-        {
-            yield return new WaitForSeconds(duration);
-            callback?.Invoke();
-        }
+        // private IEnumerator SimpleTimer(float duration, Action callback)
+        // {
+        //     yield return new WaitForSeconds(duration);
+        //     callback?.Invoke();
+        // }
 
         public void UpdateButtons()
         {
@@ -199,11 +195,6 @@ namespace TerritoryWars.UI
             }
             
         }
-        
-        
-
-
-
     }
 
     [Serializable]

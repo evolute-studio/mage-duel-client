@@ -149,13 +149,27 @@ namespace TerritoryWars.Tools
                     break;
                 }
                 
-                
-
                 if (waitBetweenLoops > 0)
                 {
                     yield return new WaitForSeconds(waitBetweenLoops);
                 }
             }
+        }
+        
+        public void PlaySpecial(Sprite[] specialSprites)
+        {
+            Stop();
+            StartCoroutine(SpecialAnimation(specialSprites, () => Play()));
+        }
+
+        private IEnumerator SpecialAnimation(Sprite[] specialSprites, Action callback = null)
+        {
+            foreach (var sprite in specialSprites)
+            {
+                SetSprite(sprite);
+                yield return new WaitForSeconds(duration / specialSprites.Length);
+            }
+            callback?.Invoke();
         }
 
         public void OnEnable()
