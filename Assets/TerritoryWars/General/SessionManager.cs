@@ -5,6 +5,7 @@ using System.Linq;
 using DG.Tweening;
 using Dojo.Starknet;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
@@ -55,7 +56,9 @@ namespace TerritoryWars.General
 
             if (!CustomSceneManager.Instance.LoadingScreen.IsLoading)
             {
-                CustomSceneManager.Instance.LoadingScreen.SetActive(true, DojoGameManager.Instance.CancelGame, LoadingScreen.connectingText);
+                CustomSceneManager.Instance.LoadingScreen.SetActive(true, 
+                    () => DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount), 
+                    LoadingScreen.connectingText);
             }
         }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TerritoryWars;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
 using UnityEngine;
@@ -44,7 +45,9 @@ public class NamePanelController : MonoBehaviour
             CustomLogger.LogWarning("profile is null");
             
             string defaultName = DojoGameManager.Instance.LocalBurnerAccount.Address.Hex().Substring(0, 10);
-            DojoGameManager.Instance.SetPlayerName(CairoFieldsConverter.GetFieldElementFromString(defaultName));
+            DojoConnector.ChangeUsername(
+                DojoGameManager.Instance.LocalBurnerAccount,
+                CairoFieldsConverter.GetFieldElementFromString(defaultName));
             SetName(defaultName);
             SetEvoluteBalance(0);
             return;

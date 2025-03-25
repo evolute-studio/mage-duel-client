@@ -6,7 +6,7 @@ namespace TerritoryWars.Tools
     {
         Info,
         Warning,
-        Event,
+        Execution,
         Error,
         Important,
         DojoLoop,
@@ -18,7 +18,7 @@ namespace TerritoryWars.Tools
         {
             {LogType.Info, "#808080"},      
             {LogType.Warning, "#FFA500"},    
-            {LogType.Event, "#32CD32"}, 
+            {LogType.Execution, "#32CD32"}, 
             {LogType.Error, "#DC143C"},        
             {LogType.Important, "#9441e0"},
             {LogType.DojoLoop, "#FFD700"}
@@ -28,7 +28,7 @@ namespace TerritoryWars.Tools
         {
             {LogType.Info, true},
             {LogType.Warning, true},
-            {LogType.Event, true},
+            {LogType.Execution, true},
             {LogType.Error, true},
             {LogType.Important, true},
             {LogType.DojoLoop, true}
@@ -52,9 +52,9 @@ namespace TerritoryWars.Tools
             Log(LogType.Warning, message);
         }
         
-        public static void LogEvent(string message)
+        public static void LogExecution(string message)
         {
-            Log(LogType.Event, message);
+            Log(LogType.Execution, message);
         }
         
         public static void LogError(string message)

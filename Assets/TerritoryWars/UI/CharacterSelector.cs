@@ -3,6 +3,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using DG.Tweening;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using TMPro;
@@ -144,7 +145,7 @@ namespace TerritoryWars.UI
         {
             currentCharacterIndex = characters[1].CharacterId;
             characters[1].Locker?.Unlock();
-            DojoGameManager.Instance.ChangePlayerSkin(characters[1].CharacterId);
+            DojoConnector.ChangeSkin(DojoGameManager.Instance.LocalBurnerAccount, characters[1].CharacterId);
             UpdateButtons();
         }
         

@@ -22,8 +22,19 @@ public abstract record PlayerSide() : Enum {
 
 // Type definition for `core::option::Option::<core::integer::u8>` enum
 public abstract record Option<A>() : Enum {
+    
     public record Some(A value) : Option<A>;
     public record None() : Option<A>;
+    
+    public A Unwrap()
+    {
+        return this switch
+        {
+            Some some => some.value,
+            None => default,
+            _ => throw new Exception("Unexpected case in Unwrap")
+        };
+    }
 }
 
 

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Dojo;
 using Dojo.Starknet;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
@@ -131,7 +132,7 @@ namespace TerritoryWars.Dojo
             bool isJoker = eventModel.is_joker;
             string board_id = eventModel.board_id.Hex();
 
-            CustomLogger.LogEvent(
+            CustomLogger.LogExecution(
                 $"[Moved] | Player: {player} | MoveId: {move_id} | PrevMoveId: {prev_move_id} | Tile: {tile} | Rotation: {rotation} | Position: {position} | IsJoker: {isJoker} | BoardId: {board_id}");
             OnMoveReceived?.Invoke(player, tile, position, rotation, isJoker);
         }
@@ -147,7 +148,7 @@ namespace TerritoryWars.Dojo
         private void Skipped(evolute_duel_Skiped eventModel)
         {
             string player = eventModel.player.Hex();
-            CustomLogger.LogEvent($"[Skipped] | Player: {player}");
+            CustomLogger.LogExecution($"[Skipped] | Player: {player}");
             OnSkipMoveReceived?.Invoke(player);
         }
 
@@ -155,7 +156,7 @@ namespace TerritoryWars.Dojo
         {
             string board_id = eventModel.board_id.Hex();
             if (LocalPlayerBoard.id.Hex() != board_id) return;
-            CustomLogger.LogEvent($"[BoardUpdated] | BoardId: {board_id}");
+            CustomLogger.LogExecution($"[BoardUpdated] | BoardId: {board_id}");
             int cityScoreBlue = eventModel.blue_score.Item1;
             int cartScoreBlue = eventModel.blue_score.Item2;
             int cityScoreRed = eventModel.red_score.Item1;
@@ -186,7 +187,7 @@ namespace TerritoryWars.Dojo
                                          SessionManager.Instance.RemotePlayer.Address.Hex() == hostPlayer.Hex();
             if (isCurrentBoard || isHostPlayerInSession)
             {
-                CustomLogger.LogEvent($"[GameFinished]");
+                CustomLogger.LogExecution($"[GameFinished]");
                 Coroutines.StartRoutine(GameFinishedDelayed());
                 CloseAllStructure();
             }
@@ -218,7 +219,7 @@ namespace TerritoryWars.Dojo
             
 
 
-            CustomLogger.LogEvent(
+            CustomLogger.LogExecution(
                 $"[RoadContestWon] | Player: {winner} | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
         }
 
@@ -236,7 +237,7 @@ namespace TerritoryWars.Dojo
             ContestAnimation(root, new ushort[] {blue_points, red_points}, UpdateBoardAfterRoadContest);
             
 
-            CustomLogger.LogEvent(
+            CustomLogger.LogExecution(
                 $"[RoadContestDraw] | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
         }
         
@@ -259,7 +260,7 @@ namespace TerritoryWars.Dojo
             ContestAnimation(root, new ushort[] {blue_points, red_points}, UpdateBoardAfterCityContest);
 
 
-            CustomLogger.LogEvent(
+            CustomLogger.LogExecution(
                 $"[CityContestWon] | Player: {winner} | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
         }
 
@@ -275,7 +276,7 @@ namespace TerritoryWars.Dojo
 
             ContestAnimation(root, new ushort[] {blue_points, red_points}, UpdateBoardAfterCityContest);
 
-            CustomLogger.LogEvent(
+            CustomLogger.LogExecution(
                 $"[CityContestDraw] | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
         }
         
@@ -563,59 +564,22 @@ namespace TerritoryWars.Dojo
             return new TileData(OnChainBoardDataConverter.GetTopTile(LocalPlayerBoard.top_tile));
         }
 
-        public async void MakeMove(TileData data, int x, int y, bool isJoker)
+        public void MakeMove(TileData data, int x, int y, bool isJoker)
         {
             Account account = _dojoGameManager.LocalBurnerAccount;
-            var tileConfig = OnChainBoardDataConverter.GetTypeAndRotation(data.id);
-            Option<byte> jokerTile = isJoker ? new Option<byte>.Some(tileConfig.Item1) : new Option<byte>.None();
-            byte rotation = (byte)((tileConfig.Item2 + 1) % 4);
-            byte col = (byte) (x - 1);
-            byte row = (byte) (y - 1);
-            try
-            {
-                var txHash = await _dojoGameManager.GameSystem.make_move(account, jokerTile, rotation, col, row);
-                CustomLogger.LogEvent($"[Make Move]: Hash {txHash} Account {account.Address.Hex()} made a move at {x}, {y}. Rotation: {rotation}");
-            }
-            catch (Exception e)
-            {
-                CustomLogger.LogError($"Error making move: {e.Message}. " +
-                                      $"\n| account: {account.Address.Hex()} |" +
-                                      $"jokerTile: {jokerTile} |" +
-                                      $"rotation: {rotation} |" +
-                                      $"col: {col} |" +
-                                      $"row: {row} |" +
-                                      $"tile config: {data}");
-            }
+            var serverTypes = DojoConverter.MoveClientToServer(data, x, y, isJoker);
+            DojoConnector.MakeMove(account, serverTypes.joker_tile, serverTypes.rotation, serverTypes.col, serverTypes.row);
         }
         
         public void CreateSnapshot()
         {
-            try
-            {
-                GameObject[] movesGO = _dojoGameManager.WorldManager.Entities<evolute_duel_Move>();
-                var txHash = _dojoGameManager.GameSystem.create_snapshot(_localPlayerAccount, LocalPlayerBoard.id, (byte)movesGO.Length);
-                CustomLogger.LogEvent($"[Create Snapshot]: Hash {txHash} Account {_localPlayerAccount.Address.Hex()} created a snapshot");
-            }
-            catch (Exception e)
-            {
-                CustomLogger.LogError($"Error creating snapshot: {e.Message}. " +
-                                      $"\n| account: {_localPlayerAccount.Address.Hex()} |" +
-                                      $"boardId: {LocalPlayerBoard.id} |" +
-                                      $"snapshotTurn: {_snapshotTurn}");
-            }
+            GameObject[] movesGO = _dojoGameManager.WorldManager.Entities<evolute_duel_Move>();
+            DojoConnector.CreateSnapshot(_localPlayerAccount, LocalPlayerBoard.id, (byte)movesGO.Length);
         }
 
-        public async void SkipMove()
+        public void SkipMove()
         {
-            try
-            {
-                var txHash = await _dojoGameManager.GameSystem.skip_move(_localPlayerAccount);
-                CustomLogger.LogEvent($"[Skip Move]: Hash {txHash} Account {_localPlayerAccount.Address.Hex()} skipped a move");
-                
-            } catch (Exception e)
-            {
-                CustomLogger.LogError($"Error skipping move: {e.Message}");
-            }
+            DojoConnector.SkipMove(_localPlayerAccount);
         }
 
         private evolute_duel_Move GetMoveModelById(Option<FieldElement> move_id)

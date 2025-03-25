@@ -39,43 +39,14 @@ namespace TerritoryWars.Dojo
             logMessages = $"{prefix}{logString}\n{logMessages}";
         }
 
-        public async void CreateGame()
-        {
-            try
-            {
-                var txHash = await gameSystem.create_game(localPlayer);
-                Debug.Log($"Create Game: {txHash}");
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-            }
-        }
+        public async void CreateGame() { }
         
         public async void CancelGame()
         {
-            try
-            {
-                var txHash = await gameSystem.cancel_game(localPlayer);
-                Debug.Log($"Cancel Game: {txHash}");
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-            }
         }
 
         public async void JoinGame(string hostPlayer)
         {
-            try
-            {
-                var txHash = await gameSystem.join_game(localPlayer, new FieldElement(hostPlayer));
-                Debug.Log($"Join Game: {txHash}");
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-            }
         }
         
         private void InitStyles()

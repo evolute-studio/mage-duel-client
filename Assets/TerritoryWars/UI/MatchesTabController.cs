@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dojo;
 using Dojo.Starknet;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
@@ -157,7 +158,7 @@ namespace TerritoryWars.UI
                     matchListItem.UpdateItem(playerName, evoluteBalance, status, player.player_id.Hex(), moveNumber,() =>
                     {
                         SetActivePanel(false);
-                        DojoGameManager.Instance.JoinGame(gameModel.player);
+                        DojoConnector.JoinGame(DojoGameManager.Instance.LocalBurnerAccount, gameModel.player);
                     });
                 
                     if (playerName == DojoGameManager.Instance.LocalBurnerAccount.Address.Hex())
@@ -222,7 +223,7 @@ namespace TerritoryWars.UI
         public void CreateMatch()
         {
             SetActivePanel(false);
-            DojoGameManager.Instance.CreateGame();
+            DojoConnector.CreateGame(DojoGameManager.Instance.LocalBurnerAccount);
         }
         
         public async void SetActivePanel(bool isActive)
