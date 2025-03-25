@@ -97,6 +97,13 @@ namespace TerritoryWars.General
                         return;
                     }
                     break;
+                case ApplicationStates.Leaderboard:
+                    if (!LeaderboardFilter(model))
+                    {
+                        DestroyModel(model);
+                        return;
+                    }
+                    break;
             }
             OnModelPassed.Invoke(model);
         }
@@ -402,6 +409,45 @@ namespace TerritoryWars.General
                 case nameof(evolute_duel_PotentialCityContests):
                     return false;
                 case nameof(evolute_duel_PotentialRoadContests):
+                    return false;
+                
+                default:
+                    CustomLogger.LogWarning($"Unknown model type {type.Name}. Filtering out.");
+                    return true;
+            }
+        }
+        
+        public static bool LeaderboardFilter(ModelInstance model)
+        {
+            var type = model.GetType();
+            switch (type.Name)
+            {
+                // Have condition
+                
+                // Always allow
+                case nameof(evolute_duel_Player):
+                    return true;
+                case nameof(evolute_duel_Rules):
+                    return true;
+                case nameof(evolute_duel_Shop):
+                    return true;
+                
+                // Always deny
+                case nameof(evolute_duel_Game):
+                    return false;
+                case nameof(evolute_duel_Snapshot): 
+                    return false;
+                case nameof(evolute_duel_Board):
+                    return false;
+                case nameof(evolute_duel_Move):
+                    return false;
+                case nameof(evolute_duel_PotentialCityContests):
+                    return false;
+                case nameof(evolute_duel_CityNode):
+                    return false;
+                case nameof(evolute_duel_PotentialRoadContests):
+                    return false;
+                case nameof(evolute_duel_RoadNode):
                     return false;
                 
                 default:

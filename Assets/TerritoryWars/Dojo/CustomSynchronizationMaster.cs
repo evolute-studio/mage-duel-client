@@ -37,6 +37,15 @@ namespace TerritoryWars.Dojo
             CustomLogger.LogDojoLoop($"Synced {count} players in array with addresses count {address.Length}");
             return count;
         }
+
+        public async Task<int> SyncTopPlayersForLeaderboard(uint playersCount)
+        {
+            int count = await SyncConstruction(
+                DojoQueries.GetQueryTopPlayersForLeaderboard(playersCount), 
+                nameof(SyncTopPlayersForLeaderboard));
+            CustomLogger.LogDojoLoop($"Synced {count} top players for leaderboard with count {playersCount}");
+            return count;
+        }
         
         public async Task<int> SyncPlayerInProgressGame(FieldElement address)
         {

@@ -168,7 +168,7 @@ public class SnapshotListItem
         
         _creatorPlayerNameText.text = creatorPlayerName;
         _creatorPlayerEvoluteCountText.text = " x " + creatorPlayerEvoluteCount.ToString();
-        _moveNumberText.text = "Move number: \n" + moveNumber;
+        _moveNumberText.text = "Moves: \n" + moveNumber;
         
         _restoreButton.onClick.RemoveAllListeners();
         if (onRestore != null)

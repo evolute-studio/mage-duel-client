@@ -7,6 +7,7 @@ namespace TerritoryWars.General
         MatchTab,
         SnapshotTab,
         Session,
+        Leaderboard,
     }
     
     public static class ApplicationState

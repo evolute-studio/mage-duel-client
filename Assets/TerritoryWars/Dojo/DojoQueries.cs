@@ -60,6 +60,22 @@ namespace TerritoryWars.Dojo
             return query;
         }
 
+        public static Query GetQueryTopPlayersForLeaderboard(uint count)
+        {
+            string[] entity_models = new[] { GetModelName<evolute_duel_Player>() };
+            
+            OrderBy[] order_by = new[]
+            {
+                new OrderBy(
+                    model: GetModelName<evolute_duel_Player>(),
+                    member: "balance",
+                    direction: dojo.OrderDirection.Desc)
+            };
+            Query query = new Query(count, offset, null, dont_include_hashed_keys, 
+                                    order_by, entity_models, entity_updated_after);
+            return query;
+        }
+
         /// <summary>
         /// Gets a query to fetch games in progress for a specific player
         /// </summary>
