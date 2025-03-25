@@ -43,7 +43,7 @@ namespace TerritoryWars.UI
         [SerializeField] private CanvasGroup _deckContainerCanvasGroup;
 
         [SerializeField] private ResultPopUpUI _resultPopUpUI;
-        [SerializeField] public SessionUI SessionUI;
+        [FormerlySerializedAs("SessionUI")] [SerializeField] public PlayerInfoUI playerInfoUI;
         
         [SerializeField] private Button SaveSnapshotButton;
         [SerializeField] private TextMeshProUGUI SaveSnapshotText;
@@ -133,10 +133,10 @@ namespace TerritoryWars.UI
             _resultPopUpUI.SetPlayersScore(score1, score2);
             _resultPopUpUI.SetPlayersCityScores(cityScoreBlue, cityScoreRed);
             _resultPopUpUI.SetPlayersCartScores(cartScoreBlue, cartScoreRed);
-            _resultPopUpUI.SetPlayersAvatars(SessionUI.charactersObject.GetAvatar(PlayerCharactersManager.GetCurrentCharacterId()),
-                SessionUI.charactersObject.GetAvatar(PlayerCharactersManager.GetOpponentCurrentCharacterId()));
-            _resultPopUpUI.SetPlayerHeroAnimator(SessionUI.charactersObject.GetAnimatorController(PlayerCharactersManager.GetCurrentCharacterId()),
-                SessionUI.charactersObject.GetAnimatorController(PlayerCharactersManager.GetOpponentCurrentCharacterId()));
+            _resultPopUpUI.SetPlayersAvatars(playerInfoUI.charactersObject.GetAvatar(PlayerCharactersManager.GetCurrentCharacterId()),
+                playerInfoUI.charactersObject.GetAvatar(PlayerCharactersManager.GetOpponentCurrentCharacterId()));
+            _resultPopUpUI.SetPlayerHeroAnimator(playerInfoUI.charactersObject.GetAnimatorController(PlayerCharactersManager.GetCurrentCharacterId()),
+                playerInfoUI.charactersObject.GetAnimatorController(PlayerCharactersManager.GetOpponentCurrentCharacterId()));
                 
             bool isLocalPlayerBlue = SessionManager.Instance.LocalPlayer.LocalId == 0;
             string wonText;

@@ -10,7 +10,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Serialization;
 
-public class SessionUI : MonoBehaviour
+public class PlayerInfoUI : MonoBehaviour
 {
     public SessionTimerUI SessionTimerUI;
     

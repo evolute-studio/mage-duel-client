@@ -62,7 +62,7 @@ namespace TerritoryWars.General
 
         public Board Board;
         [SerializeField] private GameUI gameUI;
-        [SerializeField] private SessionUI sessionUI;
+        [SerializeField] private PlayerInfoUI sessionUI;
         [SerializeField] private DeckManager deckManager;
         public JokerManager JokerManager;
         public TileSelector TileSelector;
@@ -103,10 +103,10 @@ namespace TerritoryWars.General
             int cartScoreBlue = board.blue_score.Item2;
             int cityScoreRed = board.red_score.Item1;
             int cartScoreRed = board.red_score.Item2;
-            GameUI.Instance.SessionUI.SetCityScores(cityScoreBlue, cityScoreRed);
-            GameUI.Instance.SessionUI.SetRoadScores(cartScoreBlue, cartScoreRed);
-            GameUI.Instance.SessionUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
-            GameUI.Instance.SessionUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(SkipMove);
+            GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
+            GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
+            GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(SkipMove);
             JokerManager.Initialize(board);
             SetTilesInDeck(board.available_tiles_in_deck.Length);
             StartGame();
@@ -248,7 +248,7 @@ namespace TerritoryWars.General
 
         private void StartTurn()
         {
-            GameUI.Instance.SessionUI.SessionTimerUI.StartTurnTimer();
+            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer();
             if (CurrentTurnPlayer == LocalPlayer)
             {
                 StartLocalTurn();
@@ -349,7 +349,7 @@ namespace TerritoryWars.General
 
         public void SetTilesInDeck(int count)
         {
-            gameUI.SessionUI.SetDeckCount(count);
+            gameUI.playerInfoUI.SetDeckCount(count);
         }
 
         public void RotateCurrentTile()
@@ -387,7 +387,7 @@ namespace TerritoryWars.General
         {
             DojoGameManager.Instance.SessionManager.OnMoveReceived -= HandleMove;
             DojoGameManager.Instance.SessionManager.OnSkipMoveReceived -= SkipMove;
-            GameUI.Instance.SessionUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(SkipMove);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(SkipMove);
         }
     }
 }

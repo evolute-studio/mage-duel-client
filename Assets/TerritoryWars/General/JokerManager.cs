@@ -28,7 +28,7 @@ namespace TerritoryWars.General
         }
         public void Initialize(evolute_duel_Board board)
         {
-            GameUI.Instance.SessionUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
+            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
             SetJokersCount(0, board.player1.Item3);
             SetJokersCount(1, board.player2.Item3);
         }
@@ -198,8 +198,8 @@ namespace TerritoryWars.General
         
         public void SetJokersCount(int playerId, int count)
         {
-            GameUI.Instance.SessionUI.SetJokersCount(playerId, count);
-            GameUI.Instance.SessionUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
+            GameUI.Instance.playerInfoUI.SetJokersCount(playerId, count);
+            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
         }
     }
 }

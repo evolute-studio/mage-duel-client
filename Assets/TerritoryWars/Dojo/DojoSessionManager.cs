@@ -160,9 +160,9 @@ namespace TerritoryWars.Dojo
             int cartScoreBlue = eventModel.blue_score.Item2;
             int cityScoreRed = eventModel.red_score.Item1;
             int cartScoreRed = eventModel.red_score.Item2;
-            GameUI.Instance.SessionUI.SetCityScores(cityScoreBlue, cityScoreRed);
-            GameUI.Instance.SessionUI.SetRoadScores(cartScoreBlue, cartScoreRed);
-            GameUI.Instance.SessionUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
+            GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
+            GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
+            GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
             var tileData = eventModel.top_tile switch
             {
                 Option<byte>.Some topTile => new TileData(OnChainBoardDataConverter.GetTopTile(topTile)),
