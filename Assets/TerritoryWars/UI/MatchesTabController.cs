@@ -160,6 +160,7 @@ namespace TerritoryWars.UI
                     {
                         SetActivePanel(false);
                         DojoConnector.JoinGame(DojoGameManager.Instance.LocalBurnerAccount, gameModel.player);
+                        SimpleStorage.SetIsGameWithBot(false);
                     });
                 
                     if (playerName == DojoGameManager.Instance.LocalBurnerAccount.Address.Hex())
@@ -225,12 +226,14 @@ namespace TerritoryWars.UI
         {
             SetActivePanel(false);
             DojoConnector.CreateGame(DojoGameManager.Instance.LocalBurnerAccount);
+            SimpleStorage.SetIsGameWithBot(false);
         }
 
         public void CreateMatchWithBot()
         {
             SetActivePanel(false);
             DojoGameManager.Instance.CreateGameWithBots();
+            SimpleStorage.SetIsGameWithBot(true);
         }
         
         public async void SetActivePanel(bool isActive)

@@ -17,6 +17,7 @@ namespace TerritoryWars.Dojo
     public class DojoSessionManager
     {
         private DojoGameManager _dojoGameManager;
+        public bool IsGameWithBot { get; private set; }
 
         private Account _localPlayerAccount => _dojoGameManager.LocalBurnerAccount;
         private evolute_duel_Board _localPlayerBoard;
@@ -51,6 +52,7 @@ namespace TerritoryWars.Dojo
         public DojoSessionManager(DojoGameManager dojoGameManager)
         {
             _dojoGameManager = dojoGameManager;
+            IsGameWithBot = SimpleStorage.LoadIsGameWithBot();
             dojoGameManager.WorldManager.synchronizationMaster.OnModelUpdated.AddListener(OnModelUpdated);
             dojoGameManager.WorldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
         }

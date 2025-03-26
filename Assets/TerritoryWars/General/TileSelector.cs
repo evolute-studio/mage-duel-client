@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
@@ -410,7 +411,24 @@ namespace TerritoryWars.General
 
             gameUI.SetRotateButtonActive(false);
 
-            tilePreview.PlaceTile();
+            tilePreview.PlaceTile(CompleteTilePlacement);
+        }
+
+        public void PlaceTile(TileData tileData, ValidPlacement validPlacement, int playerId)
+        {
+            // first check if it is possible to place the tile
+            bool isPossible = board.CanPlaceTile(tileData, validPlacement.X, validPlacement.Y);
+            if (!isPossible)
+            {
+                CustomLogger.LogWarning($"TileSelector: PlaceTile: Can't place tile. Config: {tileData.id} " +
+                                        $"Position: {validPlacement.X} {validPlacement.Y}");
+                return;
+            }
+
+            tilePreview.PlaceTile( () =>
+            {
+                board.PlaceTile(currentTile, validPlacement.X, validPlacement.Y, playerId);
+            });
         }
 
         public void CompleteTilePlacement()
