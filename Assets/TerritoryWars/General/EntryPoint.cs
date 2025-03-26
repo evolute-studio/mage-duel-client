@@ -75,7 +75,7 @@ namespace TerritoryWars.General
             var tcs = new TaskCompletionSource<bool>();
             
             try {
-                DojoGameManager.SetupAccount(() => tcs.TrySetResult(true));
+                DojoGameManager.SetupMasterAccount(() => tcs.TrySetResult(true));
                 // timeout to avoid hanging
                 StartCoroutine(SetupAccountTimeout(tcs, 30f));
             }

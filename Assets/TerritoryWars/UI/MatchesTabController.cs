@@ -26,6 +26,7 @@ namespace TerritoryWars.UI
         public TextMeshProUGUI CanceledMatchesText;
         public GameObject BackgroundPlaceholderGO;
         public Button CreateMatchButton;
+        public Button CreateBotMatchButton;
         
         private int _createdMatchesCount = 0;
         private int _inProgressMatchesCount = 0;
@@ -39,7 +40,7 @@ namespace TerritoryWars.UI
         public void Initialize()
         {
             CreateMatchButton.onClick.AddListener(CreateMatch);
-            
+            CreateBotMatchButton.onClick.AddListener(CreateMatchWithBot);
         }
         
         public MatchListItem CreateListItem()
@@ -224,6 +225,12 @@ namespace TerritoryWars.UI
         {
             SetActivePanel(false);
             DojoConnector.CreateGame(DojoGameManager.Instance.LocalBurnerAccount);
+        }
+
+        public void CreateMatchWithBot()
+        {
+            SetActivePanel(false);
+            DojoGameManager.Instance.CreateGameWithBots();
         }
         
         public async void SetActivePanel(bool isActive)

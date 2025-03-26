@@ -23,7 +23,7 @@ namespace TerritoryWars.ExternalConnections
         // }
         
         #region Game Actions
-        public static async void CreateGame(Account account)
+        public static async Task CreateGame(Account account)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithLoading(LoadingScreen.waitAnotherPlayerText, () => CancelGame(account))
@@ -124,7 +124,7 @@ namespace TerritoryWars.ExternalConnections
 
         
         #region Player Profile Actions
-        public static async void ChangeUsername(Account account, FieldElement name)
+        public static async Task ChangeUsername(Account account, FieldElement name)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(ChangeUsername)}] " +
@@ -187,7 +187,7 @@ namespace TerritoryWars.ExternalConnections
         private static async void ContractNotFoundHandler()
         {
             CustomLogger.LogError("The contract was not found. Maybe a problem in creating an account");
-            await DojoGameManager.Instance.CreateAccount(true);
+            await DojoGameManager.Instance.CreateLocalAccount(true);
             CustomSceneManager.Instance.LoadLobby();
             
         }
