@@ -89,7 +89,6 @@ namespace TerritoryWars.ExternalConnections
         public static async void MakeMove(Account account, Option<byte> joker_tile, byte rotation, byte col, byte row)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
-                .WithLoading(LoadingScreen.launchGameText, () => CancelGame(account))
                 .WithMessage($"DojoCall: [{nameof(MakeMove)}] " +
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n JokerTile: {joker_tile.Unwrap()} Rotation: {rotation} Col: {col} Row: {row}");
@@ -102,7 +101,6 @@ namespace TerritoryWars.ExternalConnections
         public static async void CreateSnapshot(Account account, FieldElement boardId, byte moveNumber)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
-                .WithLoading(LoadingScreen.launchGameText, () => CancelGame(account))
                 .WithMessage($"DojoCall: [{nameof(CreateSnapshot)}] " +
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n BoardId: {boardId.Hex()} MoveNumber: {moveNumber}");
@@ -115,7 +113,6 @@ namespace TerritoryWars.ExternalConnections
         public static async void SkipMove(Account account)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
-                .WithLoading(LoadingScreen.launchGameText, () => CancelGame(account))
                 .WithMessage($"DojoCall: [{nameof(SkipMove)}] " +
                              $"\n Account: {account.Address.Hex()}");
             await TryExecuteAction(
