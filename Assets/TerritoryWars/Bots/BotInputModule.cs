@@ -32,8 +32,8 @@ namespace TerritoryWars.Bots
             }
             
             //_tileSelector.PlaceTile(tile, placement, _localId);
-            tile.Rotate(placement.Rotation);
-            var serverTypes = DojoConverter.MoveClientToServer(tile, placement.X, placement.Y, isJoker);
+            tile.Rotate(placement.rotation);
+            var serverTypes = DojoConverter.MoveClientToServer(tile, placement.x, placement.y, isJoker);
             DojoConnector.MakeMove(Bot.Account, serverTypes.joker_tile, serverTypes.rotation, serverTypes.col, serverTypes.row);
         }
         

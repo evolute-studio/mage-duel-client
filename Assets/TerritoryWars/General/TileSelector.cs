@@ -153,7 +153,7 @@ namespace TerritoryWars.General
             ClearHighlights();
             foreach (var placement in placements)
             {
-                CreateHighlight(placement.X, placement.Y);
+                CreateHighlight(placement.x, placement.y);
             }
             SetHighlightColor(normalHighlightColor);
         }
@@ -302,7 +302,7 @@ namespace TerritoryWars.General
         {
             foreach (var position in _currentValidPlacements)
             {
-                if (position.X == x && position.Y == y)
+                if (position.x == x && position.y == y)
                 {
                     return true;
                 }
@@ -417,17 +417,17 @@ namespace TerritoryWars.General
         public void PlaceTile(TileData tileData, ValidPlacement validPlacement, int playerId)
         {
             // first check if it is possible to place the tile
-            bool isPossible = board.CanPlaceTile(tileData, validPlacement.X, validPlacement.Y);
+            bool isPossible = board.CanPlaceTile(tileData, validPlacement.x, validPlacement.y);
             if (!isPossible)
             {
                 CustomLogger.LogWarning($"TileSelector: PlaceTile: Can't place tile. Config: {tileData.id} " +
-                                        $"Position: {validPlacement.X} {validPlacement.Y}");
+                                        $"Position: {validPlacement.x} {validPlacement.y}");
                 return;
             }
 
             tilePreview.PlaceTile( () =>
             {
-                board.PlaceTile(currentTile, validPlacement.X, validPlacement.Y, playerId);
+                board.PlaceTile(currentTile, validPlacement.x, validPlacement.y, playerId);
             });
         }
 

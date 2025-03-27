@@ -94,6 +94,11 @@ namespace TerritoryWars.Dojo
             
             await TryCreateLocalAccount(3, false);
             IncomingModelsFilter.SetLocalPlayerId(LocalBurnerAccount.Address.Hex());
+            LocalBot = await GetBotForGame();
+            if (LocalBot == null)
+            {
+                CustomLogger.LogError("Failed to create bot");
+            }
         }
 
         public async Task SyncInitialModels()
@@ -317,6 +322,18 @@ namespace TerritoryWars.Dojo
                 return null;
             }
         }
+
+        public bool TryGetAccount(string address, out Account account)
+        {
+            account = burnerManager.Burners.FirstOrDefault(b => b.Address.Hex() == address);
+            if (account == null)
+            {
+                CustomLogger.LogError("Failed to get burner account");
+                return false;
+            }
+            return true;
+            
+        }
         #endregion
 
         public async void CreateGameWithBots()
@@ -340,7 +357,11 @@ namespace TerritoryWars.Dojo
         }
         public async Task<Bot> GetBotForGame()
         {
-            Account account = await CreateAccount();
+            if (!TryGetAccount(SimpleStorage.LoadBotAddress(), out Account account))
+            {
+                account = await CreateAccount();
+                SimpleStorage.SetBotAddress(account.Address.Hex());
+            };
             if (account == null)
             {
                 CustomLogger.LogError("Failed to create bot account");

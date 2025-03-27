@@ -14,6 +14,16 @@ namespace TerritoryWars
             return PlayerPrefs.GetString("PlayerAddress", null);
         }
         
+        public static void SetBotAddress(string address)
+        {
+            PlayerPrefs.SetString("BotAddress", address);
+        }
+        
+        public static string LoadBotAddress()
+        {
+            return PlayerPrefs.GetString("BotAddress", null);
+        }
+        
         public static void SetIsGameWithBot(bool isGameWithBot)
         {
             PlayerPrefs.SetInt("IsGameWithBot", isGameWithBot ? 1 : 0);

@@ -5,6 +5,7 @@ using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using UnityEngine;
+using Vector2Int = UnityEngine.Vector2Int;
 
 namespace TerritoryWars.Bots
 {
@@ -38,6 +39,7 @@ namespace TerritoryWars.Bots
 
         public TileData CurrentTile { get; private set; }
         public List<ValidPlacement> CurrentValidPlacements { get; private set; }
+        public Dictionary<ValidPlacement, TileData> CurrentJokers { get; private set; }
         
         public BotDataCollectorModule(Bot bot) : base(bot)
         {
@@ -53,6 +55,26 @@ namespace TerritoryWars.Bots
             }
             CurrentTile = new TileData(OnChainBoardDataConverter.GetTopTile(BoardModel.top_tile));
             CurrentValidPlacements = Board.GetValidPlacements(CurrentTile);
+        }
+
+        public void CollectJokerData()
+        {
+            if (Board == null || BoardModel == null)
+            {
+                CustomLogger.LogWarning("BotDataCollectorModule: BoardModel or Board is null");
+                return;
+            }
+            
+            List<ValidPlacement> jokerPlacements = Board.GetJokerValidPlacements();
+            CurrentJokers = new Dictionary<ValidPlacement, TileData>();
+            
+            foreach (var jokerPlacement in jokerPlacements)
+            {
+                Vector2Int position = new Vector2Int(jokerPlacement.x, jokerPlacement.y);
+                TileData jokerTile = JokerManager.GetOneJokerCombination(position.x, position.y);
+                CurrentJokers.Add(new ValidPlacement(position), jokerTile); 
+            }
+
         }
         
         // TODO: Need to create a new class for getting models

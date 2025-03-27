@@ -41,33 +41,118 @@ namespace TerritoryWars.Bots
         {
             if (Bot.IsDebug)
             {
-                var allMoves = EvaluateAllMoves(Bot.DataCollectorModule.CurrentTile, Bot.DataCollectorModule.CurrentValidPlacements);
-                Bot.DebugModule.ShowMoves(allMoves);
-                Bot.DebugModule.SetMoveVariant(Bot.DataCollectorModule.CurrentTile, FindBestMove(Bot.DataCollectorModule.CurrentTile, Bot.DataCollectorModule.CurrentValidPlacements));
+                Bot.DebugModule.Recalculate();
                 return;
             }
+
             MakeMove();
         }
 
-        public void PlaceTile(TileData tileData, ValidPlacement validPlacement)
+        public bool IsSimpleMove()
         {
-            Bot.InputModule.PlaceTile(tileData, validPlacement, false);
+            bool isJoker = Random.value < GetJokerChance();
+            bool hasJokers = SessionManager.Instance.RemotePlayer.JokerCount > 0;
+            return !isJoker || !hasJokers;
         }
+        
+        public float GetJokerChance()
+        {
+            float k = 4f;
+            const int maxTiles = 64;
+            const int borderTiles = 36;
+            const int maxJokers = 6;
+            int maxMoves = maxTiles + maxJokers;
+            int placedTiles = Bot.DataCollectorModule.Board.PlacedTiles.Count;
+
+            if (placedTiles <= borderTiles) return 0f;
+
+            float progress = (float)(placedTiles - borderTiles) / maxMoves;
+            float chance = Mathf.Clamp01(Mathf.Pow(progress, k));
+            CustomLogger.LogImportant($"Joker chance: {chance} Progress: {progress} Placed tiles: {placedTiles} Max moves: {maxMoves}");
+            return chance;
+        }
+
         public void MakeMove()
+        {
+            if (IsSimpleMove())
+            {
+                MakeSimpleMove();
+            }
+            else
+            {
+                MakeJokerMove();
+            }
+        }
+        
+        public void MakeSimpleMove()
         {
             (TileData tileData, ValidPlacement validPlacement) = SelectMoveVariant();
             if (tileData == null || validPlacement == null)
             {
                 CustomLogger.LogDojoLoop("BotLogicModule: Skip move");
+                if (SessionManager.Instance.RemotePlayer.JokerCount > 0)
+                {
+                    MakeJokerMove();
+                    return;
+                }
                 SkipMove();
                 return;
             }
-            PlaceTile(tileData, validPlacement);
+            PlaceTile(tileData, validPlacement, false);
+        }
+        
+        public void MakeJokerMove()
+        {
+            (TileData tileData, ValidPlacement validPlacement) = GetJokerMoveVariant();
+            if (tileData == null || validPlacement == null)
+            {
+                CustomLogger.LogDojoLoop("BotLogicModule: Skip joker move");
+                if (SessionManager.Instance.RemotePlayer.JokerCount > 0)
+                {
+                    MakeJokerMove();
+                    return;
+                }
+                SkipMove();
+                return;
+            }
+            PlaceTile(tileData, validPlacement, true);
+        }
+
+        public void PlaceTile(TileData tileData, ValidPlacement validPlacement, bool isJoker)
+        {
+            Bot.InputModule.PlaceTile(tileData, validPlacement, isJoker);
         }
         
         public void SkipMove()
         {
             DojoConnector.SkipMove(Bot.Account);
+        }
+        
+        
+
+        public (TileData, ValidPlacement) GetJokerMoveVariant()
+        {
+            Bot.DataCollectorModule.CollectJokerData();
+            Dictionary<ValidPlacement, TileData> jokers = Bot.DataCollectorModule.CurrentJokers;
+            if (jokers == null || jokers.Count == 0)
+            {
+                CustomLogger.LogWarning("BotLogicModule: No jokers found");
+                return (null, null);
+            }
+            // evaluate every jokers
+            Dictionary<ValidPlacement, float> jokerValues = EvaluateAllJokerMoves(jokers);
+            var bestJoker = jokerValues.OrderByDescending(x => x.Value).First();
+            CustomLogger.LogImportant($"Best joker: {bestJoker.Key.x}, {bestJoker.Key.y}, Value: {bestJoker.Value}");
+            ValidPlacement key = null;
+            foreach (var joker in jokers)
+            {
+                if (joker.Key.GetHashCode() == bestJoker.Key.GetHashCode())
+                {
+                    key = joker.Key;
+                    break;
+                }
+            }
+            return (jokers[key], bestJoker.Key);
         }
 
         private (TileData, ValidPlacement) SelectMoveVariant()
@@ -85,7 +170,7 @@ namespace TerritoryWars.Bots
             return (tileData, selectedPlacement);
         }
 
-        private ValidPlacement FindBestMove(TileData tileData, List<ValidPlacement> validPlacement)
+        public ValidPlacement FindBestMove(TileData tileData, List<ValidPlacement> validPlacement)
         {
             Dictionary<ValidPlacement, float> moves = EvaluateAllMoves(tileData, validPlacement);
             if (moves.Count == 0)
@@ -94,11 +179,11 @@ namespace TerritoryWars.Bots
                 return null;
             }
             var result = moves.OrderByDescending(x => x.Value).First();
-            CustomLogger.LogImportant($"Best move: {result.Key.X}, {result.Key.Y}, {result.Key.Rotation}, Value: {result.Value}");
+            CustomLogger.LogImportant($"Best move: {result.Key.x}, {result.Key.y}, {result.Key.rotation}, Value: {result.Value}");
             return result.Key;
         }
         
-        private Dictionary<ValidPlacement, float> EvaluateAllMoves(TileData tileData, List<ValidPlacement> validPlacements)
+        public Dictionary<ValidPlacement, float> EvaluateAllMoves(TileData tileData, List<ValidPlacement> validPlacements)
         {
             Dictionary<ValidPlacement, float> moves = new Dictionary<ValidPlacement, float>();
             foreach (var placement in validPlacements)
@@ -107,12 +192,22 @@ namespace TerritoryWars.Bots
             }
             return moves;
         }
+        
+        public Dictionary<ValidPlacement, float> EvaluateAllJokerMoves(Dictionary<ValidPlacement, TileData> jokers)
+        {
+            Dictionary<ValidPlacement, float> moves = new Dictionary<ValidPlacement, float>();
+            foreach (var joker in jokers)
+            {
+                moves.Add(joker.Key, EvaluateMove(joker.Value, joker.Key));
+            }
+            return moves;
+        }
 
         private float EvaluateMove(TileData tileData, ValidPlacement validPlacement)
         {
-            CustomLogger.LogImportant($"Evaluating move. Config: {tileData.id}, X: {validPlacement.X}, Y: {validPlacement.Y}, Rotation: {validPlacement.Rotation}");
+            CustomLogger.LogImportant($"Evaluating move. Config: {tileData.id}, X: {validPlacement.x}, Y: {validPlacement.y}, Rotation: {validPlacement.rotation}");
             TileData tile = new TileData(tileData.id);
-            tile.Rotate(validPlacement.Rotation);
+            tile.Rotate(validPlacement.rotation);
 
             (float basicCityValue, float basicRoad) = EvaluateBasicValue(tile);
             float cityValue = basicCityValue;
@@ -128,7 +223,7 @@ namespace TerritoryWars.Bots
                 {
                     var citySet =
                         _sessionManager.GetNearSetByPositionAndSide<evolute_duel_CityNode>(
-                            new Vector2Int(validPlacement.X, validPlacement.Y), (Side)i);
+                            new Vector2Int(validPlacement.x, validPlacement.y), (Side)i);
                     if (citySet.Key == null || processedCities.Contains(citySet.Key)) continue;
                     cityValue += EvaluateStructure(citySet);
                     processedCities.Add(citySet.Key);
@@ -137,7 +232,7 @@ namespace TerritoryWars.Bots
                 {
                     var roadSet =
                         _sessionManager.GetNearSetByPositionAndSide<evolute_duel_RoadNode>(
-                            new Vector2Int(validPlacement.X, validPlacement.Y), (Side)i);
+                            new Vector2Int(validPlacement.x, validPlacement.y), (Side)i);
                     if (roadSet.Key == null || processedRoads.Contains(roadSet.Key)) continue;
                     roadValue += EvaluateStructure(roadSet);
                     processedRoads.Add(roadSet.Key);
