@@ -25,6 +25,7 @@ namespace TerritoryWars.UI
         
         public NamePanelController _namePanelController;
         public ChangeNamePanelUIController _changeNamePanelUIController;
+        public CharacterSelector _characterSelector;
 
         public void Start()
         {
@@ -44,6 +45,7 @@ namespace TerritoryWars.UI
             DojoGameManager.Instance.CustomSynchronizationMaster.DestroyBoardsAndAllDependencies();
             CustomLogger.LogWarning("MenuUIController.Initialize");
             _namePanelController.Initialize();
+            _characterSelector.Initialize();
         }
 
         public async void NewAccount()

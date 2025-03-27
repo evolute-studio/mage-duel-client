@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using TerritoryWars.Dojo;
+using UnityEngine;
 
 namespace TerritoryWars.General
 {
@@ -21,7 +23,59 @@ namespace TerritoryWars.General
         }
 
         private static int _opponentCharacterId => SessionManager.Instance.IsLocalPlayerHost ? SessionManager.Instance.PlayersData[1].skin_id : SessionManager.Instance.PlayersData[0].skin_id;
-        private List<int> _availableCharacters = new List<int> { 0, 1 };
+        private const string _availableCharactersKey = "AvailableCharacters";
+        private static List<int> _availableCharactersList = new List<int>();
+        
+        public static List<int> GetAvailableCharacters()
+        {
+            if (PlayerPrefs.HasKey(_availableCharactersKey))
+            {
+                string characters = PlayerPrefs.GetString(_availableCharactersKey);
+                string[] charactersArray = characters.Split('/');
+                var filteredArray = charactersArray.Where(item => !string.IsNullOrWhiteSpace(item)).ToArray();
+                _availableCharactersList.Clear();
+                foreach (string character in filteredArray)
+                {
+                    _availableCharactersList.Add(int.Parse(character));
+                }
+            }
+            else
+            {
+                PlayerPrefs.SetString(_availableCharactersKey, "0/1/");
+                string characters = PlayerPrefs.GetString(_availableCharactersKey);
+                string[] charactersArray = characters.Split('/');
+                var filteredArray = charactersArray.Where(item => !string.IsNullOrWhiteSpace(item)).ToArray();
+                _availableCharactersList.Clear();
+                foreach (string character in filteredArray)
+                {
+                    _availableCharactersList.Add(int.Parse(character));
+                }
+            }
+
+            return _availableCharactersList;
+        }
+
+        public static void SaveCharacter(int id)
+        {
+            GetAvailableCharacters();
+            
+            if (_availableCharactersList.Contains(id))
+                return;
+            
+            _availableCharactersList.Add(id);
+            string characters = "";
+            foreach (int character in _availableCharactersList)
+            {
+                characters += character + "/";
+            }
+            PlayerPrefs.SetString(_availableCharactersKey, characters);
+        }
+        
+        public static void ClearAvailableCharacters()
+        {
+            if(PlayerPrefs.HasKey(_availableCharactersKey))
+                PlayerPrefs.DeleteKey(_availableCharactersKey);
+        }
 
         public static int GetCurrentCharacterId()
         {
@@ -33,21 +87,5 @@ namespace TerritoryWars.General
             return _opponentCharacterId;
         }
         
-        // public static void ChangeOpponentCurrentCharacterId(int id)
-        // {
-        //     _opponentCharacterId = id;
-        // }
-        
-        public bool IsCharacterAvailable(int id)
-        {
-            return _availableCharacters.Contains(id);
-        }
-        
-        public void AddCharacter(int id)
-        {
-            if(_availableCharacters.Contains(id))
-                return;
-            _availableCharacters.Add(id);
-        }
     }
 }

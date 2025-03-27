@@ -122,7 +122,7 @@ public class LeaderboardItem
         public LeaderboardItem(GameObject listItem)
         {
             ListItem = listItem;
-            _playerNameText = listItem.transform.Find("Name/NameText").GetComponent<TextMeshProUGUI>();
+            _playerNameText = listItem.transform.Find("PlayerText/NameText").GetComponent<TextMeshProUGUI>();
             _evoluteCount = listItem.transform.Find("EvoluteCount/Count/EvoluteCountText")
                 .GetComponent<TextMeshProUGUI>();
             //_leaderPlaceImage = listItem.transform.Find("LeaderPlace/LeaderPlaceImage").GetComponent<Image>();
@@ -131,7 +131,7 @@ public class LeaderboardItem
         public void UpdateItem()
         {
             _playerNameText.text = PlayerName;
-            _evoluteCount.text = EvoluteCount.ToString();
+            _evoluteCount.text = "x " + EvoluteCount.ToString();
         }
 
         public void SetActive(bool isActive)

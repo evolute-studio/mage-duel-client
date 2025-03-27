@@ -1,6 +1,5 @@
 using System;
-using System.Collections;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using DG.Tweening;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
@@ -30,24 +29,28 @@ namespace TerritoryWars.UI
         public GameObject AppliedText;
         public Image ApplyButtonImage;
         private bool isAnimating = false;
-        [SerializeField] private float WaitingForShift = 1.5f;
 
         public Sprite ActiveButtonSprite;
         public Sprite DisabledButtonSprite;
 
-        private void Initialize()
+        public void Initialize()
         {
-            int evoluteBalance = MenuUIController.Instance._namePanelController.EvoluteBalance;
+            if (MenuUIController.Instance._namePanelController.EvoluteBalance == 0)
+            {
+                PlayerCharactersManager.ClearAvailableCharacters();
+            }
+            
+            ApplyButton.onClick.AddListener(ApplyButtonClicked);
+            
             currentCharacterIndex = PlayerCharactersManager.GetCurrentCharacterId();
             
-            while(currentCharacterIndex != characters[1].CharacterId)
-            {
-                ShiftCharacters(true);
-            }
+            List<int> unlockedCharacters = PlayerCharactersManager.GetAvailableCharacters();
 
             foreach (var character in characters)
             {
-                if (evoluteBalance >= character.CharacterId)
+                if(character.Locker == null) continue;
+                
+                if (unlockedCharacters.Contains(character.CharacterId))
                 {
                     character.Locker?.FastUnlock();
                 }
@@ -56,15 +59,13 @@ namespace TerritoryWars.UI
                     character.Locker?.gameObject.SetActive(true);
                 }
             }
-        }
-
-        
-
-        public void Start()
-        {
-            ApplyButton.onClick.AddListener(ApplyButtonClicked);
             
-            Initialize();
+            while(currentCharacterIndex != characters[1].CharacterId)
+            {
+                ShiftCharacters(true);
+            }
+            
+            
             UpdateButtons();
             foreach (var character in characters)
             {
@@ -144,16 +145,10 @@ namespace TerritoryWars.UI
         {
             currentCharacterIndex = characters[1].CharacterId;
             characters[1].Locker?.Unlock();
+            PlayerCharactersManager.SaveCharacter(characters[1].CharacterId);
             DojoGameManager.Instance.ChangePlayerSkin(characters[1].CharacterId);
             UpdateButtons();
         }
-        
-        
-        // private IEnumerator SimpleTimer(float duration, Action callback)
-        // {
-        //     yield return new WaitForSeconds(duration);
-        //     callback?.Invoke();
-        // }
 
         public void UpdateButtons()
         {
