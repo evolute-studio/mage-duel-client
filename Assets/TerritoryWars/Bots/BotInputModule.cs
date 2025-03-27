@@ -18,15 +18,6 @@ namespace TerritoryWars.Bots
                 return SessionManager.Instance.TileSelector;
             }
         }
-
-        private int _localId
-        {
-            get
-            {
-                if (SessionManager.Instance == null) return -1;
-                return SessionManager.Instance.RemotePlayer.LocalId;
-            }
-        }
         
         public BotInputModule(Bot bot) : base(bot)
         {

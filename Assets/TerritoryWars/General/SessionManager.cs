@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using Dojo.Starknet;
+using TerritoryWars.Bots;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.ModelsDataConverters;
@@ -407,6 +408,15 @@ namespace TerritoryWars.General
             DojoGameManager.Instance.SessionManager.OnMoveReceived -= HandleMove;
             DojoGameManager.Instance.SessionManager.OnSkipMoveReceived -= SkipMove;
             GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(SkipMove);
+        }
+
+        public void OnGUI()
+        {
+            Bot bot = DojoGameManager.Instance.LocalBot;
+            if (bot != null && bot.IsDebug && bot.DebugModule != null)
+            {
+                bot.DebugModule.OnGUI();
+            }
         }
     }
 }

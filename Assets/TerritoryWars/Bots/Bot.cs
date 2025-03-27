@@ -6,10 +6,13 @@ namespace TerritoryWars.Bots
     public class Bot
     {
         public Account Account => AccountModule.Account;
+        public bool IsDebug = false;
+        
         public BotAccountModule AccountModule { get; private set; }
         public BotInputModule InputModule { get; private set; }
         public BotDataCollectorModule DataCollectorModule { get; private set; }
         public BotLogicModule LogicModule { get; private set; }
+        public BotDebugModule DebugModule { get; private set; }
         //public BotEventsModule EventsModule { get; private set; }
 
         public void Initialize(Account account)
@@ -18,6 +21,7 @@ namespace TerritoryWars.Bots
             InputModule = new BotInputModule(this);
             DataCollectorModule = new BotDataCollectorModule(this);
             LogicModule = new BotLogicModule(this);
+            DebugModule = new BotDebugModule(this);
             //EventsModule = new BotEventsModule(this);
         }
 
