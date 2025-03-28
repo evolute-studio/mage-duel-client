@@ -267,7 +267,7 @@ namespace TerritoryWars.Dojo
                     CustomLogger.LogInfo($"Creating burner account. Attempt: {i}");
                     if (await CreateLocalAccount(createNew))
                     {
-                        CustomLogger.LogInfo($"Burner account created. Attempt: {i}. Address: {LocalBurnerAccount.Address}");
+                        CustomLogger.LogInfo($"Burner account created. Attempt: {i}. Address: {LocalBurnerAccount.Address.Hex()}");
                         OnLocalPlayerSet?.Invoke();
                         break;
                     }
