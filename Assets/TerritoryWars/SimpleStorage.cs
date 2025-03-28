@@ -4,6 +4,16 @@ namespace TerritoryWars
 {
     public static class SimpleStorage
     {
+        public static void SetDataVersion(int version)
+        {
+            PlayerPrefs.SetInt("DataVersion", version);
+        }
+        
+        public static int LoadDataVersion()
+        {
+            return PlayerPrefs.GetInt("DataVersion", 0);
+        }
+        
         public static void SetPlayerAddress(string address)
         {
             PlayerPrefs.SetString("PlayerAddress", address);
@@ -47,6 +57,11 @@ namespace TerritoryWars
         public static void ClearCurrentBoardId()
         {
             PlayerPrefs.DeleteKey("CurrentBoardId");
+        }
+
+        public static void ClearAll()
+        {
+            PlayerPrefs.DeleteAll();
         }
     }
 }

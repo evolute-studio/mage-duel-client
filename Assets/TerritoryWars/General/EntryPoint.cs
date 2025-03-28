@@ -42,6 +42,8 @@ namespace TerritoryWars.General
         
         private async Task InitializeGameAsync()
         {
+            InitDataStorage();
+            
             try
             {
                 CustomLogger.LogDojoLoop("Starting OnChain mode initialization");
@@ -106,6 +108,18 @@ namespace TerritoryWars.General
                 //SessionManager.Instance.Initialize();
 
             }
+        }
+
+        private void InitDataStorage()
+        {
+            int currentDataVersion = 1;
+            int dataVersion = SimpleStorage.LoadDataVersion();
+            if (dataVersion < currentDataVersion)
+            {
+                SimpleStorage.ClearAll();
+                SimpleStorage.SetDataVersion(currentDataVersion);
+            }
+            
         }
         
         private void OnDestroy()
