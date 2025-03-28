@@ -1,8 +1,10 @@
+using System;
 using System.Linq;
 using dojo_bindings;
 using Dojo;
 using Dojo.Starknet;
 using Dojo.Torii;
+using TerritoryWars.General;
 using TerritoryWars.Tools;
 
 namespace TerritoryWars.Dojo
@@ -64,6 +66,13 @@ namespace TerritoryWars.Dojo
         {
             string[] entity_models = new[] { GetModelName<evolute_duel_Player>() };
             
+            var notBotClause = new MemberClause(
+                GetModelName<evolute_duel_Player>(),
+                "is_bot",
+                dojo.ComparisonOperator.Eq,
+                new MemberValue( new Primitive{ Bool = false })
+            );
+            
             OrderBy[] order_by = new[]
             {
                 new OrderBy(
@@ -71,7 +80,7 @@ namespace TerritoryWars.Dojo
                     member: "balance",
                     direction: dojo.OrderDirection.Desc)
             };
-            Query query = new Query(count, offset, null, dont_include_hashed_keys, 
+            Query query = new Query(count, offset, notBotClause, dont_include_hashed_keys, 
                                     order_by, entity_models, entity_updated_after);
             return query;
         }

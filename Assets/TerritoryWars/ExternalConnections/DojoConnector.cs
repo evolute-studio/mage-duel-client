@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dojo.Starknet;
 using TerritoryWars.Dojo;
@@ -30,6 +31,7 @@ namespace TerritoryWars.ExternalConnections
                 .WithMessage($"DojoCall: [{nameof(CreateGame)}] " +
                              $"\n Account: {account.Address.Hex()}");
             await TryExecuteAction(
+                account,
                 () => GameContract.create_game(account),
                 executeConfig
             );
@@ -43,6 +45,7 @@ namespace TerritoryWars.ExternalConnections
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n SnapshotId: {snapshotId.Hex()}");
             await TryExecuteAction(
+                account,
                 () => GameContract.create_game_from_snapshot(account, snapshotId),
                 executeConfig
             );
@@ -57,6 +60,7 @@ namespace TerritoryWars.ExternalConnections
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n HostPlayer: {hostPlayer.Hex()}");
             await TryExecuteAction(
+                account,
                 () => GameContract.join_game(account, hostPlayer),
                 executeConfig
             );
@@ -81,6 +85,7 @@ namespace TerritoryWars.ExternalConnections
                 });
                 
             await TryExecuteAction(
+                account,
                 () => GameContract.cancel_game(account),
                 executeConfig
             );
@@ -93,6 +98,7 @@ namespace TerritoryWars.ExternalConnections
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n JokerTile: {joker_tile.Unwrap()} Rotation: {rotation} Col: {col} Row: {row}");
             await TryExecuteAction(
+                account,
                 () => GameContract.make_move(account, joker_tile, rotation, col, row),
                 executeConfig
             );
@@ -105,6 +111,7 @@ namespace TerritoryWars.ExternalConnections
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n BoardId: {boardId.Hex()} MoveNumber: {moveNumber}");
             await TryExecuteAction(
+                account,
                 () => GameContract.create_snapshot(account, boardId, moveNumber),
                 executeConfig
             );
@@ -116,6 +123,7 @@ namespace TerritoryWars.ExternalConnections
                 .WithMessage($"DojoCall: [{nameof(SkipMove)}] " +
                              $"\n Account: {account.Address.Hex()}");
             await TryExecuteAction(
+                account,
                 () => GameContract.skip_move(account),
                 executeConfig
             );
@@ -131,6 +139,7 @@ namespace TerritoryWars.ExternalConnections
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n Name: { CairoFieldsConverter.GetStringFromFieldElement(name)}");
             await TryExecuteAction(
+                account,
                 () => PlayerProfileActionsContract.change_username(account, name),
                 executeConfig
             );
@@ -141,7 +150,19 @@ namespace TerritoryWars.ExternalConnections
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(ChangeSkin)}]");
             await TryExecuteAction(
+                account,
                 () => PlayerProfileActionsContract.change_skin(account, (byte)skinId),
+                executeConfig
+            );
+        }
+        
+        public static async void BecameBot(Account account)
+        {
+            ExecuteConfig executeConfig = new ExecuteConfig()
+                .WithMessage($"DojoCall: [{nameof(BecameBot)}]");
+            await TryExecuteAction(
+                account,
+                () => PlayerProfileActionsContract.become_bot(account),
                 executeConfig
             );
         }
@@ -150,7 +171,7 @@ namespace TerritoryWars.ExternalConnections
         
         
         #region Helpers
-        private static async Task<bool> TryExecuteAction(Func<Task<FieldElement>> action, ExecuteConfig config = null)
+        private static async Task<bool> TryExecuteAction(Account account, Func<Task<FieldElement>> action, ExecuteConfig config = null)
         {
             config ??= new ExecuteConfig();
             config.OnStartAction?.Invoke();
@@ -174,22 +195,45 @@ namespace TerritoryWars.ExternalConnections
                 if(!String.IsNullOrEmpty(config.Message))
                     CustomLogger.LogError(config.Message + " failed. Error: " + e.Message);
                 config.OnFailureAction?.Invoke();
-                
+
                 if (e.Message.Contains("ContractNotFound"))
-                    ContractNotFoundHandler();
+                {
+                    ContractNotFoundHandler(account);
+                }
                 
                 return false;
             }
         }
         #endregion
-        
-        
-        private static async void ContractNotFoundHandler()
+
+        private static async void ContractNotFoundHandler(Account account)
         {
-            CustomLogger.LogError("The contract was not found. Maybe a problem in creating an account");
+            string playerAddress = SimpleStorage.LoadPlayerAddress();
+            string botAddress = SimpleStorage.LoadBotAddress();
+            
+            if (account.Address.Hex() == playerAddress)
+            {
+                PlayerContractNotFoundHandler();
+            }
+            else if (account.Address.Hex() == botAddress)
+            {
+                BotContractNotFoundHandler();
+            }
+        }
+        
+        private static async void PlayerContractNotFoundHandler()
+        {
+            CustomLogger.LogError("The Player contract was not found. Maybe a problem in creating an account");
             await DojoGameManager.Instance.CreateLocalAccount(true);
             CustomSceneManager.Instance.LoadLobby();
-            
+        }
+        
+        private static async void BotContractNotFoundHandler()
+        {
+            CustomLogger.LogError("The Bot contract was not found. Maybe a problem in creating an account");
+            CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+            await DojoGameManager.Instance.GetBotForGame(true);
+            CustomSceneManager.Instance.LoadLobby();
         }
     }
     
@@ -204,6 +248,8 @@ namespace TerritoryWars.ExternalConnections
         public Action OnStartAction;
         public Action OnSuccessAction;
         public Action OnFailureAction;
+        
+        public Dictionary<string, Action> OnErrorActions;
 
         public ExecuteConfig(string message = "")
         {
@@ -254,6 +300,21 @@ namespace TerritoryWars.ExternalConnections
         {
             OnFailureAction = onFailure;
             return this;
+        }
+        
+        public ExecuteConfig OnErrorAction(string error, Action action)
+        {
+            if (OnErrorActions == null)
+                OnErrorActions = new Dictionary<string, Action>();
+            OnErrorActions.Add(error, action);
+            return this;
+        }
+        
+        public Action GetErrorAction(string error)
+        {
+            if (OnErrorActions == null)
+                return null;
+            return OnErrorActions.ContainsKey(error) ? OnErrorActions[error] : null;
         }
     }
         

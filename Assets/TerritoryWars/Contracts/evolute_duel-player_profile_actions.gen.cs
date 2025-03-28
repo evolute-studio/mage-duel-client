@@ -101,6 +101,23 @@ public class Player_profile_actions : MonoBehaviour {
             
 
     
+    // Call the `become_bot` system with the specified Account and calldata
+    // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
+    public async Task<FieldElement> become_bot(Account account) {
+        List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
+        
+
+        return await account.ExecuteRaw(new dojo.Call[] {
+            new dojo.Call{
+                to = new FieldElement(contractAddress).Inner,
+                selector = "become_bot",
+                calldata = calldata.ToArray()
+            }
+        });
+    }
+    
+    
+    
     // Call the `change_skin` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
     public async Task<FieldElement> change_skin(Account account, byte skin_id) {

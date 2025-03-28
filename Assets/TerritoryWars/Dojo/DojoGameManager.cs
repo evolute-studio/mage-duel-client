@@ -94,7 +94,7 @@ namespace TerritoryWars.Dojo
             
             await TryCreateLocalAccount(3, false);
             IncomingModelsFilter.SetLocalPlayerId(LocalBurnerAccount.Address.Hex());
-            LocalBot = await GetBotForGame();
+            LocalBot = await GetBotForGame(false);
             if (LocalBot == null)
             {
                 CustomLogger.LogError("Failed to create bot");
@@ -339,7 +339,7 @@ namespace TerritoryWars.Dojo
         public async void CreateGameWithBots()
         {
             CustomLogger.LogDojoLoop("CreateGameWithBots");
-            LocalBot ??= await GetBotForGame();
+            LocalBot ??= await GetBotForGame(false);
             CustomLogger.LogDojoLoop("Bot created");
             if (LocalBot == null)
             {
@@ -355,13 +355,23 @@ namespace TerritoryWars.Dojo
             DojoConnector.JoinGame(LocalBot.Account, LocalBurnerAccount.Address);
             CustomLogger.LogDojoLoop("Bot joined game");
         }
-        public async Task<Bot> GetBotForGame()
+        public async Task<Bot> GetBotForGame(bool newBot)
         {
-            if (!TryGetAccount(SimpleStorage.LoadBotAddress(), out Account account))
+            Account account;
+            if (newBot)
             {
                 account = await CreateAccount();
                 SimpleStorage.SetBotAddress(account.Address.Hex());
-            };
+            }
+            else
+            {
+                if (!TryGetAccount(SimpleStorage.LoadBotAddress(), out account))
+                {
+                    account = await CreateAccount();
+                    SimpleStorage.SetBotAddress(account.Address.Hex());
+                };
+            }
+            
             if (account == null)
             {
                 CustomLogger.LogError("Failed to create bot account");
@@ -369,6 +379,7 @@ namespace TerritoryWars.Dojo
             }
             Bot bot = new Bot();
             bot.Initialize(account);
+            DojoConnector.BecameBot(account);
             return bot;
         }
         
