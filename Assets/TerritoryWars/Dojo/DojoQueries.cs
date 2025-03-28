@@ -73,6 +73,14 @@ namespace TerritoryWars.Dojo
                 new MemberValue( new Primitive{ Bool = false })
             );
             
+            // username not contatin 0x part
+            var notContain0xClause = new MemberClause(
+                GetModelName<evolute_duel_Player>(),
+                "username",
+                dojo.ComparisonOperator.NotIn,
+                new MemberValue("0x")
+            );
+            
             OrderBy[] order_by = new[]
             {
                 new OrderBy(

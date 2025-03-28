@@ -56,6 +56,12 @@ namespace TerritoryWars.General
                 CustomLogger.LogDojoLoop("Creating burner accounts");
                 await DojoGameManager.CreateBurners();
                 
+                //
+                // await CoroutineAsync(() => { }, 2f);
+                //
+                CustomLogger.LogDojoLoop("Creating bot");
+                await DojoGameManager.CreateBot();
+                
                 // 3. Sync Initial Models
                 CustomLogger.LogDojoLoop("Syncing initial models");
                 await DojoGameManager.SyncInitialModels();
@@ -94,6 +100,20 @@ namespace TerritoryWars.General
             tcs.TrySetException(new TimeoutException($"Account setup timed out after {timeout} seconds"));
         }
         
+        private async Task CoroutineAsync(Action action, float delay = 0f)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            StartCoroutine(WaitForCoroutine(tcs, action, delay));
+            await tcs.Task;
+        }
+        
+        private IEnumerator WaitForCoroutine(TaskCompletionSource<bool> tcs, Action action, float delay = 0f)
+        {
+            yield return new WaitForSeconds(delay);
+            action();
+            tcs.TrySetResult(true);
+        }
+        
 
         
         
@@ -112,7 +132,7 @@ namespace TerritoryWars.General
 
         private void InitDataStorage()
         {
-            int currentDataVersion = 1;
+            int currentDataVersion = 2;
             int dataVersion = SimpleStorage.LoadDataVersion();
             if (dataVersion < currentDataVersion)
             {

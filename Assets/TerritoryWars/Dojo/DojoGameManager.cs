@@ -85,6 +85,7 @@ namespace TerritoryWars.Dojo
         public async Task CreateBurners()
         {
             burnerManager = new BurnerManager(provider, masterAccount);
+            await burnerManager.LoadBurnersFromStorage();
             
             WorldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
             WorldManager.synchronizationMaster.OnSynchronized.AddListener(OnSynchronized);
@@ -93,6 +94,11 @@ namespace TerritoryWars.Dojo
             
             await TryCreateLocalAccount(3, false);
             IncomingModelsFilter.SetLocalPlayerId(LocalBurnerAccount.Address.Hex());
+            
+        }
+
+        public async Task CreateBot()
+        {
             LocalBot = await GetBotForGame(false);
             if (LocalBot == null)
             {
@@ -327,6 +333,10 @@ namespace TerritoryWars.Dojo
             account = burnerManager.Burners.FirstOrDefault(b => b.Address.Hex() == address);
             if (account == null)
             {
+                foreach (var burner in burnerManager.Burners)
+                {
+                    CustomLogger.LogWarning($"Burner address: {burner.Address.Hex()} Target address: {address}");
+                }
                 CustomLogger.LogError("Failed to get burner account");
                 return false;
             }

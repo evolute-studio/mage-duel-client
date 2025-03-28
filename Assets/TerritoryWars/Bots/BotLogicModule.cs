@@ -107,11 +107,6 @@ namespace TerritoryWars.Bots
             if (tileData == null || validPlacement == null)
             {
                 CustomLogger.LogDojoLoop("BotLogicModule: Skip joker move");
-                if (SessionManager.Instance.RemotePlayer.JokerCount > 0)
-                {
-                    MakeJokerMove();
-                    return;
-                }
                 SkipMove();
                 return;
             }

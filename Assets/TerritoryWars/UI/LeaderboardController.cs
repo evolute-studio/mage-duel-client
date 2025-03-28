@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Dojo;
 using TerritoryWars.Dojo;
@@ -94,6 +95,10 @@ public class LeaderboardController : MonoBehaviour
         {
             if (i >= players.Count)
                 break;
+            string playerName = CairoFieldsConverter.GetStringFromFieldElement(players[i].username);
+            // start with 0x
+            if(String.IsNullOrEmpty(playerName) || playerName.StartsWith("0x"))
+                continue;
             
             LeaderboardItem leaderboardItem = CreateLeaderboardItem();
             leaderboardItem.PlayerName = CairoFieldsConverter.GetStringFromFieldElement(players[i].username);

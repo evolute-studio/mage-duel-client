@@ -25,7 +25,7 @@ namespace TerritoryWars.Dojo
             int count = await SyncConstruction(
                 DojoQueries.GetQueryPlayer(address), 
                 nameof(SyncPlayer));
-            CustomLogger.LogDojoLoop($"Synced {count} players with address {address}");
+            CustomLogger.LogDojoLoop($"Synced {count} players with address {address.Hex()}");
             return count;
         }
         
@@ -52,7 +52,7 @@ namespace TerritoryWars.Dojo
             int count = await SyncConstruction(
                 DojoQueries.GetQueryPlayerInProgressGame(address), 
                 nameof(SyncPlayerInProgressGame));
-            CustomLogger.LogDojoLoop($"Synced {count} InProgress games with player address {address}");
+            CustomLogger.LogDojoLoop($"Synced {count} InProgress games with player address {address.Hex()}");
             return count;
         }
         
