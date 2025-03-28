@@ -11,12 +11,15 @@ using UnityEngine.UI;
 public class LeaderboardController : MonoBehaviour
 {
     [SerializeField] private uint _playerToShow = 6;
-
+    [SerializeField] private uint _leaderPlaceToShow = 3;
+    
     public GameObject PanelGameObject;
     public GameObject ListItemPrefab;
     [SerializeField] private Sprite[] _leadersImages;
     [SerializeField] private GameObject _placeHolder;
     [SerializeField] private Transform ListItemParent;
+    [SerializeField] private Image[] _leaderPlaceImages;
+    
 
 
     private List<LeaderboardItem> _leaderboardItems = new List<LeaderboardItem>();
@@ -91,10 +94,14 @@ public class LeaderboardController : MonoBehaviour
         {
             if (i >= players.Count)
                 break;
+            
             LeaderboardItem leaderboardItem = CreateLeaderboardItem();
             leaderboardItem.PlayerName = CairoFieldsConverter.GetStringFromFieldElement(players[i].username);
             leaderboardItem.EvoluteCount = players[i].balance;
-            leaderboardItem.SetLeaderPlace(i + 1);
+            if (i < _leaderPlaceToShow)
+            {
+                leaderboardItem.SetLeaderPlace(i + 1);
+            }
             leaderboardItem.SetActive(true);
             leaderboardItem.UpdateItem();
         }
@@ -114,18 +121,23 @@ public class LeaderboardItem
         public GameObject ListItem;
         public string PlayerName;
         public int EvoluteCount;
+        public string Address;
 
         private TextMeshProUGUI _playerNameText;
         private TextMeshProUGUI _evoluteCount;
+        private TextMeshProUGUI _addressText;
+        private TextMeshProUGUI _placeText;
         private Image _leaderPlaceImage;
 
         public LeaderboardItem(GameObject listItem)
         {
             ListItem = listItem;
-            _playerNameText = listItem.transform.Find("PlayerText/NameText").GetComponent<TextMeshProUGUI>();
-            _evoluteCount = listItem.transform.Find("EvoluteCount/Count/EvoluteCountText")
-                .GetComponent<TextMeshProUGUI>();
-            //_leaderPlaceImage = listItem.transform.Find("LeaderPlace/LeaderPlaceImage").GetComponent<Image>();
+            LeaderboardObjects leaderboardObjects = listItem.GetComponent<LeaderboardObjects>();
+            _playerNameText = leaderboardObjects.PlayerName;
+            _evoluteCount = leaderboardObjects.EvoluteCount;
+            _leaderPlaceImage = leaderboardObjects.LeaderPlaceImage;
+            _addressText = leaderboardObjects.Address;
+            _placeText = leaderboardObjects.PlaceText;
         }
         
         public void UpdateItem()
@@ -141,6 +153,8 @@ public class LeaderboardItem
 
         public void SetLeaderPlace(int place)
         {
-            
+            _placeText.text = place.ToString();
+            _leaderPlaceImage.sprite = ListItem.GetComponent<LeaderboardObjects>().LeadersImages[place - 1];
+            ListItem.GetComponent<LeaderboardObjects>().LeaderPlaceGameObject.SetActive(true);
         }
 }
