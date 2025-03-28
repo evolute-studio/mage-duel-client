@@ -11,4 +11,5 @@ public class LeaderboardObjects : MonoBehaviour
     public Image LeaderPlaceImage;
     public Sprite[] LeadersImages;
     public GameObject LeaderPlaceGameObject;
+    public Button CopyButton;
 }
