@@ -97,6 +97,7 @@ public class LeaderboardController : MonoBehaviour
             
             LeaderboardItem leaderboardItem = CreateLeaderboardItem();
             leaderboardItem.PlayerName = CairoFieldsConverter.GetStringFromFieldElement(players[i].username);
+            leaderboardItem.Address = players[i].player_id.Hex();
             leaderboardItem.EvoluteCount = players[i].balance;
             if (i < _leaderPlaceToShow)
             {
@@ -128,6 +129,7 @@ public class LeaderboardItem
         private TextMeshProUGUI _addressText;
         private TextMeshProUGUI _placeText;
         private Image _leaderPlaceImage;
+        private Button _copyButton;
 
         public LeaderboardItem(GameObject listItem)
         {
@@ -138,12 +140,15 @@ public class LeaderboardItem
             _leaderPlaceImage = leaderboardObjects.LeaderPlaceImage;
             _addressText = leaderboardObjects.Address;
             _placeText = leaderboardObjects.PlaceText;
+            _copyButton = leaderboardObjects.CopyButton;
+            _copyButton.onClick.AddListener(CopyAddress);
         }
         
         public void UpdateItem()
         {
             _playerNameText.text = PlayerName;
             _evoluteCount.text = "x " + EvoluteCount.ToString();
+            _addressText.text = Address;
         }
 
         public void SetActive(bool isActive)
@@ -156,5 +161,10 @@ public class LeaderboardItem
             _placeText.text = place.ToString();
             _leaderPlaceImage.sprite = ListItem.GetComponent<LeaderboardObjects>().LeadersImages[place - 1];
             ListItem.GetComponent<LeaderboardObjects>().LeaderPlaceGameObject.SetActive(true);
+        }
+        
+        public void CopyAddress()
+        {
+            GUIUtility.systemCopyBuffer = Address;
         }
 }
