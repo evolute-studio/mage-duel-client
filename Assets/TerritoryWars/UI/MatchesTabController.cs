@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dojo;
 using Dojo.Starknet;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
@@ -25,6 +26,7 @@ namespace TerritoryWars.UI
         public TextMeshProUGUI CanceledMatchesText;
         public GameObject BackgroundPlaceholderGO;
         public Button CreateMatchButton;
+        public Button CreateBotMatchButton;
         
         private int _createdMatchesCount = 0;
         private int _inProgressMatchesCount = 0;
@@ -38,7 +40,7 @@ namespace TerritoryWars.UI
         public void Initialize()
         {
             CreateMatchButton.onClick.AddListener(CreateMatch);
-            
+            CreateBotMatchButton.onClick.AddListener(CreateMatchWithBot);
         }
         
         public MatchListItem CreateListItem()
@@ -157,7 +159,8 @@ namespace TerritoryWars.UI
                     matchListItem.UpdateItem(playerName, evoluteBalance, status, player.player_id.Hex(), moveNumber,() =>
                     {
                         SetActivePanel(false);
-                        DojoGameManager.Instance.JoinGame(gameModel.player);
+                        DojoConnector.JoinGame(DojoGameManager.Instance.LocalBurnerAccount, gameModel.player);
+                        SimpleStorage.SetIsGameWithBot(false);
                     });
                 
                     if (playerName == DojoGameManager.Instance.LocalBurnerAccount.Address.Hex())
@@ -222,7 +225,15 @@ namespace TerritoryWars.UI
         public void CreateMatch()
         {
             SetActivePanel(false);
-            DojoGameManager.Instance.CreateGame();
+            DojoConnector.CreateGame(DojoGameManager.Instance.LocalBurnerAccount);
+            SimpleStorage.SetIsGameWithBot(false);
+        }
+
+        public void CreateMatchWithBot()
+        {
+            SetActivePanel(false);
+            DojoGameManager.Instance.CreateGameWithBots();
+            SimpleStorage.SetIsGameWithBot(true);
         }
         
         public async void SetActivePanel(bool isActive)

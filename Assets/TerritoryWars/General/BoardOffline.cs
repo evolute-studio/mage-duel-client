@@ -389,12 +389,7 @@ namespace TerritoryWars.General
                     {
                         if (CanPlaceTile(tile, x, y))
                         {
-                            validPlacements.Add(new ValidPlacement
-                            {
-                                X = x,
-                                Y = y,
-                                Rotation = rotation
-                            });
+                            validPlacements.Add(new ValidPlacement(x, y, rotation));
                         }
                         tile.Rotate();
                     }

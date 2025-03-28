@@ -21,7 +21,7 @@ namespace TerritoryWars.General
         private Dictionary<(int, int), int> _currentCombinationIndex = new Dictionary<(int, int), int>();
         
         public bool IsJokerActive => isJokerActive;
-
+        
         public JokerManager(SessionManager manager)
         {
             _sessionManager = manager;
@@ -72,6 +72,16 @@ namespace TerritoryWars.General
             
             TileData jokerTile = new TileData(tileConfig);
             return jokerTile;
+        }
+
+        public static TileData GetOneJokerCombination(int x, int y)
+        {
+            JokerManager jokerManager = new JokerManager(SessionManager.Instance);
+            string[] possibleCombinations = jokerManager.GenerateAllCombinations(x, y);
+            string tileConfig = possibleCombinations[Random.Range(0, possibleCombinations.Length)];
+            TileData jokerTile = new TileData(tileConfig);
+            return jokerTile;
+            
         }
 
         public string[] GenerateAllCombinations(int x, int y)

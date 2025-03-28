@@ -1,4 +1,5 @@
 ﻿using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,7 +21,7 @@ namespace TerritoryWars.UI
 
         private void CancelGame()
         {
-            DojoGameManager.Instance.CancelGame();
+            DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
             CustomSceneManager.Instance.LoadLobby();
         }
         

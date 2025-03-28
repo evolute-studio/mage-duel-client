@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Text;
 using dojo_bindings;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -112,6 +113,28 @@ namespace Dojo.Starknet
         public FieldElement(Enum @enum) : this(Convert.ToUInt64(@enum))
         {
         }
+        
+        public FieldElement(string value, bool isText = true)
+        {
+            const int MAX_SHORT_STRING_LENGTH = 31;
+            if (string.IsNullOrEmpty(value))
+                inner = new FieldElement("0").inner;
+
+            if (value.Length > MAX_SHORT_STRING_LENGTH)
+                throw new ArgumentException($"String is too long. Maximum length is {MAX_SHORT_STRING_LENGTH} characters");
+
+          
+            if (value.Any(c => c > 127))
+                throw new ArgumentException("String contains non-ASCII characters");
+
+           
+            var bytes = Encoding.ASCII.GetBytes(value);
+            
+           
+            var hexString = "0x" + BitConverter.ToString(bytes).Replace("-", "");
+            
+            inner = new FieldElement(hexString).inner;
+        }
 
         public string Hex()
         {
@@ -126,6 +149,42 @@ namespace Dojo.Starknet
         public void OnBeforeSerialize()
         {
             hex = Hex();
+        }
+
+        public override string ToString()
+        {
+            try
+            {
+                var hexString = Hex();
+                
+               
+                if (hexString.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+                {
+                    hexString = hexString.Substring(2);
+                }
+
+                
+                if (hexString.Length % 2 != 0)
+                {
+                    hexString = "0" + hexString;
+                }
+
+                
+                var bytes = Enumerable.Range(0, hexString.Length / 2)
+                    .Select(x => Convert.ToByte(hexString.Substring(x * 2, 2), 16))
+                    .ToArray();
+
+               
+                var result = Encoding.ASCII.GetString(bytes).TrimEnd('\0');
+                
+                
+                return new string(result.Where(c => c >= 32 && c <= 126).ToArray());
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Error while converting FieldElement to string: {e.Message}");
+                return Hex();
+            }
         }
     }
 }

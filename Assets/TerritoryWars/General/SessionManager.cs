@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using Dojo.Starknet;
+using TerritoryWars.Bots;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
@@ -55,7 +57,9 @@ namespace TerritoryWars.General
 
             if (!CustomSceneManager.Instance.LoadingScreen.IsLoading)
             {
-                CustomSceneManager.Instance.LoadingScreen.SetActive(true, DojoGameManager.Instance.CancelGame, LoadingScreen.connectingText);
+                CustomSceneManager.Instance.LoadingScreen.SetActive(true, 
+                    () => DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount), 
+                    LoadingScreen.connectingText);
             }
         }
 
@@ -74,7 +78,8 @@ namespace TerritoryWars.General
         public Character CurrentTurnPlayer { get; private set; }
         public Character LocalPlayer { get; private set; }
         public Character RemotePlayer { get; private set; }
-        
+
+        public bool IsGameWithBot => DojoGameManager.Instance.SessionManager.IsGameWithBot;
         public bool IsLocalPlayerTurn => CurrentTurnPlayer == LocalPlayer;
         public bool IsLocalPlayerHost => LocalPlayer.LocalId == 0;
         
@@ -169,6 +174,11 @@ namespace TerritoryWars.General
 
         private void InitializePlayers()
         {
+            if (IsGameWithBot)
+            {
+                DojoGameManager.Instance.LocalBot.SessionStarted();
+            }
+            
             Players = new Character[2];
             PlayersData = new PlayerData[2];
 
@@ -279,6 +289,11 @@ namespace TerritoryWars.General
 
         private void StartRemoteTurn()
         {
+            if (IsGameWithBot)
+            {
+                DojoGameManager.Instance.LocalBot.MakeMove();
+            }
+            
             UpdateTile();
             RemotePlayer.StartSelecting();
             evolute_duel_Board board = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
@@ -382,12 +397,26 @@ namespace TerritoryWars.General
             gameUI.SetEndTurnButtonActive(false);
             Invoke(nameof(StartTurn), 1f);
         }
+    
+        public int GetLocalIdByAddress(FieldElement address)
+        {
+            return Players.FirstOrDefault(player => player.Address.Hex() == address.Hex())?.LocalId ?? -1;
+        }
 
         private void OnDestroy()
         {
             DojoGameManager.Instance.SessionManager.OnMoveReceived -= HandleMove;
             DojoGameManager.Instance.SessionManager.OnSkipMoveReceived -= SkipMove;
             GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(SkipMove);
+        }
+
+        public void OnGUI()
+        {
+            Bot bot = DojoGameManager.Instance.LocalBot;
+            if (bot != null && bot.IsDebug && bot.DebugModule != null)
+            {
+                bot.DebugModule.OnGUI();
+            }
         }
     }
 }

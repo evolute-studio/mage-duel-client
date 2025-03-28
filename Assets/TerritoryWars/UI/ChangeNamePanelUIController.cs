@@ -1,6 +1,7 @@
 using System;
 using TerritoryWars;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
@@ -40,7 +41,9 @@ public class ChangeNamePanelUIController : MonoBehaviour
         if (IsNameValid())
         {
             SetNamePanelActive(false);
-            DojoGameManager.Instance.SetPlayerName(_name);
+            DojoConnector.ChangeUsername(
+                DojoGameManager.Instance.LocalBurnerAccount,
+                CairoFieldsConverter.GetFieldElementFromString(_name));
             evolute_duel_Player profile = DojoGameManager.Instance.GetLocalPlayerData();
             if (profile == null)
             {

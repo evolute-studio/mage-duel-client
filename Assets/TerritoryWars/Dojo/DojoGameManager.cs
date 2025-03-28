@@ -10,6 +10,8 @@ using UnityEngine;
 // fix to use Records in Unity ref. https://stackoverflow.com/a/73100830
 using System.ComponentModel;
 using System.Threading.Tasks;
+using TerritoryWars.Bots;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
@@ -57,6 +59,7 @@ namespace TerritoryWars.Dojo
         public Account masterAccount;
         
         public Account LocalBurnerAccount { get; private set; }
+        public Bot LocalBot { get; private set; }
 
         public bool IsLocalPlayer;
         
@@ -65,7 +68,7 @@ namespace TerritoryWars.Dojo
         public UnityEvent OnLocalPlayerSet = new UnityEvent();
 
 
-        public void SetupAccount(Action callback)
+        public void SetupMasterAccount(Action callback)
         {
             try 
             {
@@ -89,8 +92,13 @@ namespace TerritoryWars.Dojo
             WorldManager.synchronizationMaster.OnEntitySpawned.AddListener(SpawnEntity);
             WorldManager.synchronizationMaster.OnModelUpdated.AddListener(IncomingModelsFilter.FilterModels);
             
-            await TryCreateAccount(3, false);
+            await TryCreateLocalAccount(3, false);
             IncomingModelsFilter.SetLocalPlayerId(LocalBurnerAccount.Address.Hex());
+            LocalBot = await GetBotForGame();
+            if (LocalBot == null)
+            {
+                CustomLogger.LogError("Failed to create bot");
+            }
         }
 
         public async Task SyncInitialModels()
@@ -184,7 +192,9 @@ namespace TerritoryWars.Dojo
             SessionManager = new DojoSessionManager(this);
             CustomSceneManager.Instance.LoadSession(
                 startAction: () =>
-                    CustomSceneManager.Instance.LoadingScreen.SetActive(true, CancelGame, LoadingScreen.connectingText),
+                    CustomSceneManager.Instance.LoadingScreen.SetActive(true, 
+                        () => DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount), 
+                        LoadingScreen.connectingText),
                 finishAction: () =>
                     CustomSceneManager.Instance.LoadingScreen.SetActive(false));
         }
@@ -248,14 +258,14 @@ namespace TerritoryWars.Dojo
         }
         
         #region Account Creation 
-        private async Task TryCreateAccount(int attempts, bool createNew)
+        private async Task TryCreateLocalAccount(int attempts, bool createNew)
         {
             try
             {
                 for (int i = 0; i < attempts; i++)
                 {
                     CustomLogger.LogInfo($"Creating burner account. Attempt: {i}");
-                    if (await CreateAccount(createNew))
+                    if (await CreateLocalAccount(createNew))
                     {
                         CustomLogger.LogInfo($"Burner account created. Attempt: {i}. Address: {LocalBurnerAccount.Address}");
                         OnLocalPlayerSet?.Invoke();
@@ -270,7 +280,7 @@ namespace TerritoryWars.Dojo
         }
         
         
-        public async Task<bool> CreateAccount(bool createNew)
+        public async Task<bool> CreateLocalAccount(bool createNew)
         {
             try
             {
@@ -280,19 +290,17 @@ namespace TerritoryWars.Dojo
                 }
                 else
                 {
-                    if (burnerManager.Burners.Count == 0)
+                    string storedAccountAddress = SimpleStorage.LoadPlayerAddress();
+                    bool isBurnersEmpty = burnerManager.Burners.Count == 0;
+                    Account storedAccount = burnerManager.Burners.FirstOrDefault(b => b.Address.Hex() == storedAccountAddress);
+                    LocalBurnerAccount = storedAccount;
+                    if (storedAccount == null || isBurnersEmpty)
                     {
                         CustomLogger.LogWarning("Burner account not found. Creating new account.");
                         LocalBurnerAccount = await burnerManager.DeployBurner();
                     }
-                    else
-                    {
-                        CustomLogger.LogInfo("Burner account found. Using last account: " + burnerManager.CurrentBurner.Address.Hex());
-                        //use last burner account
-                        LocalBurnerAccount = burnerManager.CurrentBurner;
-                    }
                 }
-
+                SimpleStorage.SetPlayerAddress(LocalBurnerAccount.Address.Hex());
                 return true;
             }
             catch (Exception e)
@@ -301,28 +309,68 @@ namespace TerritoryWars.Dojo
             }
         }
         
-        private async void SimpleAccountCreation(int attempts)
+        public async Task<Account> CreateAccount()
         {
             try
             {
-                for (int i = 0; i < attempts; i++)
-                {
-                    LocalBurnerAccount = await burnerManager.DeployBurner();
-                    if (LocalBurnerAccount != null)
-                    {
-                        OnLocalPlayerSet?.Invoke();
-                        CustomLogger.LogInfo($"Burner account created. Attempt: {i}. Address: {LocalBurnerAccount.Address}");
-                        break;
-                    }
-                }
+                Account account = await burnerManager.DeployBurner();
+                return account;
             }
             catch (Exception e)
             {
                 CustomLogger.LogError($"Failed to create burner account. {e}");
+                return null;
             }
         }
+
+        public bool TryGetAccount(string address, out Account account)
+        {
+            account = burnerManager.Burners.FirstOrDefault(b => b.Address.Hex() == address);
+            if (account == null)
+            {
+                CustomLogger.LogError("Failed to get burner account");
+                return false;
+            }
+            return true;
+            
+        }
         #endregion
-        
+
+        public async void CreateGameWithBots()
+        {
+            CustomLogger.LogDojoLoop("CreateGameWithBots");
+            LocalBot ??= await GetBotForGame();
+            CustomLogger.LogDojoLoop("Bot created");
+            if (LocalBot == null)
+            {
+                CustomLogger.LogError("Failed to create bot");
+                return;
+            }
+
+            await DojoConnector.ChangeUsername(LocalBot.Account,
+               new FieldElement(LocalBot.AccountModule.GetDefaultUsername(), true));
+            CustomLogger.LogDojoLoop("Bot username changed");
+            await DojoConnector.CreateGame(LocalBurnerAccount);
+            CustomLogger.LogDojoLoop("Game created");
+            DojoConnector.JoinGame(LocalBot.Account, LocalBurnerAccount.Address);
+            CustomLogger.LogDojoLoop("Bot joined game");
+        }
+        public async Task<Bot> GetBotForGame()
+        {
+            if (!TryGetAccount(SimpleStorage.LoadBotAddress(), out Account account))
+            {
+                account = await CreateAccount();
+                SimpleStorage.SetBotAddress(account.Address.Hex());
+            };
+            if (account == null)
+            {
+                CustomLogger.LogError("Failed to create bot account");
+                return null;
+            }
+            Bot bot = new Bot();
+            bot.Initialize(account);
+            return bot;
+        }
         
 
         public GameObject[] GetGames() => WorldManager.Entities<evolute_duel_Game>();
@@ -343,110 +391,6 @@ namespace TerritoryWars.Dojo
                 }
             }
             return null;
-        }
-        
-        public async void CreateGame()
-        {
-            try
-            {
-                CustomSceneManager.Instance.LoadingScreen.SetActive(true, CancelGame, LoadingScreen.waitAnathorPlayerText);
-                var txHash = await GameSystem.create_game(LocalBurnerAccount);
-                CustomLogger.LogInfo($"Create Game: {txHash.Hex()}");
-            }
-            catch (Exception e)
-            {
-                CustomSceneManager.Instance.LoadingScreen.SetActive(false);
-                CustomLogger.LogError($"Failed to create game. {e}");
-            }
-        }
-        
-        public async void CreateGameFromSnapshot(FieldElement snapshotId)
-        {
-            try
-            {
-                CustomSceneManager.Instance.LoadingScreen.SetActive(true, CancelGame, LoadingScreen.waitAnathorPlayerText);
-                var txHash = await GameSystem.create_game_from_snapshot(LocalBurnerAccount, snapshotId);
-                CustomLogger.LogInfo($"Create Game from Snapshot: {txHash.Hex()}");
-            }
-            catch (Exception e)
-            {
-                CustomSceneManager.Instance.LoadingScreen.SetActive(false);
-                CustomLogger.LogError($"Failed to create game from snapshot. {e}");
-            }
-        }
-        
-        public async void JoinGame(FieldElement hostPlayer)
-        {
-            try
-            {
-                CustomSceneManager.Instance.LoadingScreen.SetActive(true, CancelGame, LoadingScreen.connectingText);
-                var txHash = await GameSystem.join_game(LocalBurnerAccount, hostPlayer);
-                CustomLogger.LogInfo($"Join Game: {txHash.Hex()}");
-                SessionManager = new DojoSessionManager(this);
-                //CustomSceneManager.Instance.LoadSession();
-                
-            }
-            catch (Exception e)
-            {
-                CustomSceneManager.Instance.LoadingScreen.SetActive(false);
-                CustomLogger.LogError($"Failed to join game. {e}");
-            }
-        }
-        
-        public async void CancelGame()
-        {
-            try
-            {
-                var txHash = await GameSystem.cancel_game(LocalBurnerAccount);
-                CustomLogger.LogInfo($"Cancel Game: {txHash.Hex()}");
-                CustomSceneManager.Instance.LoadingScreen.SetActive(false);
-                if(CustomSceneManager.Instance.CurrentScene != CustomSceneManager.Instance.Menu)
-                {
-                    CustomSceneManager.Instance.LoadLobby(
-                        startAction: () => CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.returnToLobbyText),
-                        finishAction: () => CustomSceneManager.Instance.LoadingScreen.SetActive(false));
-                }
-            }
-            catch (Exception e)
-            {
-                CustomSceneManager.Instance.LoadingScreen.SetActive(false);
-                CustomLogger.LogError($"Failed to cancel game. {e}");
-                if(CustomSceneManager.Instance.CurrentScene != CustomSceneManager.Instance.Menu)
-                {
-                    CustomSceneManager.Instance.LoadLobby();
-                }
-            }
-        }
-        
-        public async void ChangePlayerSkin(int skinId)
-        {
-            try
-            {
-                CustomLogger.LogInfo("Set player skin");
-                var txHash = await PlayerProfileSystem.change_skin(LocalBurnerAccount, (byte)skinId);
-            }
-            catch (Exception e)
-            {
-                if (e.Message.Contains("ContractNotFound"))
-                {
-                    CustomLogger.LogError("The contract was not found. Maybe a problem in creating an account");
-                    SimpleAccountCreation(3);
-                }
-                else
-                {
-                    CustomLogger.LogError($"Failed to set player skin. {e}");
-                }
-            }
-        }
-
-        private void ModelUpdated(ModelInstance modelInstance)
-        {
-            if (modelInstance == null || modelInstance.transform == null) return;
-            
-            if (IsTargetModel(modelInstance, nameof(evolute_duel_Game)))
-            {
-                
-            }
         }
         
         private void OnEventMessage(ModelInstance modelInstance)
@@ -478,8 +422,8 @@ namespace TerritoryWars.Dojo
         {
             string hostPlayer = eventMessage.host_player.Hex();
             if (LocalBurnerAccount.Address.Hex() != hostPlayer) return;
-            CancelGame();
-            Invoke(nameof(CreateGame), 1f);
+            DojoConnector.CancelGame(LocalBurnerAccount);
+            InvokeWithDelay(() => DojoConnector.CreateGame(LocalBurnerAccount), 1f);
         }
         
 
@@ -603,54 +547,6 @@ namespace TerritoryWars.Dojo
             // }
             return player;
             
-        }
-        
-        public async void SetPlayerName(string playerName)
-        {
-            try
-            {
-                FieldElement username = CairoFieldsConverter.GetFieldElementFromString(playerName);
-                var txHash = await PlayerProfileSystem.change_username(LocalBurnerAccount, username);
-                CustomLogger.LogInfo($"Set Player Name: {playerName + "; tx" + txHash.Hex()}");
-                CustomLogger.LogInfo($"Set Player Name, signer address: {LocalBurnerAccount.Address.Hex()}");
-                CustomLogger.LogInfo($"Set Player Name, signer pub key: {LocalBurnerAccount.Signer.PublicKey.Inner.Hex()}");
-            }
-            catch (Exception e)
-            {
-                if (e.Message.Contains("ContractNotFound"))
-                {
-                    CustomLogger.LogError("The contract was not found. Maybe a problem in creating an account");
-                    SimpleAccountCreation(3);
-                }
-                else
-                {
-                    CustomLogger.LogError($"Failed to set player name. {e}");
-                }
-                
-            }
-        }
-        
-        public async void SetPlayerName(FieldElement playerName)
-        {
-            try
-            {
-                var txHash = await PlayerProfileSystem.change_username(LocalBurnerAccount, playerName);
-                CustomLogger.LogInfo($"Set Player Name: {playerName + "; tx" + txHash.Hex()}");
-                CustomLogger.LogInfo($"Set Player Name, burner address: {LocalBurnerAccount.Address.Hex()}");
-                CustomLogger.LogInfo($"Set Player Name, signer pub key: {LocalBurnerAccount.Signer.PublicKey.Inner.Hex()}");
-            }
-            catch (Exception e)
-            {
-                if (e.Message.Contains("ContractNotFound"))
-                {
-                    CustomLogger.LogError("The contract was not found. Maybe a problem in creating an account");
-                    SimpleAccountCreation(3);
-                }
-                else
-                {
-                    CustomLogger.LogError($"Failed to set player name. {e}");
-                }
-            }
         }
         
         private void OnSynchronized(List<GameObject> synchronizedModels)

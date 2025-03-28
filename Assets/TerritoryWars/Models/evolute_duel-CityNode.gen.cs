@@ -5,12 +5,13 @@ using Dojo.Starknet;
 using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
+using TerritoryWars.Models;
 using Enum = Dojo.Starknet.Enum;
 using BigInteger = System.Numerics.BigInteger;
 
 
 // Model definition for `evolute_duel::models::CityNode` model
-public class evolute_duel_CityNode : ModelInstance {
+public class evolute_duel_CityNode : ModelInstance, INode {
     [ModelField("board_id")]
         public FieldElement board_id;
 
@@ -35,13 +36,23 @@ public class evolute_duel_CityNode : ModelInstance {
         [ModelField("contested")]
         public bool contested;
 
-    // Start is called before the first frame update
-    void Start() {
+    public byte GetPosition() {
+        return position;
     }
-
-    // Update is called once per frame
-    void Update() {
+    
+    public ushort GetBluePoints() {
+        return (byte)blue_points;
     }
+    
+    public ushort GetRedPoints() {
+        return (byte)red_points;
+    }
+    
+    public byte GetOpenEdges() {
+        return open_edges;
+    }
+    
+    
 }
 
         
