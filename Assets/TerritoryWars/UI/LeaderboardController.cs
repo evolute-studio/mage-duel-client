@@ -91,6 +91,7 @@ public class LeaderboardController : MonoBehaviour
             IncomingModelsFilter.DestroyModel(players[i]);
         }
         
+        int leaderBoardPlace = 1;
         for (int i = 0; i < _playerToShow; i++)
         {
             if (i >= players.Count)
@@ -106,7 +107,8 @@ public class LeaderboardController : MonoBehaviour
             leaderboardItem.EvoluteCount = players[i].balance;
             if (i < _leaderPlaceToShow)
             {
-                leaderboardItem.SetLeaderPlace(i + 1);
+                leaderboardItem.SetLeaderPlace(leaderBoardPlace);
+                leaderBoardPlace++;
             }
             leaderboardItem.SetActive(true);
             leaderboardItem.UpdateItem();
