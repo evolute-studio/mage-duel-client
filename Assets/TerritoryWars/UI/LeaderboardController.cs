@@ -91,14 +91,14 @@ public class LeaderboardController : MonoBehaviour
             IncomingModelsFilter.DestroyModel(players[i]);
         }
         
-        int leaderBoardPlace = 1;
+        int leaderBoardPlace = 0;
         for (int i = 0; i < _playerToShow; i++)
         {
             if (i >= players.Count)
                 break;
             string playerName = CairoFieldsConverter.GetStringFromFieldElement(players[i].username);
             // start with 0x
-            if(String.IsNullOrEmpty(playerName) || playerName.StartsWith("0x"))
+            if(String.IsNullOrEmpty(playerName) || playerName.StartsWith("0x") || playerName.StartsWith("Bot"))
                 continue;
             
             LeaderboardItem leaderboardItem = CreateLeaderboardItem();
@@ -107,7 +107,7 @@ public class LeaderboardController : MonoBehaviour
             leaderboardItem.EvoluteCount = players[i].balance;
             if (i < _leaderPlaceToShow)
             {
-                leaderboardItem.SetLeaderPlace(leaderBoardPlace);
+                leaderboardItem.SetLeaderPlace(leaderBoardPlace+1);
                 leaderBoardPlace++;
             }
             leaderboardItem.SetActive(true);

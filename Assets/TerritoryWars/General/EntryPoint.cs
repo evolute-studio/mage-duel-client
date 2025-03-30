@@ -132,7 +132,7 @@ namespace TerritoryWars.General
 
         private void InitDataStorage()
         {
-            int currentDataVersion = 2;
+            int currentDataVersion = 3;
             int dataVersion = SimpleStorage.LoadDataVersion();
             if (dataVersion < currentDataVersion)
             {
