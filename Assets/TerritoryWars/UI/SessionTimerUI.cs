@@ -25,7 +25,8 @@ namespace TerritoryWars.UI
         [Header("Timer")]
         public TextMeshProUGUI TimerText;
         public float TurnDuration = 120f;
-        private float _currentTurnTime;
+        private float _startTurnTime;
+        private float _currentTurnTime => GetTurnTime();
         
         [Header("Events")]
         public UnityEvent OnLocalPlayerTurnEnd;
@@ -34,6 +35,8 @@ namespace TerritoryWars.UI
         private bool _isLocalPlayerTurn => SessionManager.Instance.IsLocalPlayerTurn;
         private bool _isTimerActive => _currentTurnTime > 0;
         private string _opponentPlayerName = "opponent's";
+        
+        
 
         public void Update()
         {
@@ -44,7 +47,7 @@ namespace TerritoryWars.UI
         public void StartTurnTimer()
         {
             RotateHourglass();
-            _currentTurnTime = TurnDuration;
+            _startTurnTime = Time.time;
             TimerText.color = Color.white;
         }
         
@@ -52,7 +55,6 @@ namespace TerritoryWars.UI
         {
             if (!_isTimerActive) return;
             
-            _currentTurnTime -= Time.deltaTime;
             TimerText.text = $"{Mathf.FloorToInt(_currentTurnTime / 60):00}:{Mathf.FloorToInt(_currentTurnTime % 60):00}";
 
             if (_currentTurnTime <= TurnDuration / 4)
@@ -65,6 +67,12 @@ namespace TerritoryWars.UI
                 TimerText.text = "00:00";
                 EndTimer();
             }
+        }
+        
+        private float GetTurnTime()
+        {
+            float turnTime = TurnDuration - (Time.time - _startTurnTime);
+            return turnTime < 0 ? 0 : turnTime;
         }
         
         private void EndTimer()
