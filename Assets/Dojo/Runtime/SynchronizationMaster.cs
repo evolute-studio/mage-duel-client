@@ -28,6 +28,8 @@ namespace Dojo
         public UnityEvent<GameObject> OnEntitySpawned;
         public UnityEvent<ModelInstance> OnModelUpdated;
         public UnityEvent<ModelInstance> OnEventMessage;
+        public UnityEvent<TokenBalance> OnTokenBalanceUpdated;
+        public UnityEvent<Token> OnTokenUpdated;
 
         // Awake is called when the script instance is being loaded.
         void Awake()
@@ -106,14 +108,6 @@ namespace Dojo
         // Handles spawning / updating entities as they are updated from the dojo world
         private void HandleEntityUpdate(FieldElement hashedKeys, Model[] entityModels)
         {
-            foreach (var model in entityModels)
-            {
-                if (model.Name == "evolute_duel_Board" || model.Name == "evolute_duel-Board")
-                {
-                    Debug.Log("Board model updated");
-                }
-            }
-            
             // Get the entity game object
             var entity = GameObject.Find(hashedKeys.Hex());
             if (entity == null)
@@ -178,9 +172,27 @@ namespace Dojo
         // Register event message callbacks
         public void RegisterEventMessageCallbacks()
         {
-            Debug.Log("Registering event message callbacks");
             ToriiEvents.Instance.OnEventMessageUpdated += HandleEventMessage;
         }
+
+        // Register token callbacks
+        public void RegisterTokenCallbacks()
+        {
+            ToriiEvents.Instance.OnTokenUpdated += (token) =>
+            {
+                OnTokenUpdated?.Invoke(token);
+            };
+        }
+
+        // Register token balance callbacks
+        public void RegisterTokenBalanceCallbacks()
+        {
+            ToriiEvents.Instance.OnTokenBalanceUpdated += (tokenBalance) =>
+            {
+                OnTokenBalanceUpdated?.Invoke(tokenBalance);
+            };
+        }
+
 
         private ModelInstance[] LoadModels()
         {
