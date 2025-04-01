@@ -111,7 +111,8 @@ namespace TerritoryWars.General
             GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
             GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
             GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
-            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(SkipMove);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(LocalSkipMove);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.AddListener(LocalSkipMove);
             JokerManager.Initialize(board);
             SetTilesInDeck(board.available_tiles_in_deck.Length);
             StartGame();
@@ -323,6 +324,7 @@ namespace TerritoryWars.General
         
         private void SkipMove(string playerAddress)
         {
+            //if (CurrentTurnPlayer.Address.Hex() != playerAddress) return;
             GameUI.Instance.SetJokerMode(false);
             TileSelector.EndTilePlacement();
             CurrentTurnPlayer.EndTurn();
@@ -381,13 +383,19 @@ namespace TerritoryWars.General
             }
         }
         
-        public void SkipMove()
+        public void LocalSkipMove()
         {
-            if (!IsLocalPlayerTurn) return;
             GameUI.Instance.SetEndTurnButtonActive(false);
             TileSelector.ClearHighlights();
             TileSelector.tilePreview.ResetPosition();
-            DojoGameManager.Instance.SessionManager.SkipMove();
+            if (IsLocalPlayerTurn)
+            {
+                DojoGameManager.Instance.SessionManager.SkipMove();
+            }
+            else
+            {
+                CompleteEndTurn(RemotePlayer.Address.Hex());
+            }
         }
 
         public void CompleteEndTurn(string lastMovePlayerAddress)
@@ -407,7 +415,8 @@ namespace TerritoryWars.General
         {
             DojoGameManager.Instance.SessionManager.OnMoveReceived -= HandleMove;
             DojoGameManager.Instance.SessionManager.OnSkipMoveReceived -= SkipMove;
-            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(SkipMove);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(LocalSkipMove);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.RemoveListener(LocalSkipMove);
         }
 
         public void OnGUI()

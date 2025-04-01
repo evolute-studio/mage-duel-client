@@ -33,7 +33,7 @@ namespace TerritoryWars.UI
         public UnityEvent OnOpponentPlayerTurnEnd;
         
         private bool _isLocalPlayerTurn => SessionManager.Instance.IsLocalPlayerTurn;
-        private bool _isTimerActive => _currentTurnTime > 0;
+        private bool _isTimerActive = false;
         private string _opponentPlayerName = "opponent's";
         
         
@@ -48,6 +48,7 @@ namespace TerritoryWars.UI
         {
             RotateHourglass();
             _startTurnTime = Time.time;
+            _isTimerActive = true;
             TimerText.color = Color.white;
         }
         
@@ -72,11 +73,16 @@ namespace TerritoryWars.UI
         private float GetTurnTime()
         {
             float turnTime = TurnDuration - (Time.time - _startTurnTime);
+            if (turnTime < 0.1f)
+            {
+                turnTime = 0;
+            }
             return turnTime < 0 ? 0 : turnTime;
         }
         
         private void EndTimer()
         {
+            _isTimerActive = false;
             CustomLogger.LogInfo("End timer");
             if (_isLocalPlayerTurn)
             {
