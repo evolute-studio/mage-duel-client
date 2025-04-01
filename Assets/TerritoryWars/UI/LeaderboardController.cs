@@ -91,25 +91,21 @@ public class LeaderboardController : MonoBehaviour
             IncomingModelsFilter.DestroyModel(players[i]);
         }
         
-        int leaderBoardPlace = 0;
+        
         for (int i = 0; i < _playerToShow; i++)
         {
             if (i >= players.Count)
                 break;
             string playerName = CairoFieldsConverter.GetStringFromFieldElement(players[i].username);
             // start with 0x
-            if(String.IsNullOrEmpty(playerName) || playerName.StartsWith("0x") || playerName.StartsWith("Bot"))
+            if(String.IsNullOrEmpty(playerName) || playerName.StartsWith("0x") || playerName.StartsWith("Bot") || players[i].balance <= 0)
                 continue;
             
             LeaderboardItem leaderboardItem = CreateLeaderboardItem();
             leaderboardItem.PlayerName = CairoFieldsConverter.GetStringFromFieldElement(players[i].username);
             leaderboardItem.Address = players[i].player_id.Hex();
             leaderboardItem.EvoluteCount = players[i].balance;
-            if (i < _leaderPlaceToShow)
-            {
-                leaderboardItem.SetLeaderPlace(leaderBoardPlace+1);
-                leaderBoardPlace++;
-            }
+            leaderboardItem.SetLeaderPlace(i + 1, _leaderPlaceToShow);
             leaderboardItem.SetActive(true);
             leaderboardItem.UpdateItem();
         }
@@ -154,7 +150,7 @@ public class LeaderboardItem
         public void UpdateItem()
         {
             _playerNameText.text = PlayerName;
-            _evoluteCount.text = "x " + EvoluteCount.ToString();
+            _evoluteCount.text = " x " + EvoluteCount.ToString();
             _addressText.text = Address;
         }
 
@@ -163,11 +159,20 @@ public class LeaderboardItem
             ListItem.SetActive(isActive);
         }
 
-        public void SetLeaderPlace(int place)
+        public void SetLeaderPlace(int place, uint leaderPlace = 3)
         {
-            _placeText.text = place.ToString();
-            _leaderPlaceImage.sprite = ListItem.GetComponent<LeaderboardObjects>().LeadersImages[place - 1];
-            ListItem.GetComponent<LeaderboardObjects>().LeaderPlaceGameObject.SetActive(true);
+            if (place <= leaderPlace)
+            {
+                _placeText.text = place.ToString();
+                _leaderPlaceImage.sprite = ListItem.GetComponent<LeaderboardObjects>().LeadersImages[place - 1];
+                ListItem.GetComponent<LeaderboardObjects>().LeaderPlaceGameObject.SetActive(true);
+            }
+            else
+            {
+                _placeText.text = place.ToString();
+                _leaderPlaceImage.gameObject.SetActive(false);
+                ListItem.GetComponent<LeaderboardObjects>().LeaderPlaceGameObject.SetActive(true);
+            }
         }
         
         public void CopyAddress()
