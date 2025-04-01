@@ -1646,8 +1646,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d9cd6c32bad6bf41a5b3615f20eca14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AlerPopup: {fileID: 5941868709884935042}
-  _confirmButton: {fileID: 5941868709884935041}
 --- !u!1 &369168418
 GameObject:
   m_ObjectHideFlags: 0
@@ -10024,22 +10022,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5132173956156441307, guid: b47ba94892437c547b43398ba828dfe6, type: 3}
   m_PrefabInstance: {fileID: 5941868709884935039}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5941868709884935041 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7921017865701581613, guid: b47ba94892437c547b43398ba828dfe6, type: 3}
-  m_PrefabInstance: {fileID: 5941868709884935039}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &5941868709884935042 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1214480169839445386, guid: b47ba94892437c547b43398ba828dfe6, type: 3}
-  m_PrefabInstance: {fileID: 5941868709884935039}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &5951269098269422705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11075,8 +11057,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8819480654152453273}
     - target: {fileID: 2052855925341146985, guid: d34991f8a1352cd4c9ae8afa1ca385c4, type: 3}
+      propertyPath: m_MovementType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2052855925341146985, guid: d34991f8a1352cd4c9ae8afa1ca385c4, type: 3}
       propertyPath: m_ScrollSensitivity
-      value: 0.75
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 3548588700949860437, guid: d34991f8a1352cd4c9ae8afa1ca385c4, type: 3}
       propertyPath: m_Name
