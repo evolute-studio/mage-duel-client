@@ -33,8 +33,6 @@ namespace Dojo
             // listen for entity updates
             synchronizationMaster.RegisterEntityCallbacks();
             synchronizationMaster.RegisterEventMessageCallbacks();
-            synchronizationMaster.RegisterTokenBalanceCallbacks();
-            synchronizationMaster.RegisterTokenCallbacks();
         }
 
         // #if UNITY_WEBGL && !UNITY_EDITOR

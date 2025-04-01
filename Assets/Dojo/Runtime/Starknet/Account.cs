@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using bottlenoselabs.C2CS.Runtime;
 using dojo_bindings;
+using UnityEngine.Events;
 using Debug = UnityEngine.Debug;
 
 namespace Dojo.Starknet
@@ -41,6 +42,7 @@ namespace Dojo.Starknet
         {
             var resultAccount = dojo.account_new(provider.client, privateKey.Inner.Inner,
                 CString.FromString(address.Hex()));
+            
             if (resultAccount.tag == dojo.ResultAccount_Tag.ErrAccount)
             {
                 throw new Exception(resultAccount.err.message);

@@ -30,16 +30,20 @@ namespace Dojo.Starknet
             return new FieldElement(hex);
         }
     }
+
     [Serializable]
     [JsonConverter(typeof(FieldElementConverter))]
     public class FieldElement : ISerializationCallbackReceiver
     {
         private dojo.FieldElement inner;
+
         public dojo.FieldElement Inner => inner;
+
         // Serialized as a hex string.
         [SerializeField] private string hex;
 
-        public static BigInteger StarkField = BigInteger.Parse("3618502788666131213697322783095070105623107215331596699973092056135872020481");
+        public static BigInteger StarkField =
+            BigInteger.Parse("3618502788666131213697322783095070105623107215331596699973092056135872020481");
 
         // These constructors are pretty slow as they involve a lot of copying.
         // TODO: benchmark and optimize
