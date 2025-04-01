@@ -177,6 +177,10 @@ public class LeaderboardItem
         
         public void CopyAddress()
         {
+            #if UNITY_WEBGL && !UNITY_EDITOR
+            Application.ExternalEval($"navigator.clipboard.writeText('{Address}')");
+            #else
             GUIUtility.systemCopyBuffer = Address;
+            #endif
         }
 }
