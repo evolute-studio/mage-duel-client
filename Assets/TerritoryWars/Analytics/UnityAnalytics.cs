@@ -28,11 +28,37 @@ namespace TerritoryWars.Analytics
         
         private async void Initialize()
         {
-            await UnityServices.InitializeAsync();
-            AnalyticsService.Instance.StartDataCollection();
-            CustomLogger.LogAnalytics($"Started UGS Analytics Sample with user ID: {AnalyticsService.Instance.GetAnalyticsUserID()}");
+            try 
+            {
+                await UnityServices.InitializeAsync();
+                
+                // Ініціалізація аналітики
+                AnalyticsService.Instance.StartDataCollection();
+                
+                // Ініціалізація крашлітики
+                //await CrashReportingService.Instance.InitializeAsync();
+                
+                CustomLogger.LogAnalytics($"Started UGS Analytics Sample with user ID: {AnalyticsService.Instance.GetAnalyticsUserID()}");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to initialize analytics: {e.Message}");
+            }
         }
-        
-        
+
+        private void OnApplicationQuit()
+        {
+            // Відправка даних про завершення сесії
+            AnalyticsService.Instance.Flush();
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (pauseStatus)
+            {
+                // Відправка даних при паузі (особливо важливо для WebGL)
+                AnalyticsService.Instance.Flush();
+            }
+        }
     }
 }
