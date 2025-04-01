@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace TerritoryWars.Tools
 {
@@ -10,6 +12,7 @@ namespace TerritoryWars.Tools
         Error,
         Important,
         DojoLoop,
+        Analytics,
     }
     
     public static class CustomLogger
@@ -21,7 +24,8 @@ namespace TerritoryWars.Tools
             {LogType.Execution, "#32CD32"}, 
             {LogType.Error, "#DC143C"},        
             {LogType.Important, "#9441e0"},
-            {LogType.DojoLoop, "#FFD700"}
+            {LogType.DojoLoop, "#FFD700"},
+            {LogType.Analytics, "#FF4500"}
         };
         
         public static Dictionary<LogType, bool> LogTypeEnabled = new Dictionary<LogType, bool>
@@ -31,15 +35,34 @@ namespace TerritoryWars.Tools
             {LogType.Execution, true},
             {LogType.Error, true},
             {LogType.Important, true},
-            {LogType.DojoLoop, true}
+            {LogType.DojoLoop, true},
+            {LogType.Analytics, true}
         };
         
-        public static void Log(LogType logType, string message)
+        public static void Log(LogType logType, string message, Exception exception = null)
         {
             if (!LogTypeEnabled[logType]) return;
+            
             string color = LogTypeColors[logType];
             string logMessage = $"<color={color}>[{logType}]: {message}</color>";
-            UnityEngine.Debug.Log(logMessage);
+
+            switch (logType)
+            {
+                case LogType.Error:
+                    if (exception != null)
+                    {
+                        exception.Data.Add("LogMessage", logMessage);
+                        Debug.LogException(exception);
+                    }
+                    else
+                    {
+                        Debug.LogError(logMessage);
+                    }
+                    break;
+                default:
+                    Debug.Log(logMessage);
+                    break;
+            }
         }
         
         public static void LogInfo(string message)
@@ -57,9 +80,9 @@ namespace TerritoryWars.Tools
             Log(LogType.Execution, message);
         }
         
-        public static void LogError(string message)
+        public static void LogError(string message, Exception exception = null)
         {
-            Log(LogType.Error, message);
+            Log(LogType.Error, $"{message}", exception);
         }
         
         public static void LogImportant(string message)
@@ -71,7 +94,12 @@ namespace TerritoryWars.Tools
         {
             Log(LogType.DojoLoop, message);
         }
-        
-        
+
+        public static void LogAnalytics(string message)
+        {
+            Log(LogType.Analytics, message);
+        }
+
+
     }
 }

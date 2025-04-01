@@ -193,7 +193,7 @@ namespace TerritoryWars.ExternalConnections
                     CustomSceneManager.Instance.LoadingScreen.SetActive(false);
     
                 if(!String.IsNullOrEmpty(config.Message))
-                    CustomLogger.LogError(config.Message + " failed. Error: " + e.Message);
+                    CustomLogger.LogError(config.Message + " failed. Error: ", e);
                 config.OnFailureAction?.Invoke();
 
                 if (e.Message.Contains("ContractNotFound"))

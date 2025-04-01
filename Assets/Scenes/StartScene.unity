@@ -248,6 +248,12 @@ MonoBehaviour:
   OnEventMessage:
     m_PersistentCalls:
       m_Calls: []
+  OnTokenBalanceUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTokenUpdated:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &209425369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1662,6 +1668,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1604953779}
   m_CullTransparentMesh: 1
+--- !u!1 &1632925030
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1632925032}
+  - component: {fileID: 1632925031}
+  m_Layer: 0
+  m_Name: Analytics
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1632925031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632925030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73917e3fbd6e4ee8acd19088606cc99a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1632925032
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632925030}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 727.09924, y: 995.29895, z: 2.8503888}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1734509911
 GameObject:
   m_ObjectHideFlags: 0
@@ -2317,3 +2367,4 @@ SceneRoots:
   - {fileID: 398816329}
   - {fileID: 105825021}
   - {fileID: 1131915669}
+  - {fileID: 1632925032}
