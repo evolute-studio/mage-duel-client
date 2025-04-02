@@ -7,6 +7,7 @@ using UnityEngine;
 public class SessionUIController : MonoBehaviour
 {
     public static SessionUIController Instance { get; private set; }
+    
     private SessionUIModel _model;
     [SerializeField] SessionUIView _view;
     [SerializeField] private ResultPopUpUI _resultPopUpUI;
@@ -30,14 +31,32 @@ public class SessionUIController : MonoBehaviour
     public void Intialization()
     {
         _sessionManager = FindObjectOfType<SessionManager>();
+        
         SetupButtons();
+        UpdateTilePreview();
+        
         _model = new SessionUIModel(_timeForTurn, GetPlayerNames(), GetPlayerAvatars());
+        _model.OnValuesChanged += UpdateView;
     }
 
     public void SetupButtons()
     {
         _view.rotateTileButton.onClick.AddListener(OnRotateButtonClicked);
         _view.endTurnButton.onClick.AddListener(OnEndTurnClicked);
+        _view.skipTurnButton.onClick.AddListener(SkipMoveButtonClicked);
+        _view.jokerButton.onClick.AddListener(OnJokerButtonClicked);
+        _view.deckButton.onClick.AddListener(OnDeckButtonClicked);
+        _view.SaveSnapshotButton.gameObject.SetActive(false);
+        _view.SaveSnapshotButton.onClick.AddListener(OnSaveSnapshotButtonClicked);
+    }
+    public void UpdateView()
+    {
+        _view.UpdateAvatarsDisplay(_model.PlayerAvatars);
+        _view.UpdateScoresDisplay(_model.Scores);
+        _view.UpdateCityScoreDisplay(_model.CityScores);
+        _view.UpdateTileScoreDisplay(_model.TileScores);
+        _view.UpdatePlayerNamesDisplay(_model.PlayerNames);
+        _view.UpdateDeckCountDisplay(_model.DeckCount);
     }
     
     public void ShowResultPopUp()
@@ -78,15 +97,6 @@ public class SessionUIController : MonoBehaviour
             _resultPopUpUI.ViewResults();
     }
 
-    public void UpdateView()
-    {
-        _view.UpdateAvatarsDisplay(_model.PlayerAvatars);
-        _view.UpdateScoresDisplay(_model.Scores);
-        _view.UpdateCityScoreDisplay(_model.CityScores);
-        _view.UpdateTileScoreDisplay(_model.TileScores);
-        _view.UpdatePlayerNamesDisplay(_model.PlayerNames);
-        _view.UpdateDeckCountDisplay(_model.DeckCount);
-    }
     
     public void UpdateTilePreview()
     {
@@ -203,5 +213,4 @@ public class SessionUIController : MonoBehaviour
             _sessionManager.TileSelector.CancelJokerMode();
         }
     }
-
 }

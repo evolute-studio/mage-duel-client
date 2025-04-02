@@ -161,20 +161,14 @@ public class SessionUIView : MonoBehaviour
         if (active)
         {
             _toggleSpriteRenderer.sprite = _toggleMods[1];
-            // SessionManager.Instance.JokerManager.ActivateJoker();
-                
             tilePreview._tileJokerAnimator.ShowIdleJokerAnimation();
             tilePreviewUITileJokerAnimator.ShowIdleJokerAnimation();
-            // UpdateUI();
         }
         else
         {
             _toggleSpriteRenderer.sprite = _toggleMods[0];
-            // SessionManager.Instance.JokerManager.DeactivateJoker();
             tilePreview._tileJokerAnimator.StopIdleJokerAnimation();
             tilePreviewUITileJokerAnimator.StopIdleJokerAnimation();
-            // SessionManager.Instance.TileSelector.CancelJokerMode();
-            // UpdateUI();
         }
     }
     
