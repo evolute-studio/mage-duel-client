@@ -121,6 +121,11 @@ public class SessionUIView : MonoBehaviour
         {
             tilePreview.UpdatePreview(SessionManager.Instance.TileSelector.CurrentTile);
         }
+        
+        if(jokerButton != null)
+        {
+            jokerButton.interactable = SessionManager.Instance.JokerManager.CanUseJoker();
+        }
     }
     
     public void UpdateJokerButtonInteractable(bool isInteractable)

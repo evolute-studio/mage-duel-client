@@ -12,6 +12,7 @@ public class SessionUIController : MonoBehaviour
     [SerializeField] private ResultPopUpUI _resultPopUpUI;
     [SerializeField] private float _timeForTurn;
     
+    
     private SessionManager _sessionManager;
 
     private void Awake()
@@ -86,6 +87,11 @@ public class SessionUIController : MonoBehaviour
         _view.UpdatePlayerNamesDisplay(_model.PlayerNames);
         _view.UpdateDeckCountDisplay(_model.DeckCount);
     }
+    
+    public void UpdateTilePreview()
+    {
+        _view.UpdateTilePreview();
+    }
 
     public void ChangeScores(int[] playerScores)
     {
@@ -131,6 +137,11 @@ public class SessionUIController : MonoBehaviour
         _view.OnSnapshotButtonClicked();
     }
 
+    public void SetActiveDeckContainer(bool active)
+    {
+        _view.UpdateDeckContainerActive(active);
+    }
+
     public void OnDeckButtonClicked()
     {
         if(!_model.IsJokerMode)
@@ -158,6 +169,12 @@ public class SessionUIController : MonoBehaviour
     {
         _view.SetSkipTurnButtonActive(active);
     }
+
+    public void SkipMoveButtonClicked()
+    {
+        _sessionManager.SkipMove();
+        UpdateTilePreview();
+    }
     
     public void SetRotateButtonActive(bool active)
     {
@@ -168,7 +185,7 @@ public class SessionUIController : MonoBehaviour
     {
         _view.OnEndTurnClicked();
         _sessionManager.EndTurn();
-        
+        UpdateTilePreview();
     }
 
     public void SetJokerMode(bool active)
