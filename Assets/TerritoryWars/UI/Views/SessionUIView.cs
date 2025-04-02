@@ -19,18 +19,18 @@ public class SessionUIView : MonoBehaviour
     [SerializeField] private Image[] redPlayerJokers;
     
     [Header("References")]
-    [SerializeField] private Button endTurnButton;
-    [SerializeField] private Button skipTurnButton;
-    [SerializeField] private Button rotateTileButton;
+    [SerializeField] public Button endTurnButton;
+    [SerializeField] public Button skipTurnButton;
+    [SerializeField] public Button rotateTileButton;
     [SerializeField] private Image currentTilePreview;
-    [SerializeField] private Button jokerButton;
-    [SerializeField] private Button deckButton;
+    [SerializeField] public Button jokerButton;
+    [SerializeField] public Button deckButton;
     [SerializeField] private GameObject jokerModeIndicator;
     [SerializeField] private Sprite[] _toggleMods;
     [SerializeField] private Image _toggleSpriteRenderer;
     [SerializeField] private CanvasGroup _deckContainerCanvasGroup;
     [SerializeField] private ResultPopUpUI _resultPopUpUI;
-    [SerializeField] private Button SaveSnapshotButton;
+    [SerializeField] public Button SaveSnapshotButton;
     [SerializeField] private TextMeshProUGUI SaveSnapshotText;
     [SerializeField] private ArrowAnimations arrowAnimations;
     [SerializeField] private TextMeshProUGUI JokerCountText;
@@ -211,6 +211,12 @@ public class SessionUIView : MonoBehaviour
                 SaveSnapshotText.gameObject.SetActive(false);
             });
         });
+    }
+
+    public void OnEndTurnClicked()
+    {
+        SetEndTurnButtonActive(false);
+        UpdateDeckContainerActive(false);
     }
     
 }

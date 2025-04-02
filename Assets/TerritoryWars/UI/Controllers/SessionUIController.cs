@@ -29,12 +29,14 @@ public class SessionUIController : MonoBehaviour
     public void Intialization()
     {
         _sessionManager = FindObjectOfType<SessionManager>();
+        SetupButtons();
         _model = new SessionUIModel(_timeForTurn, GetPlayerNames(), GetPlayerAvatars());
     }
 
     public void SetupButtons()
     {
-        
+        _view.rotateTileButton.onClick.AddListener(OnRotateButtonClicked);
+        _view.endTurnButton.onClick.AddListener(OnEndTurnClicked);
     }
     
     public void ShowResultPopUp()
@@ -125,12 +127,17 @@ public class SessionUIController : MonoBehaviour
 
     private void OnSaveSnapshotButtonClicked()
     {
-        
+        DojoGameManager.Instance.SessionManager.CreateSnapshot();
+        _view.OnSnapshotButtonClicked();
     }
 
     public void OnDeckButtonClicked()
     {
+        if(!_model.IsJokerMode)
+            return;
         
+        _model.IsJokerMode = false;
+        SetJokerMode(false);
     }
     
     public void OnJokerButtonClicked()
@@ -155,6 +162,13 @@ public class SessionUIController : MonoBehaviour
     public void SetRotateButtonActive(bool active)
     {
         _view.SetRotateButtonActive(active);
+    }
+
+    public void OnEndTurnClicked()
+    {
+        _view.OnEndTurnClicked();
+        _sessionManager.EndTurn();
+        
     }
 
     public void SetJokerMode(bool active)
