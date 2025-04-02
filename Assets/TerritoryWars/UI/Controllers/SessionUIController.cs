@@ -1,7 +1,9 @@
 using System;
+using JetBrains.Annotations;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.UI;
+using TerritoryWars.UI.Views;
 using UnityEngine;
 
 public class SessionUIController : MonoBehaviour
@@ -16,6 +18,9 @@ public class SessionUIController : MonoBehaviour
     
     private SessionManager _sessionManager;
 
+
+    public bool useViews;
+
     private void Awake()
     {
         if (Instance == null)
@@ -28,8 +33,9 @@ public class SessionUIController : MonoBehaviour
         }
     }
 
-    public void Intialization()
+    public void Intialization(bool useViews)
     {
+        this.useViews = useViews;
         _sessionManager = FindObjectOfType<SessionManager>();
         
         SetupButtons();
@@ -38,16 +44,27 @@ public class SessionUIController : MonoBehaviour
         _model = new SessionUIModel(_timeForTurn, GetPlayerNames(), GetPlayerAvatars());
         _model.OnValuesChanged += UpdateView;
     }
+    
+    public T UseView<T>(T view) where T : IView
+    {
+        if (useViews && view != null)
+        {
+            return view;
+        }
+
+        return default;
+    }
 
     public void SetupButtons()
     {
-        _view.rotateTileButton.onClick.AddListener(OnRotateButtonClicked);
-        _view.endTurnButton.onClick.AddListener(OnEndTurnClicked);
-        _view.skipTurnButton.onClick.AddListener(SkipMoveButtonClicked);
-        _view.jokerButton.onClick.AddListener(OnJokerButtonClicked);
-        _view.deckButton.onClick.AddListener(OnDeckButtonClicked);
-        _view.SaveSnapshotButton.gameObject.SetActive(false);
-        _view.SaveSnapshotButton.onClick.AddListener(OnSaveSnapshotButtonClicked);
+        UseView(_view).rotateTileButton.onClick.AddListener(OnRotateButtonClicked);
+        UseView(_view).rotateTileButton.onClick.AddListener(OnRotateButtonClicked);
+        UseView(_view).endTurnButton.onClick.AddListener(OnEndTurnClicked);
+        UseView(_view).skipTurnButton.onClick.AddListener(SkipMoveButtonClicked);
+        UseView(_view)?.jokerButton.onClick.AddListener(OnJokerButtonClicked);
+        UseView(_view)?.deckButton.onClick.AddListener(OnDeckButtonClicked);
+        UseView(_view)?.SaveSnapshotButton.gameObject.SetActive(false);
+        UseView(_view)?.SaveSnapshotButton.onClick.AddListener(OnSaveSnapshotButtonClicked);
     }
     public void UpdateView()
     {

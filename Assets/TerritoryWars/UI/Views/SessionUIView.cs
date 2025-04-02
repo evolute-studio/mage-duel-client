@@ -2,11 +2,12 @@
 using DG.Tweening;
 using TerritoryWars.General;
 using TerritoryWars.UI;
+using TerritoryWars.UI.Views;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SessionUIView : MonoBehaviour
+public class SessionUIView : MonoBehaviour, IView
 {
     [Header("Player Info")]
     
