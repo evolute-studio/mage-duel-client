@@ -1,5 +1,6 @@
 ﻿using TerritoryWars.General;
 using TerritoryWars.Tools;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class SessionUIModel
@@ -7,6 +8,16 @@ public class SessionUIModel
     public System.Action OnValuesChanged;
     
     public CharactersObject charactersObject;
+    
+    public bool IsJokerMode
+    {
+        get { return IsJokerMode; }
+        set
+        {
+            IsJokerMode = value;
+            OnValuesChanged?.Invoke();
+        }
+    }
     public float TimeForTurn { get; set; } = 600f;
 
     public int[] CityScores
@@ -59,7 +70,7 @@ public class SessionUIModel
         } 
     }
     
-    public Image[] PlayerAvatars
+    public Sprite[] PlayerAvatars
     {
         get { return PlayerAvatars;}
         set
@@ -67,9 +78,19 @@ public class SessionUIModel
             PlayerAvatars = value;
             OnValuesChanged.Invoke();
         } 
-    } 
+    }
 
-    public SessionUIModel(float timeForTurn, string[] playerNames, Image[] playerAvatars)
+    public int DeckCount
+    {
+        get { return DeckCount; }
+        set
+        {
+            DeckCount = value;
+            OnValuesChanged.Invoke();
+        }
+    }
+
+    public SessionUIModel(float timeForTurn, string[] playerNames, Sprite[] playerAvatars)
     {
         CityScores = new int[] { 0, 0 };
         TileScores = new int[] { 0, 0 };

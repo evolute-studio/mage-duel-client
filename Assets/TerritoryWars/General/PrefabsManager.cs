@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TerritoryWars.Tools;
 using UnityEngine;
 
 namespace TerritoryWars.General
@@ -26,6 +27,7 @@ namespace TerritoryWars.General
         public GameObject ClashAnimationPrefab;
         public GameObject PinPrefab;
         public List<MineEnviromentTile> MineEnviromentTiles;
+        public CharactersObject CharactersObject;
         private int _currentPlayerIndex = 0;
         
         public GameObject GetNextPlayer()
