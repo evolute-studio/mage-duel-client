@@ -95,7 +95,6 @@ namespace TerritoryWars.General
 
         public void Initialize()
         {
-            CustomLogger.LogImportant("SessionManager.Initialize()");
             InitializePlayers();
             InitializeBoard();
             DojoGameManager.Instance.SessionManager.UpdateBoardAfterRoadContest();
@@ -360,7 +359,6 @@ namespace TerritoryWars.General
 
         public void SetNextTile(TileData tile)
         {
-            CustomLogger.LogImportant("SetNextTile");
             _nextTile = tile;
         }
 

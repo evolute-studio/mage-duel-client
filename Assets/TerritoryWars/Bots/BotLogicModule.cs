@@ -68,7 +68,6 @@ namespace TerritoryWars.Bots
 
             float progress = (float)(placedTiles - borderTiles) / maxMoves;
             float chance = Mathf.Clamp01(Mathf.Pow(progress, k));
-            CustomLogger.LogImportant($"Joker chance: {chance} Progress: {progress} Placed tiles: {placedTiles} Max moves: {maxMoves}");
             return chance;
         }
 
@@ -137,7 +136,6 @@ namespace TerritoryWars.Bots
             // evaluate every jokers
             Dictionary<ValidPlacement, float> jokerValues = EvaluateAllJokerMoves(jokers);
             var bestJoker = jokerValues.OrderByDescending(x => x.Value).First();
-            CustomLogger.LogImportant($"Best joker: {bestJoker.Key.x}, {bestJoker.Key.y}, Value: {bestJoker.Value}");
             ValidPlacement key = null;
             foreach (var joker in jokers)
             {
@@ -174,7 +172,6 @@ namespace TerritoryWars.Bots
                 return null;
             }
             var result = moves.OrderByDescending(x => x.Value).First();
-            CustomLogger.LogImportant($"Best move: {result.Key.x}, {result.Key.y}, {result.Key.rotation}, Value: {result.Value}");
             return result.Key;
         }
         
@@ -200,7 +197,6 @@ namespace TerritoryWars.Bots
 
         private float EvaluateMove(TileData tileData, ValidPlacement validPlacement)
         {
-            CustomLogger.LogImportant($"Evaluating move. Config: {tileData.id}, X: {validPlacement.x}, Y: {validPlacement.y}, Rotation: {validPlacement.rotation}");
             TileData tile = new TileData(tileData.id);
             tile.Rotate(validPlacement.rotation);
 
@@ -233,7 +229,6 @@ namespace TerritoryWars.Bots
                     processedRoads.Add(roadSet.Key);
                 }
             }
-            CustomLogger.LogImportant($"Evaluating move. City value: {cityValue}, Road value: {roadValue}, Total value: {cityValue + roadValue}");
             return cityValue + roadValue;
         }
         
@@ -265,7 +260,6 @@ namespace TerritoryWars.Bots
 
             int deltaPoints = myPoints - enemyPoints;
             float result = deltaPoints * POINTS_WEIGHT;
-            CustomLogger.LogImportant($"Evaluating structure. Points: {deltaPoints}, Result: {result}");
             return result;
         }
     }

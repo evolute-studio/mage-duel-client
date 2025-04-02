@@ -43,7 +43,6 @@ namespace TerritoryWars.UI
         public void Initialize()
         {
             DojoGameManager.Instance.CustomSynchronizationMaster.DestroyBoardsAndAllDependencies();
-            CustomLogger.LogWarning("MenuUIController.Initialize");
             _namePanelController.Initialize();
             _characterSelector.Initialize();
         }

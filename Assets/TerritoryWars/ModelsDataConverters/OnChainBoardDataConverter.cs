@@ -44,7 +44,6 @@ namespace TerritoryWars.ModelsDataConverters
     
         public static string GetTopTile(Option<byte> top_tile)
         {
-            CustomLogger.LogInfo("Get top tile.");
             var type = top_tile switch
             {
                 Option<byte>.Some someValue => someValue.value.ToString(),

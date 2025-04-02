@@ -32,13 +32,11 @@ public class Character : MonoBehaviour
     }
     public void StartSelecting()
     {
-        CustomLogger.LogImportant($"Start Selecting. LocalId: {LocalId} Side: {Side}");
         _characterAnimator.PlayCast(true);
     }
     
     public void EndTurn()
     {
-        CustomLogger.LogImportant($"End Turn. LocalId: {LocalId} Side: {Side}");
         _characterAnimator.PlayCast(false);
         _characterAnimator.PlayHit();
     }

@@ -126,7 +126,6 @@ namespace TerritoryWars.General
 
         public void StartTilePlacement(TileData tile)
         {
-            CustomLogger.LogWarning("StartTilePlacement Simple");
             GameUI.Instance.SetEndTurnButtonActive(false);
             tilePreview.ResetPosition();
             tilePreview.UpdatePreview(tile);
@@ -493,7 +492,6 @@ namespace TerritoryWars.General
 
         public void StartJokerPlacement()
         {
-            CustomLogger.LogWarning("StartTilePlacement Joker");
             GameUI.Instance.SetEndTurnButtonActive(false);
             tilePreview.ResetPosition();
             

@@ -333,10 +333,6 @@ namespace TerritoryWars.Dojo
             account = burnerManager.Burners.FirstOrDefault(b => b.Address.Hex() == address);
             if (account == null)
             {
-                foreach (var burner in burnerManager.Burners)
-                {
-                    CustomLogger.LogWarning($"Burner address: {burner.Address.Hex()} Target address: {address}");
-                }
                 CustomLogger.LogError("Failed to get burner account");
                 return false;
             }
@@ -432,8 +428,6 @@ namespace TerritoryWars.Dojo
         
         private void PlayerUsernameChanged(evolute_duel_PlayerUsernameChanged eventMessage)
         {
-            CustomLogger.LogWarning("Burner account address:" + LocalBurnerAccount.Address.Hex());
-            CustomLogger.LogWarning("Real caller address from event: " + eventMessage.player_id.Hex());
             if(LocalBurnerAccount == null || LocalBurnerAccount.Address.Hex() != eventMessage.player_id.Hex()) return;
             MenuUIController.Instance._namePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username));
         }

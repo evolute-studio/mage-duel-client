@@ -175,7 +175,6 @@ namespace TerritoryWars.Dojo
             var availableTiles = eventModel.available_tiles_in_deck.Length;
             var hostPlayerJokers = eventModel.player1.Item3;
             var guestPlayerJokers = eventModel.player2.Item3;
-            CustomLogger.LogImportant($"BoardUpdated. TopTile: {tileData.id}");
             SessionManager.Instance.SetNextTile(tileData);
             SessionManager.Instance.SetTilesInDeck(availableTiles + 1);
             SessionManager.Instance.JokerManager.SetJokersCount(0, hostPlayerJokers);
@@ -304,7 +303,6 @@ namespace TerritoryWars.Dojo
         {
             ClashAnimation contestAnimation = CreateContestAnimation();
             Vector2Int coord = OnChainBoardDataConverter.GetPositionByRoot(root);
-            CustomLogger.LogWarning($"ContestAnimation: {coord}, Root: {root}");
             GameObject tile = SessionManager.Instance.Board.GetTileObject(coord.x, coord.y);
             if (tile)
             {
@@ -362,7 +360,6 @@ namespace TerritoryWars.Dojo
         {
             cities = new Dictionary<evolute_duel_CityNode, List<evolute_duel_CityNode>>();
             var cityNodesList = GetCityNodes();
-            CustomLogger.LogWarning("CityNodesList: " + cityNodesList.Count);
             foreach (var cityNode in cityNodesList)
             {
                 var root = GetCityRoot(cityNode);
@@ -378,11 +375,8 @@ namespace TerritoryWars.Dojo
         public KeyValuePair<T, List<T>> GetNearSetByPositionAndSide<T>(Vector2Int position, Side side)
             where T : class
         {
-            CustomLogger.LogImportant($"GetNearSetByPositionAndSide: {position}, {side.ToString()}");
             (Vector2Int targetPosition, Side targetSide) = GetNearTileSide(position, side);
-            CustomLogger.LogImportant($"Target: {targetPosition}, {targetSide.ToString()}");
             var root = OnChainBoardDataConverter.GetRootByPositionAndSide(targetPosition, targetSide);
-            CustomLogger.LogImportant($"Root: {root}");
             
             Dictionary<T, List<T>> targetDict;
             if (typeof(T) == typeof(evolute_duel_CityNode))
@@ -401,7 +395,6 @@ namespace TerritoryWars.Dojo
             {
                 return new KeyValuePair<T, List<T>>();
             }
-            CustomLogger.LogImportant($"TargetDict: {targetDict.Count}");
             string dictContent = "";
             foreach (var set in targetDict)
             {
@@ -412,7 +405,6 @@ namespace TerritoryWars.Dojo
                     dictContent += $"\n {node} | {iNode.GetPosition()}";
                 }
             }
-            CustomLogger.LogWarning(dictContent);
 
             foreach (var set in targetDict)
             {
@@ -464,7 +456,6 @@ namespace TerritoryWars.Dojo
         {
             roads = new Dictionary<evolute_duel_RoadNode, List<evolute_duel_RoadNode>>();
             var roadNodesList = GetRoadNodes();
-            CustomLogger.LogWarning("RoadNodesList: " + roadNodesList.Count);
             foreach (var roadNode in roadNodesList)
             {
                 var root = GetRoadRoot(roadNode);
@@ -649,7 +640,6 @@ namespace TerritoryWars.Dojo
         public TileData GetTopTile()
         {
             if (LocalPlayerBoard == null) return null;
-            CustomLogger.LogInfo("Get top tile. Board id: " + LocalPlayerBoard.id.Hex());
             return new TileData(OnChainBoardDataConverter.GetTopTile(LocalPlayerBoard.top_tile));
         }
 
