@@ -66,14 +66,14 @@ namespace TerritoryWars.ExternalConnections
             );
         }
         
+        private static void ReturnToMenu()
+        {
+            if (CustomSceneManager.Instance.CurrentScene != CustomSceneManager.Instance.Menu)
+                CustomSceneManager.Instance.LoadLobby();
+        }
+        
         public static async void CancelGame(Account account)
         {
-            void ReturnToMenu()
-            {
-                if (CustomSceneManager.Instance.CurrentScene != CustomSceneManager.Instance.Menu)
-                    CustomSceneManager.Instance.LoadLobby();
-            }
-            
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(CancelGame)}] " +
                              $"\n Account: {account.Address.Hex()}")
@@ -87,6 +87,19 @@ namespace TerritoryWars.ExternalConnections
             await TryExecuteAction(
                 account,
                 () => GameContract.cancel_game(account),
+                executeConfig
+            );
+        }
+        
+        public static async void FinishGame(Account account, FieldElement boardId)
+        {
+            ExecuteConfig executeConfig = new ExecuteConfig()
+                .WithMessage($"DojoCall: [{nameof(FinishGame)}] " +
+                             $"\n Account: {account.Address.Hex()} " +
+                             $"\n BoardId: {boardId.Hex()}");
+            await TryExecuteAction(
+                account,
+                () => GameContract.finish_game(account, boardId),
                 executeConfig
             );
         }

@@ -31,7 +31,7 @@ public class ChangeNamePanelUIController : MonoBehaviour
     
     public void SetNamePanelActive(bool active)
     {
-        NameInputField.text = "";
+        NameInputField.text = MenuUIController.Instance._namePanelController.PlayerNameText.text;
         NamePanel.SetActive(active);
     }
 

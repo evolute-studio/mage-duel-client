@@ -59,6 +59,7 @@ namespace TerritoryWars.Dojo
         
         public Account LocalBurnerAccount { get; private set; }
         public Bot LocalBot { get; private set; }
+        public Bot LocalBotAsPlayer { get; private set; }
 
         public bool IsLocalPlayer;
         
@@ -104,6 +105,14 @@ namespace TerritoryWars.Dojo
             {
                 CustomLogger.LogError("Failed to create bot");
             }
+        }
+        
+        public Bot CreateBotAsPlayer()
+        {
+            var localBotAsPlayer = new Bot();
+            localBotAsPlayer.Initialize(LocalBurnerAccount);
+            return localBotAsPlayer;
+            //DojoConnector.BecameBot(LocalBurnerAccount);
         }
 
         public async Task SyncInitialModels()
@@ -194,6 +203,7 @@ namespace TerritoryWars.Dojo
 
         private void RestoreGame()
         {
+            SessionManager?.OnDestroy();
             SessionManager = new DojoSessionManager(this);
             CustomSceneManager.Instance.LoadSession(
                 startAction: () =>
@@ -333,10 +343,6 @@ namespace TerritoryWars.Dojo
             account = burnerManager.Burners.FirstOrDefault(b => b.Address.Hex() == address);
             if (account == null)
             {
-                foreach (var burner in burnerManager.Burners)
-                {
-                    CustomLogger.LogWarning($"Burner address: {burner.Address.Hex()} Target address: {address}");
-                }
                 CustomLogger.LogError("Failed to get burner account");
                 return false;
             }
@@ -363,6 +369,26 @@ namespace TerritoryWars.Dojo
             CustomLogger.LogDojoLoop("Game created");
             DojoConnector.JoinGame(LocalBot.Account, LocalBurnerAccount.Address);
             CustomLogger.LogDojoLoop("Bot joined game");
+        }
+        
+        [ContextMenu("Create game between bots")]
+        public async void CreateGameBetweenBots()
+        {
+            CustomLogger.LogDojoLoop("CreateGameBetweenBots");
+            LocalBot ??= await GetBotForGame(false);
+            if (LocalBot == null)
+            {
+                CustomLogger.LogError("Failed to create bot");
+                return;
+            }
+
+            LocalBotAsPlayer ??= CreateBotAsPlayer();
+            await DojoConnector.ChangeUsername(LocalBot.Account,
+                new FieldElement(LocalBot.AccountModule.GetDefaultUsername(), true));
+            CustomLogger.LogDojoLoop("Bot username changed");
+            await DojoConnector.CreateGame(LocalBotAsPlayer.Account);
+            CustomLogger.LogDojoLoop("Game created");
+            DojoConnector.JoinGame(LocalBot.Account, LocalBotAsPlayer.Account.Address);
         }
         public async Task<Bot> GetBotForGame(bool newBot)
         {
@@ -432,8 +458,6 @@ namespace TerritoryWars.Dojo
         
         private void PlayerUsernameChanged(evolute_duel_PlayerUsernameChanged eventMessage)
         {
-            CustomLogger.LogWarning("Burner account address:" + LocalBurnerAccount.Address.Hex());
-            CustomLogger.LogWarning("Real caller address from event: " + eventMessage.player_id.Hex());
             if(LocalBurnerAccount == null || LocalBurnerAccount.Address.Hex() != eventMessage.player_id.Hex()) return;
             MenuUIController.Instance._namePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username));
         }
@@ -468,6 +492,7 @@ namespace TerritoryWars.Dojo
                 // Start session
                 ApplicationState.SetState(ApplicationStates.Initializing);
                 await SyncEverythingForGame();
+                SessionManager?.OnDestroy();
                 SessionManager = new DojoSessionManager(this);
                 CustomSceneManager.Instance.LoadSession();
             }
