@@ -164,9 +164,12 @@ namespace TerritoryWars.Dojo
             int cartScoreBlue = eventModel.blue_score.Item2;
             int cityScoreRed = eventModel.red_score.Item1;
             int cartScoreRed = eventModel.red_score.Item2;
-            GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
-            GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
-            GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
+            // GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
+            // GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
+            // GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
+            SessionUIController.Instance.ChangeCityScores(new [] {cityScoreBlue, cityScoreRed});
+            SessionUIController.Instance.ChangeTilesScores(new [] {cartScoreBlue, cartScoreRed});
+            SessionUIController.Instance.ChangeScores(new [] {cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed});
             var tileData = eventModel.top_tile switch
             {
                 Option<byte>.Some topTile => new TileData(OnChainBoardDataConverter.GetTopTile(topTile)),
@@ -178,8 +181,7 @@ namespace TerritoryWars.Dojo
             CustomLogger.LogImportant($"BoardUpdated. TopTile: {tileData.id}");
             SessionManager.Instance.SetNextTile(tileData);
             SessionManager.Instance.SetTilesInDeck(availableTiles + 1);
-            SessionManager.Instance.JokerManager.SetJokersCount(0, hostPlayerJokers);
-            SessionManager.Instance.JokerManager.SetJokersCount(1, guestPlayerJokers);
+            SessionManager.Instance.JokerManager.SetJokersCount(new int[] { hostPlayerJokers, guestPlayerJokers });
         }
 
         private void GameFinished(FieldElement board_id, FieldElement hostPlayer)
@@ -200,7 +202,8 @@ namespace TerritoryWars.Dojo
         {
             yield return new WaitForSeconds(6f);
             SimpleStorage.ClearCurrentBoardId();
-            GameUI.Instance.ShowResultPopUp();
+            // GameUI.Instance.ShowResultPopUp();
+            SessionUIController.Instance.ShowResultPopUp();
         }
 
         private void RoadContestWon(evolute_duel_RoadContestWon eventModel)

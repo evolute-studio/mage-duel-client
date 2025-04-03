@@ -3,7 +3,6 @@ using JetBrains.Annotations;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.UI;
-using TerritoryWars.UI.Views;
 using UnityEngine;
 
 public class SessionUIController : MonoBehaviour
@@ -14,6 +13,8 @@ public class SessionUIController : MonoBehaviour
     [SerializeField] SessionUIView _view;
     [SerializeField] private ResultPopUpUI _resultPopUpUI;
     [SerializeField] private float _timeForTurn;
+    [SerializeField] public SessionTimerUI SessionTimerUI;
+    [SerializeField] private CancelGamePopup _cancelGamePopup;
     
     
     private SessionManager _sessionManager;
@@ -57,23 +58,26 @@ public class SessionUIController : MonoBehaviour
 
     public void SetupButtons()
     {
-        UseView(_view).rotateTileButton.onClick.AddListener(OnRotateButtonClicked);
-        UseView(_view).rotateTileButton.onClick.AddListener(OnRotateButtonClicked);
-        UseView(_view).endTurnButton.onClick.AddListener(OnEndTurnClicked);
-        UseView(_view).skipTurnButton.onClick.AddListener(SkipMoveButtonClicked);
+        UseView(_view)?.rotateTileButton.onClick.AddListener(OnRotateButtonClicked);
+        UseView(_view)?.rotateTileButton.onClick.AddListener(OnRotateButtonClicked);
+        UseView(_view)?.endTurnButton.onClick.AddListener(OnEndTurnClicked);
+        UseView(_view)?.skipTurnButton.onClick.AddListener(SkipMoveButtonClicked);
         UseView(_view)?.jokerButton.onClick.AddListener(OnJokerButtonClicked);
         UseView(_view)?.deckButton.onClick.AddListener(OnDeckButtonClicked);
-        UseView(_view)?.SaveSnapshotButton.gameObject.SetActive(false);
+        UseView(_view)?.SaveSnapshotText.gameObject.SetActive(false);
         UseView(_view)?.SaveSnapshotButton.onClick.AddListener(OnSaveSnapshotButtonClicked);
+        UseView(_view)?.CancelGameButton.onClick.AddListener(OnCancelGameClicked);
     }
     public void UpdateView()
     {
-        _view.UpdateAvatarsDisplay(_model.PlayerAvatars);
-        _view.UpdateScoresDisplay(_model.Scores);
-        _view.UpdateCityScoreDisplay(_model.CityScores);
-        _view.UpdateTileScoreDisplay(_model.TileScores);
-        _view.UpdatePlayerNamesDisplay(_model.PlayerNames);
-        _view.UpdateDeckCountDisplay(_model.DeckCount);
+        UseView(_view)?.UpdateAvatarsDisplay(_model.PlayerAvatars);
+        UseView(_view)?.UpdateScoresDisplay(_model.Scores);
+        UseView(_view)?.UpdateCityScoreDisplay(_model.CityScores);
+        UseView(_view)?.UpdateTileScoreDisplay(_model.TileScores);
+        UseView(_view)?.UpdatePlayerNamesDisplay(_model.PlayerNames);
+        // UseView(_view)?.UpdateDeckCountDisplay(_model.DeckCount);
+        UseView(_view)?.UpdateJokersCountDisplay(_model.JokerCount[0], _model.JokerCount[1]);
+        UseView(_view)?.UpdateJokerCountTextDisplay(_model.JokerCount[0]);
     }
     
     public void ShowResultPopUp()
@@ -139,6 +143,12 @@ public class SessionUIController : MonoBehaviour
         _model.TileScores = scores;
     }
 
+    public void ChangeJokerCount(int[] playerJokerCount)
+    {
+        int[] jokerCount = SetLocalPlayerData.GetLocalPlayerInt(playerJokerCount[0], playerJokerCount[1]);
+        _model.JokerCount = jokerCount;
+    }
+
     public string[] GetPlayerNames()
     {
         string[] playerNames = SetLocalPlayerData.GetLocalPlayerString(_sessionManager.PlayersData[0].username, _sessionManager.PlayersData[1].username);
@@ -156,6 +166,11 @@ public class SessionUIController : MonoBehaviour
     {
         _view.PlayArrowAnimation();
         _model.RotateCurrentTile();
+    }
+
+    public void SetDeckCount(int count)
+    {
+        _view.UpdateDeckCountDisplay(count);
     }
 
     private void OnSaveSnapshotButtonClicked()
@@ -229,5 +244,10 @@ public class SessionUIController : MonoBehaviour
             _sessionManager.JokerManager.DeactivateJoker();
             _sessionManager.TileSelector.CancelJokerMode();
         }
+    }
+
+    public void OnCancelGameClicked()
+    {
+        _cancelGamePopup.SetActive(true);
     }
 }

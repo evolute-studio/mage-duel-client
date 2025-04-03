@@ -9,84 +9,93 @@ public class SessionUIModel
     
     public CharactersObject charactersObject;
     
+    private bool _isJokerMode;
     public bool IsJokerMode
     {
-        get { return IsJokerMode; }
+        get { return _isJokerMode; }
         set
         {
-            IsJokerMode = value;
+            _isJokerMode = value;
             OnValuesChanged?.Invoke();
         }
     }
+    
     public float TimeForTurn { get; set; } = 600f;
 
+    private int[] _cityScores;
     public int[] CityScores
     {
-        get { return CityScores; }
+        get { return _cityScores; }
         set
         {
-            CityScores = value;
+            _cityScores = value;
             OnValuesChanged?.Invoke();
         }
     }
 
+    private int[] _tileScores;
     public int[] TileScores
     {
-        get { return TileScores; }
+        get { return _tileScores; }
         set
         {
-            TileScores = value;
-            OnValuesChanged.Invoke();
+            _tileScores = value;
+            OnValuesChanged?.Invoke();
         } 
     }
     
+    private int[] _scores;
     public int[] Scores
     {
-        get { return Scores;}
+        get { return _scores;}
         set
         {
-            Scores = value;
-            OnValuesChanged.Invoke();
+            _scores = value;
+            OnValuesChanged?.Invoke();
         } 
     }
     
+    private string[] _playerNames;
     public string[] PlayerNames
     {
-        get { return PlayerNames;}
+        get { return _playerNames;}
         set
         {
-            PlayerNames = value;
-            OnValuesChanged.Invoke();
+            _playerNames = value;
+            OnValuesChanged?.Invoke();
         } 
     }
     
+    private int[] _jokerCount;
     public int[] JokerCount
     {
-        get { return JokerCount;}
+        get { return _jokerCount;}
         set
         {
-            JokerCount = value;
-            OnValuesChanged.Invoke();
+            _jokerCount = value;
+            OnValuesChanged?.Invoke();
         } 
     }
     
+    private Sprite[] _playerAvatars;
     public Sprite[] PlayerAvatars
     {
-        get { return PlayerAvatars;}
+        get { return _playerAvatars;}
         set
         {
-            PlayerAvatars = value;
-            OnValuesChanged.Invoke();
+            _playerAvatars = value;
+            OnValuesChanged?.Invoke();
         } 
     }
 
+    private int _deckCount;
     public int DeckCount
     {
-        get { return DeckCount; }
+        get { return _deckCount; }
         set
         {
-            DeckCount = value;
-            OnValuesChanged.Invoke();
+            _deckCount = value;
+            OnValuesChanged?.Invoke();
         }
     }
 

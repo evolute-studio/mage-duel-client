@@ -120,14 +120,16 @@ namespace TerritoryWars.General
         public void SetCurrentTile(TileData tile)
         {
             currentTile = tile;
-            gameUI.UpdateUI();
+            // gameUI.UpdateUI();
+            SessionUIController.Instance.UpdateTilePreview();
             tilePreview.UpdatePreview(tile);
         }
 
         public void StartTilePlacement(TileData tile)
         {
             CustomLogger.LogWarning("StartTilePlacement Simple");
-            GameUI.Instance.SetEndTurnButtonActive(false);
+            SessionUIController.Instance.SetEndTurnButtonActive(false);
+            // GameUI.Instance.SetEndTurnButtonActive(false);
             tilePreview.ResetPosition();
             tilePreview.UpdatePreview(tile);
             currentTile = tile;
@@ -143,9 +145,12 @@ namespace TerritoryWars.General
             }
 
             ShowPossiblePlacements(_currentValidPlacements);
-            gameUI.SetEndTurnButtonActive(false);
-            gameUI.SetRotateButtonActive(false);
-            gameUI.UpdateUI();
+            SessionUIController.Instance.SetEndTurnButtonActive(false);
+            SessionUIController.Instance.SetRotateButtonActive(false);
+            SessionUIController.Instance.UpdateTilePreview();
+            // gameUI.SetEndTurnButtonActive(false);
+            // gameUI.SetRotateButtonActive(false);
+            // gameUI.UpdateUI();
         }
 
         private void ShowPossiblePlacements(List<ValidPlacement> placements)
@@ -221,7 +226,8 @@ namespace TerritoryWars.General
                     
                     TileJokerAnimator.EvoluteTileDisappear();
                     TileJokerAnimatorUI.EvoluteTileDisappear();
-                    gameUI.SetRotateButtonActive(true);
+                    // gameUI.SetRotateButtonActive(true);
+                    SessionUIController.Instance.SetRotateButtonActive(true);
                     
                     
                     StartCoroutine(InvokeActionWithDelay(0.8f, () =>
@@ -293,8 +299,10 @@ namespace TerritoryWars.General
                 RotateToFirstValidRotation();
 
                 OnTileSelected?.Invoke(x, y);
-                gameUI.SetRotateButtonActive(currentValidRotations.Count > 1);
-                gameUI.SetEndTurnButtonActive(true);
+                // gameUI.SetRotateButtonActive(currentValidRotations.Count > 1);
+                SessionUIController.Instance.SetRotateButtonActive(currentValidRotations.Count > 1);
+                SessionUIController.Instance.SetEndTurnButtonActive(true);
+                // gameUI.SetEndTurnButtonActive(true);
             
         }
 
@@ -335,7 +343,8 @@ namespace TerritoryWars.General
                 {
                     currentTile.Rotate();
                 }
-                gameUI.UpdateUI();
+                // gameUI.UpdateUI();
+                SessionUIController.Instance.UpdateTilePreview();
             }
         }
 
@@ -349,13 +358,16 @@ namespace TerritoryWars.General
             {
                 SetHighlightColor(invalidHighlightColor);
                 selectedPosition = null;
-                gameUI.SetEndTurnButtonActive(false);
-                gameUI.SetRotateButtonActive(false);
+                // gameUI.SetEndTurnButtonActive(false);
+                SessionUIController.Instance.SetEndTurnButtonActive(false);
+                SessionUIController.Instance.SetRotateButtonActive(false);
+                // gameUI.SetRotateButtonActive(false);
                 return;
             }
 
             RotateToFirstValidRotation();
-            gameUI.SetRotateButtonActive(currentValidRotations.Count > 1);
+            // gameUI.SetRotateButtonActive(currentValidRotations.Count > 1);
+            SessionUIController.Instance.SetRotateButtonActive(currentValidRotations.Count > 1);
         }
 
         public void RotateCurrentTile()
@@ -398,7 +410,8 @@ namespace TerritoryWars.General
                     return;
                 }
 
-                gameUI.UpdateUI();
+                // gameUI.UpdateUI();
+                SessionUIController.Instance.UpdateTilePreview();
             }
             
         }
@@ -409,7 +422,8 @@ namespace TerritoryWars.General
 
             OnTurnEnding.Invoke();
 
-            gameUI.SetRotateButtonActive(false);
+            // gameUI.SetRotateButtonActive(false);
+            SessionUIController.Instance.SetRotateButtonActive(false);
 
             tilePreview.PlaceTile(CompleteTilePlacement);
         }
@@ -452,9 +466,12 @@ namespace TerritoryWars.General
                     jokerPosition = null;
                     ClearHighlights();
                     OnTilePlaced.Invoke();
-                    gameUI.SetEndTurnButtonActive(false);
-                    gameUI.SetRotateButtonActive(false);
-                    gameUI.SetSkipTurnButtonActive(true);
+                    // gameUI.SetEndTurnButtonActive(false);
+                    // gameUI.SetRotateButtonActive(false);
+                    // gameUI.SetSkipTurnButtonActive(true);
+                    SessionUIController.Instance.SetEndTurnButtonActive(false);
+                    SessionUIController.Instance.SetRotateButtonActive(false);
+                    SessionUIController.Instance.SetSkipTurnButtonActive(true);
                 }
             }
             catch (System.Exception e)
@@ -494,7 +511,8 @@ namespace TerritoryWars.General
         public void StartJokerPlacement()
         {
             CustomLogger.LogWarning("StartTilePlacement Joker");
-            GameUI.Instance.SetEndTurnButtonActive(false);
+            // GameUI.Instance.SetEndTurnButtonActive(false);
+            SessionUIController.Instance.SetEndTurnButtonActive(false);
             tilePreview.ResetPosition();
             
             isJokerMode = true;
@@ -505,9 +523,12 @@ namespace TerritoryWars.General
             
             ShowJokerPlacements();
             
-            gameUI.SetEndTurnButtonActive(false);
-            gameUI.SetRotateButtonActive(false);
-            gameUI.UpdateUI();
+            // gameUI.SetEndTurnButtonActive(false);
+            // gameUI.SetRotateButtonActive(false);
+            SessionUIController.Instance.SetEndTurnButtonActive(false);
+            SessionUIController.Instance.SetRotateButtonActive(false);
+            SessionUIController.Instance.UpdateTilePreview();
+            // gameUI.UpdateUI();
         }
 
         private void ShowJokerPlacements()
@@ -580,8 +601,10 @@ namespace TerritoryWars.General
                 selectedPosition = new Vector2Int(x, y);
                 isPlacingTile = true;
 
-                gameUI.UpdateUI();
-                gameUI.SetEndTurnButtonActive(true);
+                // gameUI.UpdateUI();
+                SessionUIController.Instance.UpdateTilePreview();
+                SessionUIController.Instance.SetEndTurnButtonActive(true);
+                // gameUI.SetEndTurnButtonActive(true);
                 
                
                 UpdateHighlights(x, y);

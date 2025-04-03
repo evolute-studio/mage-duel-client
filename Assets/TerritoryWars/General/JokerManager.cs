@@ -28,9 +28,8 @@ namespace TerritoryWars.General
         }
         public void Initialize(evolute_duel_Board board)
         {
-            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
-            SetJokersCount(0, board.player1.Item3);
-            SetJokersCount(1, board.player2.Item3);
+            // GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
+            SetJokersCount(new int[] { board.player1.Item3, board.player2.Item3 });
         }
         
          public void ActivateJoker()
@@ -47,7 +46,8 @@ namespace TerritoryWars.General
         {
             isJokerActive = false;
             Players[CurrentTurnPlayer.LocalId].JokerCount++;
-            GameUI.Instance.UpdateUI();
+            // GameUI.Instance.UpdateUI();
+            SessionUIController.Instance.UpdateTilePreview();
         }
         
         public TileData GetGenerateJokerTile(int x, int y)
@@ -202,14 +202,17 @@ namespace TerritoryWars.General
         public void CompleteJokerPlacement()
         {
             isJokerActive = false;
-            GameUI.Instance.SetJokerMode(false);
-            GameUI.Instance.UpdateUI();
+            // GameUI.Instance.SetJokerMode(false);
+            SessionUIController.Instance.SetJokerMode(false);
+            SessionUIController.Instance.UpdateTilePreview();
+            // GameUI.Instance.UpdateUI();
         }
         
-        public void SetJokersCount(int playerId, int count)
+        public void SetJokersCount(int[] jokerCount)
         {
-            GameUI.Instance.playerInfoUI.SetJokersCount(playerId, count);
-            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
+            SessionUIController.Instance.ChangeJokerCount(jokerCount);
+            // GameUI.Instance.playerInfoUI.SetJokersCount(playerId, count);
+            // GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
         }
     }
 }

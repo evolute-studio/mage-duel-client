@@ -2,7 +2,6 @@
 using DG.Tweening;
 using TerritoryWars.General;
 using TerritoryWars.UI;
-using TerritoryWars.UI.Views;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,7 +31,7 @@ public class SessionUIView : MonoBehaviour, IView
     [SerializeField] private CanvasGroup _deckContainerCanvasGroup;
     [SerializeField] private ResultPopUpUI _resultPopUpUI;
     [SerializeField] public Button SaveSnapshotButton;
-    [SerializeField] private TextMeshProUGUI SaveSnapshotText;
+    [SerializeField] public TextMeshProUGUI SaveSnapshotText;
     [SerializeField] private ArrowAnimations arrowAnimations;
     [SerializeField] private TextMeshProUGUI JokerCountText;
     
@@ -218,5 +217,4 @@ public class SessionUIView : MonoBehaviour, IView
         SetEndTurnButtonActive(false);
         UpdateDeckContainerActive(false);
     }
-    
 }

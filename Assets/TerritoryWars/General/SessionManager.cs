@@ -67,6 +67,7 @@ namespace TerritoryWars.General
         public Board Board;
         [SerializeField] private GameUI gameUI;
         [SerializeField] private PlayerInfoUI sessionUI;
+        [SerializeField] private SessionUIController _sessionUIController;
         [SerializeField] private DeckManager deckManager;
         public JokerManager JokerManager;
         public TileSelector TileSelector;
@@ -101,17 +102,22 @@ namespace TerritoryWars.General
             DojoGameManager.Instance.SessionManager.UpdateBoardAfterRoadContest();
             DojoGameManager.Instance.SessionManager.UpdateBoardAfterCityContest();
             JokerManager = new JokerManager(this);
-            gameUI.Initialize();
-            sessionUI.Initialization();
+            // gameUI.Initialize();
+            _sessionUIController.Intialization(true);
+            // sessionUI.Initialization();
             evolute_duel_Board board = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
             int cityScoreBlue = board.blue_score.Item1;
             int cartScoreBlue = board.blue_score.Item2;
             int cityScoreRed = board.red_score.Item1;
             int cartScoreRed = board.red_score.Item2;
-            GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
-            GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
-            GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
-            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(SkipMove);
+            // GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
+            SessionUIController.Instance.ChangeCityScores(new [] {cityScoreBlue, cityScoreRed});
+            SessionUIController.Instance.ChangeTilesScores(new [] {cartScoreBlue, cartScoreRed});
+            SessionUIController.Instance.ChangeScores(new [] {cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed});
+            // GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
+            // GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
+            // GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(SkipMove);
+            SessionUIController.Instance.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(SkipMove);
             JokerManager.Initialize(board);
             SetTilesInDeck(board.available_tiles_in_deck.Length);
             StartGame();
@@ -258,7 +264,8 @@ namespace TerritoryWars.General
 
         private void StartTurn()
         {
-            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer();
+            // GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer();
+            SessionUIController.Instance.SessionTimerUI.StartTurnTimer();
             if (CurrentTurnPlayer == LocalPlayer)
             {
                 StartLocalTurn();
@@ -277,14 +284,18 @@ namespace TerritoryWars.General
             Players[0].UpdateData(board.player1.Item3);
             Players[1].UpdateData(board.player2.Item3);
             
-            gameUI.SetEndTurnButtonActive(false);
-            gameUI.SetRotateButtonActive(false);
-            gameUI.SetSkipTurnButtonActive(true);
+            // gameUI.SetSkipTurnButtonActive(true);
+            // gameUI.SetEndTurnButtonActive(false);
+            // gameUI.SetRotateButtonActive(false);
+            SessionUIController.Instance.SetEndTurnButtonActive(false);
+            SessionUIController.Instance.SetRotateButtonActive(false);
+            SessionUIController.Instance.SetSkipTurnButtonActive(true);
 
             TileData currentTile = DojoGameManager.Instance.SessionManager.GetTopTile();
             currentTile.OwnerId = LocalPlayer.LocalId;
             TileSelector.StartTilePlacement(currentTile);
-            gameUI.SetActiveDeckContainer(true);
+            SessionUIController.Instance.SetActiveDeckContainer(true);
+            // gameUI.SetActiveDeckContainer(true);
         }
 
         private void StartRemoteTurn()
@@ -300,10 +311,14 @@ namespace TerritoryWars.General
             Players[0].UpdateData(board.player1.Item3);
             Players[1].UpdateData(board.player2.Item3);
             
-            gameUI.SetEndTurnButtonActive(false);
-            gameUI.SetRotateButtonActive(false);
-            gameUI.SetSkipTurnButtonActive(false);
-            gameUI.SetActiveDeckContainer(false);
+            // gameUI.SetActiveDeckContainer(false);
+            // gameUI.SetEndTurnButtonActive(false);
+            // gameUI.SetRotateButtonActive(false);
+            // gameUI.SetSkipTurnButtonActive(false);
+            SessionUIController.Instance.SetEndTurnButtonActive(false);
+            SessionUIController.Instance.SetRotateButtonActive(false);
+            SessionUIController.Instance.SetSkipTurnButtonActive(false);
+            SessionUIController.Instance.SetActiveDeckContainer(false);
         }
 
         private void HandleMove(string playerAddress, TileData tile, Vector2Int position, int rotation, bool isJoker)
@@ -323,7 +338,8 @@ namespace TerritoryWars.General
         
         private void SkipMove(string playerAddress)
         {
-            GameUI.Instance.SetJokerMode(false);
+            // GameUI.Instance.SetJokerMode(false);
+            SessionUIController.Instance.SetJokerMode(false);
             TileSelector.EndTilePlacement();
             CurrentTurnPlayer.EndTurn();
             CompleteEndTurn(playerAddress);
@@ -364,7 +380,8 @@ namespace TerritoryWars.General
 
         public void SetTilesInDeck(int count)
         {
-            gameUI.playerInfoUI.SetDeckCount(count);
+            // gameUI.playerInfoUI.SetDeckCount(count);
+            SessionUIController.Instance.SetDeckCount(count);
         }
 
         public void RotateCurrentTile()
@@ -384,7 +401,8 @@ namespace TerritoryWars.General
         public void SkipMove()
         {
             if (!IsLocalPlayerTurn) return;
-            GameUI.Instance.SetEndTurnButtonActive(false);
+            // GameUI.Instance.SetEndTurnButtonActive(false);
+            SessionUIController.Instance.SetEndTurnButtonActive(false);
             TileSelector.ClearHighlights();
             TileSelector.tilePreview.ResetPosition();
             DojoGameManager.Instance.SessionManager.SkipMove();
@@ -394,7 +412,8 @@ namespace TerritoryWars.General
         {
             bool isLocalPlayer = lastMovePlayerAddress == LocalPlayer.Address.Hex();
             CurrentTurnPlayer = isLocalPlayer ? RemotePlayer : LocalPlayer;
-            gameUI.SetEndTurnButtonActive(false);
+            // gameUI.SetEndTurnButtonActive(false);
+            SessionUIController.Instance.SetEndTurnButtonActive(false);
             Invoke(nameof(StartTurn), 1f);
         }
     
@@ -407,7 +426,8 @@ namespace TerritoryWars.General
         {
             DojoGameManager.Instance.SessionManager.OnMoveReceived -= HandleMove;
             DojoGameManager.Instance.SessionManager.OnSkipMoveReceived -= SkipMove;
-            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(SkipMove);
+            // GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(SkipMove);
+            SessionUIController.Instance.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(SkipMove);
         }
 
         public void OnGUI()
