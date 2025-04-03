@@ -75,7 +75,6 @@ public class SessionUIController : MonoBehaviour
         UseView(_view)?.UpdateCityScoreDisplay(_model.CityScores);
         UseView(_view)?.UpdateTileScoreDisplay(_model.TileScores);
         UseView(_view)?.UpdatePlayerNamesDisplay(_model.PlayerNames);
-        // UseView(_view)?.UpdateDeckCountDisplay(_model.DeckCount);
         UseView(_view)?.UpdateJokersCountDisplay(_model.JokerCount[0], _model.JokerCount[1]);
         UseView(_view)?.UpdateJokerCountTextDisplay(_model.JokerCount[0]);
     }
@@ -121,7 +120,7 @@ public class SessionUIController : MonoBehaviour
     
     public void UpdateTilePreview()
     {
-        _view.UpdateTilePreview();
+        UseView(_view)?.UpdateTilePreview();
     }
 
     public void ChangeScores(int[] playerScores)
@@ -164,24 +163,24 @@ public class SessionUIController : MonoBehaviour
 
     public void OnRotateButtonClicked()
     {
-        _view.PlayArrowAnimation();
+        UseView(_view)?.PlayArrowAnimation();
         _model.RotateCurrentTile();
     }
 
     public void SetDeckCount(int count)
     {
-        _view.UpdateDeckCountDisplay(count);
+        UseView(_view)?.UpdateDeckCountDisplay(count);
     }
 
     private void OnSaveSnapshotButtonClicked()
     {
         DojoGameManager.Instance.SessionManager.CreateSnapshot();
-        _view.OnSnapshotButtonClicked();
+        UseView(_view)?.OnSnapshotButtonClicked();
     }
 
     public void SetActiveDeckContainer(bool active)
     {
-        _view.UpdateDeckContainerActive(active);
+        UseView(_view)?.UpdateDeckContainerActive(active);
     }
 
     public void OnDeckButtonClicked()
@@ -204,12 +203,12 @@ public class SessionUIController : MonoBehaviour
     
     public void SetEndTurnButtonActive(bool active)
     {
-        _view.SetEndTurnButtonActive(active);
+        UseView(_view)?.SetEndTurnButtonActive(active);
     }
     
     public void SetSkipTurnButtonActive(bool active)
     {
-        _view.SetSkipTurnButtonActive(active);
+        UseView(_view)?.SetSkipTurnButtonActive(active);
     }
 
     public void SkipMoveButtonClicked()
@@ -220,12 +219,12 @@ public class SessionUIController : MonoBehaviour
     
     public void SetRotateButtonActive(bool active)
     {
-        _view.SetRotateButtonActive(active);
+        UseView(_view)?.SetRotateButtonActive(active);
     }
 
     public void OnEndTurnClicked()
     {
-        _view.OnEndTurnClicked();
+        UseView(_view)?.OnEndTurnClicked();
         _sessionManager.EndTurn();
         UpdateTilePreview();
     }
@@ -235,14 +234,16 @@ public class SessionUIController : MonoBehaviour
         _model.IsJokerMode = active;
         if (active)
         {
-            _view.SetJokerModeAnimation(active);
+            UseView(_view)?.SetJokerModeAnimation(active);
             _sessionManager.JokerManager.ActivateJoker();
+            UpdateTilePreview();
         }
         else
         {
-            _view.SetJokerModeAnimation(active);
+            UseView(_view)?.SetJokerModeAnimation(active);
             _sessionManager.JokerManager.DeactivateJoker();
             _sessionManager.TileSelector.CancelJokerMode();
+            UpdateTilePreview();
         }
     }
 
