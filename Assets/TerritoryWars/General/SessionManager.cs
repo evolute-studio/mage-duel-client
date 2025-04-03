@@ -110,8 +110,8 @@ namespace TerritoryWars.General
             GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
             GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
             GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
-            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(LocalSkipMove);
-            GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.AddListener(LocalSkipMove);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(ClientLocalPlayerSkip);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.AddListener(ClientRemotePlayerSkip);
             JokerManager.Initialize(board);
             SetTilesInDeck(board.available_tiles_in_deck.Length);
             StartGame();
@@ -250,6 +250,7 @@ namespace TerritoryWars.General
         public void StartGame()
         {
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp, IsLocalPlayerTurn);
             Invoke(nameof(StartTurn), 2f);
 
             DojoGameManager.Instance.SessionManager.OnMoveReceived += HandleMove;
@@ -258,7 +259,6 @@ namespace TerritoryWars.General
 
         private void StartTurn()
         {
-            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer();
             if (CurrentTurnPlayer == LocalPlayer)
             {
                 StartLocalTurn();
@@ -271,6 +271,7 @@ namespace TerritoryWars.General
 
         private void StartLocalTurn()
         {
+            CustomLogger.LogImportant("StartLocalTurn");
             UpdateTile();
             LocalPlayer.StartSelecting();
             evolute_duel_Board board = DojoGameManager.Instance.WorldManager.Entities<evolute_duel_Board>().First().GetComponent<evolute_duel_Board>();
@@ -289,6 +290,7 @@ namespace TerritoryWars.General
 
         private void StartRemoteTurn()
         {
+            CustomLogger.LogImportant("StartRemoteTurn");
             if (IsGameWithBot)
             {
                 DojoGameManager.Instance.LocalBot.MakeMove();
@@ -319,16 +321,52 @@ namespace TerritoryWars.General
             }
             if (playerAddress == LocalPlayer.Address.Hex()) CompleteEndTurn(playerAddress);
             else StartCoroutine(HandleOpponentMoveCoroutine(playerAddress, tile, position, rotation));
+            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.Address.Hex());
         }
         
         private void SkipMove(string playerAddress)
         {
-            //if (CurrentTurnPlayer.Address.Hex() != playerAddress) return;
+            if (CurrentTurnPlayer.Address.Hex() != playerAddress) return;
             GameUI.Instance.SetJokerMode(false);
             TileSelector.EndTilePlacement();
             CurrentTurnPlayer.EndTurn();
             CompleteEndTurn(playerAddress);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.Address.Hex());
         }
+
+        public void ClientLocalPlayerSkip()
+        {
+            DojoGameManager.Instance.SessionManager.LocalSkipped(LocalPlayer.Address.Hex());
+            DojoGameManager.Instance.SessionManager.SkipMove();
+        }
+        
+        public void ClientRemotePlayerSkip()
+        {
+            DojoGameManager.Instance.SessionManager.LocalSkipped(RemotePlayer.Address.Hex());
+        }
+        
+        // public void LocalSkipMove()
+        // {
+        //     GameUI.Instance.SetEndTurnButtonActive(false);
+        //     TileSelector.ClearHighlights();
+        //     TileSelector.tilePreview.ResetPosition();
+        //     CurrentTurnPlayer.EndTurn();
+        //     if (IsLocalPlayerTurn)
+        //     {
+        //         DojoGameManager.Instance.SessionManager.SkipMove();
+        //     }
+        //     else
+        //     {
+        //         _localSkipMoveCoroutine = StartCoroutine(LocalSkipMoveCoroutine(RemotePlayer.Address.Hex()));
+        //     }
+        // }
+        // private Coroutine _localSkipMoveCoroutine;
+        // private IEnumerator LocalSkipMoveCoroutine(string address)
+        // {
+        //     yield return new WaitForSeconds(2f);
+        //     GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp, false);
+        //     CompleteEndTurn(address);
+        // }
 
         private IEnumerator HandleOpponentMoveCoroutine(string playerAddress, TileData tile, Vector2Int position, int rotation)
         {
@@ -380,21 +418,6 @@ namespace TerritoryWars.General
                 TileSelector.ClearHighlights();
             }
         }
-        
-        public void LocalSkipMove()
-        {
-            GameUI.Instance.SetEndTurnButtonActive(false);
-            TileSelector.ClearHighlights();
-            TileSelector.tilePreview.ResetPosition();
-            if (IsLocalPlayerTurn)
-            {
-                DojoGameManager.Instance.SessionManager.SkipMove();
-            }
-            else
-            {
-                CompleteEndTurn(RemotePlayer.Address.Hex());
-            }
-        }
 
         public void CompleteEndTurn(string lastMovePlayerAddress)
         {
@@ -413,8 +436,8 @@ namespace TerritoryWars.General
         {
             DojoGameManager.Instance.SessionManager.OnMoveReceived -= HandleMove;
             DojoGameManager.Instance.SessionManager.OnSkipMoveReceived -= SkipMove;
-            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(LocalSkipMove);
-            GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.RemoveListener(LocalSkipMove);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(ClientLocalPlayerSkip);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.RemoveListener(ClientRemotePlayerSkip);
         }
 
         public void OnGUI()

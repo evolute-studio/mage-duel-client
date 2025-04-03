@@ -182,7 +182,7 @@ namespace TerritoryWars.UI
         
         private void SkipMoveButtonClicked()
         {
-            _sessionManager.LocalSkipMove();
+            _sessionManager.ClientLocalPlayerSkip();
             UpdateUI();
         }
         

@@ -37,6 +37,9 @@ public class evolute_duel_Moved : ModelInstance {
 
         [ModelField("board_id")]
         public FieldElement board_id;
+        
+        [ModelField("timestamp")]
+        public ulong timestamp;
 
     // Start is called before the first frame update
     void Start() {
