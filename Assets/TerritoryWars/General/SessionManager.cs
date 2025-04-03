@@ -80,6 +80,7 @@ namespace TerritoryWars.General
         public Character RemotePlayer { get; private set; }
 
         public bool IsGameWithBot => DojoGameManager.Instance.SessionManager.IsGameWithBot;
+        public bool IsGameWithBotAsPlayer => DojoGameManager.Instance.SessionManager.IsGameWithBotAsPlayer;
         public bool IsLocalPlayerTurn => CurrentTurnPlayer == LocalPlayer;
         public bool IsLocalPlayerHost => LocalPlayer.LocalId == 0;
         
@@ -201,6 +202,11 @@ namespace TerritoryWars.General
             {
                 DojoGameManager.Instance.LocalBot.SessionStarted();
             }
+            if(IsGameWithBotAsPlayer)
+            {
+                DojoGameManager.Instance.LocalBot.SessionStarted();
+                DojoGameManager.Instance.LocalBotAsPlayer.SessionStarted();
+            }
             
             Players = new Character[2];
             PlayersData = new PlayerData[2];
@@ -303,6 +309,11 @@ namespace TerritoryWars.General
         private void StartLocalTurn()
         {
             CustomLogger.LogImportant("StartLocalTurn");
+            if (IsGameWithBotAsPlayer)
+            {
+                DojoGameManager.Instance.LocalBotAsPlayer.MakeMove();
+            }
+            
             UpdateTile();
             LocalPlayer.StartSelecting();
             evolute_duel_Board board = DojoGameManager.Instance.WorldManager.Entities<evolute_duel_Board>().First().GetComponent<evolute_duel_Board>();
@@ -322,7 +333,7 @@ namespace TerritoryWars.General
         private void StartRemoteTurn()
         {
             CustomLogger.LogImportant("StartRemoteTurn");
-            if (IsGameWithBot)
+            if (IsGameWithBot || IsGameWithBotAsPlayer)
             {
                 DojoGameManager.Instance.LocalBot.MakeMove();
             }
@@ -350,8 +361,15 @@ namespace TerritoryWars.General
             {
                 PlayersData[1].UpdatePlayerData(player);
             }
-            if (playerAddress == LocalPlayer.Address.Hex()) CompleteEndTurn(playerAddress);
-            else StartCoroutine(HandleOpponentMoveCoroutine(playerAddress, tile, position, rotation));
+            if(IsGameWithBotAsPlayer)
+            {
+                StartCoroutine(HandleOpponentMoveCoroutine(playerAddress, tile, position, rotation));
+            }
+            else
+            {
+                if (playerAddress == LocalPlayer.Address.Hex()) CompleteEndTurn(playerAddress);
+                else StartCoroutine(HandleOpponentMoveCoroutine(playerAddress, tile, position, rotation));
+            }
             GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.Address.Hex());
         }
         
@@ -456,6 +474,11 @@ namespace TerritoryWars.General
             CurrentTurnPlayer = isLocalPlayer ? RemotePlayer : LocalPlayer;
             gameUI.SetEndTurnButtonActive(false);
             Invoke(nameof(StartTurn), 1f);
+        }
+        
+        public Character GetPlayerByAddress(string address)
+        {
+            return Players.FirstOrDefault(player => player.Address.Hex() == address);
         }
     
         public int GetLocalIdByAddress(FieldElement address)

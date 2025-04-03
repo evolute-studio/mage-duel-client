@@ -29,7 +29,16 @@ namespace TerritoryWars.Bots
             get
             {
                 if (SessionManager.Instance == null) return -1;
-                return SessionManager.Instance.RemotePlayer.LocalId;
+                return _player.LocalId;
+            }
+        }
+        
+        private Character _player 
+        {
+            get
+            {
+                if (SessionManager.Instance == null) return null;
+                return SessionManager.Instance.GetPlayerByAddress(Bot.Account.Address.Hex());
             }
         }
 
@@ -51,7 +60,7 @@ namespace TerritoryWars.Bots
         public bool IsSimpleMove()
         {
             bool isJoker = Random.value < GetJokerChance();
-            bool hasJokers = SessionManager.Instance.RemotePlayer.JokerCount > 0;
+            bool hasJokers = _player.JokerCount > 0;
             return !isJoker || !hasJokers;
         }
         
@@ -89,7 +98,7 @@ namespace TerritoryWars.Bots
             if (tileData == null || validPlacement == null)
             {
                 CustomLogger.LogDojoLoop("BotLogicModule: Skip move");
-                if (SessionManager.Instance.RemotePlayer.JokerCount > 0)
+                if (_player.JokerCount > 0)
                 {
                     MakeJokerMove();
                     return;

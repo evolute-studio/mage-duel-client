@@ -19,6 +19,7 @@ namespace TerritoryWars.Dojo
     {
         private DojoGameManager _dojoGameManager;
         public bool IsGameWithBot { get; private set; }
+        public bool IsGameWithBotAsPlayer { get; private set; }
 
         public static float TurnDuration = 120f;
         private Account _localPlayerAccount => _dojoGameManager.LocalBurnerAccount;
@@ -77,6 +78,7 @@ namespace TerritoryWars.Dojo
         {
             _dojoGameManager = dojoGameManager;
             IsGameWithBot = SimpleStorage.LoadIsGameWithBot();
+            IsGameWithBotAsPlayer = DojoGameManager.Instance.LocalBotAsPlayer != null;
             dojoGameManager.WorldManager.synchronizationMaster.OnModelUpdated.AddListener(OnModelUpdated);
             dojoGameManager.WorldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
         }
@@ -581,7 +583,12 @@ namespace TerritoryWars.Dojo
                 foreach (var node in city.Value)
                 {
                     Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
-                    TileGenerator tileGenerator = SessionManager.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>();
+                    if (SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
+                    {
+                        continue;
+                    }
+                    GameObject tile = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
+                    TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
                     int playerOwner;
                     if (city.Key.contested) playerOwner = city.Key.blue_points > city.Key.red_points ? 0 : 1;
                     else
@@ -607,6 +614,10 @@ namespace TerritoryWars.Dojo
                 foreach (var node in road.Value)
                 {
                     (Vector2Int position, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
+                    if(SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
+                    {
+                        continue;
+                    }
                     CustomLogger.LogInfo($"Board: " + SessionManager.Instance.Board);
                     CustomLogger.LogInfo($"TileObject: " + SessionManager.Instance.Board.GetTileObject(position.x, position.y));
                     CustomLogger.LogInfo($"TileGenerator: " + SessionManager.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>());

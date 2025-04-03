@@ -8,6 +8,7 @@ using TerritoryWars.Tools;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
 
 public class NamePanelController : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public class NamePanelController : MonoBehaviour
     public Button ChangeNameButton;
     
     private bool _isInitialized = false;
+    
+    public UnityEvent<string> OnNameChanged;
 
     // private void Awake()
     // {
@@ -73,6 +76,7 @@ public class NamePanelController : MonoBehaviour
     public void SetName(string name)
     {
         PlayerNameText.text = name;
+        OnNameChanged?.Invoke(name);
     }
     
     public void SetEvoluteBalance(int value)
