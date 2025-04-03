@@ -114,7 +114,30 @@ namespace TerritoryWars.General
             GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.AddListener(ClientRemotePlayerSkip);
             JokerManager.Initialize(board);
             SetTilesInDeck(board.available_tiles_in_deck.Length);
+            if (CheckGameStatus())
+                CurrentTurnPlayer = Players[DojoGameManager.Instance.SessionManager.WhoseMove()];
+            else
+            {
+                FinishGame();
+                return;
+            }
             StartGame();
+        }
+
+        private void FinishGame()
+        {
+            DojoConnector.FinishGame(DojoGameManager.Instance.LocalBurnerAccount,
+                DojoGameManager.Instance.SessionManager.LocalPlayerBoard.id);
+        }
+        
+        private bool CheckGameStatus()
+        {
+            int turns = DojoGameManager.Instance.SessionManager.GetTurnCount();
+            if (turns >= 2)
+            {
+                return false;
+            }
+            return true;
         }
 
         private void InitializeBoard()
@@ -250,7 +273,9 @@ namespace TerritoryWars.General
         public void StartGame()
         {
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
-            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp, IsLocalPlayerTurn);
+            int turnsCount = DojoGameManager.Instance.SessionManager.GetTurnCount();
+            ulong timeGone = (ulong)turnsCount * (ulong)DojoSessionManager.TurnDuration;
+            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp + timeGone, IsLocalPlayerTurn);
             Invoke(nameof(StartTurn), 2f);
 
             DojoGameManager.Instance.SessionManager.OnMoveReceived += HandleMove;
@@ -259,6 +284,12 @@ namespace TerritoryWars.General
 
         private void StartTurn()
         {
+            if (!CheckGameStatus())
+            {
+                FinishGame();
+                return;
+            }
+            
             if (CurrentTurnPlayer == LocalPlayer)
             {
                 StartLocalTurn();

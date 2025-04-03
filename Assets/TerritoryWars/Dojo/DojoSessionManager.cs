@@ -20,6 +20,7 @@ namespace TerritoryWars.Dojo
         private DojoGameManager _dojoGameManager;
         public bool IsGameWithBot { get; private set; }
 
+        public static float TurnDuration = 120f;
         private Account _localPlayerAccount => _dojoGameManager.LocalBurnerAccount;
         private evolute_duel_Board _localPlayerBoard;
         private int _moveCount = 0;
@@ -236,6 +237,36 @@ namespace TerritoryWars.Dojo
             SimpleStorage.ClearCurrentBoardId();
             GameUI.Instance.ShowResultPopUp();
         }
+    
+        public int GetTurnCount()
+        {
+            evolute_duel_Move lastMove = LastMove;
+            if (lastMove == null) return 0;
+            ulong timestamp = lastMove.timestamp;
+            float turnDuration = TurnDuration;
+            
+            ulong currentTime = (ulong)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+            ulong timeDiff = currentTime - timestamp;
+            int turnCount = (int)(timeDiff / turnDuration);
+            return turnCount;
+        }
+        public int WhoseMove()
+        {
+            evolute_duel_Move lastMove = LastMove;
+            if (lastMove == null) return 0;
+            int side = lastMove.player_side.Unwrap();
+            int turnCount = GetTurnCount();
+            int playerSide = side;
+            if (turnCount % 2 == 0)
+            {
+                return playerSide == 0 ? 1 : 0;
+            }
+            else
+            {
+                return playerSide;
+            }
+        }
+
 
         private void RoadContestWon(evolute_duel_RoadContestWon eventModel)
         {

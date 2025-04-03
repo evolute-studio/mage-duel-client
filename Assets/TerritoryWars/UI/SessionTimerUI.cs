@@ -1,4 +1,5 @@
 using System.Linq;
+using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using TMPro;
@@ -23,7 +24,8 @@ namespace TerritoryWars.UI
         
         [Header("Timer")]
         public TextMeshProUGUI TimerText;
-        public float TurnDuration = 120f;
+
+        public float TurnDuration => DojoSessionManager.TurnDuration;
         private ulong _startTurnTime;
         private float _currentTurnTime => GetTurnTime();
         
