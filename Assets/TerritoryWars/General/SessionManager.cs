@@ -288,7 +288,7 @@ namespace TerritoryWars.General
             DojoGameManager.Instance.SessionManager.OnSkipMoveReceived += SkipMove;
         }
 
-        private void StartTurn()
+        public void StartTurn()
         {
             if (!CheckGameStatus())
             {
@@ -324,7 +324,7 @@ namespace TerritoryWars.General
             gameUI.SetRotateButtonActive(false);
             gameUI.SetSkipTurnButtonActive(true);
 
-            TileData currentTile = DojoGameManager.Instance.SessionManager.GetTopTile();
+            TileData currentTile = GetNextTile();
             currentTile.OwnerId = LocalPlayer.LocalId;
             TileSelector.StartTilePlacement(currentTile);
             gameUI.SetActiveDeckContainer(true);
@@ -379,7 +379,7 @@ namespace TerritoryWars.General
             GameUI.Instance.SetJokerMode(false);
             TileSelector.EndTilePlacement();
             CurrentTurnPlayer.EndTurn();
-            CompleteEndTurn(playerAddress);
+            CompleteEndTurn(playerAddress, 3f);
             GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.Address.Hex());
         }
 
@@ -438,10 +438,15 @@ namespace TerritoryWars.General
         private TileData _nextTile;
         public void UpdateTile()
         {
-            _nextTile ??= DojoGameManager.Instance.SessionManager.GetTopTile();
+            _nextTile = GetNextTile();
             _nextTile.OwnerId = RemotePlayer.LocalId;
             TileSelector.SetCurrentTile(_nextTile);
             CustomLogger.LogImportant("UpdateTile. Tile: " + _nextTile.id);
+        }
+        
+        public TileData GetNextTile()
+        {
+            return _nextTile ??= DojoGameManager.Instance.SessionManager.GetTopTile();
         }
 
         public void SetNextTile(TileData tile)
@@ -468,12 +473,12 @@ namespace TerritoryWars.General
             }
         }
 
-        public void CompleteEndTurn(string lastMovePlayerAddress)
+        public void CompleteEndTurn(string lastMovePlayerAddress, float delay = 1f)
         {
             bool isLocalPlayer = lastMovePlayerAddress == LocalPlayer.Address.Hex();
             CurrentTurnPlayer = isLocalPlayer ? RemotePlayer : LocalPlayer;
             gameUI.SetEndTurnButtonActive(false);
-            Invoke(nameof(StartTurn), 1f);
+            Invoke(nameof(StartTurn), delay);
         }
         
         public Character GetPlayerByAddress(string address)
