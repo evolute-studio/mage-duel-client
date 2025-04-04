@@ -25,6 +25,9 @@ public class evolute_duel_Player : ModelInstance {
 
         [ModelField("active_skin")]
         public byte active_skin;
+        
+        [ModelField("is_bot")]
+        public bool is_bot;
 
     // Start is called before the first frame update
     void Start() {

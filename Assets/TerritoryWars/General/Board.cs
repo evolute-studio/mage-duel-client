@@ -13,9 +13,34 @@ namespace TerritoryWars.General
 {
     public class ValidPlacement
     {
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Rotation { get; set; }
+        public int x { get; set; }
+        public int y { get; set; }
+        public int rotation { get; set; }
+        
+        public ValidPlacement(int x, int y, int rotation)
+        {
+            this.x = x;
+            this.y = y;
+            this.rotation = rotation;
+        }
+
+        public ValidPlacement(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+            rotation = 0;
+        }
+        
+        public ValidPlacement(Vector2Int vector)
+        {
+            x = vector.x;
+            y = vector.y;
+            rotation = 0;
+        }
+        public int GetHashCode(ValidPlacement obj)
+        {
+            return HashCode.Combine(obj.x, obj.y, obj.rotation);
+        }
     }
 
     public class Board : MonoBehaviour
@@ -197,6 +222,7 @@ namespace TerritoryWars.General
                         {
                             renderer.Forest[rotationTimes].GetComponentsInChildren<SpriteRenderer>().ToList().ForEach(sr =>
                             {
+                                if(sr.gameObject.name == "RoadRenderer") return;
                                 sr.sortingOrder = 20;
                             });
                         }
@@ -242,7 +268,6 @@ namespace TerritoryWars.General
             data.OwnerId = ownerId;
             GameObject tile = Instantiate(tilePrefab, GetTilePosition(x, y), Quaternion.identity, transform);
             tile.name += $"_{x}_{y}";
-            CustomLogger.LogImportant("Spawned tile config: " + data.id);
             tile.GetComponent<TileGenerator>().Generate(data, true, new Vector2Int(x,y));
             tile.GetComponent<TileView>().UpdateView(data);
             tileObjects[x, y] = tile;
@@ -722,12 +747,7 @@ namespace TerritoryWars.General
                     {
                         if (CanPlaceTile(tile, x, y))
                         {
-                            validPlacements.Add(new ValidPlacement
-                            {
-                                X = x,
-                                Y = y,
-                                Rotation = rotation
-                            });
+                            validPlacements.Add(new ValidPlacement(x, y, rotation));
                         }
                         tile.Rotate();
                     }
@@ -737,6 +757,39 @@ namespace TerritoryWars.General
             }
 
             return validPlacements;
+        }
+
+        public List<ValidPlacement> GetJokerValidPlacements()
+        {
+            // it's means all empty positions where exist at least one neighbor
+            List<ValidPlacement> validPlacements = new List<ValidPlacement>();
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (tileData[x, y] != null) continue;
+                    if (HasNeighbor(x, y))
+                    {
+                        validPlacements.Add(new ValidPlacement(x, y, 0));
+                    }
+                }
+            }
+            return validPlacements;
+        }
+        
+        public bool HasNeighbor(int x, int y)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                int newX = x + GetXOffset((Side)i);
+                int newY = y + GetYOffset((Side)i);
+                if (IsValidPosition(newX, newY) && tileData[newX, newY] != null && !IsBorderTile(newX, newY))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public List<int> GetValidRotations(TileData tile, int x, int y)

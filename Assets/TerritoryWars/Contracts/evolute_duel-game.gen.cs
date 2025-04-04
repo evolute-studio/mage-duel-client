@@ -137,6 +137,21 @@ public class Game : MonoBehaviour {
             }
         });
     }
+    
+    // Call the `finish_game` system with the specified Account and calldata
+    // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
+    public async Task<FieldElement> finish_game(Account account, FieldElement board_id) {
+        List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
+        calldata.Add(board_id.Inner);
+
+        return await account.ExecuteRaw(new dojo.Call[] {
+            new dojo.Call{
+                to = new FieldElement(contractAddress).Inner,
+                selector = "finish_game",
+                calldata = calldata.ToArray()
+            }
+        });
+    }
             
 
     

@@ -18,12 +18,43 @@ public abstract record GameState() : Enum {
 public abstract record PlayerSide() : Enum {
     public record Blue() : PlayerSide;
     public record Red() : PlayerSide;
+    
+    public int Unwrap()
+    {
+        return this switch
+        {
+            Blue => 0,
+            Red => 1,
+            _ => throw new Exception("Unexpected case in Unwrap")
+        };
+    }
+    
+    public static PlayerSide FromInt(int value)
+    {
+        return value switch
+        {
+            0 => new Blue(),
+            1 => new Red(),
+            _ => throw new ArgumentOutOfRangeException(nameof(value), "Invalid value for PlayerSide")
+        };
+    }
 }
 
 // Type definition for `core::option::Option::<core::integer::u8>` enum
 public abstract record Option<A>() : Enum {
+    
     public record Some(A value) : Option<A>;
     public record None() : Option<A>;
+    
+    public A Unwrap()
+    {
+        return this switch
+        {
+            Some some => some.value,
+            None => default,
+            _ => throw new Exception("Unexpected case in Unwrap")
+        };
+    }
 }
 
 

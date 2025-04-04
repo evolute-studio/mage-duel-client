@@ -41,7 +41,7 @@ namespace TerritoryWars.ModelsDataConverters
             }
             catch (Exception e)
             {
-                CustomLogger.LogError($"Error while converting FieldElement to string: {e.Message}");
+                CustomLogger.LogError($"Error while converting FieldElement to string:", e);
                 return string.Empty; 
             }
         }

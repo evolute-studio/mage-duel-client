@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using Dojo.Starknet;
+using TerritoryWars.Bots;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
@@ -55,14 +57,16 @@ namespace TerritoryWars.General
 
             if (!CustomSceneManager.Instance.LoadingScreen.IsLoading)
             {
-                CustomSceneManager.Instance.LoadingScreen.SetActive(true, DojoGameManager.Instance.CancelGame, LoadingScreen.connectingText);
+                CustomSceneManager.Instance.LoadingScreen.SetActive(true, 
+                    () => DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount), 
+                    LoadingScreen.connectingText);
             }
         }
 
 
         public Board Board;
         [SerializeField] private GameUI gameUI;
-        [SerializeField] private SessionUI sessionUI;
+        [SerializeField] private PlayerInfoUI sessionUI;
         [SerializeField] private DeckManager deckManager;
         public JokerManager JokerManager;
         public TileSelector TileSelector;
@@ -74,7 +78,9 @@ namespace TerritoryWars.General
         public Character CurrentTurnPlayer { get; private set; }
         public Character LocalPlayer { get; private set; }
         public Character RemotePlayer { get; private set; }
-        
+
+        public bool IsGameWithBot => DojoGameManager.Instance.SessionManager.IsGameWithBot;
+        public bool IsGameWithBotAsPlayer => DojoGameManager.Instance.SessionManager.IsGameWithBotAsPlayer;
         public bool IsLocalPlayerTurn => CurrentTurnPlayer == LocalPlayer;
         public bool IsLocalPlayerHost => LocalPlayer.LocalId == 0;
         
@@ -90,16 +96,61 @@ namespace TerritoryWars.General
 
         public void Initialize()
         {
-            CustomLogger.LogImportant("SessionManager.Initialize()");
+            InitializePlayers();
+            InitializeBoard();
+            DojoGameManager.Instance.SessionManager.UpdateBoardAfterRoadContest();
+            DojoGameManager.Instance.SessionManager.UpdateBoardAfterCityContest();
+            JokerManager = new JokerManager(this);
+            gameUI.Initialize();
+            sessionUI.Initialization();
             evolute_duel_Board board = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
+            int cityScoreBlue = board.blue_score.Item1;
+            int cartScoreBlue = board.blue_score.Item2;
+            int cityScoreRed = board.red_score.Item1;
+            int cartScoreRed = board.red_score.Item2;
+            GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
+            GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
+            GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(ClientLocalPlayerSkip);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.AddListener(ClientRemotePlayerSkip);
+            JokerManager.Initialize(board);
+            SetTilesInDeck(board.available_tiles_in_deck.Length);
+            if (CheckGameStatus())
+                CurrentTurnPlayer = Players[DojoGameManager.Instance.SessionManager.WhoseMove()];
+            else
+            {
+                FinishGame();
+                return;
+            }
+            StartGame();
+        }
+
+        private void FinishGame()
+        {
+            DojoConnector.FinishGame(DojoGameManager.Instance.LocalBurnerAccount,
+                DojoGameManager.Instance.SessionManager.LocalPlayerBoard.id);
+        }
+        
+        private bool CheckGameStatus()
+        {
+            int turns = DojoGameManager.Instance.SessionManager.GetTurnCount();
+            if (turns >= 2)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private void InitializeBoard()
+        {
+            evolute_duel_Board board = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
+            List<evolute_duel_Move> processedMoves = new List<evolute_duel_Move>();
             FieldElement lastMoveId = board.last_move_id switch
             {
                 Option<FieldElement>.Some some => some.value,
                 _ => null
             };
             SimpleStorage.SaveCurrentBoardId(board.id.Hex());
-            
-            InitializePlayers();
             Board.Initialize();
             if (lastMoveId != null)
             {
@@ -132,30 +183,31 @@ namespace TerritoryWars.General
 
                     tile.Rotate((rotation + 3) % 4);
                     Board.PlaceTile(tile, x, y, owner);
+                    processedMoves.Add(move);
                 }
-                
-                // set scores
+
+                GameObject[] allMoves = DojoGameManager.Instance.WorldManager.Entities<evolute_duel_Move>();
+                foreach (var move in allMoves)
+                {
+                    evolute_duel_Move moveComponent = move.GetComponent<evolute_duel_Move>();
+                    if (processedMoves.Contains(moveComponent)) continue;
+                    IncomingModelsFilter.DestroyModel(moveComponent);
+                }
             } 
-            DojoGameManager.Instance.SessionManager.UpdateBoardAfterRoadContest();
-            DojoGameManager.Instance.SessionManager.UpdateBoardAfterCityContest();
-            JokerManager = new JokerManager(this);
-            gameUI.Initialize();
-            sessionUI.Initialization();
-            int cityScoreBlue = board.blue_score.Item1;
-            int cartScoreBlue = board.blue_score.Item2;
-            int cityScoreRed = board.red_score.Item1;
-            int cartScoreRed = board.red_score.Item2;
-            GameUI.Instance.SessionUI.SetCityScores(cityScoreBlue, cityScoreRed);
-            GameUI.Instance.SessionUI.SetRoadScores(cartScoreBlue, cartScoreRed);
-            GameUI.Instance.SessionUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
-            GameUI.Instance.SessionUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(SkipMove);
-            JokerManager.Initialize(board);
-            SetTilesInDeck(board.available_tiles_in_deck.Length);
-            StartGame();
         }
 
         private void InitializePlayers()
         {
+            if (IsGameWithBot)
+            {
+                DojoGameManager.Instance.LocalBot.SessionStarted();
+            }
+            if(IsGameWithBotAsPlayer)
+            {
+                DojoGameManager.Instance.LocalBot.SessionStarted();
+                DojoGameManager.Instance.LocalBotAsPlayer.SessionStarted();
+            }
+            
             Players = new Character[2];
             PlayersData = new PlayerData[2];
 
@@ -227,15 +279,23 @@ namespace TerritoryWars.General
         public void StartGame()
         {
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
+            int turnsCount = DojoGameManager.Instance.SessionManager.GetTurnCount();
+            ulong timeGone = (ulong)turnsCount * (ulong)DojoSessionManager.TurnDuration;
+            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp + timeGone, IsLocalPlayerTurn);
             Invoke(nameof(StartTurn), 2f);
 
             DojoGameManager.Instance.SessionManager.OnMoveReceived += HandleMove;
             DojoGameManager.Instance.SessionManager.OnSkipMoveReceived += SkipMove;
         }
 
-        private void StartTurn()
+        public void StartTurn()
         {
-            GameUI.Instance.SessionUI.SessionTimerUI.StartTurnTimer();
+            if (!CheckGameStatus())
+            {
+                FinishGame();
+                return;
+            }
+            
             if (CurrentTurnPlayer == LocalPlayer)
             {
                 StartLocalTurn();
@@ -248,6 +308,12 @@ namespace TerritoryWars.General
 
         private void StartLocalTurn()
         {
+            CustomLogger.LogImportant("StartLocalTurn");
+            if (IsGameWithBotAsPlayer)
+            {
+                DojoGameManager.Instance.LocalBotAsPlayer.MakeMove();
+            }
+            
             UpdateTile();
             LocalPlayer.StartSelecting();
             evolute_duel_Board board = DojoGameManager.Instance.WorldManager.Entities<evolute_duel_Board>().First().GetComponent<evolute_duel_Board>();
@@ -258,7 +324,7 @@ namespace TerritoryWars.General
             gameUI.SetRotateButtonActive(false);
             gameUI.SetSkipTurnButtonActive(true);
 
-            TileData currentTile = DojoGameManager.Instance.SessionManager.GetTopTile();
+            TileData currentTile = GetNextTile();
             currentTile.OwnerId = LocalPlayer.LocalId;
             TileSelector.StartTilePlacement(currentTile);
             gameUI.SetActiveDeckContainer(true);
@@ -266,6 +332,12 @@ namespace TerritoryWars.General
 
         private void StartRemoteTurn()
         {
+            CustomLogger.LogImportant("StartRemoteTurn");
+            if (IsGameWithBot || IsGameWithBotAsPlayer)
+            {
+                DojoGameManager.Instance.LocalBot.MakeMove();
+            }
+            
             UpdateTile();
             RemotePlayer.StartSelecting();
             evolute_duel_Board board = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
@@ -289,17 +361,61 @@ namespace TerritoryWars.General
             {
                 PlayersData[1].UpdatePlayerData(player);
             }
-            if (playerAddress == LocalPlayer.Address.Hex()) CompleteEndTurn(playerAddress);
-            else StartCoroutine(HandleOpponentMoveCoroutine(playerAddress, tile, position, rotation));
+            if(IsGameWithBotAsPlayer)
+            {
+                StartCoroutine(HandleOpponentMoveCoroutine(playerAddress, tile, position, rotation));
+            }
+            else
+            {
+                if (playerAddress == LocalPlayer.Address.Hex()) CompleteEndTurn(playerAddress);
+                else StartCoroutine(HandleOpponentMoveCoroutine(playerAddress, tile, position, rotation));
+            }
+            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.Address.Hex());
         }
         
         private void SkipMove(string playerAddress)
         {
+            if (CurrentTurnPlayer.Address.Hex() != playerAddress) return;
             GameUI.Instance.SetJokerMode(false);
             TileSelector.EndTilePlacement();
             CurrentTurnPlayer.EndTurn();
-            CompleteEndTurn(playerAddress);
+            CompleteEndTurn(playerAddress, 3f);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.Address.Hex());
         }
+
+        public void ClientLocalPlayerSkip()
+        {
+            DojoGameManager.Instance.SessionManager.LocalSkipped(LocalPlayer.Address.Hex());
+            DojoGameManager.Instance.SessionManager.SkipMove();
+        }
+        
+        public void ClientRemotePlayerSkip()
+        {
+            DojoGameManager.Instance.SessionManager.LocalSkipped(RemotePlayer.Address.Hex());
+        }
+        
+        // public void LocalSkipMove()
+        // {
+        //     GameUI.Instance.SetEndTurnButtonActive(false);
+        //     TileSelector.ClearHighlights();
+        //     TileSelector.tilePreview.ResetPosition();
+        //     CurrentTurnPlayer.EndTurn();
+        //     if (IsLocalPlayerTurn)
+        //     {
+        //         DojoGameManager.Instance.SessionManager.SkipMove();
+        //     }
+        //     else
+        //     {
+        //         _localSkipMoveCoroutine = StartCoroutine(LocalSkipMoveCoroutine(RemotePlayer.Address.Hex()));
+        //     }
+        // }
+        // private Coroutine _localSkipMoveCoroutine;
+        // private IEnumerator LocalSkipMoveCoroutine(string address)
+        // {
+        //     yield return new WaitForSeconds(2f);
+        //     GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.SessionManager.LastMoveTimestamp, false);
+        //     CompleteEndTurn(address);
+        // }
 
         private IEnumerator HandleOpponentMoveCoroutine(string playerAddress, TileData tile, Vector2Int position, int rotation)
         {
@@ -322,21 +438,25 @@ namespace TerritoryWars.General
         private TileData _nextTile;
         public void UpdateTile()
         {
-            _nextTile ??= DojoGameManager.Instance.SessionManager.GetTopTile();
+            _nextTile = GetNextTile();
             _nextTile.OwnerId = RemotePlayer.LocalId;
             TileSelector.SetCurrentTile(_nextTile);
             CustomLogger.LogImportant("UpdateTile. Tile: " + _nextTile.id);
         }
+        
+        public TileData GetNextTile()
+        {
+            return _nextTile ??= DojoGameManager.Instance.SessionManager.GetTopTile();
+        }
 
         public void SetNextTile(TileData tile)
         {
-            CustomLogger.LogImportant("SetNextTile");
             _nextTile = tile;
         }
 
         public void SetTilesInDeck(int count)
         {
-            gameUI.SessionUI.SetDeckCount(count);
+            gameUI.playerInfoUI.SetDeckCount(count);
         }
 
         public void RotateCurrentTile()
@@ -352,29 +472,40 @@ namespace TerritoryWars.General
                 TileSelector.ClearHighlights();
             }
         }
-        
-        public void SkipMove()
-        {
-            if (!IsLocalPlayerTurn) return;
-            GameUI.Instance.SetEndTurnButtonActive(false);
-            TileSelector.ClearHighlights();
-            TileSelector.tilePreview.ResetPosition();
-            DojoGameManager.Instance.SessionManager.SkipMove();
-        }
 
-        public void CompleteEndTurn(string lastMovePlayerAddress)
+        public void CompleteEndTurn(string lastMovePlayerAddress, float delay = 1f)
         {
             bool isLocalPlayer = lastMovePlayerAddress == LocalPlayer.Address.Hex();
             CurrentTurnPlayer = isLocalPlayer ? RemotePlayer : LocalPlayer;
             gameUI.SetEndTurnButtonActive(false);
-            Invoke(nameof(StartTurn), 1f);
+            Invoke(nameof(StartTurn), delay);
+        }
+        
+        public Character GetPlayerByAddress(string address)
+        {
+            return Players.FirstOrDefault(player => player.Address.Hex() == address);
+        }
+    
+        public int GetLocalIdByAddress(FieldElement address)
+        {
+            return Players.FirstOrDefault(player => player.Address.Hex() == address.Hex())?.LocalId ?? -1;
         }
 
         private void OnDestroy()
         {
             DojoGameManager.Instance.SessionManager.OnMoveReceived -= HandleMove;
             DojoGameManager.Instance.SessionManager.OnSkipMoveReceived -= SkipMove;
-            GameUI.Instance.SessionUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(SkipMove);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(ClientLocalPlayerSkip);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.RemoveListener(ClientRemotePlayerSkip);
+        }
+
+        public void OnGUI()
+        {
+            Bot bot = DojoGameManager.Instance.LocalBot;
+            if (bot != null && bot.IsDebug && bot.DebugModule != null)
+            {
+                bot.DebugModule.OnGUI();
+            }
         }
     }
 }

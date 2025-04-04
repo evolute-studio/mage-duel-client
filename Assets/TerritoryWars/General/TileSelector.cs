@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
@@ -125,7 +126,6 @@ namespace TerritoryWars.General
 
         public void StartTilePlacement(TileData tile)
         {
-            CustomLogger.LogWarning("StartTilePlacement Simple");
             GameUI.Instance.SetEndTurnButtonActive(false);
             tilePreview.ResetPosition();
             tilePreview.UpdatePreview(tile);
@@ -152,7 +152,7 @@ namespace TerritoryWars.General
             ClearHighlights();
             foreach (var placement in placements)
             {
-                CreateHighlight(placement.X, placement.Y);
+                CreateHighlight(placement.x, placement.y);
             }
             SetHighlightColor(normalHighlightColor);
         }
@@ -301,7 +301,7 @@ namespace TerritoryWars.General
         {
             foreach (var position in _currentValidPlacements)
             {
-                if (position.X == x && position.Y == y)
+                if (position.x == x && position.y == y)
                 {
                     return true;
                 }
@@ -410,7 +410,24 @@ namespace TerritoryWars.General
 
             gameUI.SetRotateButtonActive(false);
 
-            tilePreview.PlaceTile();
+            tilePreview.PlaceTile(CompleteTilePlacement);
+        }
+
+        public void PlaceTile(TileData tileData, ValidPlacement validPlacement, int playerId)
+        {
+            // first check if it is possible to place the tile
+            bool isPossible = board.CanPlaceTile(tileData, validPlacement.x, validPlacement.y);
+            if (!isPossible)
+            {
+                CustomLogger.LogWarning($"TileSelector: PlaceTile: Can't place tile. Config: {tileData.id} " +
+                                        $"Position: {validPlacement.x} {validPlacement.y}");
+                return;
+            }
+
+            tilePreview.PlaceTile( () =>
+            {
+                board.PlaceTile(currentTile, validPlacement.x, validPlacement.y, playerId);
+            });
         }
 
         public void CompleteTilePlacement()
@@ -475,7 +492,6 @@ namespace TerritoryWars.General
 
         public void StartJokerPlacement()
         {
-            CustomLogger.LogWarning("StartTilePlacement Joker");
             GameUI.Instance.SetEndTurnButtonActive(false);
             tilePreview.ResetPosition();
             

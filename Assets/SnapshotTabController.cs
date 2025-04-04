@@ -4,6 +4,7 @@ using Dojo;
 using Dojo.Starknet;
 using TerritoryWars;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
@@ -99,7 +100,7 @@ public class SnapshotTabController : MonoBehaviour
                 snapshotListItem.UpdateItem(playerName, evoluteBalance, moveNumber, () =>
                 {
                     SetActivePanel(false);
-                    DojoGameManager.Instance.CreateGameFromSnapshot(snapshotModel.snapshot_id);
+                    DojoConnector.CreateGameFromSnapshot(DojoGameManager.Instance.LocalBurnerAccount, snapshotModel.snapshot_id);
                 });
                 _snapshotObjects.Add(snapshot);
                 
@@ -168,7 +169,7 @@ public class SnapshotListItem
         
         _creatorPlayerNameText.text = creatorPlayerName;
         _creatorPlayerEvoluteCountText.text = " x " + creatorPlayerEvoluteCount.ToString();
-        _moveNumberText.text = "Move number: \n" + moveNumber;
+        _moveNumberText.text = "Moves: \n" + moveNumber;
         
         _restoreButton.onClick.RemoveAllListeners();
         if (onRestore != null)

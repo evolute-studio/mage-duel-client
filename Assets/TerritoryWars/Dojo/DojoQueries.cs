@@ -1,8 +1,10 @@
+using System;
 using System.Linq;
 using dojo_bindings;
 using Dojo;
 using Dojo.Starknet;
 using Dojo.Torii;
+using TerritoryWars.General;
 using TerritoryWars.Tools;
 
 namespace TerritoryWars.Dojo
@@ -56,6 +58,37 @@ namespace TerritoryWars.Dojo
             );
             
             Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys, 
+                                    order_by, entity_models, entity_updated_after);
+            return query;
+        }
+
+        public static Query GetQueryTopPlayersForLeaderboard(uint count)
+        {
+            string[] entity_models = new[] { GetModelName<evolute_duel_Player>() };
+            
+            var notBotClause = new MemberClause(
+                GetModelName<evolute_duel_Player>(),
+                "is_bot",
+                dojo.ComparisonOperator.Eq,
+                new MemberValue( new Primitive{ Bool = false })
+            );
+            
+            // username not contatin 0x part
+            var notContain0xClause = new MemberClause(
+                GetModelName<evolute_duel_Player>(),
+                "username",
+                dojo.ComparisonOperator.NotIn,
+                new MemberValue("0x")
+            );
+            
+            OrderBy[] order_by = new[]
+            {
+                new OrderBy(
+                    model: GetModelName<evolute_duel_Player>(),
+                    member: "balance",
+                    direction: dojo.OrderDirection.Desc)
+            };
+            Query query = new Query(count, offset, notBotClause, dont_include_hashed_keys, 
                                     order_by, entity_models, entity_updated_after);
             return query;
         }

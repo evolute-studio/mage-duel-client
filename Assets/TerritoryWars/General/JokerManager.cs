@@ -21,14 +21,14 @@ namespace TerritoryWars.General
         private Dictionary<(int, int), int> _currentCombinationIndex = new Dictionary<(int, int), int>();
         
         public bool IsJokerActive => isJokerActive;
-
+        
         public JokerManager(SessionManager manager)
         {
             _sessionManager = manager;
         }
         public void Initialize(evolute_duel_Board board)
         {
-            GameUI.Instance.SessionUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
+            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
             SetJokersCount(0, board.player1.Item3);
             SetJokersCount(1, board.player2.Item3);
         }
@@ -72,6 +72,16 @@ namespace TerritoryWars.General
             
             TileData jokerTile = new TileData(tileConfig);
             return jokerTile;
+        }
+
+        public static TileData GetOneJokerCombination(int x, int y)
+        {
+            JokerManager jokerManager = new JokerManager(SessionManager.Instance);
+            string[] possibleCombinations = jokerManager.GenerateAllCombinations(x, y);
+            string tileConfig = possibleCombinations[Random.Range(0, possibleCombinations.Length)];
+            TileData jokerTile = new TileData(tileConfig);
+            return jokerTile;
+            
         }
 
         public string[] GenerateAllCombinations(int x, int y)
@@ -198,8 +208,8 @@ namespace TerritoryWars.General
         
         public void SetJokersCount(int playerId, int count)
         {
-            GameUI.Instance.SessionUI.SetJokersCount(playerId, count);
-            GameUI.Instance.SessionUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
+            GameUI.Instance.playerInfoUI.SetJokersCount(playerId, count);
+            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
         }
     }
 }

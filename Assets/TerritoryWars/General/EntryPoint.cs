@@ -42,6 +42,8 @@ namespace TerritoryWars.General
         
         private async Task InitializeGameAsync()
         {
+            InitDataStorage();
+            
             try
             {
                 CustomLogger.LogDojoLoop("Starting OnChain mode initialization");
@@ -53,6 +55,12 @@ namespace TerritoryWars.General
                 // 2. Create Burners
                 CustomLogger.LogDojoLoop("Creating burner accounts");
                 await DojoGameManager.CreateBurners();
+                
+                //
+                // await CoroutineAsync(() => { }, 2f);
+                //
+                CustomLogger.LogDojoLoop("Creating bot");
+                await DojoGameManager.CreateBot();
                 
                 // 3. Sync Initial Models
                 CustomLogger.LogDojoLoop("Syncing initial models");
@@ -66,7 +74,7 @@ namespace TerritoryWars.General
             }
             catch (Exception e)
             {
-                CustomLogger.LogError($"Initialization failed: {e}");
+                CustomLogger.LogError($"Initialization failed:", e);
             }
         }
 
@@ -75,7 +83,7 @@ namespace TerritoryWars.General
             var tcs = new TaskCompletionSource<bool>();
             
             try {
-                DojoGameManager.SetupAccount(() => tcs.TrySetResult(true));
+                DojoGameManager.SetupMasterAccount(() => tcs.TrySetResult(true));
                 // timeout to avoid hanging
                 StartCoroutine(SetupAccountTimeout(tcs, 30f));
             }
@@ -92,6 +100,20 @@ namespace TerritoryWars.General
             tcs.TrySetException(new TimeoutException($"Account setup timed out after {timeout} seconds"));
         }
         
+        private async Task CoroutineAsync(Action action, float delay = 0f)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            StartCoroutine(WaitForCoroutine(tcs, action, delay));
+            await tcs.Task;
+        }
+        
+        private IEnumerator WaitForCoroutine(TaskCompletionSource<bool> tcs, Action action, float delay = 0f)
+        {
+            yield return new WaitForSeconds(delay);
+            action();
+            tcs.TrySetResult(true);
+        }
+        
 
         
         
@@ -106,6 +128,18 @@ namespace TerritoryWars.General
                 //SessionManager.Instance.Initialize();
 
             }
+        }
+
+        private void InitDataStorage()
+        {
+            int currentDataVersion = 3;
+            int dataVersion = SimpleStorage.LoadDataVersion();
+            if (dataVersion < currentDataVersion)
+            {
+                SimpleStorage.ClearAll();
+                SimpleStorage.SetDataVersion(currentDataVersion);
+            }
+            
         }
         
         private void OnDestroy()

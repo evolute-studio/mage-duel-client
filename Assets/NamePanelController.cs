@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using TerritoryWars;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
 
 public class NamePanelController : MonoBehaviour
 {
@@ -21,6 +23,8 @@ public class NamePanelController : MonoBehaviour
     public Button ChangeNameButton;
     
     private bool _isInitialized = false;
+    
+    public UnityEvent<string> OnNameChanged;
 
     // private void Awake()
     // {
@@ -35,16 +39,15 @@ public class NamePanelController : MonoBehaviour
     
     public void Initialize()
     {
-        CustomLogger.LogWarning("Initialize NamePanelController");
-        //ChangeNameButton.onClick.AddListener(CallChangeNamePanel);
-
         evolute_duel_Player profile = DojoGameManager.Instance.GetLocalPlayerData();
         if(profile == null)
         {
-            CustomLogger.LogWarning("profile is null");
+            CustomLogger.LogWarning("Player profile is null");
             
             string defaultName = DojoGameManager.Instance.LocalBurnerAccount.Address.Hex().Substring(0, 10);
-            DojoGameManager.Instance.SetPlayerName(CairoFieldsConverter.GetFieldElementFromString(defaultName));
+            DojoConnector.ChangeUsername(
+                DojoGameManager.Instance.LocalBurnerAccount,
+                CairoFieldsConverter.GetFieldElementFromString(defaultName));
             SetName(defaultName);
             SetEvoluteBalance(0);
             return;
@@ -73,6 +76,7 @@ public class NamePanelController : MonoBehaviour
     public void SetName(string name)
     {
         PlayerNameText.text = name;
+        OnNameChanged?.Invoke(name);
     }
     
     public void SetEvoluteBalance(int value)

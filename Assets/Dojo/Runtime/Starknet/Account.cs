@@ -23,6 +23,7 @@ namespace Dojo.Starknet
         private async void createAccount(JsonRpcClient provider, SigningKey privateKey, FieldElement address, Action OnAccountCreated = null)
         {
             var result = await StarknetInterop.NewAccountAsync(provider.client, privateKey, address);
+            Debug.Log("Result Account" + result);
             account.SetResult(result);
             OnAccountCreated?.Invoke();
         }

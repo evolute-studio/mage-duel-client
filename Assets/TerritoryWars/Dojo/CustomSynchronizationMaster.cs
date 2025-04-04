@@ -25,7 +25,7 @@ namespace TerritoryWars.Dojo
             int count = await SyncConstruction(
                 DojoQueries.GetQueryPlayer(address), 
                 nameof(SyncPlayer));
-            CustomLogger.LogDojoLoop($"Synced {count} players with address {address}");
+            CustomLogger.LogDojoLoop($"Synced {count} players with address {address.Hex()}");
             return count;
         }
         
@@ -37,13 +37,22 @@ namespace TerritoryWars.Dojo
             CustomLogger.LogDojoLoop($"Synced {count} players in array with addresses count {address.Length}");
             return count;
         }
+
+        public async Task<int> SyncTopPlayersForLeaderboard(uint playersCount)
+        {
+            int count = await SyncConstruction(
+                DojoQueries.GetQueryTopPlayersForLeaderboard(playersCount), 
+                nameof(SyncTopPlayersForLeaderboard));
+            CustomLogger.LogDojoLoop($"Synced {count} top players for leaderboard with count {playersCount}");
+            return count;
+        }
         
         public async Task<int> SyncPlayerInProgressGame(FieldElement address)
         {
             int count = await SyncConstruction(
                 DojoQueries.GetQueryPlayerInProgressGame(address), 
                 nameof(SyncPlayerInProgressGame));
-            CustomLogger.LogDojoLoop($"Synced {count} InProgress games with player address {address}");
+            CustomLogger.LogDojoLoop($"Synced {count} InProgress games with player address {address.Hex()}");
             return count;
         }
         

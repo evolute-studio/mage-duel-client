@@ -276,9 +276,7 @@ namespace TerritoryWars.General
                 .SetEase(moveEase)
                 .OnComplete(() =>
                 {
-                    SessionManager.Instance.TileSelector.CompleteTilePlacement();
                     callback?.Invoke();
-                    
                 });
         }
 
