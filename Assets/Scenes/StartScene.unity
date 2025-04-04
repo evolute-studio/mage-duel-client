@@ -201,7 +201,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WorldManager: {fileID: 209425369}
   CustomSynchronizationMaster: {fileID: 209425372}
-  dojoConfig: {fileID: 11400000, guid: df6c209f9a34120ecb69941c57148899, type: 2}
+  dojoConfig: {fileID: 11400000, guid: cae5977e93d0db70e8a96199bd1ca33a, type: 2}
   gameManagerData: {fileID: 11400000, guid: 291ea469f20a3a04097ffbc7db4f51f5, type: 2}
   GameSystem: {fileID: 209425367}
   PlayerProfileSystem: {fileID: 209425371}
@@ -221,7 +221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cb53232f67c4c74a3019b9862a69724, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  contractAddress: 0x040819cdd847e7a02370553896797fbdd6741beeb26720d6a1dfc493a562a291
+  contractAddress: 0x06cb83b0d877940787e70f06f618ae459b4d96b14f7c90cfe817d05e23a3c859
 --- !u!114 &209425368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,12 +248,6 @@ MonoBehaviour:
   OnEventMessage:
     m_PersistentCalls:
       m_Calls: []
-  OnTokenBalanceUpdated:
-    m_PersistentCalls:
-      m_Calls: []
-  OnTokenUpdated:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &209425369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -267,7 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   synchronizationMaster: {fileID: 209425368}
-  dojoConfig: {fileID: 11400000, guid: df6c209f9a34120ecb69941c57148899, type: 2}
+  dojoConfig: {fileID: 11400000, guid: cae5977e93d0db70e8a96199bd1ca33a, type: 2}
 --- !u!4 &209425370
 Transform:
   m_ObjectHideFlags: 0
