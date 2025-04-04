@@ -122,6 +122,11 @@ namespace TerritoryWars.General
                 FinishGame();
                 return;
             }
+
+            if (DojoGameManager.Instance.SessionManager.IsReplay)
+            {
+                return;
+            }
             StartGame();
         }
 

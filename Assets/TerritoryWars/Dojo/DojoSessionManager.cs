@@ -21,6 +21,7 @@ namespace TerritoryWars.Dojo
         private DojoGameManager _dojoGameManager;
         public bool IsGameWithBot { get; private set; }
         public bool IsGameWithBotAsPlayer { get; private set; }
+        public bool IsReplay = false;
 
         public static float TurnDuration = 120f;
         private Account _localPlayerAccount => _dojoGameManager.LocalBurnerAccount;

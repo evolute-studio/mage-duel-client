@@ -462,7 +462,9 @@ namespace TerritoryWars.Dojo
             ApplicationState.SetState(ApplicationStates.Initializing);
             IncomingModelsFilter.AddBoardToAllowedBoards(boardId.Hex());
             await SyncEverythingForBoard(boardId);
+            SessionManager?.OnDestroy();
             SessionManager = new DojoSessionManager(this);
+            SessionManager.IsReplay = true;
             CustomSceneManager.Instance.LoadSession();
         }
         
