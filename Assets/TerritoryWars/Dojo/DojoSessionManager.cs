@@ -99,6 +99,9 @@ namespace TerritoryWars.Dojo
                 case evolute_duel_InvalidMove invalidMove:
                     InvalidMove(invalidMove);
                     break;
+                case evolute_duel_NotYourTurn notYourTurn:
+                    NotYourTurn(notYourTurn);
+                    break;
                 case evolute_duel_Skiped skipped:
                     Skipped(skipped);
                     break;
@@ -171,8 +174,36 @@ namespace TerritoryWars.Dojo
         {
             string move_id = eventModel.move_id.Hex();
             string player = eventModel.player.Hex();
+            
+            if(player != SessionManager.Instance.LocalPlayer.Address.Hex() &&
+                player != SessionManager.Instance.RemotePlayer.Address.Hex()) return;
+            
+            PopupManager.Instance.ShowInvalidMovePopup();
 
             CustomLogger.LogError($"[InvalidMove] | Player: {player} | MoveId: {move_id}");
+        }
+
+        private void NotYourTurn(evolute_duel_NotYourTurn eventModel)
+        {
+            string player = eventModel.player_id.Hex();
+
+            if (player != SessionManager.Instance.LocalPlayer.Address.Hex()) { return; }
+            
+            PopupManager.Instance.NotYourTurnPopup();
+            
+            CustomLogger.LogError($"[NotYourTurn] | Player: {player}");
+        }
+
+        private void CantFinishGame()
+        {
+            // string player = eventModel.player_id.Hex();
+            // string board = eventModel.board_id.Hex();
+
+            // if (player != SessionManager.Instance.LocalPlayer.Address.Hex()) { return; }
+            //
+            // PopupManager.Instance.ShowCantFinishGamePopup();
+            //
+            // CustomLogger.LogError($"[CantFinishGame] | Player: {player} | BoardId: {board}");
         }
 
         private void Skipped(evolute_duel_Skiped eventModel)
@@ -635,7 +666,7 @@ namespace TerritoryWars.Dojo
                     {
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                     }
-                    tileGenerator.RecolorPinOnSide(playerOwner, (int)side);
+                    tileGenerator.RecolorPinOnSide(playerOwner, (int)side, true);
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                         Board.StructureType.Road);
                 }
