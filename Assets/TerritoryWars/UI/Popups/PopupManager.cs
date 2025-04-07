@@ -63,9 +63,9 @@ namespace TerritoryWars.UI.Popups
         {
             PopupConfig popupConfig = new PopupConfig
             {
-                Text = "Invalid move. Please cancel game or restart.",
-                FirstOptionText = "OK",
-                FirstOptionAction = () => { },
+                Text = "[Invalid move]\nPlease reload the page or cancel the game",
+                FirstOptionText = "Reload",
+                FirstOptionAction = JSBridge.ReloadPage,
                 SecondOptionText = "Cancel game",
                 SecondOptionAction = () =>
                 {
@@ -82,9 +82,9 @@ namespace TerritoryWars.UI.Popups
         {
             PopupConfig popupConfig = new PopupConfig
             {
-                Text = "Cannot finish game. Please restart or cancel game",
-                FirstOptionText = "OK",
-                FirstOptionAction = () => { },
+                Text = "[Cannot finish game]\nPlease reload the page or cancel the game",
+                FirstOptionText = "Reload",
+                FirstOptionAction = JSBridge.ReloadPage,
                 SecondOptionText = "Cancel game",
                 SecondOptionAction = () =>
                 {
@@ -101,11 +101,14 @@ namespace TerritoryWars.UI.Popups
         {
             PopupConfig popupConfig = new PopupConfig
             {
-                Text = "Not your turn",
-                FirstOptionText = "OK",
-                FirstOptionAction = () => 
-                { 
-                    
+                Text = "[Not your turn]\nPlease reload the page or cancel the game",
+                FirstOptionText = "Reload",
+                FirstOptionAction = JSBridge.ReloadPage,
+                SecondOptionText = "Cancel game",
+                SecondOptionAction = () =>
+                {
+                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+                    CustomSceneManager.Instance.LoadLobby();
                 }
             };
             

@@ -194,16 +194,16 @@ namespace TerritoryWars.Dojo
             CustomLogger.LogError($"[NotYourTurn] | Player: {player}");
         }
 
-        private void CantFinishGame()
+        private void CantFinishGame(evolute_duel_CantFinishGame eventModel)
         {
-            // string player = eventModel.player_id.Hex();
-            // string board = eventModel.board_id.Hex();
+            string player = eventModel.player_id.Hex();
+            string board = eventModel.board_id.Hex();
 
-            // if (player != SessionManager.Instance.LocalPlayer.Address.Hex()) { return; }
-            //
-            // PopupManager.Instance.ShowCantFinishGamePopup();
-            //
-            // CustomLogger.LogError($"[CantFinishGame] | Player: {player} | BoardId: {board}");
+            if (player != SessionManager.Instance.LocalPlayer.Address.Hex()) { return; }
+            
+            PopupManager.Instance.ShowCantFinishGamePopup();
+            
+            CustomLogger.LogError($"[CantFinishGame] | Player: {player} | BoardId: {board}");
         }
 
         private void Skipped(evolute_duel_Skiped eventModel)
