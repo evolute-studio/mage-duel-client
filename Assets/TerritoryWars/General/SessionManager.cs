@@ -266,7 +266,7 @@ namespace TerritoryWars.General
             
             Camera camera = Camera.main;
             float startOrthographicSize = 5.5f;
-            float endOrthographicSize = 4f;
+            float endOrthographicSize = 5f;
             camera.orthographicSize = startOrthographicSize;
             Sequence sequence = DOTween.Sequence();
             sequence.AppendInterval(0.5f);

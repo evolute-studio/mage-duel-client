@@ -190,7 +190,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1303192047734377587
 Transform:
   m_ObjectHideFlags: 0
@@ -2136,7 +2136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1138812809527182026
 Transform:
   m_ObjectHideFlags: 0
@@ -4767,10 +4767,19 @@ MonoBehaviour:
   - {fileID: 9150831819334846585}
   - {fileID: 5061906836932312515}
   - {fileID: 4438943541549498454}
+  - {fileID: 4709844537843051494}
+  - {fileID: 3540363284228735769}
+  - {fileID: 2561068767300111473}
+  - {fileID: 4267635509762959604}
+  - {fileID: 6570698174831800612}
+  - {fileID: 962215441328731265}
+  - {fileID: 1804796616430769005}
+  - {fileID: 8550823355322079261}
   MirrorRotationObjects: []
   LineRenderers:
   - {fileID: 2826332499081408789}
   - {fileID: 3668082802921502739}
+  - {fileID: 5727852618871069143}
   SpriteSwapElements: []
   SpriteLayerSwapElements: []
   OnRotation:
@@ -4821,7 +4830,9 @@ MonoBehaviour:
   ArcRenderers: []
   TileTerritoryFiller: {fileID: 209659163570961529}
   TileFencePlacer: {fileID: 8780780960363262699}
+  TileFencePlacerContested: {fileID: 6596559945797373837}
   RoadRenderers: {fileID: 0}
+  RoadContestRenderer: {fileID: 0}
   Mill: {fileID: 0}
   CloserToBorderFences:
   - Side: 0

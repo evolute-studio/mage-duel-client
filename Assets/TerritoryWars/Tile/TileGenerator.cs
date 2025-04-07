@@ -322,12 +322,19 @@ namespace TerritoryWars.Tile
             TileRotator.OnRotation.AddListener(fencePlacer.PlaceFence);
         }
         
-        public void RecolorHouses(int playerId)
+        public void RecolorHouses(int playerId, bool isContest = false)
         {
             if (CurrentTileGO.GetComponent<TileRenderers>().HouseRenderers == null)
             {
                 return;
             }
+
+            if (isContest)
+            {
+                CurrentTileGO.GetComponent<TileRenderers>().ChangeCityFenceForContest();
+                
+            }
+            
             Debug.Log("Recoloring houses. PlayerId: " + playerId);
             houseRenderers = CurrentTileGO.GetComponentsInChildren<SpriteRenderer>()
                 .ToList().Where(x => x.name == "House").ToList();

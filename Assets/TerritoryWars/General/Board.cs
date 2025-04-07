@@ -303,15 +303,15 @@ namespace TerritoryWars.General
             None,
         }
 
-        public void CheckAndConnectEdgeStructure(int ownerId, int x, int y, StructureType type)
+        public void CheckAndConnectEdgeStructure(int ownerId, int x, int y, StructureType type, bool isCityContest = false)
         {
             if( (x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
             {
-                TryConnectEdgeStructure(ownerId, x, y, type);
+                TryConnectEdgeStructure(ownerId, x, y, type, isCityContest);
             }
         }
 
-        private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All)
+        private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false)
         {
             GameObject[] neighborsGO = new GameObject[4];
             TileData[] neighborsData = new TileData[4];
@@ -342,7 +342,7 @@ namespace TerritoryWars.General
                         foreach (var renderer in tileGenerator.houseRenderers)
                         {
                             //renderer.sprite = tileAssets.GetHouseByReference(renderer.sprite, owner);
-                            tileGenerator.RecolorHouses(owner);
+                            tileGenerator.RecolorHouses(owner, isCityContest);
                         }
                     }
 
@@ -359,7 +359,8 @@ namespace TerritoryWars.General
                             RoadPin placedTilePin = placedTileGenerator.Pins[(int)oppositeSide];
                             if (placedTilePin == null) continue;
                             int ownerToSet = placedTilePin.OwnerId;
-                            tileGenerator.Pins[j].SetPin(ownerToSet);
+                            bool isContested = placedTilePin.IsContested;
+                            tileGenerator.Pins[j].SetPin(ownerToSet, isContested);
                             
                         }
                     }

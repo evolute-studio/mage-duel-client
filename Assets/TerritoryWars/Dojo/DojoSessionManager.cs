@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
 using Dojo;
 using Dojo.Starknet;
 using TerritoryWars.ExternalConnections;
@@ -613,6 +614,7 @@ namespace TerritoryWars.Dojo
             {
                 foreach (var node in city.Value)
                 {
+                    bool isContested = city.Key.contested;
                     Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
                     if (SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
                     {
@@ -626,12 +628,10 @@ namespace TerritoryWars.Dojo
                     {
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                     }
-                    tileGenerator.RecolorHouses(playerOwner);
+                    tileGenerator.RecolorHouses(playerOwner, isContested);
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                        Board.StructureType.City);
+                        Board.StructureType.City, isContested);
                 }
-
-
             }
         }
 
@@ -644,6 +644,7 @@ namespace TerritoryWars.Dojo
             {
                 foreach (var node in road.Value)
                 {
+                    bool isContest = road.Key.contested;
                     (Vector2Int position, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
                     if(SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
                     {
@@ -666,7 +667,7 @@ namespace TerritoryWars.Dojo
                     {
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                     }
-                    tileGenerator.RecolorPinOnSide(playerOwner, (int)side);
+                    tileGenerator.RecolorPinOnSide(playerOwner, (int)side, isContest);
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                         Board.StructureType.Road);
                 }
