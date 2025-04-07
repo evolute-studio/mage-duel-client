@@ -46,7 +46,7 @@ namespace TerritoryWars.Bots
         {
         }
 
-        public void ExecuteLogic()
+        public virtual void ExecuteLogic()
         {
             if (Bot.IsDebug)
             {
