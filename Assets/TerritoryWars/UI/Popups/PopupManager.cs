@@ -1,3 +1,5 @@
+using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using UnityEngine;
@@ -53,6 +55,60 @@ namespace TerritoryWars.UI.Popups
                     MenuUIController.Instance.NewAccount();
                 }
             };
+            MessagePopup.Setup(popupConfig);
+            MessagePopup.SetActive(true);
+        }
+
+        public void ShowInvalidMovePopup()
+        {
+            PopupConfig popupConfig = new PopupConfig
+            {
+                Text = "Invalid move. Please cancel game or restart.",
+                FirstOptionText = "OK",
+                FirstOptionAction = () => { },
+                SecondOptionText = "Cancel game",
+                SecondOptionAction = () =>
+                {
+                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+                    CustomSceneManager.Instance.LoadLobby();
+                }
+            };
+            
+            MessagePopup.Setup(popupConfig);
+            MessagePopup.SetActive(true);
+        }
+
+        public void ShowCantFinishGamePopup()
+        {
+            PopupConfig popupConfig = new PopupConfig
+            {
+                Text = "Cannot finish game. Please restart or cancel game",
+                FirstOptionText = "OK",
+                FirstOptionAction = () => { },
+                SecondOptionText = "Cancel game",
+                SecondOptionAction = () =>
+                {
+                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+                    CustomSceneManager.Instance.LoadLobby();
+                }
+            };
+            
+            MessagePopup.Setup(popupConfig);
+            MessagePopup.SetActive(true);
+        }
+
+        public void NotYourTurnPopup()
+        {
+            PopupConfig popupConfig = new PopupConfig
+            {
+                Text = "Not your turn",
+                FirstOptionText = "OK",
+                FirstOptionAction = () => 
+                { 
+                    
+                }
+            };
+            
             MessagePopup.Setup(popupConfig);
             MessagePopup.SetActive(true);
         }
