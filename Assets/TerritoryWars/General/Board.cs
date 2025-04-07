@@ -282,6 +282,18 @@ namespace TerritoryWars.General
 
             return true;
         }
+
+        public bool ReturnTile(int x, int y)
+        {
+            Destroy(tileObjects[x,y]);
+            tileObjects[x, y] = null;
+            
+            
+            
+            
+            
+            return false;
+        }
         
         public enum StructureType
         {

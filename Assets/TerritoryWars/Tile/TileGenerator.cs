@@ -383,7 +383,7 @@ namespace TerritoryWars.Tile
             }
         }
         
-        public void RecolorPinOnSide(int playerId, int side)
+        public void RecolorPinOnSide(int playerId, int side, bool isContest = false)
         {
             if (Pins.Count == 0)
             {
@@ -393,7 +393,7 @@ namespace TerritoryWars.Tile
             {
                 return;
             }
-            Pins[side].SetPin(playerId);
+            Pins[side].SetPin(playerId, isContest);
         }
     }
 
