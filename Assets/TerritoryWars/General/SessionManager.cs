@@ -426,7 +426,7 @@ namespace TerritoryWars.General
             yield return new WaitForSeconds(0.3f);
             TileSelector.tilePreview.PlaceTile(() =>
             {
-                Board.PlaceTile(tile, position.x + 1, position.y + 1, RemotePlayer.LocalId);
+                Board.PlaceTile(tile, position.x + 1, position.y + 1, GetPlayerByAddress(playerAddress).LocalId);
             });
             yield return new WaitForSeconds(0.5f);
             CurrentTurnPlayer.EndTurn();
