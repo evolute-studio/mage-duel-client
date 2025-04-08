@@ -332,7 +332,6 @@ namespace TerritoryWars.Tile
             if (isContest)
             {
                 CurrentTileGO.GetComponent<TileRenderers>().ChangeCityFenceForContest();
-                
             }
             
             Debug.Log("Recoloring houses. PlayerId: " + playerId);

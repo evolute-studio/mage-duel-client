@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+using TerritoryWars.General;
 using TerritoryWars.Tile;
 using UnityEngine;
 
@@ -14,6 +17,7 @@ public class TileRenderers : MonoBehaviour
     public SpriteRenderer RoadContestRenderer;
     public GameObject Mill;
     public List<CloserToBorderFence> CloserToBorderFences;
+
     public Transform[] PinsPositions;
     public GameObject[] Forest;
     public GameObject Enviroment;
@@ -25,9 +29,10 @@ public class TileRenderers : MonoBehaviour
 
     public void ChangeCityFenceForContest()
     {
-        TileFencePlacer.gameObject.SetActive(false);
-        TileFencePlacerContested.gameObject.SetActive(true);
-        TileFencePlacerContested.PlaceFence();
+        // TileFencePlacer.gameObject.SetActive(false);
+        // TileFencePlacerContested.gameObject.SetActive(true);
+        // TileFencePlacerContested.PlaceFence();
+        //
     }
 
     [Serializable]

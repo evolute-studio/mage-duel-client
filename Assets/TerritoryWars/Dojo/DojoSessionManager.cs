@@ -659,9 +659,12 @@ namespace TerritoryWars.Dojo
                     {
                         if (road.Key.blue_points == road.Key.red_points)
                         {
-                            continue;
+                            playerOwner = 3;
                         }
-                        playerOwner = road.Key.blue_points > road.Key.red_points ? 0 : 1;
+                        else
+                        {
+                            playerOwner = road.Key.blue_points > road.Key.red_points ? 0 : 1;
+                        }
                     }
                     else
                     {

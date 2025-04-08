@@ -24,9 +24,10 @@ namespace TerritoryWars
         
         public void SetPin(int playerIndex, bool isContest = false)
         {
-            OwnerId = playerIndex;
+
+            OwnerId = playerIndex == 3 ? OwnerId : playerIndex;
             IsContested = isContest;
-            playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex) + 1;
+            playerIndex = SetLocalPlayerData.GetLocalIndex(OwnerId) + 1;
             int pinIndex = playerIndex + (PointsCount - 1) * 3;
             SpriteRenderer.sprite = isContest ? PinsContestSprites[pinIndex] : PinsSprites[pinIndex];
         }
