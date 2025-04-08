@@ -169,7 +169,7 @@ namespace TerritoryWars.General
                         .GetComponent<SpriteRenderer>().sortingOrder = 20;
                 }
 
-                tileObjects[startPos.x, startPos.y].GetComponentsInChildren<TileRenderers>().ToList().ForEach(
+                tileObjects[startPos.x, startPos.y].GetComponentsInChildren<TileParts>().ToList().ForEach(
                     renderer =>
                     {
                         renderer.Enviroment.SetActive(false);
@@ -187,7 +187,7 @@ namespace TerritoryWars.General
                     tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer")
                         .GetComponent<SpriteRenderer>().sortingOrder = 20;
                 }
-                tileObjects[endPos.x, endPos.y].GetComponentsInChildren<TileRenderers>().ToList().ForEach(
+                tileObjects[endPos.x, endPos.y].GetComponentsInChildren<TileParts>().ToList().ForEach(
                     renderer =>
                     {
                         renderer.Enviroment.SetActive(false);
@@ -214,7 +214,7 @@ namespace TerritoryWars.General
                     TileRotator.GetMirrorRotationStatic(borderArc, rotationTimes);
                     var pins = tileObjects[availablePositions[i].x, availablePositions[i].y]
                         .GetComponent<TileGenerator>().Pins;
-                    tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileRenderers>().ToList().ForEach(renderer =>
+                    tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileParts>().ToList().ForEach(renderer =>
                     {
                         renderer.Mill.SetActive(false);
                         renderer.Forest[rotationTimes].SetActive(true);
@@ -235,7 +235,7 @@ namespace TerritoryWars.General
                 }
                 else if (tilesToSpawn[i] == cityTile)
                 {
-                    tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileRenderers>().ToList().ForEach(renderer =>
+                    tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileParts>().ToList().ForEach(renderer =>
                     {
                         renderer.Forest[rotationTimes].SetActive(true);
                         if (swapOrderLayer)
@@ -248,7 +248,7 @@ namespace TerritoryWars.General
                     });
                 }
                 
-                tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileRenderers>().ToList().ForEach(
+                tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileParts>().ToList().ForEach(
                     renderer =>
                     {
                         renderer.Enviroment.SetActive(false);

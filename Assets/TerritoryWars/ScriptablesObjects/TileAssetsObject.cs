@@ -23,6 +23,8 @@ namespace TerritoryWars.ScriptablesObjects
         public Sprite[] StonePillars;
         public Sprite[] WoodenWallSprites;
         public Sprite[] StoneWallSprites;
+        public Sprite WoodenArc;
+        public Sprite StoneArc;
 
         // 0 - neutral, 1 - first player, 2 - second player
         // 3 - neutral two points, 4 - first player two points, 5 - second player two points

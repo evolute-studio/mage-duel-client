@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using TerritoryWars.Tile;
 using UnityEngine;
 
-public class TileRenderers : MonoBehaviour
+public class TileParts : MonoBehaviour
 {
     public List<SpriteRenderer> HouseRenderers;
-    public List<SpriteRenderer> ArcRenderers;
+    public List<SpriteRenderer> ArcRenderers = new List<SpriteRenderer>();
     public TerritoryFiller TileTerritoryFiller;
     public WallPlacer WallPlacer;
     public SpriteRenderer RoadRenderers;

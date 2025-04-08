@@ -10,7 +10,7 @@ namespace TerritoryWars.Tile
 {
     public class TileRotator : MonoBehaviour
     {
-        private TileRenderers _tileRenderers;
+        private TileParts _tileParts;
         
         public List<Transform> SimpleRotationObjects = new List<Transform>();
         public List<Transform> MirrorRotationObjects = new List<Transform>();
@@ -28,7 +28,7 @@ namespace TerritoryWars.Tile
         
         public void Awake()
         {
-            _tileRenderers = GetComponent<TileRenderers>();
+            _tileParts = GetComponent<TileParts>();
         }
 
         [ContextMenu("Rotate Clockwise")]
@@ -68,7 +68,7 @@ namespace TerritoryWars.Tile
                 {
                     pins[i] = pinsParent.GetChild(i);
                 }
-                _tileRenderers.PinsPositions = pins;
+                _tileParts.PinsPositions = pins;
             }
 
             // foreach (var spriteLayerSwapElement in SpriteLayerSwapElements) - this logic now disabled!
@@ -176,7 +176,7 @@ namespace TerritoryWars.Tile
                     {
                         pins[i] = pinsParent.GetChild(i);
                     }
-                    _tileRenderers.PinsPositions = pins;
+                    _tileParts.PinsPositions = pins;
                 }
             }
 

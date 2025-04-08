@@ -112,11 +112,11 @@ namespace TerritoryWars.General
                 tileGeneratorForUI.Generate(currentTile);
                 if (tileGenerator.CurrentTileGO != null)
                 {
-                    TileRenderers tileRenderers = tileGenerator.CurrentTileGO.GetComponent<TileRenderers>();
+                    TileParts tileParts = tileGenerator.CurrentTileGO.GetComponent<TileParts>();
                     
-                    if (tileRenderers.TileTerritoryFiller != null)
+                    if (tileParts.TileTerritoryFiller != null)
                     {
-                        Transform territoryPlacer = tileRenderers
+                        Transform territoryPlacer = tileParts
                             .TileTerritoryFiller.transform;
                         territoryPlacer.GetComponentInChildren<SpriteMask>().frontSortingLayerID
                             = SortingLayer.NameToID("Preview");
@@ -124,7 +124,7 @@ namespace TerritoryWars.General
                     
 
                     _houseSprites.Clear();
-                    SpriteRenderer[] houseRenderers = tileGenerator.CurrentTileGO.GetComponent<TileRenderers>().HouseRenderers.ToArray();
+                    SpriteRenderer[] houseRenderers = tileGenerator.CurrentTileGO.GetComponent<TileParts>().HouseRenderers.ToArray();
                     foreach (SpriteRenderer houseRenderer in houseRenderers)
                     {
                         houseRenderer.sortingLayerName = "Preview";
@@ -212,17 +212,17 @@ namespace TerritoryWars.General
             
             if (tileGenerator.CurrentTileGO != null)
             {
-                TileRenderers tileRenderers = tileGenerator.CurrentTileGO.GetComponent<TileRenderers>();
+                TileParts tileParts = tileGenerator.CurrentTileGO.GetComponent<TileParts>();
 
-                foreach (var spriteRenderer in tileRenderers.Enviroment.GetComponentsInChildren<SpriteRenderer>())
+                foreach (var spriteRenderer in tileParts.Enviroment.GetComponentsInChildren<SpriteRenderer>())
                 {
                     spriteRenderer.sortingLayerName = "Default";
                 }
                 
-                if (tileRenderers.WallPlacer != null)
+                if (tileParts.WallPlacer != null)
                 {
-                    var pillars = tileRenderers.WallPlacer.GetPillars();
-                    var segments = tileRenderers.WallPlacer.GetWallSegments();
+                    var pillars = tileParts.WallPlacer.GetPillars();
+                    var segments = tileParts.WallPlacer.GetWallSegments();
                         
                     foreach (var pillar in pillars)
                     { 
@@ -235,12 +235,12 @@ namespace TerritoryWars.General
                     }
                 }
             
-                if(tileRenderers.RoadRenderers != null)
-                    tileRenderers.RoadRenderers.sortingLayerName = "Default";
+                if(tileParts.RoadRenderers != null)
+                    tileParts.RoadRenderers.sortingLayerName = "Default";
                 
-                if (tileRenderers.TileTerritoryFiller != null)
+                if (tileParts.TileTerritoryFiller != null)
                 {
-                    Transform territoryPlacer = tileRenderers
+                    Transform territoryPlacer = tileParts
                         .TileTerritoryFiller.transform;
                     
                     territoryPlacer.GetComponentInChildren<SpriteMask>().frontSortingLayerID
@@ -260,7 +260,7 @@ namespace TerritoryWars.General
                 }
 
                 _houseSprites.Clear();
-                SpriteRenderer[] houseRenderers = tileGenerator.CurrentTileGO.GetComponent<TileRenderers>().HouseRenderers.ToArray();
+                SpriteRenderer[] houseRenderers = tileGenerator.CurrentTileGO.GetComponent<TileParts>().HouseRenderers.ToArray();
                 foreach (SpriteRenderer houseRenderer in houseRenderers)
                 {
                     houseRenderer.sortingLayerName = "Default";
