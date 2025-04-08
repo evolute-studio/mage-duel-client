@@ -222,10 +222,16 @@ namespace TerritoryWars.General
                 if (tileRenderers.WallPlacer != null)
                 {
                     var pillars = tileRenderers.WallPlacer.GetPillars();
+                    var segments = tileRenderers.WallPlacer.GetWallSegments();
                         
                     foreach (var pillar in pillars)
                     { 
                         pillar.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
+                    }
+
+                    foreach (var segment in segments)
+                    {
+                        segment.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
                     }
                 }
             

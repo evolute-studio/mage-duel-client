@@ -101,6 +101,11 @@ namespace TerritoryWars.Tile
             return pillars;
         }
         
+        public List<GameObject> GetWallSegments()
+        {
+            return wallSegments;
+        }
+        
         private void DestroyWallSegments()
         {
             foreach (GameObject segment in wallSegments)
