@@ -827,7 +827,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6799311391530683069}
-  - component: {fileID: 8514387166531949526}
+  - component: {fileID: 7891883717641262745}
   m_Layer: 0
   m_Name: DownFence
   m_TagString: Untagged
@@ -858,7 +858,7 @@ Transform:
   - {fileID: 6635821321248664471}
   m_Father: {fileID: 8428676047067724783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8514387166531949526
+--- !u!114 &7891883717641262745
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -867,21 +867,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2097358286064032126}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0aead369020479db4137f6bc35dd618, type: 3}
+  m_Script: {fileID: 11500000, guid: 3fb9f5f4ffcc4b6aabaadb90782d1e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pillars:
-  - {fileID: 6733344175458802177}
-  - {fileID: 1982068486477523926}
-  - {fileID: 4661034450790024961}
-  - {fileID: 5395282791085623160}
-  - {fileID: 3657447356373086731}
-  - {fileID: 7876812798159845928}
-  - {fileID: 1915186791974623163}
-  fenceYOffset: 0.08
-  lineRenderer: {fileID: 1937172103352240085}
-  skipIndices: 
-  poleYOffset: 0
+  wallYOffset: 0.035
+  sidesOffsetX: 0
+  pillars: []
+  wallSegments: []
+  skipSegments: 
 --- !u!1 &2104390202208021070
 GameObject:
   m_ObjectHideFlags: 0
@@ -1562,7 +1555,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 684910157530062641}
-  - component: {fileID: 1084423973395408549}
   m_Layer: 0
   m_Name: StoneFence
   m_TagString: Untagged
@@ -1593,30 +1585,6 @@ Transform:
   - {fileID: 4682330392131219895}
   m_Father: {fileID: 1615365249479384164}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1084423973395408549
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3363761957259026176}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0aead369020479db4137f6bc35dd618, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pillars:
-  - {fileID: 1522815704292441951}
-  - {fileID: 9137726484370752761}
-  - {fileID: 6233748804070118949}
-  - {fileID: 8419543665831798631}
-  - {fileID: 3712451377158946781}
-  - {fileID: 6957104097275455200}
-  - {fileID: 6617544632496919018}
-  fenceYOffset: 0.08
-  lineRenderer: {fileID: 4057315375359809134}
-  skipIndices: 
-  poleYOffset: 0
 --- !u!1 &3372395387537501359
 GameObject:
   m_ObjectHideFlags: 0
@@ -2475,7 +2443,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2431123524795452908}
-  - component: {fileID: 330687333565808396}
+  - component: {fileID: 4233533593540758849}
   m_Layer: 0
   m_Name: TopFence
   m_TagString: Untagged
@@ -2505,7 +2473,7 @@ Transform:
   - {fileID: 4828429834564218817}
   m_Father: {fileID: 8428676047067724783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &330687333565808396
+--- !u!114 &4233533593540758849
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2514,20 +2482,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4451166684079033044}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0aead369020479db4137f6bc35dd618, type: 3}
+  m_Script: {fileID: 11500000, guid: 3fb9f5f4ffcc4b6aabaadb90782d1e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pillars:
-  - {fileID: 7918353871624464139}
-  - {fileID: 9183095093847621000}
-  - {fileID: 4991019792412519095}
-  - {fileID: 4671155659661281031}
-  - {fileID: 2636574638836514141}
-  - {fileID: 4142447090756075138}
-  fenceYOffset: 0.08
-  lineRenderer: {fileID: 7014725031115141110}
-  skipIndices: 
-  poleYOffset: 0
+  wallYOffset: 0.035
+  sidesOffsetX: 0
+  pillars: []
+  wallSegments: []
+  skipSegments: 
 --- !u!1 &4564316732739195958
 GameObject:
   m_ObjectHideFlags: 0
@@ -3845,7 +3807,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5869228572245061726}
-  - component: {fileID: 3728670046120134891}
+  - component: {fileID: 893360559491492177}
   m_Layer: 0
   m_Name: LeftFence
   m_TagString: Untagged
@@ -3876,7 +3838,7 @@ Transform:
   - {fileID: 1348477881814583257}
   m_Father: {fileID: 8428676047067724783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3728670046120134891
+--- !u!114 &893360559491492177
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3885,21 +3847,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 6056110214806292706}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0aead369020479db4137f6bc35dd618, type: 3}
+  m_Script: {fileID: 11500000, guid: 3fb9f5f4ffcc4b6aabaadb90782d1e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pillars:
-  - {fileID: 1595720354905900810}
-  - {fileID: 7941403061009099260}
-  - {fileID: 5366604414077923757}
-  - {fileID: 7670851811849958562}
-  - {fileID: 9170425622486589988}
-  - {fileID: 1920137893810791914}
-  - {fileID: 2075100360668457869}
-  fenceYOffset: 0.08
-  lineRenderer: {fileID: 6193700623640021841}
-  skipIndices: 
-  poleYOffset: 0
+  wallYOffset: 0.035
+  sidesOffsetX: 0
+  pillars: []
+  wallSegments: []
+  skipSegments: 
 --- !u!1 &6221446592940269347
 GameObject:
   m_ObjectHideFlags: 0
@@ -4347,7 +4302,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 386591817929567095}
-  - component: {fileID: 669434564599273059}
+  - component: {fileID: 1283634364595921445}
   m_Layer: 0
   m_Name: RightFence
   m_TagString: Untagged
@@ -4378,7 +4333,7 @@ Transform:
   - {fileID: 4872062278330001928}
   m_Father: {fileID: 8428676047067724783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &669434564599273059
+--- !u!114 &1283634364595921445
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4387,21 +4342,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 6900431547444562672}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0aead369020479db4137f6bc35dd618, type: 3}
+  m_Script: {fileID: 11500000, guid: 3fb9f5f4ffcc4b6aabaadb90782d1e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pillars:
-  - {fileID: 7729784266485242643}
-  - {fileID: 634348594218634865}
-  - {fileID: 4285214713153515869}
-  - {fileID: 4788463628475752090}
-  - {fileID: 7793012771499344444}
-  - {fileID: 6568239863007953868}
-  - {fileID: 620608082469276566}
-  fenceYOffset: 0.08
-  lineRenderer: {fileID: 5383035248470337422}
-  skipIndices: 
-  poleYOffset: 0
+  wallYOffset: 0.035
+  sidesOffsetX: 0
+  pillars: []
+  wallSegments: []
+  skipSegments: 
 --- !u!1 &6961425143924820092
 GameObject:
   m_ObjectHideFlags: 0
@@ -4806,150 +4754,6 @@ MonoBehaviour:
   waitBetweenLoops: 0
   playOnAwake: 1
   _spriteRenderer: {fileID: 0}
---- !u!1 &7287845057636422614
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8462191549213525272}
-  - component: {fileID: 6410726126401658457}
-  m_Layer: 0
-  m_Name: LineRenderer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8462191549213525272
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7287845057636422614}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3846727506227102953}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!120 &6410726126401658457
-LineRenderer:
-  serializedVersion: 2
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7287845057636422614}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 0
-  m_LightProbeUsage: 0
-  m_ReflectionProbeUsage: 0
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 8aa79752bd8b74b7b9b1f801d65e0eeb, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 14
-  m_Positions:
-  - {x: 0, y: -0.235, z: 0}
-  - {x: -0.042, y: -0.14, z: 0}
-  - {x: 0.0104, y: -0.019000001, z: 0}
-  - {x: 0.03, y: 0.125, z: 0}
-  - {x: -0.012, y: 0.2056, z: 0}
-  - {x: -0.0451, y: 0.2957, z: 0}
-  - {x: 0, y: 0.39499998, z: 0}
-  m_Parameters:
-    serializedVersion: 3
-    widthMultiplier: 1
-    widthCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0.018180847
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    colorGradient:
-      serializedVersion: 2
-      key0: {r: 1, g: 1, b: 1, a: 1}
-      key1: {r: 1, g: 1, b: 1, a: 1}
-      key2: {r: 0, g: 0, b: 0, a: 0}
-      key3: {r: 0, g: 0, b: 0, a: 0}
-      key4: {r: 0, g: 0, b: 0, a: 0}
-      key5: {r: 0, g: 0, b: 0, a: 0}
-      key6: {r: 0, g: 0, b: 0, a: 0}
-      key7: {r: 0, g: 0, b: 0, a: 0}
-      ctime0: 0
-      ctime1: 65535
-      ctime2: 0
-      ctime3: 0
-      ctime4: 0
-      ctime5: 0
-      ctime6: 0
-      ctime7: 0
-      atime0: 0
-      atime1: 65535
-      atime2: 0
-      atime3: 0
-      atime4: 0
-      atime5: 0
-      atime6: 0
-      atime7: 0
-      m_Mode: 0
-      m_ColorSpace: -1
-      m_NumColorKeys: 2
-      m_NumAlphaKeys: 2
-    numCornerVertices: 0
-    numCapVertices: 0
-    alignment: 1
-    textureMode: 0
-    textureScale: {x: 1, y: 1}
-    shadowBias: 0.5
-    generateLightingData: 0
-  m_MaskInteraction: 0
-  m_UseWorldSpace: 0
-  m_Loop: 0
-  m_ApplyActiveColorSpace: 1
 --- !u!1 &7497659923442593514
 GameObject:
   m_ObjectHideFlags: 0
@@ -5372,7 +5176,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3846727506227102953}
-  - component: {fileID: 530750877121663140}
+  - component: {fileID: 5463404623427042060}
   m_Layer: 0
   m_Name: Fence
   m_TagString: Untagged
@@ -5400,10 +5204,9 @@ Transform:
   - {fileID: 7521339904871986532}
   - {fileID: 434105322672244679}
   - {fileID: 543215904113441800}
-  - {fileID: 8462191549213525272}
   m_Father: {fileID: 1615365249479384164}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &530750877121663140
+--- !u!114 &5463404623427042060
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5412,21 +5215,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 7733600988165466113}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0aead369020479db4137f6bc35dd618, type: 3}
+  m_Script: {fileID: 11500000, guid: 3fb9f5f4ffcc4b6aabaadb90782d1e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pillars:
-  - {fileID: 1128773304722995975}
-  - {fileID: 6258938418563962914}
-  - {fileID: 7795149559142262147}
-  - {fileID: 963109965670419615}
-  - {fileID: 7521339904871986532}
-  - {fileID: 434105322672244679}
-  - {fileID: 543215904113441800}
-  fenceYOffset: 0.08
-  lineRenderer: {fileID: 6410726126401658457}
-  skipIndices: 
-  poleYOffset: 0
+  wallYOffset: 0.035
+  sidesOffsetX: 0
+  pillars: []
+  wallSegments: []
+  skipSegments: 
 --- !u!1 &7809792017612545100
 GameObject:
   m_ObjectHideFlags: 0
@@ -6098,8 +5894,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3006687765285961175}
   - {fileID: 8428676047067724783}
+  - {fileID: 3006687765285961175}
   - {fileID: 2480258112236508169}
   - {fileID: 5234756067272046660}
   - {fileID: 5124838059100914524}
@@ -6128,20 +5924,23 @@ MonoBehaviour:
   - {fileID: 7865962242932361575}
   ArcRenderers: []
   TileTerritoryFiller: {fileID: 9210884626696092831}
-  TileFencePlacer: {fileID: 530750877121663140}
-  TileFencePlacerContested: {fileID: 1084423973395408549}
+  WallPlacer: {fileID: 0}
   RoadRenderers: {fileID: 6348333720883247209}
   RoadContestRenderer: {fileID: 0}
   Mill: {fileID: 0}
   CloserToBorderFences:
   - Side: 0
     Fence: {fileID: 4451166684079033044}
+    WallPlacer: {fileID: 0}
   - Side: 1
     Fence: {fileID: 6900431547444562672}
+    WallPlacer: {fileID: 0}
   - Side: 2
     Fence: {fileID: 2097358286064032126}
+    WallPlacer: {fileID: 0}
   - Side: 3
     Fence: {fileID: 6056110214806292706}
+    WallPlacer: {fileID: 0}
   PinsPositions:
   - {fileID: 2753312398331852045}
   - {fileID: 4870216626500998120}
@@ -6182,7 +5981,7 @@ MonoBehaviour:
   - {fileID: 6617544632496919018}
   MirrorRotationObjects: []
   LineRenderers:
-  - {fileID: 6410726126401658457}
+  - {fileID: 0}
   - {fileID: 2875247490487801722}
   - {fileID: 4057315375359809134}
   SpriteSwapElements:
@@ -6206,7 +6005,7 @@ MonoBehaviour:
   OnRotation:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 530750877121663140}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: TerritoryWars.Tile.FencePlacer, Assembly-CSharp
         m_MethodName: PlaceFence
         m_Mode: 1

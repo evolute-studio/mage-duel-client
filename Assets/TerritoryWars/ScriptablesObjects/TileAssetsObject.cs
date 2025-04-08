@@ -17,6 +17,11 @@ namespace TerritoryWars.ScriptablesObjects
         public Sprite[] Mountains;
         public GameObject ForestPrefab;
 
+        public Sprite[] WoodenPillars;
+        public Sprite[] StonePillars;
+        public Sprite[] WoodenWallSprites;
+        public Sprite[] StoneWallSprites;
+
         // 0 - neutral, 1 - first player, 2 - second player
         // 3 - neutral two points, 4 - first player two points, 5 - second player two points
         public Sprite[] Pins; 
@@ -139,6 +144,20 @@ namespace TerritoryWars.ScriptablesObjects
             }
 
             return null;
+        }
+
+        public Sprite GetPillar(bool isContested)
+        {
+            int randomIndex = Random.Range(0, (isContested ? StonePillars : WoodenPillars).Length);
+            Sprite randomPillar = (isContested ? StonePillars : WoodenPillars)[randomIndex];
+            return randomPillar;
+        }
+        
+        public Sprite GetWall(bool isContested)
+        {
+            int randomIndex = Random.Range(0, (isContested ? StoneWallSprites : WoodenWallSprites).Length);
+            Sprite randomWall = (isContested ? StoneWallSprites : WoodenWallSprites)[randomIndex];
+            return randomWall;
         }
         
         public Sprite GetPinByPlayerId(int playerId)

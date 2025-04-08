@@ -52,6 +52,7 @@ namespace TerritoryWars.Tile
         private Vector2Int _placingTilePosition;
 
         public GameObject CurrentTileGO { get; private set; }
+        public WallPlacer WallPlacer { get; private set; }
 
 
         public void Awake() => Initialize();
@@ -171,6 +172,10 @@ namespace TerritoryWars.Tile
             
             var tileConfig = OnChainBoardDataConverter.GetTypeAndRotation(TileConfig);
             string id = OnChainBoardDataConverter.TileTypes[tileConfig.Item1];
+            if (id.Contains('C'))
+            {
+                
+            }
             _rotation = (byte)((tileConfig.Item2 + 1) % 4);
             CurrentTileGO.GetComponent<TileRotator>().RotateTile((_rotation + 3) % 4);
             
@@ -180,12 +185,12 @@ namespace TerritoryWars.Tile
             houseRenderers = TileRenderers.HouseRenderers;
             List<SpriteRenderer> arcRenderers = TileRenderers.ArcRenderers;
             TerritoryFiller territoryFiller = TileRenderers.TileTerritoryFiller;
-            FencePlacer fencePlacer = TileRenderers.TileFencePlacer;
+            WallPlacer = TileRenderers.WallPlacer;
             List<Transform> pillars = null;
             Transform[] pins = TileRenderers.PinsPositions;
-            if (fencePlacer != null)
+            if (WallPlacer != null)
             {
-                pillars = fencePlacer.pillars;
+                pillars = WallPlacer.GetPillars().ToList();
             }
 
             if (pillars != null)
@@ -225,10 +230,9 @@ namespace TerritoryWars.Tile
             }
 
             
-            if (fencePlacer != null)
+            if (WallPlacer != null)
             {
-                AllCityLineRenderers.Add(fencePlacer.lineRenderer);
-                fencePlacer.PlaceFence();
+                WallPlacer.PlaceWall(false);
             }
 
             
@@ -331,8 +335,11 @@ namespace TerritoryWars.Tile
 
             if (isContest)
             {
-                CurrentTileGO.GetComponent<TileRenderers>().ChangeCityFenceForContest();
-                
+                WallPlacer?.PlaceWall(true);
+                foreach (var border in TileRenderers.CloserToBorderFences)
+                {
+                    border.WallPlacer.PlaceWall(true);
+                }
             }
             
             Debug.Log("Recoloring houses. PlayerId: " + playerId);
@@ -352,9 +359,9 @@ namespace TerritoryWars.Tile
             {
                 if(_tileData.GetSide(side) != LandscapeType.City) continue;
                 
-                GameObject fence = TileRenderers.CloserToBorderFences.Find(x => x.Side == side).Fence;
-                fence.SetActive(true);
-                fence.GetComponent<FencePlacer>().PlaceFence();
+                TileRenderers.CloserToBorderFence fence = TileRenderers.CloserToBorderFences.Find(x => x.Side == side);
+                fence.Fence.SetActive(true);
+                fence.WallPlacer.PlaceWall(false);
             }
         }
 

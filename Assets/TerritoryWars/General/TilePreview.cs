@@ -219,13 +219,9 @@ namespace TerritoryWars.General
                     spriteRenderer.sortingLayerName = "Default";
                 }
                 
-                if (tileRenderers.TileFencePlacer != null)
+                if (tileRenderers.WallPlacer != null)
                 {
-                    tileRenderers.TileFencePlacer.GetComponent<FencePlacer>().lineRenderer.GetComponent<LineRenderer>()
-                    .sortingLayerName = "Default";
-                    
-                    var pillars = tileRenderers.TileFencePlacer
-                        .GetComponent<FencePlacer>().pillars;
+                    var pillars = tileRenderers.WallPlacer.GetPillars();
                         
                     foreach (var pillar in pillars)
                     { 

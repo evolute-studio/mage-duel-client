@@ -2,22 +2,46 @@
 using System.Collections.Generic;
 using TerritoryWars.Tile;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class TileRenderers : MonoBehaviour
 {
     public List<SpriteRenderer> HouseRenderers;
     public List<SpriteRenderer> ArcRenderers;
     public TerritoryFiller TileTerritoryFiller;
-    public FencePlacer TileFencePlacer;
-    public FencePlacer TileFencePlacerContested;
+    public WallPlacer WallPlacer;
     public SpriteRenderer RoadRenderers;
     public SpriteRenderer RoadContestRenderer;
     public GameObject Mill;
-    public List<CloserToBorderFence> CloserToBorderFences;
+    public List<CloserToBorderFence> CloserToBorderFences = new List<CloserToBorderFence>();
     public Transform[] PinsPositions;
     public GameObject[] Forest;
     public GameObject Enviroment;
 
+    public void Awake()
+    {
+        // BorderFences
+        Transform borderFences = transform.Find("BorderFence");
+        if (borderFences != null)
+        {
+            CloserToBorderFences = new List<CloserToBorderFence>();
+            for(int i = 0; i < borderFences.childCount; i++)
+            {
+                CloserToBorderFence sideFence = new CloserToBorderFence();
+                sideFence.Side = (Side)i;
+                sideFence.Fence = borderFences.GetChild(i).gameObject;
+                sideFence.WallPlacer = sideFence.Fence.GetComponent<WallPlacer>();
+                CloserToBorderFences.Add(sideFence);
+            }
+        }
+        
+        // WallPlacer
+        Transform fence = transform.Find("Fence");
+        if (fence != null)
+        {
+            WallPlacer = fence.GetComponent<WallPlacer>();
+        }
+    }
     public void ChangeRoadForContest()
     {
         
@@ -25,9 +49,7 @@ public class TileRenderers : MonoBehaviour
 
     public void ChangeCityFenceForContest()
     {
-        TileFencePlacer.gameObject.SetActive(false);
-        TileFencePlacerContested.gameObject.SetActive(true);
-        TileFencePlacerContested.PlaceFence();
+        
     }
 
     [Serializable]
@@ -35,5 +57,6 @@ public class TileRenderers : MonoBehaviour
     {
         public Side Side;
         public GameObject Fence;
+        public WallPlacer WallPlacer;
     }
 }

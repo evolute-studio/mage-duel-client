@@ -39941,7 +39941,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1333970274}
   - component: {fileID: 1333970279}
-  - component: {fileID: 1333970278}
   - component: {fileID: 1333970277}
   - component: {fileID: 1333970276}
   - component: {fileID: 1333970275}
@@ -40051,14 +40050,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &1333970278
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1333970273}
-  m_Enabled: 1
 --- !u!20 &1333970279
 Camera:
   m_ObjectHideFlags: 0
@@ -45601,6 +45592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a86d4224e564d8b863cde1128432916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TileAssetsObject: {fileID: 11400000, guid: 19b0530eb84214bbf973b9dbeb4e18b4, type: 2}
   Players:
   - {fileID: 5368312208594547958, guid: 19110789765fd2c48b79d1198ae58085, type: 3}
   - {fileID: 6849612934398127024, guid: a995aaa8a0d2d034ba3bc5c29e0bed8f, type: 3}
@@ -45618,6 +45610,7 @@ MonoBehaviour:
     Direction: 2
   - MineTile: {fileID: 7051384673640516141, guid: e22ca937ae3ec014587304500caf8f99, type: 3}
     Direction: 3
+  WallSegmentPrefab: {fileID: 850394536357289255, guid: 85af6dc638e1b310e82c4561e53af286, type: 3}
 --- !u!1 &1539724579
 GameObject:
   m_ObjectHideFlags: 0

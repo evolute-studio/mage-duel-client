@@ -119,6 +119,7 @@ namespace TerritoryWars.Tile
 
         public void LineRotation(LineRenderer lineRenderer, int times = 1)
         {
+            if (lineRenderer == null) return;
             Vector3[] positions = new Vector3[lineRenderer.positionCount];
             lineRenderer.GetPositions(positions);
             for (int t = 0; t < times; t++)
