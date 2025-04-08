@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using TerritoryWars.General;
+using TerritoryWars.ScriptablesObjects;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -186,6 +188,14 @@ namespace TerritoryWars.Tile
             // }
         }
 
+        public void ChangeRoadContestSprites()
+        {
+            foreach (var spriteSwapElement in SpriteSwapElements)
+            {
+                spriteSwapElement.SwapRoadForContest();
+            }
+        }
+
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.R))
@@ -249,6 +259,18 @@ namespace TerritoryWars.Tile
                 pinObject.gameObject.SetActive(false);
             }
             PinObjects[newIndex].gameObject.SetActive(true);
+        }
+
+        public void SwapRoadForContest()
+        {
+            int currentIndex = GetCurrentRuleIndex();
+
+            foreach (var rule in Rules)
+            {
+                rule.Sprite = PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(rule.Sprite);
+            }
+            
+            SpriteRenderer.sprite = Rules[currentIndex].Sprite;
         }
     }
 

@@ -14,7 +14,6 @@ public class TileRenderers : MonoBehaviour
     public FencePlacer TileFencePlacer;
     public FencePlacer TileFencePlacerContested;
     public SpriteRenderer RoadRenderers;
-    public SpriteRenderer RoadContestRenderer;
     public GameObject Mill;
     public List<CloserToBorderFence> CloserToBorderFences;
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TerritoryWars.ScriptablesObjects;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,7 +29,8 @@ namespace TerritoryWars.General
         public GameObject PinPrefab;
         public List<MineEnviromentTile> MineEnviromentTiles;
         private int _currentPlayerIndex = 0;
-        public Sprite StonePillar; 
+        public Sprite StonePillar;
+        public TileAssetsObject TileAssetsObject;
         
         public GameObject GetNextPlayer()
         {

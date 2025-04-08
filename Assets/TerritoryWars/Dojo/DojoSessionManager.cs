@@ -671,6 +671,13 @@ namespace TerritoryWars.Dojo
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                     }
                     tileGenerator.RecolorPinOnSide(playerOwner, (int)side, isContest);
+                    if (isContest)
+                    {
+                        tileGenerator.CurrentTileGO.GetComponent<TileRenderers>().RoadRenderers.sprite =
+                            PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(tileGenerator
+                                .CurrentTileGO.GetComponent<TileRenderers>().RoadRenderers.sprite);
+                        // tileGenerator.TileRotator.ChangeRoadContestSprites();
+                    }
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                         Board.StructureType.Road);
                 }
