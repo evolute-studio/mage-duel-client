@@ -172,10 +172,6 @@ namespace TerritoryWars.Tile
             
             var tileConfig = OnChainBoardDataConverter.GetTypeAndRotation(TileConfig);
             string id = OnChainBoardDataConverter.TileTypes[tileConfig.Item1];
-            if (id.Contains('C'))
-            {
-                
-            }
             _rotation = (byte)((tileConfig.Item2 + 1) % 4);
             CurrentTileGO.GetComponent<TileRotator>().RotateTile((_rotation + 3) % 4);
             

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using TerritoryWars.Tile;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class TileRenderers : MonoBehaviour
 {
@@ -11,7 +10,6 @@ public class TileRenderers : MonoBehaviour
     public TerritoryFiller TileTerritoryFiller;
     public WallPlacer WallPlacer;
     public SpriteRenderer RoadRenderers;
-    public SpriteRenderer RoadContestRenderer;
     public GameObject Mill;
     public List<CloserToBorderFence> CloserToBorderFences = new List<CloserToBorderFence>();
     public Transform[] PinsPositions;

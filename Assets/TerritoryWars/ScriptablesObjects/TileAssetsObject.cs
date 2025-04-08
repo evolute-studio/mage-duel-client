@@ -16,6 +16,8 @@ namespace TerritoryWars.ScriptablesObjects
         public Sprite[] SecondPlayerHouses;
         public Sprite[] Mountains;
         public GameObject ForestPrefab;
+        public List<Sprite> RoadsSprites;
+        public List<Sprite> RoadsSpritesContested;
 
         public Sprite[] WoodenPillars;
         public Sprite[] StonePillars;
@@ -110,6 +112,18 @@ namespace TerritoryWars.ScriptablesObjects
             }
 
             return null;
+        }
+
+        public Sprite GetContestedRoadByReference(Sprite roadSprite)
+        {
+            for(int i = 0; i < RoadsSprites.Count; i++)
+            {
+                if (RoadsSprites[i] == roadSprite)
+                {
+                    return RoadsSpritesContested[i];
+                }
+            }
+            return roadSprite;
         }
         
         public Sprite GetHouseByReference(Sprite sprites, int playerIndex){

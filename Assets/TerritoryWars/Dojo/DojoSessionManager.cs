@@ -659,15 +659,25 @@ namespace TerritoryWars.Dojo
                     {
                         if (road.Key.blue_points == road.Key.red_points)
                         {
-                            continue;
+                            playerOwner = 3;
                         }
-                        playerOwner = road.Key.blue_points > road.Key.red_points ? 0 : 1;
+                        else
+                        {
+                            playerOwner = road.Key.blue_points > road.Key.red_points ? 0 : 1;
+                        }
                     }
                     else
                     {
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                     }
                     tileGenerator.RecolorPinOnSide(playerOwner, (int)side, isContest);
+                    if (isContest)
+                    {
+                        tileGenerator.CurrentTileGO.GetComponent<TileRenderers>().RoadRenderers.sprite =
+                            PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(tileGenerator
+                                .CurrentTileGO.GetComponent<TileRenderers>().RoadRenderers.sprite);
+                        // tileGenerator.TileRotator.ChangeRoadContestSprites();
+                    }
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                         Board.StructureType.Road);
                 }
