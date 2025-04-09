@@ -308,9 +308,9 @@ namespace TerritoryWars.Tile
                 {
                     if (prefab.Direction == side.Direction)
                     {
-                        GameObject mine = Instantiate(prefab.MineTile, side.Position, Quaternion.identity);
-                        SessionManager.Instance.Board.ChangeBorderTileGO(mine, side.TileBoardPosition.x, side.TileBoardPosition.y);
-                        side.Tile.SetActive(false);
+                        GameObject mine = Instantiate(prefab.MineTile, side.Position, Quaternion.identity,
+                            SessionManager.Instance.Board.GetTileObject(side.TileBoardPosition.x, side.TileBoardPosition.y).transform);
+                        side.Tile.GetComponent<TileGenerator>().RoadRenderer.gameObject.SetActive(false);
                     }
                 }
             }

@@ -311,11 +311,6 @@ namespace TerritoryWars.General
             }
         }
 
-        public void ChangeBorderTileGO(GameObject gameObject,int x, int y)
-        {
-            tileObjects[x, y] = gameObject;
-        } 
-
         private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false, bool isRoadContest = false)
         {
             GameObject[] neighborsGO = new GameObject[4];
@@ -341,14 +336,15 @@ namespace TerritoryWars.General
             {
                 if(IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
-                    if (neighborsGO[i].TryGetComponent<MineTile>(out MineTile mineTile) && isRoadContest)
+                    if (neighborsGO[i].GetComponentInChildren<MineTile>() && isRoadContest)
                     {
-                        mineTile.MineRoad.sprite =
+                        MineTile mineTile = neighborsGO[i].GetComponentInChildren<MineTile>();
+                        
+                        mineTile.MineRoad.sprite = 
                             PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(mineTile.MineRoad
                                 .sprite);
                     }
-                    if(!neighborsGO[i].TryGetComponent<TileGenerator>(out TileGenerator tryGetTileGenerator)) continue;
-                    
+
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
                     {
