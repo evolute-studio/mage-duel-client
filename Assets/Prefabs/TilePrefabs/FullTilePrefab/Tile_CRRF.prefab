@@ -205,32 +205,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fenceTop: {fileID: 253931004268219658, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
-  fenceTopRight: {fileID: -5355338603965652872, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-    type: 3}
-  fenceRight: {fileID: 4829423339344872611, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-    type: 3}
-  fenceBottomRight: {fileID: 7086771514483057864, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-    type: 3}
-  fenceBottom: {fileID: 253931004268219658, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-    type: 3}
-  fenceBottomLeft: {fileID: -5355338603965652872, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-    type: 3}
-  fenceLeft: {fileID: 4829423339344872611, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-    type: 3}
-  fenceTopLeft: {fileID: 7086771514483057864, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-    type: 3}
-  arcSprite: {fileID: 2571884862024727973, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-    type: 3}
-  fencePrefab: {fileID: 5409568526174727832, guid: f2e85ee2b5691476cbd7a58f1ed2311d,
-    type: 3}
+  fenceTopRight: {fileID: -5355338603965652872, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+  fenceRight: {fileID: 4829423339344872611, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+  fenceBottomRight: {fileID: 7086771514483057864, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+  fenceBottom: {fileID: 253931004268219658, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+  fenceBottomLeft: {fileID: -5355338603965652872, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+  fenceLeft: {fileID: 4829423339344872611, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+  fenceTopLeft: {fileID: 7086771514483057864, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+  arcSprite: {fileID: 2571884862024727973, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+  fencePrefab: {fileID: 5409568526174727832, guid: f2e85ee2b5691476cbd7a58f1ed2311d, type: 3}
   spacing: 0
   fenceWidth: 0.12
   arcIndex: -1
   skipVertices: 00000000010000000200000003000000
   spawnDelay: 0
   showDebugInfo: 0
-  territoryPrefab: {fileID: 8966325575830096033, guid: 69e89afcf12104fa1abb0ee24bbad36e,
-    type: 3}
+  territoryPrefab: {fileID: 8966325575830096033, guid: 69e89afcf12104fa1abb0ee24bbad36e, type: 3}
   TerritorySpriteRenderer: {fileID: 3069344787335656881}
   lineRenderer: {fileID: 4543475705473467417}
 --- !u!120 &4543475705473467417
@@ -421,8 +411,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 14
-  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81,
-    type: 3}
+  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -724,13 +713,11 @@ MonoBehaviour:
   - CurrentIndex: 0
     SpriteRenderer: {fileID: 3705760157452341539}
     Rules:
-    - Sprite: {fileID: 862869666472089368, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-        type: 3}
+    - Sprite: {fileID: 862869666472089368, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
       Scale: {x: 1, y: 1, z: 1}
     - Sprite: {fileID: 1542361981, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
       Scale: {x: 1, y: -1, z: 1}
-    - Sprite: {fileID: 862869666472089368, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-        type: 3}
+    - Sprite: {fileID: 862869666472089368, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
       Scale: {x: -1, y: 1, z: 1}
     - Sprite: {fileID: 1542361981, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
       Scale: {x: 1, y: 1, z: 1}
@@ -796,20 +783,26 @@ MonoBehaviour:
   - {fileID: 5261256487826883839}
   ArcRenderers: []
   TileTerritoryFiller: {fileID: 4270478840347261383}
-  TileFencePlacer: {fileID: 0}
-  TileFencePlacerContested: {fileID: 0}
-  RoadRenderers: {fileID: 3705760157452341539}
-  RoadContestRenderer: {fileID: 0}
+  WallPlacer: {fileID: 0}
+  RoadRenderers:
+  - {fileID: 0}
+  - {fileID: 3705760157452341539}
+  - {fileID: 3705760157452341539}
+  - {fileID: 0}
   Mill: {fileID: 0}
   CloserToBorderFences:
   - Side: 0
     Fence: {fileID: 0}
+    WallPlacer: {fileID: 0}
   - Side: 1
     Fence: {fileID: 0}
+    WallPlacer: {fileID: 0}
   - Side: 2
     Fence: {fileID: 0}
+    WallPlacer: {fileID: 0}
   - Side: 3
     Fence: {fileID: 0}
+    WallPlacer: {fileID: 0}
   PinsPositions:
   - {fileID: 5788128270096055890}
   - {fileID: 1720582861041568382}
@@ -1580,8 +1573,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 14
-  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81,
-    type: 3}
+  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1904,7 +1896,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fb9f5f4ffcc4b6aabaadb90782d1e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WallSegmentPrefab: {fileID: 0}
   wallYOffset: 0.035
   sidesOffsetX: 0
   pillars: []
@@ -1961,7 +1952,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fb9f5f4ffcc4b6aabaadb90782d1e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WallSegmentPrefab: {fileID: 0}
   wallYOffset: 0.035
   sidesOffsetX: 0
   pillars: []
@@ -2693,7 +2683,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fb9f5f4ffcc4b6aabaadb90782d1e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WallSegmentPrefab: {fileID: 0}
   wallYOffset: 0.035
   sidesOffsetX: 0
   pillars: []
@@ -3416,7 +3405,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fb9f5f4ffcc4b6aabaadb90782d1e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WallSegmentPrefab: {fileID: 0}
   wallYOffset: 0.035
   sidesOffsetX: 0
   pillars: []
@@ -3499,8 +3487,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 14
-  m_Sprite: {fileID: 2912985593240855013, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-    type: 3}
+  m_Sprite: {fileID: 2912985593240855013, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -3611,8 +3598,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 12
-  m_Sprite: {fileID: -4169148551782896339, guid: 4298f7da559cc46f4af6e4a6b83850db,
-    type: 3}
+  m_Sprite: {fileID: -4169148551782896339, guid: 4298f7da559cc46f4af6e4a6b83850db, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -3946,8 +3932,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 14
-  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81,
-    type: 3}
+  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4183,8 +4168,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 14
-  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81,
-    type: 3}
+  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4271,8 +4255,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 9
-  m_Sprite: {fileID: -6079988009467377576, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
-    type: 3}
+  m_Sprite: {fileID: -6079988009467377576, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4390,8 +4373,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 14
-  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81,
-    type: 3}
+  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4478,8 +4460,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 14
-  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81,
-    type: 3}
+  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4740,8 +4721,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 14
-  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81,
-    type: 3}
+  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4891,7 +4871,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fb9f5f4ffcc4b6aabaadb90782d1e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WallSegmentPrefab: {fileID: 0}
   wallYOffset: 0.035
   sidesOffsetX: 0
   pillars: []
@@ -5998,8 +5977,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 14
-  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81,
-    type: 3}
+  m_Sprite: {fileID: -5384640258807371201, guid: 03c21766d1152db4381d25eabcd2cc81, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

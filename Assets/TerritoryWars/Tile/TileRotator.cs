@@ -71,6 +71,11 @@ namespace TerritoryWars.Tile
                 _tileParts.PinsPositions = pins;
             }
 
+            if (_tileParts.RoadRenderers != null)
+            {
+                _tileParts.RoadRenderers = RotateRoadArray(_tileParts.RoadRenderers);
+            }
+
             // foreach (var spriteLayerSwapElement in SpriteLayerSwapElements) - this logic now disabled!
             // {
             //     spriteLayerSwapElement.Rotate();
@@ -89,6 +94,20 @@ namespace TerritoryWars.Tile
                 newPos.y = originalPos.x / -2;
                 obj.localPosition = newPos;
             }
+        }
+
+        public SpriteRenderer[] RotateRoadArray(SpriteRenderer[] roadArray, int times = 1)
+        {
+            if (roadArray.Length != 4) return roadArray;
+            SpriteRenderer[] tempArray = new SpriteRenderer[roadArray.Length];
+            
+            for (int i = 0; i < 4; i++)
+            {
+                int sourceIndex = (i - times + 4) % 4;
+                tempArray[i] = roadArray[sourceIndex];
+            }
+
+            return tempArray;
         }
 
         public void MirrorRotation(Transform obj, int times = 1)
@@ -170,14 +189,23 @@ namespace TerritoryWars.Tile
                 foreach (var spriteSwapElement in SpriteSwapElements)
                 {
                     spriteSwapElement.Rotate(times);
-                    var pinsParent = spriteSwapElement.PinObjects[spriteSwapElement.CurrentIndex];
-                    Transform[] pins = new Transform[pinsParent.childCount];
-                    for (int i = 0; i < pinsParent.childCount; i++)
+                    if (spriteSwapElement.PinObjects != null && spriteSwapElement.PinObjects.Length > 0)
                     {
-                        pins[i] = pinsParent.GetChild(i);
+                        var pinsParent = spriteSwapElement.PinObjects[spriteSwapElement.CurrentIndex];
+                        Transform[] pins = new Transform[pinsParent.childCount];
+                        for (int i = 0; i < pinsParent.childCount; i++)
+                        {
+                            pins[i] = pinsParent.GetChild(i);
+                        }
+
+                        _tileParts.PinsPositions = pins;
                     }
-                    _tileParts.PinsPositions = pins;
                 }
+            }
+            
+            if (_tileParts.RoadRenderers != null)
+            {
+                _tileParts.RoadRenderers = RotateRoadArray(_tileParts.RoadRenderers, times);
             }
 
             // if (SpriteLayerSwapElements != null) - this logic now disabled!
@@ -255,11 +283,15 @@ namespace TerritoryWars.Tile
             CurrentIndex = newIndex;
             SpriteRenderer.sprite = Rules[newIndex].Sprite;
             SpriteRenderer.transform.localScale = Rules[newIndex].Scale;
-            foreach (var pinObject in PinObjects)
+            if (PinObjects != null && PinObjects.Length > 0)
             {
-                pinObject.gameObject.SetActive(false);
+                foreach (var pinObject in PinObjects)
+                {
+                    pinObject.gameObject.SetActive(false);
+                }
+
+                PinObjects[newIndex].gameObject.SetActive(true);
             }
-            PinObjects[newIndex].gameObject.SetActive(true);
         }
 
         public void SwapRoadForContest()

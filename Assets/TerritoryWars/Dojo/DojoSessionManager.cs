@@ -673,13 +673,13 @@ namespace TerritoryWars.Dojo
                     tileGenerator.RecolorPinOnSide(playerOwner, (int)side, isContest);
                     if (isContest)
                     {
-                        tileGenerator.CurrentTileGO.GetComponent<TileParts>().RoadRenderers.sprite =
+                        tileGenerator.CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite =
                             PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(tileGenerator
-                                .CurrentTileGO.GetComponent<TileParts>().RoadRenderers.sprite);
-                        // tileGenerator.TileRotator.ChangeRoadContestSprites();
+                                .CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite);
+                        
                     }
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                        Board.StructureType.Road);
+                        Board.StructureType.Road, false, isContest);
                 }
 
             }

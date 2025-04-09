@@ -303,15 +303,15 @@ namespace TerritoryWars.General
             None,
         }
 
-        public void CheckAndConnectEdgeStructure(int ownerId, int x, int y, StructureType type, bool isCityContest = false)
+        public void CheckAndConnectEdgeStructure(int ownerId, int x, int y, StructureType type, bool isCityContest = false, bool isRoadContest = false)
         {
             if( (x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
             {
-                TryConnectEdgeStructure(ownerId, x, y, type, isCityContest);
+                TryConnectEdgeStructure(ownerId, x, y, type, isCityContest, isRoadContest);
             }
         }
 
-        private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false)
+        private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false, bool isRoadContest = false)
         {
             GameObject[] neighborsGO = new GameObject[4];
             TileData[] neighborsData = new TileData[4];
@@ -351,6 +351,17 @@ namespace TerritoryWars.General
                         TileGenerator placedTileGenerator = tileObjects[x, y].GetComponent<TileGenerator>();
                         List<Side> roadSides = neighborsData[i].GetRoadSides();
                         if (roadSides.Count == 0) continue;
+
+                        if (isRoadContest)
+                        {
+                            foreach (var road in tileGenerator.CurrentTileGO.GetComponent<TileParts>().RoadRenderers)
+                            {
+                                if (road != null)
+                                {
+                                    road.sprite = PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(road.sprite);
+                                }
+                            }
+                        }
                         
                         for (int j = 0; j < tileGenerator.Pins.Count; j++)
                         {

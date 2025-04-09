@@ -236,7 +236,10 @@ namespace TerritoryWars.General
                 }
             
                 if(tileParts.RoadRenderers != null)
-                    tileParts.RoadRenderers.sortingLayerName = "Default";
+                    foreach (var road in tileParts.RoadRenderers)
+                    {
+                        if(road != null) road.sortingLayerName = "Default";
+                    }
                 
                 if (tileParts.TileTerritoryFiller != null)
                 {

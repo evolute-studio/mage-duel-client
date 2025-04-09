@@ -9,13 +9,14 @@ public class TileParts : MonoBehaviour
     public List<SpriteRenderer> ArcRenderers = new List<SpriteRenderer>();
     public TerritoryFiller TileTerritoryFiller;
     public WallPlacer WallPlacer;
-    public SpriteRenderer RoadRenderers;
+    public SpriteRenderer[] RoadRenderers = new SpriteRenderer[4];
     public GameObject Mill;
     public List<CloserToBorderFence> CloserToBorderFences = new List<CloserToBorderFence>();
     public Transform[] PinsPositions;
     public GameObject[] Forest;
     public GameObject Enviroment;
-
+    
+    
     public void Awake()
     {
         // BorderFences
