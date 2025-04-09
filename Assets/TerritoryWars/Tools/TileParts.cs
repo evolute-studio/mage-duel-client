@@ -102,14 +102,17 @@ public class TileParts : MonoBehaviour
         }
     }
     
-    public void RoadOutline(bool isOutline)
+    public void RoadOutline(bool isOutline, Side side = Side.None)
     {
         int mask = isOutline ? OutlineLayerMask : DefaultLayerMask;
-        foreach (var road in RoadRenderers)
+        for(int i = 0; i < RoadRenderers.Length; i++)
         {
-            if (road != null)
+            if (RoadRenderers[i] != null)
             {
-                road.gameObject.layer = mask;
+                if (side == Side.None || side == (Side)i)
+                {
+                    RoadRenderers[i].gameObject.layer = mask;
+                }
             }
         }
         

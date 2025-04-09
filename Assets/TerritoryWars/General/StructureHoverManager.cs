@@ -8,7 +8,7 @@ namespace TerritoryWars.General
 {
     public class StructureHoverManager : MonoBehaviour
     {
-        private HashSet<Vector2Int> _hoveredTiles = new HashSet<Vector2Int>();
+        private HashSet<KeyValuePair<Vector2Int, Side>> _hoveredTiles = new HashSet<KeyValuePair<Vector2Int, Side>>();
         private List<TileParts> _hoveredTilesParts = new List<TileParts>();
         private bool isCity = false;
         private bool isHovered = false;
@@ -41,11 +41,11 @@ namespace TerritoryWars.General
 
         private bool IsNewStructure(RaycastHit2D[] hits)
         {
-            foreach (var hit in hits)
-            {
-                Vector2Int tilePosition = Board.GetPositionByWorld(hit.transform.position);
-                if (_hoveredTiles.Contains(tilePosition)) return false;
-            }
+            // foreach (var hit in hits)
+            // {
+            //     Vector2Int tilePosition = Board.GetPositionByWorld(hit.transform.position);
+            //     if (_hoveredTiles.Contains(tilePosition)) return false;
+            // }
             return true;
         }
 
@@ -76,15 +76,17 @@ namespace TerritoryWars.General
             if (cityDict.Key == null) return;
             foreach (var city in cityDict.Value)
             {
-                Vector2Int structurePosition = OnChainBoardDataConverter.GetPositionByRoot(city.position);
-                if (_hoveredTiles.Contains(structurePosition)) continue;
+                (Vector2Int structurePosition, Side side) = OnChainBoardDataConverter.GetPositionAndSide(city.position);
+                KeyValuePair<Vector2Int, Side> keyValuePair = new KeyValuePair<Vector2Int, Side>(structurePosition, side);
+                if (_hoveredTiles.Contains(keyValuePair)) continue;
                 
-                _hoveredTiles.Add(structurePosition);
+                _hoveredTiles.Add(keyValuePair);
                 List<Vector2Int> edgeTiles = SessionManager.Instance.Board.GetEdgeNeighbors(structurePosition.x, structurePosition.y);
                 foreach (var edgeTile in edgeTiles)
                 {
-                    if (_hoveredTiles.Contains(edgeTile)) continue;
-                    _hoveredTiles.Add(edgeTile);
+                    KeyValuePair<Vector2Int, Side> edgeKeyValuePair = new KeyValuePair<Vector2Int, Side>(edgeTile, Side.None);
+                    if (_hoveredTiles.Contains(edgeKeyValuePair)) continue;
+                    _hoveredTiles.Add(edgeKeyValuePair);
                 }
             }
             if (cityDict.Value.Count > 0)
@@ -102,14 +104,16 @@ namespace TerritoryWars.General
             foreach (var road in roadDict.Value)
             {
                 Vector2Int structurePosition = OnChainBoardDataConverter.GetPositionByRoot(road.position);
-                if (_hoveredTiles.Contains(structurePosition)) continue;
+                KeyValuePair<Vector2Int, Side> keyValuePair = new KeyValuePair<Vector2Int, Side>(structurePosition, Side.None);
+                if (_hoveredTiles.Contains(keyValuePair)) continue;
                 
-                _hoveredTiles.Add(structurePosition);
+                _hoveredTiles.Add(keyValuePair);
                 List<Vector2Int> edgeTiles = SessionManager.Instance.Board.GetEdgeNeighbors(structurePosition.x, structurePosition.y);
                 foreach (var edgeTile in edgeTiles)
                 {
-                    if (_hoveredTiles.Contains(edgeTile)) continue;
-                    _hoveredTiles.Add(edgeTile);
+                    KeyValuePair<Vector2Int, Side> edgeKeyValuePair = new KeyValuePair<Vector2Int, Side>(edgeTile, Side.None);
+                    if (_hoveredTiles.Contains(edgeKeyValuePair)) continue;
+                    _hoveredTiles.Add(edgeKeyValuePair);
                 }
             }
             if (roadDict.Value.Count > 0)
@@ -132,7 +136,7 @@ namespace TerritoryWars.General
             Board board = SessionManager.Instance.Board;
             foreach (var position in _hoveredTiles)
             {
-                GameObject tile = board.GetTileObject(position.x, position.y);
+                GameObject tile = board.GetTileObject(position.Key.x, position.Key.y);
                 if (tile != null)
                 {
                     TileParts tileParts = tile.GetComponentInChildren<TileParts>();

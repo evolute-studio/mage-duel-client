@@ -737,7 +737,8 @@ namespace TerritoryWars.General
                 Side.Right => Side.Left,
                 Side.Bottom => Side.Top,
                 Side.Left => Side.Right,
-                _ => throw new System.ArgumentException($"Invalid side: {side}")
+                Side.None => Side.None,
+                //_ => throw new System.ArgumentException($"Invalid side: {side}")
             };
         }
 
