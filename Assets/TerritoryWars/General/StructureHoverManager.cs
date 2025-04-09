@@ -80,6 +80,12 @@ namespace TerritoryWars.General
                 if (_hoveredTiles.Contains(structurePosition)) continue;
                 
                 _hoveredTiles.Add(structurePosition);
+                List<Vector2Int> edgeTiles = SessionManager.Instance.Board.GetEdgeNeighbors(structurePosition.x, structurePosition.y);
+                foreach (var edgeTile in edgeTiles)
+                {
+                    if (_hoveredTiles.Contains(edgeTile)) continue;
+                    _hoveredTiles.Add(edgeTile);
+                }
             }
             if (cityDict.Value.Count > 0)
             {
@@ -99,6 +105,12 @@ namespace TerritoryWars.General
                 if (_hoveredTiles.Contains(structurePosition)) continue;
                 
                 _hoveredTiles.Add(structurePosition);
+                List<Vector2Int> edgeTiles = SessionManager.Instance.Board.GetEdgeNeighbors(structurePosition.x, structurePosition.y);
+                foreach (var edgeTile in edgeTiles)
+                {
+                    if (_hoveredTiles.Contains(edgeTile)) continue;
+                    _hoveredTiles.Add(edgeTile);
+                }
             }
             if (roadDict.Value.Count > 0)
             {
