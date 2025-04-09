@@ -523,7 +523,51 @@ namespace TerritoryWars.Dojo
             return new KeyValuePair<T, List<T>>();
         }
 
-
+        public KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>> GetCityByPosition(Vector2Int position)
+        {
+            byte[] roots = OnChainBoardDataConverter.GetRootsByPosition(position);
+            BuildCitySets();
+            foreach (var root in roots)
+            {
+                foreach (var set in cities)
+                {
+                    foreach (var node in set.Value)
+                    {
+                        INode iNode = node as INode;
+                        if (iNode == null) continue;
+                        byte nodePosition = iNode.GetPosition();
+                        if (nodePosition == root)
+                        {
+                            return set;
+                        }
+                    }
+                }
+            }
+            return new KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>>();
+        }
+        
+        public KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>> GetRoadByPosition(Vector2Int position)
+        {
+            byte[] roots = OnChainBoardDataConverter.GetRootsByPosition(position);
+            BuildRoadSets();
+            foreach (var root in roots)
+            {
+                foreach (var set in roads)
+                {
+                    foreach (var node in set.Value)
+                    {
+                        INode iNode = node as INode;
+                        if (iNode == null) continue;
+                        byte nodePosition = iNode.GetPosition();
+                        if (nodePosition == root)
+                        {
+                            return set;
+                        }
+                    }
+                }
+            }
+            return new KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>>();
+        }
 
         private (Vector2Int, Side) GetNearTileSide(Vector2Int position, Side side)
         {

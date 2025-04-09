@@ -163,8 +163,8 @@ namespace TerritoryWars.General
             var highlightUpperBorder = new GameObject("HighlightUpperBorder");
             highlight.transform.SetParent(highlightedTiles.transform);
             highlightUpperBorder.transform.SetParent(highlight.transform);
-            highlight.transform.position = board.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
-            highlightUpperBorder.transform.position = board.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
+            highlight.transform.position = Board.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
+            highlightUpperBorder.transform.position = Board.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
             
 
             var spriteRenderer = highlight.AddComponent<SpriteRenderer>();

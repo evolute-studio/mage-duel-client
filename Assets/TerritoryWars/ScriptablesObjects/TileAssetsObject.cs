@@ -151,9 +151,9 @@ namespace TerritoryWars.ScriptablesObjects
 
         public void BackIndex(int times)
         {
-            CurrentHouseIndex = (CurrentHouseIndex - times) % FirstPlayerHouses.Length;
+            CurrentHouseIndex = (CurrentHouseIndex - times) % FirstPlayerHousesAnimated.Count;
             if (CurrentHouseIndex < 0)
-                CurrentHouseIndex += FirstPlayerHouses.Length;
+                CurrentHouseIndex += FirstPlayerHousesAnimated.Count;
         }
 
         public Sprite GetRandomMountain()

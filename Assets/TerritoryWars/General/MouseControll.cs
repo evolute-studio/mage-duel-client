@@ -12,7 +12,9 @@ namespace TerritoryWars.General
         [SerializeField] private float minZoom = 2f;
         [SerializeField] private float maxZoom = 4f;
 
+        private Camera _mainCamera;
         private Camera _camera;
+        private bool _isMainCamera = false;
         private Vector3 lastMousePosition;
         private bool isDragging = false;
         private Vector3 minBounds = new Vector3(-4f, -3f, 0f);
@@ -22,6 +24,11 @@ namespace TerritoryWars.General
         void Start()
         {
             _camera = GetComponent<Camera>();
+            _mainCamera = Camera.main;
+            if (_camera == _mainCamera)
+            {
+                _isMainCamera = true;
+            }
         }
 
         // Update is called once per frame
@@ -60,6 +67,11 @@ namespace TerritoryWars.General
 
         private void HandleZoom()
         {
+            if (!_isMainCamera)
+            {
+                _camera.orthographicSize = _mainCamera.orthographicSize;
+                return;
+            }
             float scrollDelta = Input.mouseScrollDelta.y;
             if (scrollDelta != 0)
             {

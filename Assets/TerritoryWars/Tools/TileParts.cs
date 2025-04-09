@@ -15,10 +15,18 @@ public class TileParts : MonoBehaviour
     public Transform[] PinsPositions;
     public GameObject[] Forest;
     public GameObject Enviroment;
+
+    private int DefaultLayerMask = 0; // Default layer
+    private int OutlineLayerMask = 31; // Outline layer
     
-    
+
     public void Awake()
     {
+        DefaultLayerMask = LayerMask.NameToLayer("Default");
+        OutlineLayerMask = LayerMask.NameToLayer("Outline");
+        Debug.Log($"DefaultLayerMask: {DefaultLayerMask}");
+        Debug.Log($"OutlineLayerMask: {OutlineLayerMask}");
+        
         // BorderFences
         Transform borderFences = transform.Find("BorderFence");
         if (borderFences != null)
@@ -41,14 +49,87 @@ public class TileParts : MonoBehaviour
             WallPlacer = fence.GetComponent<WallPlacer>();
         }
     }
-    public void ChangeRoadForContest()
+
+    public void CityOutline(bool isOutline)
     {
+        int mask = isOutline ? OutlineLayerMask : DefaultLayerMask;
+        if (HouseRenderers != null)
+        {
+            foreach (var house in HouseRenderers)
+            {
+                if (house != null) house.gameObject.layer = mask;
+            }
+        }
+        if (ArcRenderers != null)
+        {
+            foreach (var arc in ArcRenderers)
+            {
+                if (arc != null) arc.gameObject.layer = mask;
+            }
+        }
+        if (TileTerritoryFiller != null && TileTerritoryFiller.currentTerritory != null && TileTerritoryFiller.currentTerritory.fillTexture != null)
+        {
+            TileTerritoryFiller.currentTerritory.fillTexture.gameObject.layer = mask;
+        }
+        if (WallPlacer != null)
+        {
+            foreach (var pillar in WallPlacer.GetPillars())
+            {
+                if (pillar != null) pillar.gameObject.layer = mask;
+            }
+            foreach (var wall in WallPlacer.GetWallSegments())
+            {
+                if (wall != null) wall.gameObject.layer = mask;
+            }
+        }
+
+        if (CloserToBorderFences != null)
+        {
+            foreach (var border in CloserToBorderFences)
+            {
+                if (border != null && border.WallPlacer != null)
+                {
+                    foreach (var house in border.WallPlacer.GetPillars())
+                    {
+                        if (house != null) house.gameObject.layer = mask;
+                    }
+                    foreach (var wall in border.WallPlacer.GetWallSegments())
+                    {
+                        if (wall != null) wall.gameObject.layer = mask;
+                    }
+                }
+            }
+        }
+    }
+    
+    public void RoadOutline(bool isOutline)
+    {
+        int mask = isOutline ? OutlineLayerMask : DefaultLayerMask;
+        foreach (var road in RoadRenderers)
+        {
+            if (road != null)
+            {
+                road.gameObject.layer = mask;
+            }
+        }
         
+        if (Mill != null)
+        {
+            Mill.layer = mask;
+        }
+        if (ArcRenderers != null)
+        {
+            foreach (var arc in ArcRenderers)
+            {
+                if (arc != null) arc.gameObject.layer = mask;
+            }
+        }
     }
 
-    public void ChangeCityFenceForContest()
+    public void DisableOutline()
     {
-        
+        CityOutline(false);
+        RoadOutline(false);
     }
 
     [Serializable]

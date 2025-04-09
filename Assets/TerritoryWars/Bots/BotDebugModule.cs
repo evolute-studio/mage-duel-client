@@ -103,7 +103,7 @@ namespace TerritoryWars.Bots
             {
                 Board board = Bot.DataCollectorModule.Board;
                 var placement = move.Key;
-                Vector3 worldTilePosition = board.GetTilePosition(placement.x, placement.y);
+                Vector3 worldTilePosition = Board.GetTilePosition(placement.x, placement.y);
                 Vector3 screenTilePosition = Camera.main.WorldToScreenPoint(worldTilePosition);
                 
                 GUI.Label(new Rect(screenTilePosition.x, Screen.height - screenTilePosition.y, 100, 100), move.Value.ToString());
