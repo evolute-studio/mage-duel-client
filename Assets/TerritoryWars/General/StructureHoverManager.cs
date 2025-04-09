@@ -1,21 +1,35 @@
 using System.Collections.Generic;
 using TerritoryWars.Dojo;
+using TerritoryWars.Models;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
+using TerritoryWars.UI;
 using UnityEngine;
 
 namespace TerritoryWars.General
 {
     public class StructureHoverManager : MonoBehaviour
     {
+        public Transform Canvas;
+        private INode _structureRoot;
         private HashSet<KeyValuePair<Vector2Int, Side>> _hoveredTiles = new HashSet<KeyValuePair<Vector2Int, Side>>();
         private List<TileParts> _hoveredTilesParts = new List<TileParts>();
         private bool isCity = false;
         private bool isHovered = false;
-
+        
+        private StructureHoverPanel structureHoverPanel;
+        [SerializeField] private float _offsetY = 0;
+        
+        public void Start()
+        {
+            structureHoverPanel = Instantiate(PrefabsManager.Instance.StructureHoverPrefab, Canvas).GetComponent<StructureHoverPanel>();
+            structureHoverPanel.gameObject.SetActive(false);
+        }
+        
         public void Update()
         {
             HandleTileHover();
+            UpdateInfoPanel();
         }
         
         private void HandleTileHover()
@@ -37,6 +51,22 @@ namespace TerritoryWars.General
                     HoverExit();
                 }
             }
+        }
+
+        private void UpdateInfoPanel()
+        {
+            if (!isHovered)
+            {
+                structureHoverPanel.gameObject.SetActive(false);
+                return;
+            }
+            structureHoverPanel.gameObject.SetActive(true);
+            structureHoverPanel.SetScores(_structureRoot.GetBluePoints(), _structureRoot.GetRedPoints());
+            
+            Vector3 mousePosition = Input.mousePosition;
+            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            Vector3 panelPosition = new Vector3(worldPosition.x, worldPosition.y + _offsetY, 0);
+            structureHoverPanel.transform.position = panelPosition;
         }
 
         private bool IsNewStructure(RaycastHit2D[] hits)
@@ -74,6 +104,7 @@ namespace TerritoryWars.General
             CustomLogger.LogInfo("Tile Position: " + tilePosition);
             var cityDict = DojoGameManager.Instance.SessionManager.GetCityByPosition(tilePosition);
             if (cityDict.Key == null) return;
+            _structureRoot = cityDict.Key;
             foreach (var city in cityDict.Value)
             {
                 (Vector2Int structurePosition, Side side) = OnChainBoardDataConverter.GetPositionAndSide(city.position);
@@ -101,6 +132,7 @@ namespace TerritoryWars.General
             tilePosition = SessionManager.Instance.Board.GetPositionByObject(parent.gameObject);
             var roadDict = DojoGameManager.Instance.SessionManager.GetRoadByPosition(tilePosition);
             if (roadDict.Key == null) return;
+            _structureRoot = roadDict.Key;
             foreach (var road in roadDict.Value)
             {
                 Vector2Int structurePosition = OnChainBoardDataConverter.GetPositionByRoot(road.position);

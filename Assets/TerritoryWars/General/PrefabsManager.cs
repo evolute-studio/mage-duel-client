@@ -32,6 +32,7 @@ namespace TerritoryWars.General
         public GameObject WallSegmentPrefab;
         private int _currentPlayerIndex = 0;
         public Sprite StonePillar;
+        public GameObject StructureHoverPrefab;
         
         public GameObject GetNextPlayer()
         {
