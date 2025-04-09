@@ -1,3 +1,4 @@
+using TerritoryWars.General;
 using TMPro;
 using UnityEngine;
 
@@ -10,8 +11,17 @@ namespace TerritoryWars.UI
         
         public void SetScores(ushort blueScore, ushort redScore)
         {
-            BlueScoreText.text = blueScore.ToString();
-            RedScoreText.text = redScore.ToString();
+            if (SessionManager.Instance.IsLocalPlayerHost)
+            {
+                BlueScoreText.text = blueScore.ToString();
+                RedScoreText.text = redScore.ToString();
+            }
+            else
+            {
+                BlueScoreText.text = redScore.ToString();
+                RedScoreText.text = blueScore.ToString();
+            }
+            
         }
     }
 }
