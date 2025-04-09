@@ -194,7 +194,7 @@ public class LeaderboardItem
                 _copyButton.gameObject.transform.position.y + 0.3f, _copyButton.gameObject.transform.position.z);
             
             _copyDiscribeGameObject.SetActive(true);
-            _copyDiscribeGameObject.GetComponent<Transform>().DOMoveY(_copyButton.gameObject.transform.position.y + 1,
+            _copyDiscribeGameObject.GetComponent<Transform>().DOMoveY(_copyButton.gameObject.transform.position.y + 0.7f,
                 0.5f).OnComplete(() =>
             {
                 _copyDiscribeGameObject.SetActive(false);

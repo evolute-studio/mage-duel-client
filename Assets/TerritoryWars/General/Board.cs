@@ -311,6 +311,11 @@ namespace TerritoryWars.General
             }
         }
 
+        public void ChangeBorderTileGO(GameObject gameObject,int x, int y)
+        {
+            tileObjects[x, y] = gameObject;
+        } 
+
         private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false, bool isRoadContest = false)
         {
             GameObject[] neighborsGO = new GameObject[4];
@@ -336,6 +341,14 @@ namespace TerritoryWars.General
             {
                 if(IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
+                    if (neighborsGO[i].TryGetComponent<MineTile>(out MineTile mineTile) && isRoadContest)
+                    {
+                        mineTile.MineRoad.sprite =
+                            PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(mineTile.MineRoad
+                                .sprite);
+                    }
+                    if(!neighborsGO[i].TryGetComponent<TileGenerator>(out TileGenerator tryGetTileGenerator)) continue;
+                    
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
                     {
@@ -386,7 +399,7 @@ namespace TerritoryWars.General
                 for(int y = 0; y < height; y++)
                 {
                     GameObject tile = GetTileObject(x, y);
-                    if(tile == null) continue;
+                    if(tile == null || tile.TryGetComponent(out TileGenerator tryGetTileGenerator)) continue;
                     TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
                     List<Side> sides = CheckCityTileSidesToEmpty(x, y);
                     tileGenerator.FencePlacerForCloserToBorderCity(sides);
@@ -455,6 +468,7 @@ namespace TerritoryWars.General
                 {
                     Tile = GetTileObject(x + 1, y),
                     Position = GetTilePosition(x + 1, y),
+                    TileBoardPosition = new Vector2Int(x + 1, y),
                     Direction = Side.Top
                 });
             }
@@ -465,6 +479,7 @@ namespace TerritoryWars.General
                 {
                     Tile = GetTileObject(x, y - 1),
                     Position = GetTilePosition(x, y - 1),
+                    TileBoardPosition = new Vector2Int(x, y - 1),
                     Direction = Side.Right
                 });
             }
@@ -475,6 +490,7 @@ namespace TerritoryWars.General
                 {
                     Tile = GetTileObject(x - 1, y),
                     Position = GetTilePosition(x - 1, y),
+                    TileBoardPosition = new Vector2Int(x - 1, y),
                     Direction = Side.Bottom
                 });
             }
@@ -485,6 +501,7 @@ namespace TerritoryWars.General
                 {
                     Tile = GetTileObject(x, y + 1),
                     Position = GetTilePosition(x, y + 1),
+                    TileBoardPosition = new Vector2Int(x, y + 1),
                     Direction = Side.Left
                 });
             }
@@ -1010,6 +1027,7 @@ namespace TerritoryWars.General
         {
             public GameObject Tile;
             public Vector3 Position;
+            public Vector2Int TileBoardPosition;
             public Side Direction;
         }
     }
