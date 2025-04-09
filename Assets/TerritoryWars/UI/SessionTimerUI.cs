@@ -48,9 +48,14 @@ namespace TerritoryWars.UI
         {
             RotateHourglass();
             CustomLogger.LogImportant("Start turn timer. Timestamp: " + timestamp + " _startTurnTime: " + _startTurnTime);
-            timestamp = _startTurnTime < timestamp && _startTurnTime != 0 ? _startTurnTime : timestamp;
+            
+            // checking for the future
+            ulong currentTimestamp = (ulong) (System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
+            timestamp = timestamp > currentTimestamp ? currentTimestamp : timestamp;
+            timestamp = timestamp == 0 ? currentTimestamp : timestamp;
+            
             _isLocalPlayerTurn = isLocal;
-            _startTurnTime = timestamp != 0 && _startTurnTime != timestamp ? timestamp : (ulong) (System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
+            _startTurnTime = timestamp;
             _isTimerActive = true;
             TimerText.color = Color.white;
         }
