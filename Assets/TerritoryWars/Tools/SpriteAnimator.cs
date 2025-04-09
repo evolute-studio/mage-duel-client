@@ -70,6 +70,7 @@ namespace TerritoryWars.Tools
 
         public SpriteAnimator Play(Sprite[] animation)
         {
+            Stop();
             sprites = animation;
             Play();
             return this;

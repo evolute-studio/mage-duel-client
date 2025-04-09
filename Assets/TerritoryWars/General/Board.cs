@@ -45,7 +45,7 @@ namespace TerritoryWars.General
 
     public class Board : MonoBehaviour
     {
-        public TileAssetsObject tileAssets;
+        public TileAssetsObject tileAssets => PrefabsManager.Instance.TileAssetsObject;
         private StructureChecker structureChecker;
 
         [SerializeField] private int width = 10;

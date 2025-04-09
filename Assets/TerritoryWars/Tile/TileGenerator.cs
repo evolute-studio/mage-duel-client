@@ -20,7 +20,7 @@ namespace TerritoryWars.Tile
     {
         public TileConnector[] connectors;
         public SpriteRenderer RoadRenderer;
-        public TileAssetsObject TileAssetsObject;
+        public TileAssetsObject TileAssetsObject => PrefabsManager.Instance.TileAssetsObject;
         [FormerlySerializedAs("TileRenderers")] public TileParts tileParts;
         public TileJokerAnimator TileJokerAnimator;
 
@@ -278,7 +278,7 @@ namespace TerritoryWars.Tile
                 .ToList().Where(x => x.name == "House").ToList();
             for (int i = 0; i < houseRenderers.Count; i++)
             {
-                houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().ChangeSprites(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, playerId));
+                houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, playerId, isContest));
             }
         }
 
