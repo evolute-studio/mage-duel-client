@@ -8,7 +8,7 @@ namespace TerritoryWars.Tile
         [Header("References")]
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private SpriteMask spriteMask;
-        [SerializeField] private SpriteRenderer fillTexture;
+        [SerializeField] public SpriteRenderer fillTexture;
 
         [Header("Settings")]
         [SerializeField] private int textureSize = 512;
@@ -94,6 +94,7 @@ namespace TerritoryWars.Tile
             
             spriteMask.sprite = maskSprite;
             spriteMask.transform.localPosition = bounds.center;
+            
             // spriteMask.transform.localScale = new Vector3(maxSize, maxSize, 1);
 
             

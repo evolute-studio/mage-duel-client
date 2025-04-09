@@ -172,7 +172,7 @@ public class StructureChecker
         Vector3 result = Vector3.zero;
         foreach (var structure in structures)
         {
-            result += SessionManager.Instance.Board.GetTilePosition(structure.Position.x, structure.Position.y);
+            result += Board.GetTilePosition(structure.Position.x, structure.Position.y);
         }
         result /= structures.Count;
         return result;

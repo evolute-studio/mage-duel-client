@@ -51,7 +51,7 @@ namespace TerritoryWars.General
         [SerializeField] private int width = 10;
         [SerializeField] private int height = 10;
         [SerializeField] private GameObject tilePrefab;
-        [SerializeField] private float tileSpacing = 0.5f;
+        [SerializeField] private static float tileSpacing = 0.63f;
 
         private GameObject[,] tileObjects;
         private TileData[,] tileData;
@@ -387,6 +387,22 @@ namespace TerritoryWars.General
                 }
             }
         }
+
+        public List<Vector2Int> GetEdgeNeighbors(int x, int y)
+        {
+            List<Vector2Int> neighbors = new List<Vector2Int>();
+            int[][] positions = new[] { new int[] {1, 0}, new int[] {0, -1}, new int[] {-1, 0}, new int[] {0, 1} };
+            for (int i = 0; i < 4; i++)
+            {
+                int newX = x + positions[i][0];
+                int newY = y + positions[i][1];
+                if (IsEdgeTile(newX, newY))
+                {
+                    neighbors.Add(new Vector2Int(newX, newY));
+                }
+            }
+            return neighbors;
+        }
         
         public void CloseAllStructures()
         {
@@ -721,7 +737,8 @@ namespace TerritoryWars.General
                 Side.Right => Side.Left,
                 Side.Bottom => Side.Top,
                 Side.Left => Side.Right,
-                _ => throw new System.ArgumentException($"Invalid side: {side}")
+                Side.None => Side.None,
+                //_ => throw new System.ArgumentException($"Invalid side: {side}")
             };
         }
 
@@ -765,13 +782,36 @@ namespace TerritoryWars.General
         public int Width => width;
         public int Height => height;
 
-        public Vector3 GetTilePosition(int x, int y)
+        public static Vector3 GetTilePosition(int x, int y)
         {
             float xPosition = (x - y) * tileSpacing;
             float yPosition = (x + y) * (tileSpacing / 2);
             return new Vector3(xPosition, yPosition, 0);
         }
+        
+        public static Vector2Int GetPositionByWorld(Vector3 worldPosition)
+        {
+            float x = (worldPosition.x + worldPosition.y) / tileSpacing;
+            float y = (worldPosition.y - worldPosition.x) / tileSpacing * 2;
+            return new Vector2Int(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
+        }
+        
+        public Vector2Int GetPositionByObject(GameObject tile)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (tileObjects[x, y] == tile)
+                    {
+                        return new Vector2Int(x, y);
+                    }
+                }
+            }
 
+            return new Vector2Int(-1, -1);
+        }
+        
         public List<ValidPlacement> GetValidPlacements(TileData tile)
         {
             List<ValidPlacement> validPlacements = new List<ValidPlacement>();
@@ -865,152 +905,6 @@ namespace TerritoryWars.General
         {
             if (!IsValidPosition(x, y)) return null;
             return tileData[x, y];
-        }
-        
-        public void RoadContest(byte root, int winnerId, int bluePoints, int redPoints)
-        {
-            List<RoadStructure> connectedRoadTiles = GetConnectedRoadTiles(root);
-            foreach (RoadStructure roadStructure in connectedRoadTiles)
-            {
-                TileData tile = GetTileData(roadStructure.tilePosition.x, roadStructure.tilePosition.y);
-                if (tile != null && tile.IsRoad())
-                {
-                    tile.RoadStructure.OwnerId = winnerId;
-                    
-                    
-                }
-                
-                
-              
-                Vector2 centralPinPosition = ReplacePinsAndGetCentralPosition(connectedRoadTiles, winnerId);
-                Vector2 offset = new Vector2(0, 0.4f);
-            }
-        }
-
-        public List<RoadStructure> GetConnectedRoadTiles(byte root)
-        {
-            Vector2Int startPosition = OnChainBoardDataConverter.GetPositionByRoot(root);
-            
-            Side startSide = (Side)((root + 3) % 4);
-            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
-            List<RoadStructure> roadTiles = new List<RoadStructure>();
-           
-
-            
-
-            
-            DfsRoadSearch(startPosition.x, startPosition.y, visited, roadTiles, startSide);
-            
-            return roadTiles;
-        }
-        
-        private Vector2 ReplacePinsAndGetCentralPosition(List<RoadStructure> roadTiles, int winnerId)
-        {
-            List<Vector2> pinsPositions = new List<Vector2>();
-            foreach (RoadStructure roadStructure in roadTiles)
-            {
-                GameObject tileObject = GetTileObject(roadStructure.tilePosition.x, roadStructure.tilePosition.y);
-                if (tileObject != null)
-                {
-                    TileGenerator tileGenerator = tileObject.GetComponent<TileGenerator>();
-                    for(int i = 0; i < 4; i++)
-                    {
-                        if (roadStructure.roadSides[i])
-                        {
-                            if (tileGenerator.Pins[i] == null) continue;
-                            pinsPositions.Add(tileGenerator.Pins[i].transform.position);    
-                            
-                            tileGenerator.Pins[i].SetPin(winnerId);
-                            //tileGenerator.pinRenderers[i].transform.DOKill();
-                            //Destroy(tileGenerator.pinRenderers[i].gameObject);
-                        }
-                    }
-                }
-            }
-            // sort pinsPositions by x and y
-            pinsPositions.Sort((a, b) => a.x.CompareTo(b.x));
-            return pinsPositions[pinsPositions.Count / 2];
-        }
-
-        private void DfsRoadSearch(int x, int y, HashSet<Vector2Int> visited, List<RoadStructure> roadTiles, Side? fromSide = null)
-        {
-            string s = "";
-            s += $"DfsRoadSearch at {x}, {y} from {fromSide} visited: \n";
-            Vector2Int currentPos = new Vector2Int(x, y);
-
-            if (visited.Contains(currentPos) || !IsValidPosition(x, y))
-            {
-                CustomLogger.LogWarning(s);
-                return;
-            }
-            s += $"DfsRoadSearch at {x}, {y} is not visited and valid\n";
-            
-            TileData currentTile = GetTileData(x, y);
-            if (currentTile == null || !currentTile.IsRoad())
-            {
-                CustomLogger.LogWarning(s);
-                return;
-            }
-            s += $"DfsRoadSearch at {x}, {y} is road\n";
-            
-            visited.Add(currentPos);
-            
-            RoadStructure roadStructure = new RoadStructure 
-            { 
-                tilePosition = currentPos,
-                roadSides = new bool[4]
-            };
-
-           
-            int roadCount = 0;
-            foreach (Side side in System.Enum.GetValues(typeof(Side)))
-            {
-                if (currentTile.GetSide(side) == LandscapeType.Road)
-                {
-                    roadCount++;
-                    roadStructure.roadSides[(int)side] = true;
-                }
-            }
-            s += $"DfsRoadSearch at {x}, {y} roadCount: {roadCount}\n";
-            
-           
-            if (roadCount == 1 || roadCount >= 3)
-            {
-                
-                s += $"DfsRoadSearch at {x}, {y} fromSide: {fromSide}\n";
-                
-                for (int i = 0; i < 4; i++)
-                {
-                    roadStructure.roadSides[i] = (i == (int)GetOppositeSide(fromSide.Value));
-                }
-                
-                roadTiles.Add(roadStructure);
-                s += $"DfsRoadSearch at {x}, {y} roadStructure added\n";
-                CustomLogger.LogWarning(s);
-                return;
-            }
-
-            roadTiles.Add(roadStructure);
-            
-            
-            foreach (Side side in System.Enum.GetValues(typeof(Side)))
-            {
-                if (!roadStructure.roadSides[(int)side])
-                    continue;
-
-                int newX = x + GetXOffset(side);
-                int newY = y + GetYOffset(side);
-                s += $"DfsRoadSearch at {x}, {y} side: {side} newX: {newX} newY: {newY}\n";
-                
-                TileData neighborTile = GetTileData(newX, newY);
-                if (neighborTile != null && 
-                    neighborTile.GetSide(GetOppositeSide(side)) == LandscapeType.Road)
-                {
-                    s += $"DfsRoadSearch at {x}, {y} side: {side} newX: {newX} newY: {newY} is road\n";
-                    DfsRoadSearch(newX, newY, visited, roadTiles, side);
-                }
-            }
-            CustomLogger.LogWarning(s);
         }
 
         public class RoadStructure

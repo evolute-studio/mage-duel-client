@@ -1336,6 +1336,7 @@ MonoBehaviour:
   spawnDelay: 0
   showDebugInfo: 0
   territoryPrefab: {fileID: 8966325575830096033, guid: 69e89afcf12104fa1abb0ee24bbad36e, type: 3}
+  currentTerritory: {fileID: 0}
   TerritorySpriteRenderer: {fileID: 6679306099111258056}
   lineRenderer: {fileID: 199215659685845233}
 --- !u!120 &199215659685845233
@@ -3633,9 +3634,10 @@ GameObject:
   m_Component:
   - component: {fileID: 7092516591437053428}
   - component: {fileID: 2433350264997144542}
+  - component: {fileID: 994529200739853700}
   m_Layer: 0
   m_Name: RoadRenderer (2)
-  m_TagString: Untagged
+  m_TagString: Road
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3710,6 +3712,63 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!60 &994529200739853700
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5210281651195031437}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.29, y: 0.65}
+    newSize: {x: 1.3, y: 0.65}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.074999996, y: 0.035}
+      - {x: -0.065, y: 0.015}
+      - {x: 0.065, y: -0.065}
+      - {x: 0.13499999, y: -0.065}
+      - {x: 0.45499998, y: 0.085}
+      - {x: 0.45499998, y: 0.145}
+      - {x: 0.435, y: 0.16499999}
+      - {x: 0.33499998, y: 0.225}
+      - {x: 0.255, y: 0.225}
+      - {x: -0.074999996, y: 0.065}
+  m_UseDelaunayMesh: 0
 --- !u!1 &5228238903380564596
 GameObject:
   m_ObjectHideFlags: 0
@@ -4660,9 +4719,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1229205243886836665}
   - component: {fileID: 1768455291309824050}
+  - component: {fileID: 7543283653902823725}
   m_Layer: 0
   m_Name: RoadRenderer
-  m_TagString: Untagged
+  m_TagString: Road
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4737,6 +4797,60 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!60 &7543283653902823725
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6790138616946436188}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.3, y: 0.65}
+    newSize: {x: 1.3, y: 0.65}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.02, y: 0.055}
+      - {x: -0.099999994, y: 0.055}
+      - {x: -0.42999998, y: -0.105}
+      - {x: -0.42999998, y: -0.235}
+      - {x: 0.099999994, y: -0.235}
+      - {x: 0.099999994, y: -0.044999998}
+      - {x: 0.08, y: -0.005}
+  m_UseDelaunayMesh: 0
 --- !u!1 &6857485370040537726
 GameObject:
   m_ObjectHideFlags: 0
@@ -4747,9 +4861,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2765803084379364185}
   - component: {fileID: 5857073051434225437}
+  - component: {fileID: 7172794091467960083}
   m_Layer: 0
   m_Name: RoadRenderer (1)
-  m_TagString: Untagged
+  m_TagString: Road
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4824,6 +4939,60 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!60 &7172794091467960083
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6857485370040537726}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.3, y: 0.65}
+    newSize: {x: 1.3, y: 0.65}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.02, y: 0.055}
+      - {x: -0.099999994, y: 0.055}
+      - {x: -0.42999998, y: -0.105}
+      - {x: -0.42999998, y: -0.235}
+      - {x: 0.099999994, y: -0.235}
+      - {x: 0.099999994, y: -0.044999998}
+      - {x: 0.08, y: -0.005}
+  m_UseDelaunayMesh: 0
 --- !u!1 &7126381046226463081
 GameObject:
   m_ObjectHideFlags: 0

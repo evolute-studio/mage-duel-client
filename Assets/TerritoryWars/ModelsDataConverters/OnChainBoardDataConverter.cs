@@ -189,6 +189,14 @@ namespace TerritoryWars.ModelsDataConverters
             return (byte)(tile * 4);
         }
         
+        public static byte[] GetRootsByPosition(Vector2Int position)
+        {
+            int x = position.x - 1;
+            int y = position.y - 1;
+            int tile = x * 8 + y;
+            return new byte[] { (byte)(tile * 4), (byte)(tile * 4 + 1), (byte)(tile * 4 + 2), (byte)(tile * 4 + 3) };
+        }
+        
         public static (Vector2Int, Side) GetPositionAndSide(byte root)
         {
             Vector2Int position = GetPositionByRoot(root);
