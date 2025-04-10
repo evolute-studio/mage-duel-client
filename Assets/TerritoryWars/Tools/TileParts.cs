@@ -24,9 +24,6 @@ public class TileParts : MonoBehaviour
     {
         DefaultLayerMask = LayerMask.NameToLayer("Default");
         OutlineLayerMask = LayerMask.NameToLayer("Outline");
-        Debug.Log($"DefaultLayerMask: {DefaultLayerMask}");
-        Debug.Log($"OutlineLayerMask: {OutlineLayerMask}");
-        
         // BorderFences
         Transform borderFences = transform.Find("BorderFence");
         if (borderFences != null)
