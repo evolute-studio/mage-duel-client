@@ -388,20 +388,16 @@ namespace TerritoryWars.General
             }
         }
 
-        public List<Vector2Int> GetEdgeNeighbors(int x, int y)
+        public Vector2Int GetEdgeNeighbors(int x, int y, Side side)
         {
-            List<Vector2Int> neighbors = new List<Vector2Int>();
-            int[][] positions = new[] { new int[] {1, 0}, new int[] {0, -1}, new int[] {-1, 0}, new int[] {0, 1} };
-            for (int i = 0; i < 4; i++)
+            //Side oppositeSide = GetOppositeSide(side);
+            int newX = x + GetXOffset(side);
+            int newY = y + GetYOffset(side);
+            if (IsValidPosition(newX, newY) && IsEdgeTile(newX, newY))
             {
-                int newX = x + positions[i][0];
-                int newY = y + positions[i][1];
-                if (IsEdgeTile(newX, newY))
-                {
-                    neighbors.Add(new Vector2Int(newX, newY));
-                }
+                return new Vector2Int(newX, newY);
             }
-            return neighbors;
+            return new Vector2Int(-1, -1);
         }
         
         public void CloseAllStructures()

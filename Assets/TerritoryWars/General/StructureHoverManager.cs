@@ -5,14 +5,18 @@ using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TerritoryWars.General
 {
     public class StructureHoverManager : MonoBehaviour
     {
         public Transform Canvas;
+        public RawImage FillImage;
+        public RawImage OutlineImage;
         private INode _structureRoot;
         private HashSet<KeyValuePair<Vector2Int, Side>> _hoveredTiles = new HashSet<KeyValuePair<Vector2Int, Side>>();
+        private HashSet<GameObject> _hoveredObjects = new HashSet<GameObject>();
         private List<TileParts> _hoveredTilesParts = new List<TileParts>();
         private bool isCity = false;
         private bool isHovered = false;
@@ -71,11 +75,17 @@ namespace TerritoryWars.General
 
         private bool IsNewStructure(RaycastHit2D[] hits)
         {
-            // foreach (var hit in hits)
-            // {
-            //     Vector2Int tilePosition = Board.GetPositionByWorld(hit.transform.position);
-            //     if (_hoveredTiles.Contains(tilePosition)) return false;
-            // }
+            foreach (var hit in hits)
+            {
+                if(!hit.transform.gameObject.CompareTag("City") ||
+                   !hit.transform.gameObject.CompareTag("Road")) continue;
+                Transform cityParent = hit.transform.parent.parent.parent;
+                Transform roadParent = hit.transform.parent.parent;
+                if (_hoveredObjects.Contains(cityParent.gameObject) || _hoveredObjects.Contains(roadParent.gameObject))
+                {
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -99,10 +109,9 @@ namespace TerritoryWars.General
         private void CityHover(Transform objTransform)
         {
             Transform parent = objTransform.transform.parent.parent.parent;
-            CustomLogger.LogInfo("Parent: " + parent.name);
+            _hoveredObjects.Add(parent.gameObject);
             tilePosition = SessionManager.Instance.Board.GetPositionByObject(parent.gameObject);
             if(SessionManager.Instance.Board.IsEdgeTile(tilePosition.x, tilePosition.y)) return;
-            CustomLogger.LogInfo("Tile Position: " + tilePosition);
             var cityDict = DojoGameManager.Instance.SessionManager.GetCityByPosition(tilePosition);
             if (cityDict.Key == null) return;
             _structureRoot = cityDict.Key;
@@ -113,13 +122,11 @@ namespace TerritoryWars.General
                 if (_hoveredTiles.Contains(keyValuePair)) continue;
                 
                 _hoveredTiles.Add(keyValuePair);
-                List<Vector2Int> edgeTiles = SessionManager.Instance.Board.GetEdgeNeighbors(structurePosition.x, structurePosition.y);
-                foreach (var edgeTile in edgeTiles)
-                {
-                    KeyValuePair<Vector2Int, Side> edgeKeyValuePair = new KeyValuePair<Vector2Int, Side>(edgeTile, Side.None);
-                    if (_hoveredTiles.Contains(edgeKeyValuePair)) continue;
-                    _hoveredTiles.Add(edgeKeyValuePair);
-                }
+                Vector2Int edgeTile = SessionManager.Instance.Board.GetEdgeNeighbors(structurePosition.x, structurePosition.y, side);
+                if(edgeTile == new Vector2Int(-1, -1)) continue;
+                KeyValuePair<Vector2Int, Side> edgeKeyValuePair = new KeyValuePair<Vector2Int, Side>(edgeTile, side);
+                if (_hoveredTiles.Contains(edgeKeyValuePair)) continue;
+                _hoveredTiles.Add(edgeKeyValuePair);
             }
             if (cityDict.Value.Count > 0)
             {
@@ -130,6 +137,7 @@ namespace TerritoryWars.General
         private void RoadHover(Transform objTransform)
         {
             Transform parent = objTransform.transform.parent.parent;
+            _hoveredObjects.Add(parent.gameObject);
             TileParts tileParts = objTransform.transform.parent.GetComponent<TileParts>();
             Side hoveredSide = tileParts.GetRoadSideByObject(objTransform.gameObject);
             int roadCount = tileParts.GetRoadCount();
@@ -147,13 +155,11 @@ namespace TerritoryWars.General
                 if (_hoveredTiles.Contains(keyValuePair)) continue;
                 
                 _hoveredTiles.Add(keyValuePair);
-                List<Vector2Int> edgeTiles = SessionManager.Instance.Board.GetEdgeNeighbors(structurePosition.x, structurePosition.y);
-                foreach (var edgeTile in edgeTiles)
-                {
-                    KeyValuePair<Vector2Int, Side> edgeKeyValuePair = new KeyValuePair<Vector2Int, Side>(edgeTile, Side.None);
-                    if (_hoveredTiles.Contains(edgeKeyValuePair)) continue;
-                    _hoveredTiles.Add(edgeKeyValuePair);
-                }
+                Vector2Int edgeTile = SessionManager.Instance.Board.GetEdgeNeighbors(structurePosition.x, structurePosition.y, side);
+                if(edgeTile == new Vector2Int(-1, -1)) continue;
+                KeyValuePair<Vector2Int, Side> edgeKeyValuePair = new KeyValuePair<Vector2Int, Side>(edgeTile, SessionManager.Instance.Board.GetOppositeSide(side));
+                if (_hoveredTiles.Contains(edgeKeyValuePair)) continue;
+                _hoveredTiles.Add(edgeKeyValuePair);
             }
             if (roadDict.Value.Count > 0)
             {
