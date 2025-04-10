@@ -31,7 +31,7 @@ namespace TerritoryWars.General
         public List<MineEnviromentTile> MineEnviromentTiles;
         public GameObject WallSegmentPrefab;
         private int _currentPlayerIndex = 0;
-        public Sprite StonePillar;
+        public GameObject SkipBubblePrefab;
         public GameObject StructureHoverPrefab;
         
         public GameObject GetNextPlayer()

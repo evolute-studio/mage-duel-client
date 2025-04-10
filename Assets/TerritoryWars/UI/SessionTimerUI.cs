@@ -1,4 +1,5 @@
 using System.Linq;
+using DG.Tweening;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
@@ -24,6 +25,7 @@ namespace TerritoryWars.UI
         
         [Header("Timer")]
         public TextMeshProUGUI TimerText;
+        public TextMeshProUGUI SkipText;
 
         public float TurnDuration => DojoSessionManager.TurnDuration;
         private ulong _startTurnTime;
@@ -46,6 +48,7 @@ namespace TerritoryWars.UI
 
         public void StartTurnTimer(ulong timestamp, bool isLocal)
         {
+            ShowSkipText(false);
             RotateHourglass();
             CustomLogger.LogImportant("Start turn timer. Timestamp: " + timestamp + " _startTurnTime: " + _startTurnTime);
             timestamp = _startTurnTime < timestamp && _startTurnTime != 0 ? _startTurnTime : timestamp;
@@ -92,13 +95,39 @@ namespace TerritoryWars.UI
             {
                 CustomLogger.LogInfo("Local player turn end");
                 OnLocalPlayerTurnEnd?.Invoke();
+                ShowSkipText(true);
             }
             else
             {
                 CustomLogger.LogInfo("Opponent player turn end");
                 OnOpponentPlayerTurnEnd?.Invoke();
+                ShowSkipText(true);
             }
             
+        }
+
+        public void ShowSkipText(bool isActive)
+        {
+            if (isActive)
+            {
+                Sequence sequence = DOTween.Sequence();
+                Color skipTextColor = SkipText.color;
+                skipTextColor.a = 0f;
+                SkipText.color = skipTextColor;
+                SkipText.gameObject.SetActive(true);
+                sequence.Append(SkipText.DOFade(1f, 0.5f));
+                sequence.AppendInterval(5f);
+                sequence.Append(SkipText.DOFade(0f, 0.5f)).OnComplete(() =>
+                {
+                    SkipText.gameObject.SetActive(false);
+                });
+                
+                sequence.Play();
+            }
+            else
+            {
+                SkipText.gameObject.SetActive(false);
+            }
         }
         
         private void RotateHourglass()
