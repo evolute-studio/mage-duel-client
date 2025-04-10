@@ -190,6 +190,7 @@ namespace TerritoryWars.Dojo
 
             if (player != SessionManager.Instance.LocalPlayer.Address.Hex()) { return; }
             
+            if(!SessionManager.Instance.IsLocalPlayerTurn) return;
             PopupManager.Instance.NotYourTurnPopup();
             
             CustomLogger.LogError($"[NotYourTurn] | Player: {player}");
