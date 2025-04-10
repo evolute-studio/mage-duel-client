@@ -32,8 +32,8 @@ namespace TerritoryWars.Tools
         
         public static Dictionary<LogType, bool> LogTypeEnabled = new Dictionary<LogType, bool>
         {
-            {LogType.Info, true},
-            {LogType.Warning, true},
+            {LogType.Info, false},
+            {LogType.Warning, false},
             {LogType.Execution, true},
             {LogType.Error, true},
             {LogType.Important, true},

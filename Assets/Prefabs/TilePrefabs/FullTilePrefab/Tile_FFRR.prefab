@@ -466,9 +466,10 @@ GameObject:
   m_Component:
   - component: {fileID: 6455349581735934883}
   - component: {fileID: 4734293525057027603}
+  - component: {fileID: 1196827321484886706}
   m_Layer: 0
   m_Name: RoadRenderer
-  m_TagString: Untagged
+  m_TagString: Road
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -543,6 +544,64 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!60 &1196827321484886706
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4425787071183157596}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.3, y: 0.65}
+    newSize: {x: 1.3, y: 0.65}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.26, y: 0.21499999}
+      - {x: -0.42999998, y: 0.114999995}
+      - {x: -0.42, y: 0.085}
+      - {x: -0.38, y: 0.074999996}
+      - {x: -0.42, y: -0.155}
+      - {x: -0.29999998, y: -0.235}
+      - {x: -0.17999999, y: -0.235}
+      - {x: -0.049999997, y: -0.195}
+      - {x: 0, y: -0.155}
+      - {x: 0, y: 0.085}
+      - {x: -0.08, y: 0.21499999}
+  m_UseDelaunayMesh: 0
 --- !u!1 &4609341746846252181
 GameObject:
   m_ObjectHideFlags: 0
@@ -832,8 +891,12 @@ MonoBehaviour:
   HouseRenderers: []
   ArcRenderers: []
   TileTerritoryFiller: {fileID: 0}
-  TileFencePlacer: {fileID: 0}
-  RoadRenderers: {fileID: 4734293525057027603}
+  WallPlacer: {fileID: 0}
+  RoadRenderers:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 4734293525057027603}
+  - {fileID: 4734293525057027603}
   Mill: {fileID: 0}
   CloserToBorderFences: []
   PinsPositions:
@@ -869,11 +932,13 @@ MonoBehaviour:
   - CurrentIndex: 0
     SpriteRenderer: {fileID: 4734293525057027603}
     Rules:
-    - Sprite: {fileID: 862869666472089368, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+    - Sprite: {fileID: 862869666472089368, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
+        type: 3}
       Scale: {x: -1, y: 1, z: 1}
     - Sprite: {fileID: 1542361981, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
       Scale: {x: 1, y: 1, z: 1}
-    - Sprite: {fileID: 862869666472089368, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+    - Sprite: {fileID: 862869666472089368, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
+        type: 3}
       Scale: {x: 1, y: 1, z: 1}
     - Sprite: {fileID: 1542361981, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
       Scale: {x: 1, y: -1, z: 1}
@@ -1113,7 +1178,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 9
-  m_Sprite: {fileID: -6079988009467377576, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+  m_Sprite: {fileID: -6079988009467377576, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

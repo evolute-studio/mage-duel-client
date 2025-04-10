@@ -66,7 +66,7 @@ namespace TerritoryWars.General
 
         public Board Board;
         [SerializeField] private GameUI gameUI;
-        [SerializeField] private PlayerInfoUI sessionUI;
+        [SerializeField] public PlayerInfoUI sessionUI;
         [SerializeField] private DeckManager deckManager;
         public JokerManager JokerManager;
         public TileSelector TileSelector;
@@ -266,7 +266,7 @@ namespace TerritoryWars.General
             
             Camera camera = Camera.main;
             float startOrthographicSize = 5.5f;
-            float endOrthographicSize = 4f;
+            float endOrthographicSize = 5f;
             camera.orthographicSize = startOrthographicSize;
             Sequence sequence = DOTween.Sequence();
             sequence.AppendInterval(0.5f);
@@ -376,6 +376,14 @@ namespace TerritoryWars.General
         private void SkipMove(string playerAddress)
         {
             if (CurrentTurnPlayer.Address.Hex() != playerAddress) return;
+            foreach (var player in Players)
+            {
+                if(player.Address.Hex() == playerAddress)
+                {
+                    player.PlaySkippedBubbleAnimation();
+                    break;
+                }
+            }
             GameUI.Instance.SetJokerMode(false);
             TileSelector.EndTilePlacement();
             CurrentTurnPlayer.EndTurn();
@@ -426,7 +434,7 @@ namespace TerritoryWars.General
             yield return new WaitForSeconds(0.3f);
             TileSelector.tilePreview.PlaceTile(() =>
             {
-                Board.PlaceTile(tile, position.x + 1, position.y + 1, RemotePlayer.LocalId);
+                Board.PlaceTile(tile, position.x + 1, position.y + 1, GetPlayerByAddress(playerAddress).LocalId);
             });
             yield return new WaitForSeconds(0.5f);
             CurrentTurnPlayer.EndTurn();

@@ -106,14 +106,6 @@ namespace Dojo
         // Handles spawning / updating entities as they are updated from the dojo world
         private void HandleEntityUpdate(FieldElement hashedKeys, Model[] entityModels)
         {
-            foreach (var model in entityModels)
-            {
-                if (model.Name == "evolute_duel_Board" || model.Name == "evolute_duel-Board")
-                {
-                    Debug.Log("Board model updated");
-                }
-            }
-            
             // Get the entity game object
             var entity = GameObject.Find(hashedKeys.Hex());
             if (entity == null)

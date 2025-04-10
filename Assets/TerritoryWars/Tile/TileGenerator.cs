@@ -20,8 +20,8 @@ namespace TerritoryWars.Tile
     {
         public TileConnector[] connectors;
         public SpriteRenderer RoadRenderer;
-        public TileAssetsObject TileAssetsObject;
-        public TileRenderers TileRenderers;
+        public TileAssetsObject TileAssetsObject => PrefabsManager.Instance.TileAssetsObject;
+        [FormerlySerializedAs("TileRenderers")] public TileParts tileParts;
         public TileJokerAnimator TileJokerAnimator;
 
         public TileRotator TileRotator;
@@ -52,6 +52,7 @@ namespace TerritoryWars.Tile
         private Vector2Int _placingTilePosition;
 
         public GameObject CurrentTileGO { get; private set; }
+        public WallPlacer WallPlacer { get; private set; }
 
 
         public void Awake() => Initialize();
@@ -167,7 +168,7 @@ namespace TerritoryWars.Tile
         
         public void InitializeTile()
         {
-            TileRenderers = CurrentTileGO.GetComponent<TileRenderers>();
+            tileParts = CurrentTileGO.GetComponent<TileParts>();
             
             var tileConfig = OnChainBoardDataConverter.GetTypeAndRotation(TileConfig);
             string id = OnChainBoardDataConverter.TileTypes[tileConfig.Item1];
@@ -177,15 +178,15 @@ namespace TerritoryWars.Tile
             AllCityRenderers = new List<SpriteRenderer>();
             AllCityLineRenderers = new List<LineRenderer>();
             
-            houseRenderers = TileRenderers.HouseRenderers;
-            List<SpriteRenderer> arcRenderers = TileRenderers.ArcRenderers;
-            TerritoryFiller territoryFiller = TileRenderers.TileTerritoryFiller;
-            FencePlacer fencePlacer = TileRenderers.TileFencePlacer;
+            houseRenderers = tileParts.HouseRenderers;
+            List<SpriteRenderer> arcRenderers = tileParts.ArcRenderers;
+            TerritoryFiller territoryFiller = tileParts.TileTerritoryFiller;
+            WallPlacer = tileParts.WallPlacer;
             List<Transform> pillars = null;
-            Transform[] pins = TileRenderers.PinsPositions;
-            if (fencePlacer != null)
+            Transform[] pins = tileParts.PinsPositions;
+            if (WallPlacer != null)
             {
-                pillars = fencePlacer.pillars;
+                pillars = WallPlacer.GetPillars().ToList();
             }
 
             if (pillars != null)
@@ -225,10 +226,9 @@ namespace TerritoryWars.Tile
             }
 
             
-            if (fencePlacer != null)
+            if (WallPlacer != null)
             {
-                AllCityLineRenderers.Add(fencePlacer.lineRenderer);
-                fencePlacer.PlaceFence();
+                WallPlacer.PlaceWall(false);
             }
 
             
@@ -252,102 +252,47 @@ namespace TerritoryWars.Tile
                     _placingTilePosition.y));
             }
         }
-
-        public void InitCity(GameObject city, int index)
+        public void RecolorHouses(int playerId, bool isContest = false)
         {
-            AllCityRenderers = new List<SpriteRenderer>();
-            AllCityLineRenderers = new List<LineRenderer>();
-            
-            
-            // find in children game objects with sprite renderer and name House
-            houseRenderers = city.GetComponentsInChildren<SpriteRenderer>()
-                .ToList().Where(x => x.name == "House").ToList();
-            Transform arc = city.transform.Find("Arc");
-            List<SpriteRenderer> arcRenderers = city.GetComponentsInChildren<SpriteRenderer>().ToList().Where(x => x.name == "Arc").ToList();
-            TerritoryFiller territoryFiller = city.GetComponentInChildren<TerritoryFiller>();
-            FencePlacer fencePlacer = city.GetComponentInChildren<FencePlacer>();
-            List<Transform> pillars = fencePlacer.pillars;
-            List<SpriteRenderer> pillarsRenderers = pillars.Select(x => x.GetComponent<SpriteRenderer>()).ToList();
-            
-            AllCityRenderers.AddRange(houseRenderers);
-            AllCityRenderers.AddRange(arcRenderers);
-            AllCityRenderers.AddRange(pillarsRenderers);
-            AllCityLineRenderers.Add(fencePlacer.lineRenderer);
-            
-            
-            
-            TileAssetsObject.BackIndex(houseRenderers.Count);
-            
-            foreach (var house in houseRenderers)
-            {
-                int playerId = 0;
-                General.SessionManager sessionManager = General.SessionManager.Instance;
-                if (sessionManager == null || sessionManager.CurrentTurnPlayer == null)
-                {
-                   playerId = Random.Range(0, 2);
-                }
-                else
-                {
-                    playerId = sessionManager.CurrentTurnPlayer.LocalId;
-                }
-
-                if (_tileData.OwnerId == -1) playerId = -1;
-                house.gameObject.GetComponent<SpriteAnimator>().ChangeSprites(TileAssetsObject.GetNextHouse(playerId));
-                TileRotator.SimpleRotation(house.transform, index);
-                TileRotator.SimpleRotationObjects.Add(house.transform);
-            }
-
-            foreach (var arcs in arcRenderers)
-            {
-                TileRotator.MirrorRotation(arcs.transform, index);
-                TileRotator.MirrorRotationObjects.Add(arcs.transform);
-            }
-
-            foreach (var pillar in pillars)
-            {
-                TileRotator.SimpleRotation(pillar, index);
-                TileRotator.SimpleRotationObjects.Add(pillar);
-            }
-
-            LineRenderer territoryLineRenderer = territoryFiller.GetComponent<LineRenderer>();
-            if (territoryLineRenderer != null)
-            {
-                TileRotator.LineRotation(territoryLineRenderer, index);
-                TileRotator.LineRenderers.Add(territoryLineRenderer);
-            }
-
-            territoryFiller.PlaceTerritory();
-            fencePlacer.PlaceFence();
-            TileRotator.OnRotation.AddListener(territoryFiller.PlaceTerritory);
-            TileRotator.OnRotation.AddListener(fencePlacer.PlaceFence);
-        }
-        
-        public void RecolorHouses(int playerId)
-        {
-            if (CurrentTileGO.GetComponent<TileRenderers>().HouseRenderers == null)
+            if (tileParts.HouseRenderers == null)
             {
                 return;
             }
+
+            if (isContest)
+            {
+                WallPlacer?.PlaceWall(true);
+                foreach (var border in tileParts.CloserToBorderFences)
+                {
+                    border.WallPlacer.PlaceWall(true);
+                }
+
+                foreach (var arc in tileParts.ArcRenderers)
+                {
+                    arc.sprite = TileAssetsObject.StoneArc;
+                }
+            }
+            
             Debug.Log("Recoloring houses. PlayerId: " + playerId);
             houseRenderers = CurrentTileGO.GetComponentsInChildren<SpriteRenderer>()
                 .ToList().Where(x => x.name == "House").ToList();
             for (int i = 0; i < houseRenderers.Count; i++)
             {
-                houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().ChangeSprites(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, playerId));
+                houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, playerId, isContest));
             }
         }
 
         public void FencePlacerForCloserToBorderCity(List<Side> closerSides)
         {
-            if (closerSides == null || TileRenderers.HouseRenderers == null) return;
+            if (closerSides == null || tileParts.HouseRenderers == null) return;
 
             foreach (var side in closerSides)
             {
                 if(_tileData.GetSide(side) != LandscapeType.City) continue;
                 
-                GameObject fence = TileRenderers.CloserToBorderFences.Find(x => x.Side == side).Fence;
-                fence.SetActive(true);
-                fence.GetComponent<FencePlacer>().PlaceFence();
+                TileParts.CloserToBorderFence fence = tileParts.CloserToBorderFences.Find(x => x.Side == side);
+                fence.Fence.SetActive(true);
+                fence.WallPlacer.PlaceWall(false);
             }
         }
 
@@ -363,8 +308,9 @@ namespace TerritoryWars.Tile
                 {
                     if (prefab.Direction == side.Direction)
                     {
-                        GameObject mine = Instantiate(prefab.MineTile, side.Position, Quaternion.identity);
-                        side.Tile.SetActive(false);
+                        GameObject mine = Instantiate(prefab.MineTile, side.Position, Quaternion.identity,
+                            SessionManager.Instance.Board.GetTileObject(side.TileBoardPosition.x, side.TileBoardPosition.y).transform);
+                        side.Tile.GetComponent<TileGenerator>().RoadRenderer.gameObject.SetActive(false);
                     }
                 }
             }
@@ -383,7 +329,7 @@ namespace TerritoryWars.Tile
             }
         }
         
-        public void RecolorPinOnSide(int playerId, int side)
+        public void RecolorPinOnSide(int playerId, int side, bool isContest = false)
         {
             if (Pins.Count == 0)
             {
@@ -393,7 +339,7 @@ namespace TerritoryWars.Tile
             {
                 return;
             }
-            Pins[side].SetPin(playerId);
+            Pins[side].SetPin(playerId, isContest);
         }
     }
 

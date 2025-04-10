@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
 using Dojo;
 using Dojo.Starknet;
 using TerritoryWars.ExternalConnections;
@@ -189,6 +190,7 @@ namespace TerritoryWars.Dojo
 
             if (player != SessionManager.Instance.LocalPlayer.Address.Hex()) { return; }
             
+            if(!SessionManager.Instance.IsLocalPlayerTurn) return;
             PopupManager.Instance.NotYourTurnPopup();
             
             CustomLogger.LogError($"[NotYourTurn] | Player: {player}");
@@ -522,7 +524,51 @@ namespace TerritoryWars.Dojo
             return new KeyValuePair<T, List<T>>();
         }
 
-
+        public KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>> GetCityByPosition(Vector2Int position)
+        {
+            byte[] roots = OnChainBoardDataConverter.GetRootsByPosition(position);
+            BuildCitySets();
+            foreach (var root in roots)
+            {
+                foreach (var set in cities)
+                {
+                    foreach (var node in set.Value)
+                    {
+                        INode iNode = node as INode;
+                        if (iNode == null) continue;
+                        byte nodePosition = iNode.GetPosition();
+                        if (nodePosition == root)
+                        {
+                            return set;
+                        }
+                    }
+                }
+            }
+            return new KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>>();
+        }
+        
+        public KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>> GetRoadByPosition(Vector2Int position)
+        {
+            byte[] roots = OnChainBoardDataConverter.GetRootsByPosition(position);
+            BuildRoadSets();
+            foreach (var root in roots)
+            {
+                foreach (var set in roads)
+                {
+                    foreach (var node in set.Value)
+                    {
+                        INode iNode = node as INode;
+                        if (iNode == null) continue;
+                        byte nodePosition = iNode.GetPosition();
+                        if (nodePosition == root)
+                        {
+                            return set;
+                        }
+                    }
+                }
+            }
+            return new KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>>();
+        }
 
         private (Vector2Int, Side) GetNearTileSide(Vector2Int position, Side side)
         {
@@ -613,6 +659,7 @@ namespace TerritoryWars.Dojo
             {
                 foreach (var node in city.Value)
                 {
+                    bool isContested = city.Key.contested;
                     Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
                     if (SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
                     {
@@ -626,12 +673,10 @@ namespace TerritoryWars.Dojo
                     {
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                     }
-                    tileGenerator.RecolorHouses(playerOwner);
+                    tileGenerator.RecolorHouses(playerOwner, isContested);
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                        Board.StructureType.City);
+                        Board.StructureType.City, isContested);
                 }
-
-
             }
         }
 
@@ -644,6 +689,7 @@ namespace TerritoryWars.Dojo
             {
                 foreach (var node in road.Value)
                 {
+                    bool isContest = road.Key.contested;
                     (Vector2Int position, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
                     if(SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
                     {
@@ -658,17 +704,27 @@ namespace TerritoryWars.Dojo
                     {
                         if (road.Key.blue_points == road.Key.red_points)
                         {
-                            continue;
+                            playerOwner = 3;
                         }
-                        playerOwner = road.Key.blue_points > road.Key.red_points ? 0 : 1;
+                        else
+                        {
+                            playerOwner = road.Key.blue_points > road.Key.red_points ? 0 : 1;
+                        }
                     }
                     else
                     {
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                     }
-                    tileGenerator.RecolorPinOnSide(playerOwner, (int)side);
+                    tileGenerator.RecolorPinOnSide(playerOwner, (int)side, isContest);
+                    if (isContest)
+                    {
+                        tileGenerator.CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite =
+                            PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(tileGenerator
+                                .CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite);
+                        
+                    }
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                        Board.StructureType.Road);
+                        Board.StructureType.Road, false, isContest);
                 }
 
             }

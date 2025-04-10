@@ -140,8 +140,12 @@ MonoBehaviour:
   HouseRenderers: []
   ArcRenderers: []
   TileTerritoryFiller: {fileID: 0}
-  TileFencePlacer: {fileID: 0}
-  RoadRenderers: {fileID: 2164914586056324121}
+  WallPlacer: {fileID: 0}
+  RoadRenderers:
+  - {fileID: 0}
+  - {fileID: 2164914586056324121}
+  - {fileID: 0}
+  - {fileID: 2164914586056324121}
   Mill: {fileID: 0}
   CloserToBorderFences: []
   PinsPositions:
@@ -222,9 +226,10 @@ GameObject:
   m_Component:
   - component: {fileID: 490825551283622352}
   - component: {fileID: 2164914586056324121}
+  - component: {fileID: 3695385796535502722}
   m_Layer: 0
   m_Name: RoadRenderer
-  m_TagString: Untagged
+  m_TagString: Road
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -288,7 +293,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 11
-  m_Sprite: {fileID: 8044837882678929092, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+  m_Sprite: {fileID: 8044837882678929092, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -299,6 +305,63 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!60 &3695385796535502722
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896922711186994388}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.3, y: 0.65}
+    newSize: {x: 1.3, y: 0.65}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.26999998, y: 0.21499999}
+      - {x: -0.41, y: 0.155}
+      - {x: -0.42, y: 0.13499999}
+      - {x: -0.42, y: 0.074999996}
+      - {x: -0.08, y: -0.105}
+      - {x: 0.16, y: -0.225}
+      - {x: 0.25, y: -0.225}
+      - {x: 0.41, y: -0.155}
+      - {x: 0.41, y: -0.095}
+      - {x: -0.19, y: 0.21499999}
+  m_UseDelaunayMesh: 0
 --- !u!1 &927050771338640686
 GameObject:
   m_ObjectHideFlags: 0
@@ -671,7 +734,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 9
-  m_Sprite: {fileID: -6079988009467377576, guid: cf52b3cb60cc649e5a8c0b561bbcc154, type: 3}
+  m_Sprite: {fileID: -6079988009467377576, guid: cf52b3cb60cc649e5a8c0b561bbcc154,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

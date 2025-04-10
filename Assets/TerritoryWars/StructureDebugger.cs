@@ -34,7 +34,7 @@ public class StructureDebugger : MonoBehaviour
     private void DrawStructureInfo(Structure structure, Color color, bool isCity)
     {
         // get the world position of the tile
-        Vector3 worldPosition = board.GetTilePosition(structure.Position.x, structure.Position.y);
+        Vector3 worldPosition = Board.GetTilePosition(structure.Position.x, structure.Position.y);
         
         // convert the world position to screen coordinates
         Vector3 screenPos = mainCamera.WorldToScreenPoint(worldPosition);

@@ -12,7 +12,9 @@ namespace TerritoryWars.General
         [SerializeField] private float minZoom = 2f;
         [SerializeField] private float maxZoom = 4f;
 
-        private Camera mainCamera;
+        private Camera _mainCamera;
+        private Camera _camera;
+        private bool _isMainCamera = false;
         private Vector3 lastMousePosition;
         private bool isDragging = false;
         private Vector3 minBounds = new Vector3(-4f, -3f, 0f);
@@ -21,7 +23,12 @@ namespace TerritoryWars.General
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            mainCamera = Camera.main;
+            _camera = GetComponent<Camera>();
+            _mainCamera = Camera.main;
+            if (_camera == _mainCamera)
+            {
+                _isMainCamera = true;
+            }
         }
 
         // Update is called once per frame
@@ -47,7 +54,7 @@ namespace TerritoryWars.General
             {
                 Vector3 delta = Input.mousePosition - lastMousePosition;
                 Vector3 move = new Vector3(-delta.x, -delta.y, 0) * panSpeed * Time.deltaTime;
-                move *= mainCamera.orthographicSize / 5f;
+                move *= _camera.orthographicSize / 5f;
 
                 Vector3 newPosition = transform.position + move;
                 newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
@@ -60,11 +67,16 @@ namespace TerritoryWars.General
 
         private void HandleZoom()
         {
+            if (!_isMainCamera)
+            {
+                _camera.orthographicSize = _mainCamera.orthographicSize;
+                return;
+            }
             float scrollDelta = Input.mouseScrollDelta.y;
             if (scrollDelta != 0)
             {
-                float newSize = mainCamera.orthographicSize - scrollDelta * zoomSpeed * Time.deltaTime;
-                mainCamera.orthographicSize = Mathf.Clamp(newSize, minZoom, maxZoom);
+                float newSize = _camera.orthographicSize - scrollDelta * zoomSpeed * Time.deltaTime;
+                _camera.orthographicSize = Mathf.Clamp(newSize, minZoom, maxZoom);
             }
         }
     }
