@@ -10,11 +10,9 @@ namespace TerritoryWars.ScriptablesObjects
     [CreateAssetMenu(fileName = "TileAssetsObject", menuName = "TileAssetsObject", order = 0)]
     public class TileAssetsObject : ScriptableObject
     {
-        public Sprite[] FirstPlayerHouses;
         public List<HousesSprites> FirstPlayerHousesAnimated;
         public List<HousesSprites> SecondPlayerHousesAnimated;
         public List<HousesSprites> NeutralHousesAnimated;
-        public Sprite[] SecondPlayerHouses;
         public Sprite[] Mountains;
         public GameObject ForestPrefab;
         public List<Sprite> RoadsSprites;
@@ -68,7 +66,7 @@ namespace TerritoryWars.ScriptablesObjects
             playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
             foreach (var house in FirstPlayerHousesAnimated)
             {
-                if (house.DefaultSprites == sprites)
+                if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
                 {
                     if (playerIndex == 0)
                         return isContested ? house.ContestedSprites : house.DefaultSprites;
@@ -83,7 +81,7 @@ namespace TerritoryWars.ScriptablesObjects
 
             foreach (var house in SecondPlayerHousesAnimated)
             {
-                if (house.DefaultSprites == sprites)
+                if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
                 {
                     if (playerIndex == 1)
                         return isContested ? house.ContestedSprites : house.DefaultSprites;
