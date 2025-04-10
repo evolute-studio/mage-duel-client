@@ -196,8 +196,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b36e210c3c444dc9d2d66c7c039e6a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Background: {fileID: 264650543678850887}
   BlueScoreText: {fileID: 4205108893796722939}
   RedScoreText: {fileID: 4408831187944355287}
+  ScoreFlags:
+  - {fileID: 8040190332180370435, guid: 2d62ffbbaf46ac94d9aa89d9d8675dca, type: 3}
+  - {fileID: -7908176792256367968, guid: 2d62ffbbaf46ac94d9aa89d9d8675dca, type: 3}
+  - {fileID: -8364041477376081380, guid: 2d62ffbbaf46ac94d9aa89d9d8675dca, type: 3}
 --- !u!1 &8258287987330565340
 GameObject:
   m_ObjectHideFlags: 0
@@ -256,14 +261,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.22745098}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -7908176792256367968, guid: 2d62ffbbaf46ac94d9aa89d9d8675dca, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
