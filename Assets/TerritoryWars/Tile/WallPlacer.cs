@@ -32,8 +32,6 @@ namespace TerritoryWars.Tile
         public void PlaceWall(bool isContested)
         {
             if (!enabled) return;
-            
-            DestroyWallSegments();
             SetPillars();
             
             if (pillars == null || pillars.Length < 2) return;
@@ -51,7 +49,7 @@ namespace TerritoryWars.Tile
                 Vector3 start = pillars[i].position;
                 Vector3 end = pillars[i + 1].position;
 
-                GameObject wallSegment = Instantiate(WallSegmentPrefab, start, Quaternion.identity, transform);
+                GameObject wallSegment = GetWallObject(i);
                 SpriteSkew skew = wallSegment.GetComponent<SpriteSkew>();
                
                 SpriteRenderer segmentRenderer = wallSegment.GetComponent<SpriteRenderer>();
@@ -104,6 +102,16 @@ namespace TerritoryWars.Tile
         public List<GameObject> GetWallSegments()
         {
             return wallSegments;
+        }
+
+        public GameObject GetWallObject(int index)
+        {
+            if (index < 0 || index >= wallSegments.Count)
+            {
+                GameObject defaultSegment = Instantiate(WallSegmentPrefab, transform);
+                return defaultSegment;
+            }
+            return wallSegments[index];
         }
         
         private void DestroyWallSegments()

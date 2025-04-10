@@ -18,21 +18,18 @@ public class TileParts : MonoBehaviour
 
     private int DefaultLayerMask = 0; // Default layer
     private int OutlineLayerMask = 31; // Outline layer
-    
+
 
     public void Awake()
     {
         DefaultLayerMask = LayerMask.NameToLayer("Default");
         OutlineLayerMask = LayerMask.NameToLayer("Outline");
-        Debug.Log($"DefaultLayerMask: {DefaultLayerMask}");
-        Debug.Log($"OutlineLayerMask: {OutlineLayerMask}");
-        
         // BorderFences
         Transform borderFences = transform.Find("BorderFence");
         if (borderFences != null)
         {
             CloserToBorderFences = new List<CloserToBorderFence>();
-            for(int i = 0; i < borderFences.childCount; i++)
+            for (int i = 0; i < borderFences.childCount; i++)
             {
                 CloserToBorderFence sideFence = new CloserToBorderFence();
                 sideFence.Side = (Side)i;
@@ -41,7 +38,7 @@ public class TileParts : MonoBehaviour
                 CloserToBorderFences.Add(sideFence);
             }
         }
-        
+
         // WallPlacer
         Transform fence = transform.Find("Fence");
         if (fence != null)
@@ -60,6 +57,7 @@ public class TileParts : MonoBehaviour
                 if (house != null) house.gameObject.layer = mask;
             }
         }
+
         if (ArcRenderers != null)
         {
             foreach (var arc in ArcRenderers)
@@ -67,16 +65,20 @@ public class TileParts : MonoBehaviour
                 if (arc != null) arc.gameObject.layer = mask;
             }
         }
-        if (TileTerritoryFiller != null && TileTerritoryFiller.currentTerritory != null && TileTerritoryFiller.currentTerritory.fillTexture != null)
+
+        if (TileTerritoryFiller != null && TileTerritoryFiller.currentTerritory != null &&
+            TileTerritoryFiller.currentTerritory.fillTexture != null)
         {
             TileTerritoryFiller.currentTerritory.fillTexture.gameObject.layer = mask;
         }
+
         if (WallPlacer != null)
         {
             foreach (var pillar in WallPlacer.GetPillars())
             {
                 if (pillar != null) pillar.gameObject.layer = mask;
             }
+
             foreach (var wall in WallPlacer.GetWallSegments())
             {
                 if (wall != null) wall.gameObject.layer = mask;
@@ -93,6 +95,7 @@ public class TileParts : MonoBehaviour
                     {
                         if (house != null) house.gameObject.layer = mask;
                     }
+
                     foreach (var wall in border.WallPlacer.GetWallSegments())
                     {
                         if (wall != null) wall.gameObject.layer = mask;
@@ -101,11 +104,11 @@ public class TileParts : MonoBehaviour
             }
         }
     }
-    
+
     public void RoadOutline(bool isOutline, Side side = Side.None)
     {
         int mask = isOutline ? OutlineLayerMask : DefaultLayerMask;
-        for(int i = 0; i < RoadRenderers.Length; i++)
+        for (int i = 0; i < RoadRenderers.Length; i++)
         {
             if (RoadRenderers[i] != null)
             {
@@ -115,11 +118,12 @@ public class TileParts : MonoBehaviour
                 }
             }
         }
-        
+
         if (Mill != null)
         {
             Mill.layer = mask;
         }
+
         if (ArcRenderers != null)
         {
             foreach (var arc in ArcRenderers)
@@ -127,6 +131,33 @@ public class TileParts : MonoBehaviour
                 if (arc != null) arc.gameObject.layer = mask;
             }
         }
+    }
+
+    public Side GetRoadSideByObject(GameObject go)
+    {
+        for (int i = 0; i < RoadRenderers.Length; i++)
+        {
+            if (RoadRenderers[i] != null && RoadRenderers[i].gameObject == go)
+            {
+                return (Side)i;
+            }
+        }
+
+        return Side.None;
+    }
+
+    public int GetRoadCount()
+    {
+        int count = 0;
+        for (int i = 0; i < RoadRenderers.Length; i++)
+        {
+            if (RoadRenderers[i] != null)
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     public void DisableOutline()

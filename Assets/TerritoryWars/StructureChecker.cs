@@ -60,8 +60,6 @@ public class StructureChecker
         if (city1.OpenEdges < 0) city1.OpenEdges = 0;
         if (city2.OpenEdges < 0) city2.OpenEdges = 0;
         
-        Debug.Log("UnionStructures. Structure1: " + city1.Position + " Structure2: " + city2.Position);
-        
         if (CheckCityCompletion(root1))
         {
             Contest(root1);
@@ -73,7 +71,6 @@ public class StructureChecker
         root = FindRoot(root);
         int[] points = GetPoints(root);
         int winner = points[0] > points[1] ? 0 : 1;
-        Debug.Log($"Player {winner} wins. Points: {points[0]} - {points[1]}");
         
         ChangeOwner(root, winner);
         

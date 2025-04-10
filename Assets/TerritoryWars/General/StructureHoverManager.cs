@@ -101,6 +101,7 @@ namespace TerritoryWars.General
             Transform parent = objTransform.transform.parent.parent.parent;
             CustomLogger.LogInfo("Parent: " + parent.name);
             tilePosition = SessionManager.Instance.Board.GetPositionByObject(parent.gameObject);
+            if(SessionManager.Instance.Board.IsEdgeTile(tilePosition.x, tilePosition.y)) return;
             CustomLogger.LogInfo("Tile Position: " + tilePosition);
             var cityDict = DojoGameManager.Instance.SessionManager.GetCityByPosition(tilePosition);
             if (cityDict.Key == null) return;
@@ -129,14 +130,20 @@ namespace TerritoryWars.General
         private void RoadHover(Transform objTransform)
         {
             Transform parent = objTransform.transform.parent.parent;
+            TileParts tileParts = objTransform.transform.parent.GetComponent<TileParts>();
+            Side hoveredSide = tileParts.GetRoadSideByObject(objTransform.gameObject);
+            int roadCount = tileParts.GetRoadCount();
+            if (roadCount > 2) return;
             tilePosition = SessionManager.Instance.Board.GetPositionByObject(parent.gameObject);
+            if(SessionManager.Instance.Board.IsEdgeTile(tilePosition.x, tilePosition.y)) return;
             var roadDict = DojoGameManager.Instance.SessionManager.GetRoadByPosition(tilePosition);
             if (roadDict.Key == null) return;
             _structureRoot = roadDict.Key;
             foreach (var road in roadDict.Value)
             {
-                Vector2Int structurePosition = OnChainBoardDataConverter.GetPositionByRoot(road.position);
-                KeyValuePair<Vector2Int, Side> keyValuePair = new KeyValuePair<Vector2Int, Side>(structurePosition, Side.None);
+                (Vector2Int structurePosition, Side side) = OnChainBoardDataConverter.GetPositionAndSide(road.position);
+                side = roadCount > 2 ? hoveredSide : side;
+                KeyValuePair<Vector2Int, Side> keyValuePair = new KeyValuePair<Vector2Int, Side>(structurePosition, side);
                 if (_hoveredTiles.Contains(keyValuePair)) continue;
                 
                 _hoveredTiles.Add(keyValuePair);
@@ -178,7 +185,7 @@ namespace TerritoryWars.General
                     }
                     else
                     {
-                        tileParts.RoadOutline(true);
+                        tileParts.RoadOutline(true, position.Value);
                     }
                     _hoveredTilesParts.Add(tileParts);
                 }
