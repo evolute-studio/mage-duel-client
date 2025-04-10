@@ -66,7 +66,7 @@ namespace TerritoryWars.General
 
         public Board Board;
         [SerializeField] private GameUI gameUI;
-        [SerializeField] private PlayerInfoUI sessionUI;
+        [SerializeField] public PlayerInfoUI sessionUI;
         [SerializeField] private DeckManager deckManager;
         public JokerManager JokerManager;
         public TileSelector TileSelector;
@@ -376,6 +376,14 @@ namespace TerritoryWars.General
         private void SkipMove(string playerAddress)
         {
             if (CurrentTurnPlayer.Address.Hex() != playerAddress) return;
+            foreach (var player in Players)
+            {
+                if(player.Address.Hex() == playerAddress)
+                {
+                    player.PlaySkippedBubbleAnimation();
+                    break;
+                }
+            }
             GameUI.Instance.SetJokerMode(false);
             TileSelector.EndTilePlacement();
             CurrentTurnPlayer.EndTurn();
