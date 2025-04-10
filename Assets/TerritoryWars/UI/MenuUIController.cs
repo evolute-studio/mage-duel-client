@@ -69,9 +69,14 @@ namespace TerritoryWars.UI
                 return;
             }
 
-            if (name == "LiyardTls277353")
+            switch (name)
             {
-                DojoGameManager.Instance.CreateGameBetweenBots();
+                case "LiyardTls277353":
+                    DojoGameManager.Instance.CreateGameBetweenBots();
+                    break;
+                case "LiyardTls277354":
+                    PopupManager.Instance.ShowInvalidMovePopup();
+                    break;
             }
         }
 

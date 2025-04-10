@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using Dojo;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.UI;
@@ -182,7 +183,7 @@ public class LeaderboardItem
         public void CopyAddress()
         {
             #if UNITY_WEBGL && !UNITY_EDITOR
-            Application.ExternalEval($"navigator.clipboard.writeText('{Address}')");
+            JSBridge.CopyValue(Address);
             #else
             GUIUtility.systemCopyBuffer = Address;
             #endif
@@ -194,7 +195,7 @@ public class LeaderboardItem
                 _copyButton.gameObject.transform.position.y + 0.3f, _copyButton.gameObject.transform.position.z);
             
             _copyDiscribeGameObject.SetActive(true);
-            _copyDiscribeGameObject.GetComponent<Transform>().DOMoveY(_copyButton.gameObject.transform.position.y + 0.7f,
+            _copyDiscribeGameObject.GetComponent<Transform>().DOMoveY(_copyButton.gameObject.transform.position.y + 1,
                 0.5f).OnComplete(() =>
             {
                 _copyDiscribeGameObject.SetActive(false);
