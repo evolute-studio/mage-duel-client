@@ -46,7 +46,6 @@ namespace TerritoryWars.General
     public class Board : MonoBehaviour
     {
         public TileAssetsObject tileAssets => PrefabsManager.Instance.TileAssetsObject;
-        private StructureChecker structureChecker;
 
         [SerializeField] private int width = 10;
         [SerializeField] private int height = 10;
@@ -63,7 +62,6 @@ namespace TerritoryWars.General
 
         public void Initialize()
         {
-            structureChecker = new StructureChecker(this);
             InitializeBoard();
             var onChainBoard = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
             char[] edgeTiles = OnChainBoardDataConverter.GetInitialEdgeState(onChainBoard.initial_edge_state);
@@ -73,7 +71,7 @@ namespace TerritoryWars.General
 
         public void OnDestroy()
         {
-            structureChecker.OnDestroy();
+            
         }
 
         private void InitializeBoard()
@@ -283,14 +281,17 @@ namespace TerritoryWars.General
             return true;
         }
 
-        public bool ReturnTile(int x, int y)
+        public bool RevertTile(int x, int y)
         {
             Destroy(tileObjects[x,y]);
             tileObjects[x, y] = null;
-            
-            
-            
-            
+            tileData[x, y] = null;
+            PlacedTiles.Remove(new Vector2Int(x, y));
+
+            if(tileObjects[x,y] == null && tileData[x,y] == null && PlacedTiles.ContainsKey(new Vector2Int(x, y)))
+            {
+                return true;
+            }
             
             return false;
         }
@@ -697,16 +698,15 @@ namespace TerritoryWars.General
                 {
                     continue;
                 }
-                structureChecker.CreateStructures(tile, x, y);
-                structureChecker.CreateStructures(adjacentTile, x + GetXOffset(side), y + GetYOffset(side));
+                
                 if (currentSide == LandscapeType.City && adjacentSide == LandscapeType.City)
                 {
-                    structureChecker.UnionStructures(tile.CityStructure, adjacentTile.CityStructure);
+                    
                 }
 
                 if (currentSide == LandscapeType.Road && adjacentSide == LandscapeType.Road)
                 {
-                    structureChecker.UnionStructures(tile.RoadStructure, adjacentTile.RoadStructure);
+                    
                 }
             }
         }

@@ -1,5 +1,7 @@
 using System;
 using DG.Tweening;
+using DG.Tweening.Core;
+using DG.Tweening.Plugins.Options;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
@@ -57,6 +59,9 @@ namespace TerritoryWars.UI
         private SessionManager _sessionManager;
         private DeckManager deckManager;
         
+        private TweenerCore<Vector3,Vector3,VectorOptions> _skipButtonTween;
+        private Vector3 _skipButtonScale;
+        
         [SerializeField] private ArrowAnimations arrowAnimations;
         private bool _isJokerActive = false;
 
@@ -73,6 +78,7 @@ namespace TerritoryWars.UI
             {
                 jokerModeIndicator.SetActive(false);
             }
+            _skipButtonScale = skipTurnButton.transform.localScale;
         }
 
         private void SetupButtons()
@@ -183,7 +189,22 @@ namespace TerritoryWars.UI
         private void SkipMoveButtonClicked()
         {
             _sessionManager.ClientLocalPlayerSkip();
+            SetActiveSkipButtonPulse(false);
             UpdateUI();
+        }
+
+        public void SetActiveSkipButtonPulse(bool isActive)
+        {
+            if (isActive)
+            {
+                skipTurnButton.transform.localScale = _skipButtonScale;
+                _skipButtonTween = skipTurnButton.transform.DOScale(skipTurnButton.transform.localScale.x * 1.1f, 0.8f).SetLoops(-1, LoopType.Yoyo);
+            }
+            else
+            {
+                _skipButtonTween?.Kill();
+                skipTurnButton.transform.localScale = _skipButtonScale;
+            }
         }
         
         public void SetActiveDeckContainer(bool active)

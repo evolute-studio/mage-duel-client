@@ -304,6 +304,8 @@ namespace TerritoryWars.General
             {
                 StartRemoteTurn();
             }
+            
+            gameUI.SetActiveSkipButtonPulse(false);
         }
 
         private void StartLocalTurn()

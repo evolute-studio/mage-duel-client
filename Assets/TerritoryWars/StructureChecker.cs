@@ -15,7 +15,7 @@ public class StructureChecker
 
     public StructureChecker(Board board)
     {
-        board.OnTilePlaced += CreateStructures;
+        
     }
 
     public void OnDestroy()
