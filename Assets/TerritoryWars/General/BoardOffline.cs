@@ -11,7 +11,7 @@ namespace TerritoryWars.General
     public class BoardOffline : MonoBehaviour
     {
         public TileAssetsObject tileAssets;
-        private StructureChecker structureChecker;
+        
 
         [SerializeField] private int width = 10;
         [SerializeField] private int height = 10;
@@ -294,16 +294,15 @@ namespace TerritoryWars.General
                 {
                     continue;
                 }
-                structureChecker.CreateStructures(tile, x, y);
-                structureChecker.CreateStructures(adjacentTile, x + GetXOffset(side), y + GetYOffset(side));
+                
                 if (currentSide == LandscapeType.City && adjacentSide == LandscapeType.City)
                 {
-                    structureChecker.UnionStructures(tile.CityStructure, adjacentTile.CityStructure);
+                    
                 }
 
                 if (currentSide == LandscapeType.Road && adjacentSide == LandscapeType.Road)
                 {
-                    structureChecker.UnionStructures(tile.RoadStructure, adjacentTile.RoadStructure);
+                    
                 }
             }
         }
