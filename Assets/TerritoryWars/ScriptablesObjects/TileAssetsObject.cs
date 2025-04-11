@@ -24,6 +24,9 @@ namespace TerritoryWars.ScriptablesObjects
         public Sprite[] StoneWallSprites;
         public Sprite WoodenArc;
         public Sprite StoneArc;
+        
+        public Sprite MudCityTextureSprite;
+        public Sprite StoneCityTextureSprite;
 
         // 0 - neutral, 1 - first player, 2 - second player
         // 3 - neutral two points, 4 - first player two points, 5 - second player two points
@@ -125,6 +128,8 @@ namespace TerritoryWars.ScriptablesObjects
             }
             return roadSprite;
         }
+        
+        
 
         public Sprite GetPillar(bool isContested)
         {
@@ -145,6 +150,11 @@ namespace TerritoryWars.ScriptablesObjects
             playerId = SetLocalPlayerData.GetLocalIndex(playerId);
             int id = playerId + 1;
             return Pins[id];
+        }
+        
+        public Sprite GetCityGroundTexture(bool isContested)
+        {
+            return isContested ? StoneCityTextureSprite : MudCityTextureSprite;
         }
 
         public void BackIndex(int times)

@@ -42,7 +42,7 @@ namespace TerritoryWars.Tile
         private bool isArcSpawned = false;
 
         [ContextMenu("Place Fence")]
-        public void PlaceTerritory()
+        public void PlaceTerritory(bool isContested)
         {
             if (fencePrefab == null || lineRenderer == null || lineRenderer.positionCount < 2)
             {
@@ -55,10 +55,10 @@ namespace TerritoryWars.Tile
                 DestroyImmediate(transform.GetChild(0).gameObject);
             }
 
-            StartCoroutine(PlaceFenceRoutine());
+            StartCoroutine(PlaceTerritoryRoutine(isContested));
         }
 
-        private IEnumerator PlaceFenceRoutine()
+        private IEnumerator PlaceTerritoryRoutine(bool isContested)
         {
             Vector3[] points = new Vector3[lineRenderer.positionCount];
             lineRenderer.GetPositions(points);
@@ -85,6 +85,7 @@ namespace TerritoryWars.Tile
             TerritorySpriteRenderer = currentTerritory.GetComponent<SpriteRenderer>();
             currentTerritory.SetLineRenderer(lineRenderer);
             currentTerritory.GenerateMask();
+            currentTerritory.SetTexture(isContested);
             
             if (arcIndex >= 0 && arcIndex < points.Length - 1 && !isArcSpawned)
             {

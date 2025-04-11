@@ -67,9 +67,9 @@ public class TileParts : MonoBehaviour
         }
 
         if (TileTerritoryFiller != null && TileTerritoryFiller.currentTerritory != null &&
-            TileTerritoryFiller.currentTerritory.fillTexture != null)
+            TileTerritoryFiller.currentTerritory._spriteRenderer != null)
         {
-            TileTerritoryFiller.currentTerritory.fillTexture.gameObject.layer = mask;
+            TileTerritoryFiller.currentTerritory._spriteRenderer.gameObject.layer = mask;
         }
 
         if (WallPlacer != null)
