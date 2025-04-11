@@ -68,7 +68,7 @@ namespace TerritoryWars.General
                 {
                     return;
                 }
-                
+
 
                 if (isPlacingTile)// && SessionManager.Instance.IsLocalPlayerTurn)
                 {
@@ -137,7 +137,8 @@ namespace TerritoryWars.General
             _currentValidPlacements = board.GetValidPlacements(currentTile);
             if (_currentValidPlacements.Count == 0)
             {
-                EndTilePlacement();
+                gameUI.SetActiveSkipButtonPulse(true);
+                // EndTilePlacement();
                 return;
             }
 
