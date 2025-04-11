@@ -61,6 +61,14 @@ namespace Dojo.Torii
             Name = model.name;
             Members = new Dictionary<string, object>(model.children.ToArray().Select(m => new KeyValuePair<string, object>(m.name, HandleCValue(m.ty))));
         }
+        
+        public string GetModelName()
+        {
+            string @namespace = "evolute_duel";
+            string name = Name;
+            return $"{@namespace}-{name.Replace("evolute_duel_", "")}";
+            //return $"{@namespace}-{name.Replace("evolute_duel_", "")}";
+        }
 
         private object HandleCValue(dojo.Ty ty)
         {

@@ -70,29 +70,24 @@ namespace Dojo.Starknet
                     }
                 },
                 // primary type
-                {
-                    "OffchainMessage",
-                    new TypedDataType[] {
-                        // model name
-                        new TypedDataType("model", "shortstring"),
-                        // model type
-                        new TypedDataType(model.Name, "Model")
-                    }
-                }
+                // {
+                //     "OffchainMessage",
+                //     new TypedDataType[] {
+                //         // model name
+                //         new TypedDataType("model", "shortstring"),
+                //         // model type
+                //         new TypedDataType(model.GetModelName(), "Model")
+                //     }
+                // }
             };
 
             // model members types
-            types.Add("Model", getMembersTypes(ref types, model.Members));
+            types.Add(model.GetModelName(), getMembersTypes(ref types, model.Members));
 
-            primaryType = "OffchainMessage";
+            primaryType = model.GetModelName();
 
             // wip
             domain = new Domain("Dojo", "1", "1");
-            message = new Dictionary<string, object>
-            {
-                // model name
-                { "model", model.Name }
-            };
 
             // model members
             var members = new Dictionary<string, object>();
@@ -101,7 +96,8 @@ namespace Dojo.Starknet
                 members.Add(member.Key, mapMember(member.Value));
             }
 
-            message.Add(model.Name, members);
+            message = members;
+            //message.Add(model.GetModelName(), members);
         }
 
         object mapMember(object member)

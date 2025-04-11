@@ -6419,11 +6419,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3226441139909757904, guid: dab301b96ced5474290878d13aa7842b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.000038146973
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3226441139909757904, guid: dab301b96ced5474290878d13aa7842b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 240.65988
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3226441139909757904, guid: dab301b96ced5474290878d13aa7842b, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -7434,6 +7434,9 @@ MonoBehaviour:
   PlayerNameText: {fileID: 879706995}
   EvoluteCountText: {fileID: 1445019230}
   ChangeNameButton: {fileID: 985551442}
+  OnNameChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1625938408
 GameObject:
   m_ObjectHideFlags: 0

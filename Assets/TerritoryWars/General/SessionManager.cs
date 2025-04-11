@@ -123,6 +123,7 @@ namespace TerritoryWars.General
                 return;
             }
             StartGame();
+            ChatManager.Instance.Initialize(board.id);
         }
 
         private void FinishGame()
