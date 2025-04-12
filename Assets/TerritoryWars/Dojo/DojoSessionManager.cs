@@ -318,7 +318,7 @@ namespace TerritoryWars.Dojo
             ushort red_points = eventModel.red_points;
             ushort blue_points = eventModel.blue_points;
 
-            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterRoadContest);
+            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterRoadContest, true, false);
 
 
 
@@ -337,7 +337,7 @@ namespace TerritoryWars.Dojo
             ushort blue_points = eventModel.blue_points;
 
 
-            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterRoadContest);
+            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterRoadContest, true,  false);
 
 
             CustomLogger.LogExecution(
@@ -360,7 +360,7 @@ namespace TerritoryWars.Dojo
             ushort red_points = eventModel.red_points;
             ushort blue_points = eventModel.blue_points;
 
-            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterCityContest);
+            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterCityContest, false, true);
 
 
             CustomLogger.LogExecution(
@@ -377,7 +377,7 @@ namespace TerritoryWars.Dojo
             ushort red_points = eventModel.red_points;
             ushort blue_points = eventModel.blue_points;
 
-            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterCityContest);
+            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterCityContest, false, true);
 
             CustomLogger.LogExecution(
                 $"[CityContestDraw] | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
@@ -400,7 +400,7 @@ namespace TerritoryWars.Dojo
             ClashAnimation contestAnimation = contestAnimationGO.GetComponent<ClashAnimation>();
             return contestAnimation;
         }
-        private void ContestAnimation(byte root, ushort[] points, Action recoloring)
+        private void ContestAnimation(byte root, ushort[] points, Action recoloring, bool isRoadContest = false, bool isCityContest = false)
         {
             ClashAnimation contestAnimation = CreateContestAnimation();
             Vector2Int coord = OnChainBoardDataConverter.GetPositionByRoot(root);
@@ -416,11 +416,11 @@ namespace TerritoryWars.Dojo
                     winner = 1;
                 else
                     winner = -1;
-                contestAnimation.Initialize(position + offset, winner, points, recoloring);
+                contestAnimation.Initialize(position + offset, winner, points, recoloring, isRoadContest, isCityContest);
             }
             else
             {
-                Coroutines.StartRoutine(RemoteContestAnimation(coord, points, contestAnimation, recoloring));
+                Coroutines.StartRoutine(RemoteContestAnimation(coord, points, contestAnimation, recoloring, isRoadContest, isCityContest));
             }
 
         }
@@ -428,7 +428,7 @@ namespace TerritoryWars.Dojo
         private Dictionary<evolute_duel_CityNode, List<evolute_duel_CityNode>> cities;
         private Dictionary<evolute_duel_RoadNode, List<evolute_duel_RoadNode>> roads;
 
-        private IEnumerator RemoteContestAnimation(Vector2Int coord, ushort[] points, ClashAnimation contestAnimation, Action recoloring)
+        private IEnumerator RemoteContestAnimation(Vector2Int coord, ushort[] points, ClashAnimation contestAnimation, Action recoloring, bool isRoadContest = false, bool isCityContest = false)
         {
             int i = 0;
             int maxAttempts = 6;
@@ -446,7 +446,7 @@ namespace TerritoryWars.Dojo
                         winner = 1;
                     else
                         winner = -1;
-                    contestAnimation.Initialize(position + offset, winner, points, recoloring);
+                    contestAnimation.Initialize(position + offset, winner, points, recoloring, isRoadContest, isCityContest);
                     break;
 
                 }
