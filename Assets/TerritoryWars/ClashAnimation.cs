@@ -14,8 +14,10 @@ namespace TerritoryWars
     {
         public SpriteAnimator SwordsAnimator;
         public SpriteAnimator FlagsAnimator;
-        public TextMeshPro PointsText;
+        public TextMeshPro SinglePointsText;
+        public TextMeshPro[] DoublePointsText;
         public SpriteRenderer BackgroundCircle;
+        public SpriteRenderer ContestSprite;
         
         private Queue<Action> _animationQueue = new Queue<Action>();
         private List<List<Sprite>> FlagsAnimations;
@@ -26,6 +28,12 @@ namespace TerritoryWars
         public List<Sprite> MixedFlagsAnimations;
         
         public Color[] PlayerColors;
+        
+        [SerializeField] private Sprite[] _roadContestSprites; 
+        [SerializeField] private Sprite[] _cityContestSprites;
+
+        private bool _isRoadContest;
+        private bool _isCityContest;
         
         
         
@@ -40,13 +48,15 @@ namespace TerritoryWars
         // fourth action dependencies
         private ushort[] Points;
         
-        public void Initialize(Vector3 position, int winPlayerId, ushort[] points, Action recoloring)
+        public void Initialize(Vector3 position, int winPlayerId, ushort[] points, Action recoloring, bool isRoadContest = false, bool isCityContest = false)
         {
             
             transform.position = position;
             WinPlayerId = SetLocalPlayerData.GetLocalIndex(winPlayerId);
             Points = points;
             Recoloring = recoloring;
+            _isRoadContest = isRoadContest;
+            _isCityContest = isCityContest;
             
             FlagsAnimations = new List<List<Sprite>>()
             {
@@ -77,20 +87,60 @@ namespace TerritoryWars
             {
                 WinPlayerId = 2;
             }
-            BackgroundCircle.color = PlayerColors[WinPlayerId];
-            FlagsAnimator.Play(FlagsAnimations[WinPlayerId].ToArray());
-            FlagsAnimator.OnAnimationEnd = NextAction;
+            // BackgroundCircle.color = PlayerColors[WinPlayerId];
+            // FlagsAnimator.Play(FlagsAnimations[WinPlayerId].ToArray());
+            // FlagsAnimator.OnAnimationEnd = NextAction;
+
+            if (_isRoadContest)
+            {
+                ContestSprite.color = new Color(1, 1, 1, 0);
+                ContestSprite.sprite = _roadContestSprites[WinPlayerId];
+                ContestSprite.DOFade(1f, 0.2f);
+            }
+            else if (_isCityContest)
+            {
+                ContestSprite.color = new Color(1, 1, 1, 0);
+                ContestSprite.sprite = _cityContestSprites[WinPlayerId];
+                ContestSprite.DOFade(1f, 0.2f);
+            }
+            else
+            {
+                
+            }
             
-            BackgroundCircle.gameObject.SetActive(true);
-            PointsText.gameObject.SetActive(true);
-            PointsText.text = (Points[0] + Points[1]).ToString();
+            // BackgroundCircle.gameObject.SetActive(true);
+            if (WinPlayerId == 2)
+            {
+                SinglePointsText.gameObject.SetActive(false);
+                
+                DoublePointsText[0].color = new Color(1, 1, 1, 0);
+                DoublePointsText[1].color = new Color(1, 1, 1, 0);
+                
+                DoublePointsText[0].gameObject.SetActive(true);
+                DoublePointsText[1].gameObject.SetActive(true);
+                
+                DoublePointsText[0].text = Points[0].ToString();
+                DoublePointsText[1].text = Points[1].ToString();
+                
+                
+                Sequence sequence = DOTween.Sequence();
+                sequence.Append(DoublePointsText[0].DOFade(1, 0.2f));
+                sequence.Join(DoublePointsText[1].DOFade(1, 0.2f));
+            }
+            else
+            {
+                SinglePointsText.gameObject.SetActive(true);
+                SinglePointsText.text = (Points[0] + Points[1]).ToString();
+
+                SinglePointsText.color = new Color(1, 1, 1, 0);
+                // BackgroundCircle.color = new Color(PlayerColors[WinPlayerId].r, PlayerColors[WinPlayerId].g, PlayerColors[WinPlayerId].b, 0);
+
+                Sequence sequence = DOTween.Sequence();
+                sequence.Append(SinglePointsText.DOFade(1, 0.2f));
+                // sequence.Join(BackgroundCircle.DOFade(1, 0.2f));
+            }
             
-            PointsText.color = new Color(1, 1, 1, 0);
-            BackgroundCircle.color = new Color(PlayerColors[WinPlayerId].r, PlayerColors[WinPlayerId].g, PlayerColors[WinPlayerId].b, 0);
-            
-            Sequence sequence = DOTween.Sequence();
-            sequence.Append(PointsText.DOFade(1, 0.2f));
-            sequence.Join(BackgroundCircle.DOFade(1, 0.2f));
+            Invoke(nameof(NextAction), 1f);
         }
         
         private void ThirdAction()
@@ -106,17 +156,20 @@ namespace TerritoryWars
 
         private void FifthAction()
         {
-            List<Sprite> mirrorAnimation = FlagsAnimations[WinPlayerId].ToList();
-            mirrorAnimation.Reverse();
+            // List<Sprite> mirrorAnimation = FlagsAnimations[WinPlayerId].ToList();
+            // mirrorAnimation.Reverse();
             
-            FlagsAnimator.Play(mirrorAnimation.ToArray());
+            // FlagsAnimator.Play(mirrorAnimation.ToArray());
             
             Sequence sequence = DOTween.Sequence();
             sequence.AppendInterval(0.2f);
-            sequence.Append(FlagsAnimator.GetComponent<SpriteRenderer>().DOFade(0, 0.2f));
+            // sequence.Append(FlagsAnimator.GetComponent<SpriteRenderer>().DOFade(0, 0.2f));
             sequence.Join(SwordsAnimator.GetComponent<SpriteRenderer>().DOFade(0, 0.2f));
-            sequence.Join(PointsText.DOFade(0, 0.2f));
-            sequence.Join(BackgroundCircle.DOFade(0, 0.2f));
+            sequence.Join(ContestSprite.DOFade(0, 0.2f));
+            sequence.Join(SinglePointsText.DOFade(0, 0.2f));
+            sequence.Join(DoublePointsText[0].DOFade(0, 0.2f));
+            sequence.Join(DoublePointsText[1].DOFade(0, 0.2f));
+            // sequence.Join(BackgroundCircle.DOFade(0, 0.2f));
             sequence.AppendCallback(NextAction);
         }
 

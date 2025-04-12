@@ -1551,7 +1551,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 42700278}
-  fillTexture: {fileID: 42700279}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -2898,7 +2899,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 70357158}
-  fillTexture: {fileID: 70357159}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -3345,7 +3347,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 996950218}
   spriteMask: {fileID: 89900286}
-  fillTexture: {fileID: 89900287}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -7506,7 +7509,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 1525227210}
   spriteMask: {fileID: 244331736}
-  fillTexture: {fileID: 244331737}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -11925,7 +11929,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 426797745}
-  fillTexture: {fileID: 426797746}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -15681,7 +15686,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 532344613}
-  fillTexture: {fileID: 532344614}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -20441,7 +20447,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 711770867}
-  fillTexture: {fileID: 711770868}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -22566,7 +22573,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 754285545}
-  fillTexture: {fileID: 754285546}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -22884,6 +22892,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Canvas: {fileID: 1783385970}
+  FillImage: {fileID: 0}
+  OutlineImage: {fileID: 0}
   _offsetY: 0.7
 --- !u!4 &766226768
 Transform:
@@ -29797,7 +29807,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 1008179909}
-  fillTexture: {fileID: 1008179910}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -34407,7 +34418,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 1151941144}
-  fillTexture: {fileID: 1151941145}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -35780,7 +35792,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 1196421804}
-  fillTexture: {fileID: 1196421805}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -37661,6 +37674,18 @@ PrefabInstance:
     - target: {fileID: 837118097709401665, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1121909718998667797, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0.23529412
+      objectReference: {fileID: 0}
+    - target: {fileID: 1121909718998667797, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.078431375
+      objectReference: {fileID: 0}
+    - target: {fileID: 1121909718998667797, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.8627451
       objectReference: {fileID: 0}
     - target: {fileID: 1125127958852417758, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_AnchorMax.y
@@ -41807,7 +41832,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 1409182153}
-  fillTexture: {fileID: 1409182154}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -45019,7 +45045,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 1516054301}
-  fillTexture: {fileID: 1516054302}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -48069,7 +48096,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 588469445}
   spriteMask: {fileID: 1646654741}
-  fillTexture: {fileID: 1646654742}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -55224,7 +55252,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 1868698651}
-  fillTexture: {fileID: 1868698652}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -57664,7 +57693,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 1950853780}
-  fillTexture: {fileID: 1950853781}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -59852,7 +59882,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 2029095205}
-  fillTexture: {fileID: 2029095206}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -60394,7 +60425,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 2050862879}
-  fillTexture: {fileID: 2050862880}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -64954,7 +64986,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 840368553661877290}
-  fillTexture: {fileID: 6353977582465729321}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -66020,7 +66053,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   spriteMask: {fileID: 7035497529049575411}
-  fillTexture: {fileID: 3613947347654271216}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
