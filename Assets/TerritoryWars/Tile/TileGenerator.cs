@@ -276,9 +276,15 @@ namespace TerritoryWars.Tile
                 .ToList().Where(x => x.name == "House").ToList();
             for (int i = 0; i < houseRenderers.Count; i++)
             {
-                houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(
-                    TileAssetsObject.GetHouseByReference(
-                        houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, playerId, isContest));
+                if (playerId == 3)
+                {
+                    houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, isContest));
+                }
+                else
+                {
+                    houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, playerId, isContest));
+
+                }
                 TerritoryFiller territoryFiller = tileParts.TileTerritoryFiller;
                 if (territoryFiller != null)
                 {

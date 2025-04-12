@@ -668,7 +668,17 @@ namespace TerritoryWars.Dojo
                     GameObject tile = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
                     TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
                     int playerOwner;
-                    if (city.Key.contested) playerOwner = city.Key.blue_points > city.Key.red_points ? 0 : 1;
+                    if (city.Key.contested)
+                    {
+                        if (city.Key.blue_points == city.Key.red_points)
+                        {
+                            playerOwner = 3;
+                        }
+                        else
+                        {
+                            playerOwner = city.Key.blue_points > city.Key.red_points ? 0 : 1;
+                        }
+                    }
                     else
                     {
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);

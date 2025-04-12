@@ -27,6 +27,9 @@ namespace TerritoryWars.ScriptablesObjects
         
         public Sprite MudCityTextureSprite;
         public Sprite StoneCityTextureSprite;
+        
+        public Sprite[] ContestedBlueHouses;
+        public Sprite[] ContestedRedHouses;
 
         // 0 - neutral, 1 - first player, 2 - second player
         // 3 - neutral two points, 4 - first player two points, 5 - second player two points
@@ -72,11 +75,11 @@ namespace TerritoryWars.ScriptablesObjects
                 if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
                 {
                     if (playerIndex == 0)
-                        return isContested ? house.ContestedSprites : house.DefaultSprites;
+                        return isContested ? GetRandomContestedHouse(playerIndex) : house.DefaultSprites;
                     else
                     {
                         HousesSprites housesSprites = SecondPlayerHousesAnimated[FirstPlayerHousesAnimated.IndexOf(house)];
-                        return isContested ? housesSprites.ContestedSprites : housesSprites.DefaultSprites;
+                        return isContested ? GetRandomContestedHouse(playerIndex) : housesSprites.DefaultSprites;
                     }
                         
                 }
@@ -87,11 +90,11 @@ namespace TerritoryWars.ScriptablesObjects
                 if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
                 {
                     if (playerIndex == 1)
-                        return isContested ? house.ContestedSprites : house.DefaultSprites;
+                        return isContested ? GetRandomContestedHouse(playerIndex) : house.DefaultSprites;
                     else
                     {
                         HousesSprites housesSprites = FirstPlayerHousesAnimated[SecondPlayerHousesAnimated.IndexOf(house)];
-                        return isContested ? housesSprites.ContestedSprites : housesSprites.DefaultSprites;
+                        return isContested ? GetRandomContestedHouse(playerIndex) : housesSprites.DefaultSprites;
                     }
                 }
             }
@@ -116,6 +119,36 @@ namespace TerritoryWars.ScriptablesObjects
 
             return null;
         }
+        
+        public Sprite[] GetHouseByReference(Sprite[] sprites, bool isContested)
+        {
+            foreach (var house in FirstPlayerHousesAnimated)
+            {
+                if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
+                {
+                    return isContested ? GetRandomContestedHouse(0) : house.DefaultSprites;
+                }
+            }
+
+            foreach (var house in SecondPlayerHousesAnimated)
+            {
+                if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
+                {
+                    return isContested ? GetRandomContestedHouse(1) : house.DefaultSprites;
+                }
+            }
+
+            foreach (var house in NeutralHousesAnimated)
+            {
+                if (house.DefaultSprites == sprites)
+                {
+                    return isContested ? house.ContestedSprites : house.DefaultSprites;
+                }
+            }
+
+            return null;
+        }
+
 
         public Sprite GetContestedRoadByReference(Sprite roadSprite)
         {
@@ -155,6 +188,13 @@ namespace TerritoryWars.ScriptablesObjects
         public Sprite GetCityGroundTexture(bool isContested)
         {
             return isContested ? StoneCityTextureSprite : MudCityTextureSprite;
+        }
+        
+        public Sprite[] GetRandomContestedHouse(int playerIndex)
+        {
+            int randomIndex = Random.Range(0, (playerIndex == 0 ? ContestedBlueHouses : ContestedRedHouses).Length);
+            Sprite randomContestedHouse = (playerIndex == 0 ? ContestedBlueHouses : ContestedRedHouses)[randomIndex];
+            return new Sprite[] {randomContestedHouse};
         }
 
         public void BackIndex(int times)

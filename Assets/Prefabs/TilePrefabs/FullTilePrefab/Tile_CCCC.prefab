@@ -738,7 +738,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 6756659314696613044}
   spriteMask: {fileID: 5472565619163380215}
-  fillTexture: {fileID: 1419951050282553016}
+  _spriteRenderer: {fileID: 0}
+  texture: {fileID: 0}
   textureSize: 105
   lineWidth: 0
   fillColor: {r: 1, g: 1, b: 1, a: 1}
@@ -2451,18 +2452,22 @@ MonoBehaviour:
   ArcRenderers: []
   TileTerritoryFiller: {fileID: 840167752889725829}
   WallPlacer: {fileID: 0}
-  RoadRenderers: {fileID: 0}
-  RoadContestRenderer: {fileID: 0}
+  RoadRenderers:
+  - {fileID: 0}
   Mill: {fileID: 0}
   CloserToBorderFences:
   - Side: 0
     Fence: {fileID: 4282508955790012276}
+    WallPlacer: {fileID: 0}
   - Side: 1
     Fence: {fileID: 9065554269379505117}
+    WallPlacer: {fileID: 0}
   - Side: 2
     Fence: {fileID: 6826953325649534156}
+    WallPlacer: {fileID: 0}
   - Side: 3
     Fence: {fileID: 2251828125323388412}
+    WallPlacer: {fileID: 0}
   PinsPositions: []
   Forest: []
   Enviroment: {fileID: 7494911196213781815}
@@ -3446,6 +3451,7 @@ MonoBehaviour:
   spawnDelay: 0
   showDebugInfo: 0
   territoryPrefab: {fileID: 8966325575830096033, guid: 69e89afcf12104fa1abb0ee24bbad36e, type: 3}
+  currentTerritory: {fileID: 0}
   TerritorySpriteRenderer: {fileID: 1419951050282553016}
   lineRenderer: {fileID: 6756659314696613044}
 --- !u!120 &6756659314696613044
