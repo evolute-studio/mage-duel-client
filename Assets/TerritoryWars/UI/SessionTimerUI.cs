@@ -69,7 +69,7 @@ namespace TerritoryWars.UI
             
             TimerText.text = $"{Mathf.FloorToInt(_currentTurnTime / 60):00}:{Mathf.FloorToInt(_currentTurnTime % 60):00}";
 
-            if (_currentTurnTime <= TurnDuration / 4)
+            if (_currentTurnTime <= TurnDuration / 3f)
             {
                 TimerText.color = new Color(0.866f, 0.08f, 0.236f);
             }
