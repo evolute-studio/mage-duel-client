@@ -278,11 +278,11 @@ namespace TerritoryWars.Tile
             {
                 if (playerId == 3)
                 {
-                    houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, isContest));
+                    houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites));
                 }
                 else
                 {
-                    houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, playerId, isContest));
+                    houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, playerId));
 
                 }
                 TerritoryFiller territoryFiller = tileParts.TileTerritoryFiller;
@@ -291,6 +291,11 @@ namespace TerritoryWars.Tile
                     territoryFiller.PlaceTerritory(isContest);
                 }
             }
+        }
+
+        public void ChangeEnvironmentForContest()
+        {
+            tileParts.ChangeEnvironmentForContest();
         }
 
         public void FencePlacerForCloserToBorderCity(List<Side> closerSides)

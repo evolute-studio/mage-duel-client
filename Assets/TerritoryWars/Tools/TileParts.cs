@@ -15,6 +15,7 @@ public class TileParts : MonoBehaviour
     public Transform[] PinsPositions;
     public GameObject[] Forest;
     public GameObject Enviroment;
+    public GameObject ContestedEnviroment;
     public PolygonCollider2D PolygonCollider2D;
 
     private int DefaultLayerMask = 0; // Default layer
@@ -45,6 +46,21 @@ public class TileParts : MonoBehaviour
         if (fence != null)
         {
             WallPlacer = fence.GetComponent<WallPlacer>();
+        }
+    }
+
+    public void ChangeEnvironmentForContest()
+    {
+        if (ContestedEnviroment != null)
+        {
+            ContestedEnviroment.SetActive(true);
+            if (HouseRenderers.Count == 4)
+            {
+                foreach (var house in HouseRenderers)
+                {
+                    house.gameObject.SetActive(false);
+                }
+            }
         }
     }
 
