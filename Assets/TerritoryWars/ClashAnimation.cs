@@ -14,6 +14,7 @@ namespace TerritoryWars
     {
         public SpriteAnimator SwordsAnimator;
         public SpriteAnimator FlagsAnimator;
+        public SpriteAnimator ContestSpriteAnimator;
         public TextMeshPro SinglePointsText;
         public TextMeshPro[] DoublePointsText;
         public SpriteRenderer BackgroundCircle;
@@ -29,8 +30,8 @@ namespace TerritoryWars
         
         public Color[] PlayerColors;
         
-        [SerializeField] private Sprite[] _roadContestSprites; 
-        [SerializeField] private Sprite[] _cityContestSprites;
+        [SerializeField] private ContestedSprites[] _roadContestSprites; 
+        [SerializeField] private ContestedSprites[] _cityContestSprites;
 
         private bool _isRoadContest;
         private bool _isCityContest;
@@ -90,17 +91,18 @@ namespace TerritoryWars
             // BackgroundCircle.color = PlayerColors[WinPlayerId];
             // FlagsAnimator.Play(FlagsAnimations[WinPlayerId].ToArray());
             // FlagsAnimator.OnAnimationEnd = NextAction;
+            ContestSpriteAnimator.OnAnimationEnd = NextAction;
 
             if (_isRoadContest)
             {
                 ContestSprite.color = new Color(1, 1, 1, 0);
-                ContestSprite.sprite = _roadContestSprites[WinPlayerId];
+                ContestSpriteAnimator.Play(_roadContestSprites[WinPlayerId].Sprites);
                 ContestSprite.DOFade(1f, 0.2f);
             }
             else if (_isCityContest)
             {
                 ContestSprite.color = new Color(1, 1, 1, 0);
-                ContestSprite.sprite = _cityContestSprites[WinPlayerId];
+                ContestSpriteAnimator.Play(_cityContestSprites[WinPlayerId].Sprites);
                 ContestSprite.DOFade(1f, 0.2f);
             }
             else
@@ -139,8 +141,6 @@ namespace TerritoryWars
                 sequence.Append(SinglePointsText.DOFade(1, 0.2f));
                 // sequence.Join(BackgroundCircle.DOFade(1, 0.2f));
             }
-            
-            Invoke(nameof(NextAction), 1f);
         }
         
         private void ThirdAction()
@@ -185,5 +185,11 @@ namespace TerritoryWars
             }
         }
 
+    }
+    
+    [Serializable]
+    public class ContestedSprites
+    {
+        public Sprite[] Sprites;
     }
 }
