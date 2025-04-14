@@ -259,8 +259,10 @@ namespace TerritoryWars.Tile
     {
         public int CurrentIndex = 0;
         public SpriteRenderer SpriteRenderer;
+        public PolygonCollider2D PolygonCollider2D;
         public SpriteSwapRule[] Rules;
         public Transform[] PinObjects;
+        public PolygonColliderSwapRule[] PolygonColliderSwapRules;
         
         public int GetCurrentRuleIndex()
         {
@@ -291,6 +293,17 @@ namespace TerritoryWars.Tile
                 }
 
                 PinObjects[newIndex].gameObject.SetActive(true);
+            }
+            
+            if (PolygonColliderSwapRules != null && PolygonColliderSwapRules.Length > 0 && PolygonCollider2D != null)
+            {
+                for (int i = 0; i < PolygonColliderSwapRules.Length; i++)
+                {
+                    if (i == newIndex)
+                    {
+                        PolygonCollider2D.points = PolygonColliderSwapRules[i].Points;
+                    }
+                }
             }
         }
 
@@ -348,5 +361,11 @@ namespace TerritoryWars.Tile
     {
         public int LayerIndex;
         public int RotationIndex;
+    }
+
+    [Serializable]
+    public class PolygonColliderSwapRule
+    {
+        public Vector2[] Points;
     }
 }

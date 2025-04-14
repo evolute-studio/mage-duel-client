@@ -15,6 +15,7 @@ public class TileParts : MonoBehaviour
     public Transform[] PinsPositions;
     public GameObject[] Forest;
     public GameObject Enviroment;
+    public PolygonCollider2D PolygonCollider2D;
 
     private int DefaultLayerMask = 0; // Default layer
     private int OutlineLayerMask = 31; // Outline layer
