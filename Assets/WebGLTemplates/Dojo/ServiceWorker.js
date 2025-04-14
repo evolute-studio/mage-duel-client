@@ -1,6 +1,6 @@
 // Serviceworker.js - with forced activation
 console.log('Serviceworker has been downloaded');
-console.log('Test service worker update 5'); // Change the number to track updates
+console.log('Test service worker update 15'); // Change the number to track updates
 
 // Примусово пропускаємо чергу очікування під час встановлення
 self.addEventListener('install', event => {

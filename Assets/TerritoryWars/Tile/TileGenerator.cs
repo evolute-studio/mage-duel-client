@@ -295,7 +295,7 @@ namespace TerritoryWars.Tile
 
         public void ChangeEnvironmentForContest()
         {
-            tileParts.ChangeEnvironmentForContest();
+            //tileParts.ChangeEnvironmentForContest();
         }
 
         public void FencePlacerForCloserToBorderCity(List<Side> closerSides)
