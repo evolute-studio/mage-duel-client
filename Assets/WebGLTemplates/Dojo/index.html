@@ -16,16 +16,46 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
+            background-color: #000000;
         }
         #unity-container {
             width: 100vw;
             height: 100vh;
             position: absolute;
             overflow: hidden;
+            background-color: #000000;
         }
         #unity-canvas {
             width: 100% !important;
             height: 100% !important;
+            background-color: #000000;
+        }
+        #unity-loading-bar {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #unity-logo {
+            display: none;
+        }
+        #unity-progress-bar-empty {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        #unity-progress-bar-full {
+            width: 0%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            transition: width 0.3s ease;
         }
         /* Стилі для нової кнопки повноекранного режиму */
         #top-fullscreen-button {
@@ -181,14 +211,14 @@
     <div id="unity-warning"> </div>
     <div id="unity-footer">
         <div id="unity-webgl-logo"></div>
-        <div id="unity-fullscreen-button"></div>
+        <!-- <div id="unity-fullscreen-button"></div> -->
         #if SHOW_DIAGNOSTICS
         <img id="diagnostics-icon" src="TemplateData/webmemd-icon.png">
         #endif
         <div id="unity-build-title">{{{ PRODUCT_NAME }}}</div>
     </div>
     <!-- Нова кнопка повноекранного режиму -->
-    <div id="top-fullscreen-button" title="Toggle Fullscreen"></div>
+    <!-- <div id="top-fullscreen-button" title="Toggle Fullscreen"></div> -->
 </div>
 
 <!-- Portrait mode overlay -->
@@ -209,8 +239,8 @@
     var canvas = document.querySelector("#unity-canvas");
     var loadingBar = document.querySelector("#unity-loading-bar");
     var progressBarFull = document.querySelector("#unity-progress-bar-full");
-    var fullscreenButton = document.querySelector("#unity-fullscreen-button");
-    var topFullscreenButton = document.querySelector("#top-fullscreen-button");
+    // var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+    // var topFullscreenButton = document.querySelector("#top-fullscreen-button");
     var warningBanner = document.querySelector("#unity-warning");
     #if SHOW_DIAGNOSTICS
     var diagnostics_icon = document.getElementById("diagnostics-icon");
@@ -343,9 +373,9 @@
                         unityDiagnostics.openDiagnosticsDiv(unityInstance.GetMemoryInfo);
                     };
                     #endif
-                    fullscreenButton.onclick = () => {
-                        unityInstance.SetFullscreen(1);
-                    };
+                    // fullscreenButton.onclick = () => {
+                    //     unityInstance.SetFullscreen(1);
+                    // };
                 }).catch((message) => {
                     alert(message);
                 });
@@ -356,23 +386,23 @@
     document.body.appendChild(script);
 
     // Функція для перемикання повноекранного режиму
-    function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-            container.requestFullscreen().catch(err => {
-                alert(`Error attempting to enable fullscreen: ${err.message}`);
-            });
-        } else {
-            document.exitFullscreen();
-        }
-    }
+    // function toggleFullscreen() {
+    //     if (!document.fullscreenElement) {
+    //         container.requestFullscreen().catch(err => {
+    //             alert(`Error attempting to enable fullscreen: ${err.message}`);
+    //         });
+    //     } else {
+    //         document.exitFullscreen();
+    //     }
+    // }
 
     // Обробники подій для повноекранного режиму
-    document.addEventListener('fullscreenchange', () => {
-        topFullscreenButton.classList.toggle('fullscreen', document.fullscreenElement);
-    });
+    // document.addEventListener('fullscreenchange', () => {
+    //     topFullscreenButton.classList.toggle('fullscreen', document.fullscreenElement);
+    // });
 
     // Додаємо обробник кліку для нової кнопки
-    topFullscreenButton.addEventListener('click', toggleFullscreen);
+    // topFullscreenButton.addEventListener('click', toggleFullscreen);
 
 </script>
 </body>
