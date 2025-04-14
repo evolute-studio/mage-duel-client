@@ -67,7 +67,7 @@ namespace TerritoryWars.ScriptablesObjects
             return nextHouseSprites;
         }
         
-        public Sprite[] GetHouseByReference(Sprite[] sprites, int playerIndex, bool isContested)
+        public Sprite[] GetHouseByReference(Sprite[] sprites, int playerIndex, bool isContested = false)
         {
             playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
             foreach (var house in FirstPlayerHousesAnimated)
@@ -81,7 +81,6 @@ namespace TerritoryWars.ScriptablesObjects
                         HousesSprites housesSprites = SecondPlayerHousesAnimated[FirstPlayerHousesAnimated.IndexOf(house)];
                         return isContested ? GetRandomContestedHouse(playerIndex) : housesSprites.DefaultSprites;
                     }
-                        
                 }
             }
 
@@ -120,7 +119,7 @@ namespace TerritoryWars.ScriptablesObjects
             return null;
         }
         
-        public Sprite[] GetHouseByReference(Sprite[] sprites, bool isContested)
+        public Sprite[] GetHouseByReference(Sprite[] sprites, bool isContested = false)
         {
             foreach (var house in FirstPlayerHousesAnimated)
             {
