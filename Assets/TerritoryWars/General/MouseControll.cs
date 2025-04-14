@@ -11,6 +11,7 @@ namespace TerritoryWars.General
         [SerializeField] private float zoomSpeed = 20f;
         [SerializeField] private float minZoom = 2f;
         [SerializeField] private float maxZoom = 4f;
+        [SerializeField] private float pinchZoomSpeed = 0.5f;
 
         private Camera _mainCamera;
         private Camera _camera;
@@ -19,6 +20,10 @@ namespace TerritoryWars.General
         private bool isDragging = false;
         private Vector3 minBounds = new Vector3(-4f, -3f, 0f);
         private Vector3 maxBounds = new Vector3(4f, 4f, 0f);
+
+        // Для мобільних жестів
+        private float lastPinchDistance;
+        private bool isPinching = false;
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -40,7 +45,35 @@ namespace TerritoryWars.General
 
         private void HandlePanning()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.touchCount == 1) // Один палець для переміщення
+            {
+                Touch touch = Input.GetTouch(0);
+                
+                if (touch.phase == TouchPhase.Began)
+                {
+                    isDragging = true;
+                    lastMousePosition = touch.position;
+                }
+                else if (touch.phase == TouchPhase.Ended)
+                {
+                    isDragging = false;
+                }
+
+                if (isDragging)
+                {
+                    Vector3 delta = touch.position - (Vector2)lastMousePosition;
+                    Vector3 move = new Vector3(-delta.x, -delta.y, 0) * panSpeed * Time.deltaTime;
+                    move *= _camera.orthographicSize / 5f;
+
+                    Vector3 newPosition = transform.position + move;
+                    newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
+                    newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y, maxBounds.y);
+
+                    transform.position = newPosition;
+                    lastMousePosition = touch.position;
+                }
+            }
+            else if (Input.GetMouseButtonDown(0)) // ПК управління
             {
                 isDragging = true;
                 lastMousePosition = Input.mousePosition;
@@ -50,7 +83,7 @@ namespace TerritoryWars.General
                 isDragging = false;
             }
 
-            if (isDragging)
+            if (isDragging && Input.touchCount == 0) // ПК управління
             {
                 Vector3 delta = Input.mousePosition - lastMousePosition;
                 Vector3 move = new Vector3(-delta.x, -delta.y, 0) * panSpeed * Time.deltaTime;
@@ -72,11 +105,43 @@ namespace TerritoryWars.General
                 _camera.orthographicSize = _mainCamera.orthographicSize;
                 return;
             }
-            float scrollDelta = Input.mouseScrollDelta.y;
-            if (scrollDelta != 0)
+
+            // Мобільний зум
+            if (Input.touchCount == 2)
             {
-                float newSize = _camera.orthographicSize - scrollDelta * zoomSpeed * Time.deltaTime;
-                _camera.orthographicSize = Mathf.Clamp(newSize, minZoom, maxZoom);
+                Touch touch0 = Input.GetTouch(0);
+                Touch touch1 = Input.GetTouch(1);
+
+                if (touch0.phase == TouchPhase.Began || touch1.phase == TouchPhase.Began)
+                {
+                    lastPinchDistance = Vector2.Distance(touch0.position, touch1.position);
+                    isPinching = true;
+                }
+                else if (touch0.phase == TouchPhase.Ended || touch1.phase == TouchPhase.Ended)
+                {
+                    isPinching = false;
+                }
+
+                if (isPinching)
+                {
+                    float currentPinchDistance = Vector2.Distance(touch0.position, touch1.position);
+                    float pinchDelta = currentPinchDistance - lastPinchDistance;
+                    
+                    float newSize = _camera.orthographicSize - pinchDelta * pinchZoomSpeed * Time.deltaTime;
+                    _camera.orthographicSize = Mathf.Clamp(newSize, minZoom, maxZoom);
+                    
+                    lastPinchDistance = currentPinchDistance;
+                }
+            }
+            // ПК зум
+            else
+            {
+                float scrollDelta = Input.mouseScrollDelta.y;
+                if (scrollDelta != 0)
+                {
+                    float newSize = _camera.orthographicSize - scrollDelta * zoomSpeed * Time.deltaTime;
+                    _camera.orthographicSize = Mathf.Clamp(newSize, minZoom, maxZoom);
+                }
             }
         }
     }

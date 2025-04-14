@@ -27,6 +27,50 @@
             width: 100% !important;
             height: 100% !important;
         }
+        /* Стилі для нової кнопки повноекранного режиму */
+        #top-fullscreen-button {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        #top-fullscreen-button:hover {
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 1;
+        }
+        #top-fullscreen-button::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>') center/contain no-repeat;
+        }
+        #top-fullscreen-button.fullscreen::before {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>') center/contain no-repeat;
+        }
+        /* Приховуємо кнопку в повноекранному режимі */
+        :fullscreen #top-fullscreen-button {
+            display: none;
+        }
+        :-webkit-full-screen #top-fullscreen-button {
+            display: none;
+        }
+        :-moz-full-screen #top-fullscreen-button {
+            display: none;
+        }
+        :-ms-fullscreen #top-fullscreen-button {
+            display: none;
+        }
         /* Portrait mode overlay styles */
         #portrait-overlay {
             display: none;
@@ -143,6 +187,8 @@
         #endif
         <div id="unity-build-title">{{{ PRODUCT_NAME }}}</div>
     </div>
+    <!-- Нова кнопка повноекранного режиму -->
+    <div id="top-fullscreen-button" title="Toggle Fullscreen"></div>
 </div>
 
 <!-- Portrait mode overlay -->
@@ -164,6 +210,7 @@
     var loadingBar = document.querySelector("#unity-loading-bar");
     var progressBarFull = document.querySelector("#unity-progress-bar-full");
     var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+    var topFullscreenButton = document.querySelector("#top-fullscreen-button");
     var warningBanner = document.querySelector("#unity-warning");
     #if SHOW_DIAGNOSTICS
     var diagnostics_icon = document.getElementById("diagnostics-icon");
@@ -307,6 +354,25 @@
     }
 
     document.body.appendChild(script);
+
+    // Функція для перемикання повноекранного режиму
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            container.requestFullscreen().catch(err => {
+                alert(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    // Обробники подій для повноекранного режиму
+    document.addEventListener('fullscreenchange', () => {
+        topFullscreenButton.classList.toggle('fullscreen', document.fullscreenElement);
+    });
+
+    // Додаємо обробник кліку для нової кнопки
+    topFullscreenButton.addEventListener('click', toggleFullscreen);
 
 </script>
 </body>
