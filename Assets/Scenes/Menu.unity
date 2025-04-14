@@ -5265,7 +5265,7 @@ GameObject:
   - component: {fileID: 1247605298}
   - component: {fileID: 1247605297}
   m_Layer: 5
-  m_Name: New Game
+  m_Name: Play
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6319,7 +6319,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1795330702957914682, guid: dab301b96ced5474290878d13aa7842b, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -19.99997
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 2275738990379624664, guid: dab301b96ced5474290878d13aa7842b, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -7099,7 +7099,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Game
+  m_text: PLAY
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0535867d5bfbbae44bc6b50b1db4123a, type: 2}
   m_sharedMaterial: {fileID: 2131835402581274008, guid: 0535867d5bfbbae44bc6b50b1db4123a, type: 2}
@@ -7434,6 +7434,9 @@ MonoBehaviour:
   PlayerNameText: {fileID: 879706995}
   EvoluteCountText: {fileID: 1445019230}
   ChangeNameButton: {fileID: 985551442}
+  OnNameChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1625938408
 GameObject:
   m_ObjectHideFlags: 0
@@ -10371,7 +10374,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1795330702957914682, guid: dab301b96ced5474290878d13aa7842b, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -19.99997
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 2275738990379624664, guid: dab301b96ced5474290878d13aa7842b, type: 3}
       propertyPath: m_AnchoredPosition.y
