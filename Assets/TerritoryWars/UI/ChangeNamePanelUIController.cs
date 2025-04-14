@@ -25,14 +25,29 @@ public class ChangeNamePanelUIController : MonoBehaviour
 
     private void Initialization()
     {
+        MenuUIController.Instance._namePanelController.OnNameChanged.AddListener(NameChanged);
         _confirmButton.onClick.AddListener(GetNameFromInputField);
         _cancelButton.onClick.AddListener(OnCancelButtonClick);
     }
     
     public void SetNamePanelActive(bool active)
     {
+        if(active) SetNamePanelControlActive(true);
         NameInputField.text = MenuUIController.Instance._namePanelController.PlayerNameText.text;
         NamePanel.SetActive(active);
+    }
+    
+    public void SetNamePanelControlActive(bool active)
+    {
+        NameInputField.interactable = active;
+        _confirmButton.interactable = active;
+        _cancelButton.interactable = active;
+    }
+
+    public void NameChanged(string name)
+    {
+        SetNamePanelControlActive(true);
+        SetNamePanelActive(false);
     }
 
     private void GetNameFromInputField()
@@ -40,10 +55,11 @@ public class ChangeNamePanelUIController : MonoBehaviour
         _name = NameInputField.text;
         if (IsNameValid())
         {
-            SetNamePanelActive(false);
+            //SetNamePanelActive(false);
             DojoConnector.ChangeUsername(
                 DojoGameManager.Instance.LocalBurnerAccount,
                 CairoFieldsConverter.GetFieldElementFromString(_name));
+            SetNamePanelControlActive(false);
             evolute_duel_Player profile = DojoGameManager.Instance.GetLocalPlayerData();
             if (profile == null)
             {
@@ -51,7 +67,7 @@ public class ChangeNamePanelUIController : MonoBehaviour
                 return;
             }
             
-            MenuUIController.Instance._namePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(profile.username));
+            //MenuUIController.Instance._namePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(profile.username));
             MenuUIController.Instance._namePanelController.SetEvoluteBalance(profile.balance);
         }
         else
