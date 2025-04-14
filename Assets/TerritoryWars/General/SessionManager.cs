@@ -224,6 +224,12 @@ namespace TerritoryWars.General
             rightCharacterPath[2] = SpawnPoints[1];
             
             evolute_duel_Board board = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
+            if (board == null)
+            {
+                CustomLogger.LogError("SessionManager.InitializePlayers() - board is null");
+                CustomSceneManager.Instance.ForceLoadScene(CustomSceneManager.Instance.Menu);
+                return;
+            }
 
             evolute_duel_Player hostData = DojoGameManager.Instance.GetPlayerData(board.player1.Item1.Hex());
             evolute_duel_Player guestData = DojoGameManager.Instance.GetPlayerData(board.player2.Item1.Hex()); 

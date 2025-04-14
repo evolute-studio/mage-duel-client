@@ -90,7 +90,8 @@ namespace TerritoryWars.General
         
         public void ForceLoadScene(string name)
         {
-            if (_isLoading)
+            if (_isLoading) 
+                StopCoroutine(_loadingCoroutine);
                 
             StartCoroutine(LoadSceneAsync(name));
         }
