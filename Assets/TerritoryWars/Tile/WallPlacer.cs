@@ -59,7 +59,11 @@ namespace TerritoryWars.Tile
                 
                 skew.SetPositions(start, end, wallYOffset, sidesOffsetX);
                 
-                wallSegments.Add(wallSegment);
+                if (!wallSegments.Contains(wallSegment))
+                {
+                    wallSegments.Add(wallSegment);
+                }
+                
             }
             
             foreach (Transform pillar in pillars)
@@ -111,7 +115,13 @@ namespace TerritoryWars.Tile
                 GameObject defaultSegment = Instantiate(WallSegmentPrefab, transform);
                 return defaultSegment;
             }
-            return wallSegments[index];
+            GameObject wallSegment = wallSegments[index];
+            if (wallSegment == null)
+            {
+                wallSegment = Instantiate(WallSegmentPrefab, transform);
+                wallSegments[index] = wallSegment;
+            }
+            return wallSegment;
         }
         
         private void DestroyWallSegments()
