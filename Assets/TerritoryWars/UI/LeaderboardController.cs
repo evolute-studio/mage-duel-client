@@ -59,6 +59,10 @@ public class LeaderboardController : MonoBehaviour
             ClearAllListItems();
             FetchData();
         }
+        else
+        {
+            CursorManager.Instance.SetCursor("default");
+        }
     }
 
     private void ClearAllListItems()

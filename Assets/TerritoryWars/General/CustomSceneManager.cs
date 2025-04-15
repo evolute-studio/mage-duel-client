@@ -58,7 +58,7 @@ namespace TerritoryWars.General
 
         public void LoadSession(Action startAction = null, Action finishAction = null)
         {
-            Debug.Log("LoadSession");
+            CursorManager.Instance.SetCursor("default");
             ApplicationState.SetState(ApplicationStates.Session);
             LoadSceneWithDealay(Session, startAction, finishAction);
         }
