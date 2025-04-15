@@ -42,6 +42,9 @@ namespace TerritoryWars.UI
         [SerializeField] private GameObject jokerModeIndicator;
         [SerializeField] private Sprite[] _toggleMods;
         [SerializeField] private Image _toggleSpriteRenderer;
+        [SerializeField] private GameObject[] _toggleGameObjects;
+        [SerializeField] private GameObject _toggleJokerButton;
+        [SerializeField] private CanvasGroup[] _togglersCanvasGroup;
         [SerializeField] private CanvasGroup _deckContainerCanvasGroup;
 
         [SerializeField] private ResultPopUpUI _resultPopUpUI;
@@ -60,6 +63,7 @@ namespace TerritoryWars.UI
         private DeckManager deckManager;
         
         private TweenerCore<Vector3,Vector3,VectorOptions> _skipButtonTween;
+        private TweenerCore<Vector3,Vector3,VectorOptions> _jokerButtonTween;
         private Vector3 _skipButtonScale;
         
         [SerializeField] private ArrowAnimations arrowAnimations;
@@ -190,6 +194,7 @@ namespace TerritoryWars.UI
         {
             _sessionManager.ClientLocalPlayerSkip();
             SetActiveSkipButtonPulse(false);
+            JokerButtonPulse(false);
             UpdateUI();
         }
 
@@ -211,18 +216,40 @@ namespace TerritoryWars.UI
         {
             if (active)
             {
-                _deckContainerCanvasGroup.alpha = 0.5f;
-                _deckContainerCanvasGroup.DOFade(1, 0.5f);
+                _togglersCanvasGroup[0].alpha = 0.5f;
+                _togglersCanvasGroup[0].DOFade(1, 0.5f);
+                _togglersCanvasGroup[1].alpha = 0.5f;
+                _togglersCanvasGroup[1].DOFade(1, 0.5f);
+                // _deckContainerCanvasGroup.alpha = 0.5f;
+                // _deckContainerCanvasGroup.DOFade(1, 0.5f);
                 jokerButton.interactable = true;
                 deckButton.interactable = true;
                 
             }
             else
             {
-                _deckContainerCanvasGroup.alpha = 1;
-                _deckContainerCanvasGroup.DOFade(0.5f, 0.5f);
+                _togglersCanvasGroup[0].alpha = 1f;
+                _togglersCanvasGroup[0].DOFade(0.5f, 0.5f);
+                _togglersCanvasGroup[1].alpha = 1f;
+                _togglersCanvasGroup[1].DOFade(0.5f, 0.5f);
+                // _deckContainerCanvasGroup.alpha = 1;
+                // _deckContainerCanvasGroup.DOFade(0.5f, 0.5f);
                 jokerButton.interactable = false;
                 deckButton.interactable = false;
+            }
+        }
+        
+        public void JokerButtonPulse(bool isActive)
+        {
+            if (isActive)
+            {
+                _toggleJokerButton.transform.localScale = Vector3.one;
+                _jokerButtonTween = _toggleJokerButton.transform.DOScale(_toggleJokerButton.transform.localScale.x * 1.1f, 0.8f).SetLoops(-1, LoopType.Yoyo);
+            }
+            else
+            {
+                _jokerButtonTween?.Kill();
+                _toggleJokerButton.transform.localScale = Vector3.one;
             }
         }
 
@@ -237,6 +264,7 @@ namespace TerritoryWars.UI
         {
             if(SessionManager.Instance.CurrentTurnPlayer.JokerCount <= 0 || _isJokerActive || !SessionManager.Instance.IsLocalPlayerTurn) return;
             _isJokerActive = true;
+            JokerButtonPulse(false);
             
             SetJokerMode(true);
             OnJokerButtonClickedEvent?.Invoke();
@@ -255,7 +283,9 @@ namespace TerritoryWars.UI
             _isJokerActive = active;
             if (active)
             {
-                _toggleSpriteRenderer.sprite = _toggleMods[1];
+                _toggleGameObjects[1].SetActive(true);
+                _toggleGameObjects[0].SetActive(false);
+                
                 _sessionManager.JokerManager.ActivateJoker();
                 
                 tilePreview._tileJokerAnimator.ShowIdleJokerAnimation();
@@ -264,7 +294,8 @@ namespace TerritoryWars.UI
             }
             else
             {
-                _toggleSpriteRenderer.sprite = _toggleMods[0];
+                _toggleGameObjects[1].SetActive(false);
+                _toggleGameObjects[0].SetActive(true);
                 _sessionManager.JokerManager.DeactivateJoker();
                 tilePreview._tileJokerAnimator.StopIdleJokerAnimation();
                 tilePreviewUITileJokerAnimator.StopIdleJokerAnimation();

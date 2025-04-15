@@ -62,6 +62,13 @@ namespace TerritoryWars.General
 
         private void Update()
         {
+            #if UNITY_EDITOR
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    StartTilePlacement(new TileData("FFFF"));
+                }
+            #endif
+            
             if (Input.GetMouseButtonDown(0))
             {
                 if (EventSystem.current.IsPointerOverGameObject())
@@ -137,10 +144,16 @@ namespace TerritoryWars.General
             _currentValidPlacements = board.GetValidPlacements(currentTile);
             if (_currentValidPlacements.Count == 0)
             {
+                if (SessionManager.Instance.CurrentTurnPlayer.JokerCount > 0)
+                {
+                    gameUI.JokerButtonPulse(true);
+                }
+                
                 gameUI.SetActiveSkipButtonPulse(true);
                 // EndTilePlacement();
                 return;
             }
+            
 
             ShowPossiblePlacements(_currentValidPlacements);
             gameUI.SetEndTurnButtonActive(false);

@@ -303,6 +303,7 @@ namespace TerritoryWars.General
             }
             
             gameUI.SetActiveSkipButtonPulse(false);
+            gameUI.JokerButtonPulse(false);
             
             if (CurrentTurnPlayer == LocalPlayer)
             {
