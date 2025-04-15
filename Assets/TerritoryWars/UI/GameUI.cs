@@ -44,6 +44,7 @@ namespace TerritoryWars.UI
         [SerializeField] private Image _toggleSpriteRenderer;
         [SerializeField] private GameObject[] _toggleGameObjects;
         [SerializeField] private GameObject _toggleJokerButton;
+        [SerializeField] private GameObject[] _toggleJokerInfoGameObjects;
         [SerializeField] private CanvasGroup[] _togglersCanvasGroup;
         [SerializeField] private CanvasGroup _deckContainerCanvasGroup;
 
@@ -64,6 +65,7 @@ namespace TerritoryWars.UI
         
         private TweenerCore<Vector3,Vector3,VectorOptions> _skipButtonTween;
         private TweenerCore<Vector3,Vector3,VectorOptions> _jokerButtonTween;
+        
         private Vector3 _skipButtonScale;
         
         [SerializeField] private ArrowAnimations arrowAnimations;
@@ -244,10 +246,16 @@ namespace TerritoryWars.UI
             if (isActive)
             {
                 _toggleJokerButton.transform.localScale = Vector3.one;
+                _toggleJokerInfoGameObjects[0].transform.localScale = Vector3.one;
+                _toggleJokerInfoGameObjects[1].transform.localScale = Vector3.one;
                 _jokerButtonTween = _toggleJokerButton.transform.DOScale(_toggleJokerButton.transform.localScale.x * 1.1f, 0.8f).SetLoops(-1, LoopType.Yoyo);
+                _toggleJokerInfoGameObjects[0].transform.DOScale(_toggleJokerInfoGameObjects[0].transform.localScale.x * 1.1f, 0.8f).SetLoops(-1, LoopType.Yoyo);
+                _toggleJokerInfoGameObjects[1].transform.DOScale(_toggleJokerInfoGameObjects[1].transform.localScale.x * 1.1f, 0.8f).SetLoops(-1, LoopType.Yoyo);
             }
             else
             {
+                _toggleJokerInfoGameObjects[0].transform.DOKill();
+                _toggleJokerInfoGameObjects[1].transform.DOKill();
                 _jokerButtonTween?.Kill();
                 _toggleJokerButton.transform.localScale = Vector3.one;
             }
