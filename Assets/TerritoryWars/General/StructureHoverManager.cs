@@ -222,7 +222,6 @@ namespace TerritoryWars.General
         private void HoverExit()
         {
             if (!isHovered) return;
-            Board board = SessionManager.Instance.Board;
             foreach (var tilePart in _hoveredTilesParts)
             {
                 if (isCity)
@@ -243,32 +242,32 @@ namespace TerritoryWars.General
 
         private Vector2Int tilePosition;
 
-        private void OnGUI()
-        {
-            GUIStyle style = new GUIStyle();
-            style.fontSize = 20;
-            style.normal.textColor = Color.white;
-            
-            Vector3 mousePosition = Input.mousePosition;
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            Vector2Int boardPosition = tilePosition;
-            
-            float screenHeight = Screen.height;
-            float startY = screenHeight / 2 - 120; // Починаємо з центру мінус половина висоти тексту
-            
-            GUI.Label(new Rect(10, startY, 300, 30), $"Mouse Screen: {mousePosition.x:F0}, {mousePosition.y:F0}", style);
-            GUI.Label(new Rect(10, startY + 30, 300, 30), $"Mouse World: {worldPosition.x:F2}, {worldPosition.y:F2}", style);
-            GUI.Label(new Rect(10, startY + 60, 300, 30), $"Board Position: {boardPosition.x}, {boardPosition.y}", style);
-            GUI.Label(new Rect(10, startY + 90, 300, 30), $"Hovered: {isHovered}", style);
-            GUI.Label(new Rect(10, startY + 120, 300, 30), $"Is City: {isCity}", style);
-            GUI.Label(new Rect(10, startY + 150, 300, 30), $"Hovered Tiles Count: {_hoveredTiles.Count}", style);
-            
-            float yOffset = startY + 180;
-            foreach (var tile in _hoveredTiles)
-            {
-                GUI.Label(new Rect(10, yOffset, 300, 30), $"Tile: {tile.Key.x}, {tile.Key.y} Side: {tile.Value}", style);
-                yOffset += 30;
-            }
-        }
+        // private void OnGUI()
+        // {
+        //     GUIStyle style = new GUIStyle();
+        //     style.fontSize = 20;
+        //     style.normal.textColor = Color.white;
+        //     
+        //     Vector3 mousePosition = Input.mousePosition;
+        //     Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+        //     Vector2Int boardPosition = tilePosition;
+        //     
+        //     float screenHeight = Screen.height;
+        //     float startY = screenHeight / 2 - 120; // Починаємо з центру мінус половина висоти тексту
+        //     
+        //     GUI.Label(new Rect(10, startY, 300, 30), $"Mouse Screen: {mousePosition.x:F0}, {mousePosition.y:F0}", style);
+        //     GUI.Label(new Rect(10, startY + 30, 300, 30), $"Mouse World: {worldPosition.x:F2}, {worldPosition.y:F2}", style);
+        //     GUI.Label(new Rect(10, startY + 60, 300, 30), $"Board Position: {boardPosition.x}, {boardPosition.y}", style);
+        //     GUI.Label(new Rect(10, startY + 90, 300, 30), $"Hovered: {isHovered}", style);
+        //     GUI.Label(new Rect(10, startY + 120, 300, 30), $"Is City: {isCity}", style);
+        //     GUI.Label(new Rect(10, startY + 150, 300, 30), $"Hovered Tiles Count: {_hoveredTiles.Count}", style);
+        //     
+        //     float yOffset = startY + 180;
+        //     foreach (var tile in _hoveredTiles)
+        //     {
+        //         GUI.Label(new Rect(10, yOffset, 300, 30), $"Tile: {tile.Key.x}, {tile.Key.y} Side: {tile.Value}", style);
+        //         yOffset += 30;
+        //     }
+        // }
     }
 }

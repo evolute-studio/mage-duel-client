@@ -259,6 +259,7 @@ namespace TerritoryWars.UI
                 DojoGameManager.Instance.CustomSynchronizationMaster.DestroyAllGames();
                 DojoGameManager.Instance.WorldManager.synchronizationMaster.OnEventMessage.RemoveListener(OnEventMessage);
                 ClearAllListItems();
+                CursorManager.Instance.SetCursor("default");
             }
         }
     }

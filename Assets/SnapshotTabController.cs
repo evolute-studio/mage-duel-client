@@ -133,6 +133,7 @@ public class SnapshotTabController : MonoBehaviour
                 DojoGameManager.Instance.CustomSynchronizationMaster.DestroyAllSnapshots();
                 IncomingModelsFilter.OnModelPassed.RemoveListener(ModelUpdated);
                 ClearAllListItems();
+                CursorManager.Instance.SetCursor("default");
             }
         }
     
