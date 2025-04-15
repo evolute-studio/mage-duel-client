@@ -1274,6 +1274,7 @@ GameObject:
   - component: {fileID: 1226731877}
   - component: {fileID: 1226731876}
   - component: {fileID: 1226731875}
+  - component: {fileID: 1226731878}
   m_Layer: 5
   m_Name: CancelButton
   m_TagString: Untagged
@@ -1383,6 +1384,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1226731873}
   m_CullTransparentMesh: 1
+--- !u!114 &1226731878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226731873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a43edcbda0334476b440977c0127c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorType: pointer
 --- !u!1 &1261583744
 GameObject:
   m_ObjectHideFlags: 0
