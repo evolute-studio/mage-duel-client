@@ -547,6 +547,25 @@ namespace TerritoryWars.Dojo
             return new KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>>();
         }
         
+        public KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>> GetCityByPosition(byte position)
+        {
+            BuildCitySets();
+            foreach (var set in cities)
+            {
+                foreach (var node in set.Value)
+                {
+                    INode iNode = node as INode;
+                    if (iNode == null) continue;
+                    byte nodePosition = iNode.GetPosition();
+                    if (nodePosition == position)
+                    {
+                        return set;
+                    }
+                }
+            }
+            return new KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>>();
+        }
+        
         public KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>> GetRoadByPosition(Vector2Int position)
         {
             byte[] roots = OnChainBoardDataConverter.GetRootsByPosition(position);

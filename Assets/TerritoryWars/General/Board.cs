@@ -522,6 +522,27 @@ namespace TerritoryWars.General
         {
             return x == 0 || x == width - 1 || y == 0 || y == height - 1;
         }
+
+        public (Vector2Int, Side) GetNeighborPositionAndSideToEdgeTile(int x, int y)
+        {
+            if (x == 0)
+            {
+                return (new Vector2Int(1, y), Side.Bottom);
+            }
+            else if (x == width - 1)
+            {
+                return (new Vector2Int(width - 2, y), Side.Top);
+            }
+            else if (y == 0)
+            {
+                return (new Vector2Int(x, 1), Side.Right);
+            }
+            else if (y == height - 1)
+            {
+                return (new Vector2Int(x, height - 2), Side.Left);
+            }
+            return (new Vector2Int(-1, -1), Side.None);
+        }
         
         public bool CanPlaceTile(TileData tile, int x, int y)
         {
