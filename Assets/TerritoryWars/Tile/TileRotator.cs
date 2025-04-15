@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TerritoryWars.General;
 using TerritoryWars.ScriptablesObjects;
+using TerritoryWars.Tools;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -62,13 +63,17 @@ namespace TerritoryWars.Tile
             foreach (var spriteSwapElement in SpriteSwapElements)
             {
                 spriteSwapElement.Rotate();
-                var pinsParent = spriteSwapElement.PinObjects[spriteSwapElement.CurrentIndex];
-                Transform[] pins = new Transform[pinsParent.childCount];
-                for (int i = 0; i < pinsParent.childCount; i++)
+                if (spriteSwapElement.PinObjects != null && spriteSwapElement.PinObjects.Length > 0)
                 {
-                    pins[i] = pinsParent.GetChild(i);
+                    var pinsParent = spriteSwapElement.PinObjects[spriteSwapElement.CurrentIndex];
+                    Transform[] pins = new Transform[pinsParent.childCount];
+                    for (int i = 0; i < pinsParent.childCount; i++)
+                    {
+                        pins[i] = pinsParent.GetChild(i);
+                    }
+
+                    _tileParts.PinsPositions = pins;
                 }
-                _tileParts.PinsPositions = pins;
             }
 
             if (_tileParts.RoadRenderers != null)
@@ -189,6 +194,7 @@ namespace TerritoryWars.Tile
                 foreach (var spriteSwapElement in SpriteSwapElements)
                 {
                     spriteSwapElement.Rotate(times);
+                    CustomLogger.LogInfo($"Sprite swap element: {times} | Houses : {_tileParts.HouseRenderers.Count} | Roads: {_tileParts.RoadRenderers.Length}");
                     if (spriteSwapElement.PinObjects != null && spriteSwapElement.PinObjects.Length > 0)
                     {
                         var pinsParent = spriteSwapElement.PinObjects[spriteSwapElement.CurrentIndex];
@@ -205,6 +211,7 @@ namespace TerritoryWars.Tile
             
             if (_tileParts.RoadRenderers != null)
             {
+                CustomLogger.LogInfo($"Road renderers : {times} | Houses : {_tileParts.HouseRenderers.Count} | Roads: {_tileParts.RoadRenderers.Length}");
                 _tileParts.RoadRenderers = RotateRoadArray(_tileParts.RoadRenderers, times);
             }
 
@@ -294,17 +301,23 @@ namespace TerritoryWars.Tile
 
                 PinObjects[newIndex].gameObject.SetActive(true);
             }
-            
-            if (PolygonColliderSwapRules != null && PolygonColliderSwapRules.Length > 0 && PolygonCollider2D != null)
+
+            if (PolygonCollider2D != null)
             {
-                for (int i = 0; i < PolygonColliderSwapRules.Length; i++)
-                {
-                    if (i == newIndex)
-                    {
-                        PolygonCollider2D.points = PolygonColliderSwapRules[i].Points;
-                    }
-                }
+                MonoBehaviour.Destroy(PolygonCollider2D);
+                SpriteRenderer.gameObject.AddComponent<PolygonCollider2D>();
             }
+
+            // if (PolygonColliderSwapRules != null && PolygonColliderSwapRules.Length > 0 && PolygonCollider2D != null)
+            // {
+            //     for (int i = 0; i < PolygonColliderSwapRules.Length; i++)
+            //     {
+            //         if (i == newIndex)
+            //         {
+            //             PolygonCollider2D.points = PolygonColliderSwapRules[i].Points;
+            //         }
+            //     }
+            // }
         }
 
         public void SwapRoadForContest()
