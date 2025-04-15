@@ -218,24 +218,24 @@ namespace TerritoryWars.UI
         {
             if (active)
             {
-                _togglersCanvasGroup[0].alpha = 0.5f;
-                _togglersCanvasGroup[0].DOFade(1, 0.5f);
-                _togglersCanvasGroup[1].alpha = 0.5f;
-                _togglersCanvasGroup[1].DOFade(1, 0.5f);
-                // _deckContainerCanvasGroup.alpha = 0.5f;
-                // _deckContainerCanvasGroup.DOFade(1, 0.5f);
+                // _togglersCanvasGroup[0].alpha = 0.5f;
+                // _togglersCanvasGroup[0].DOFade(1, 0.5f);
+                // _togglersCanvasGroup[1].alpha = 0.5f;
+                // _togglersCanvasGroup[1].DOFade(1, 0.5f);
+                _deckContainerCanvasGroup.alpha = 0.33f;
+                _deckContainerCanvasGroup.DOFade(1, 0.5f);
                 jokerButton.interactable = true;
                 deckButton.interactable = true;
                 
             }
             else
             {
-                _togglersCanvasGroup[0].alpha = 1f;
-                _togglersCanvasGroup[0].DOFade(0.5f, 0.5f);
-                _togglersCanvasGroup[1].alpha = 1f;
-                _togglersCanvasGroup[1].DOFade(0.5f, 0.5f);
-                // _deckContainerCanvasGroup.alpha = 1;
-                // _deckContainerCanvasGroup.DOFade(0.5f, 0.5f);
+                // _togglersCanvasGroup[0].alpha = 1f;
+                // _togglersCanvasGroup[0].DOFade(0.5f, 0.5f);
+                // _togglersCanvasGroup[1].alpha = 1f;
+                // _togglersCanvasGroup[1].DOFade(0.5f, 0.5f);
+                _deckContainerCanvasGroup.alpha = 1;
+                _deckContainerCanvasGroup.DOFade(0.33f, 0.5f);
                 jokerButton.interactable = false;
                 deckButton.interactable = false;
             }
