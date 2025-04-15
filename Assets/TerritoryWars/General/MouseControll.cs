@@ -62,8 +62,10 @@ namespace TerritoryWars.General
                 if (isDragging)
                 {
                     Vector3 delta = touch.position - (Vector2)lastMousePosition;
-                    Vector3 move = new Vector3(-delta.x, -delta.y, 0) * panSpeed * Time.deltaTime;
-                    move *= _camera.orthographicSize / 5f;
+                    // Конвертуємо дельту з екранних координат у світові
+                    Vector3 worldDelta = _camera.ScreenToWorldPoint(touch.position) - 
+                                       _camera.ScreenToWorldPoint(lastMousePosition);
+                    Vector3 move = -worldDelta;
 
                     Vector3 newPosition = transform.position + move;
                     newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
@@ -86,8 +88,10 @@ namespace TerritoryWars.General
             if (isDragging && Input.touchCount == 0) // ПК управління
             {
                 Vector3 delta = Input.mousePosition - lastMousePosition;
-                Vector3 move = new Vector3(-delta.x, -delta.y, 0) * panSpeed * Time.deltaTime;
-                move *= _camera.orthographicSize / 5f;
+                // Конвертуємо дельту з екранних координат у світові
+                Vector3 worldDelta = _camera.ScreenToWorldPoint(Input.mousePosition) - 
+                                   _camera.ScreenToWorldPoint(lastMousePosition);
+                Vector3 move = -worldDelta;
 
                 Vector3 newPosition = transform.position + move;
                 newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
