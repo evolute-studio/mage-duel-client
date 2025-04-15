@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Numerics;
 using TerritoryWars.Dojo;
 using TerritoryWars.Models;
 using TerritoryWars.ModelsDataConverters;
@@ -6,6 +7,8 @@ using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using UnityEngine;
 using UnityEngine.UI;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 namespace TerritoryWars.General
 {
@@ -23,10 +26,13 @@ namespace TerritoryWars.General
         
         private StructureHoverPanel structureHoverPanel;
         [SerializeField] private float _offsetY = 0;
+        private float _defaultOrthoSize = 5f;
+        private float _initialPanelScale = 1.2f;
         
         public void Start()
         {
             structureHoverPanel = Instantiate(PrefabsManager.Instance.StructureHoverPrefab, Canvas).GetComponent<StructureHoverPanel>();
+            _initialPanelScale = structureHoverPanel.transform.localScale.x;
             structureHoverPanel.gameObject.SetActive(false);
         }
         
@@ -69,8 +75,12 @@ namespace TerritoryWars.General
             
             Vector3 mousePosition = Input.mousePosition;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            Vector3 panelPosition = new Vector3(worldPosition.x, worldPosition.y + _offsetY, 0);
+            float ratio = Camera.main.orthographicSize / _defaultOrthoSize * 1.2f;
+            float y = worldPosition.y + _offsetY * ratio;
+            Vector3 panelPosition = new Vector3(worldPosition.x, y, 0);
             structureHoverPanel.transform.position = panelPosition;
+            Vector3 localScale = Vector3.one  / (_initialPanelScale * ratio);
+            structureHoverPanel.transform.localScale = localScale.x < _initialPanelScale ? Vector3.one * _initialPanelScale : localScale;
         }
 
         private bool IsNewStructure(RaycastHit2D[] hits)

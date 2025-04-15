@@ -107,6 +107,7 @@ namespace TerritoryWars.General
             if (!_isMainCamera)
             {
                 _camera.orthographicSize = _mainCamera.orthographicSize;
+                _camera.transform.position = _mainCamera.transform.position;
                 return;
             }
 

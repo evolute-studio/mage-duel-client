@@ -97,8 +97,8 @@ namespace TerritoryWars.Dojo
                 if(_boardInProgress != null) return _boardInProgress;
                 evolute_duel_Board board = WorldManager.Entities<evolute_duel_Board>()
                     .FirstOrDefault(b =>
-                        b.GetComponent<evolute_duel_Board>().player1.Item1.Hex() == LocalBurnerAccount.Address.Hex() ||
-                        b.GetComponent<evolute_duel_Board>().player2.Item1.Hex() == LocalBurnerAccount.Address.Hex())?
+                        b.GetComponent<evolute_duel_Board>()?.player1.Item1?.Hex() == LocalBurnerAccount.Address.Hex() ||
+                        b.GetComponent<evolute_duel_Board>()?.player2.Item1?.Hex() == LocalBurnerAccount.Address.Hex())?
                     .GetComponent<evolute_duel_Board>();
                 if (board == null)
                 {
