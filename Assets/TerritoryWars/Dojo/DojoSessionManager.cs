@@ -569,6 +569,25 @@ namespace TerritoryWars.Dojo
             }
             return new KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>>();
         }
+        
+        public KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>> GetRoadByPosition(byte position)
+        {
+            BuildRoadSets();
+            foreach (var set in roads)
+            {
+                foreach (var node in set.Value)
+                {
+                    INode iNode = node as INode;
+                    if (iNode == null) continue;
+                    byte nodePosition = iNode.GetPosition();
+                    if (nodePosition == position)
+                    {
+                        return set;
+                    }
+                }
+            }
+            return new KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>>();
+        }
 
         private (Vector2Int, Side) GetNearTileSide(Vector2Int position, Side side)
         {

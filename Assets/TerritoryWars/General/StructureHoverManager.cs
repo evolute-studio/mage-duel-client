@@ -151,16 +151,16 @@ namespace TerritoryWars.General
             TileParts tileParts = objTransform.transform.parent.GetComponent<TileParts>();
             Side hoveredSide = tileParts.GetRoadSideByObject(objTransform.gameObject);
             int roadCount = tileParts.GetRoadCount();
-            if (roadCount > 2) return;
+            //if (roadCount > 2) return;
             tilePosition = SessionManager.Instance.Board.GetPositionByObject(parent.gameObject);
+            byte rootPosition = OnChainBoardDataConverter.GetRootByPositionAndSide(tilePosition, hoveredSide);
             if(SessionManager.Instance.Board.IsEdgeTile(tilePosition.x, tilePosition.y)) return;
-            var roadDict = DojoGameManager.Instance.SessionManager.GetRoadByPosition(tilePosition);
+            var roadDict = DojoGameManager.Instance.SessionManager.GetRoadByPosition(rootPosition);
             if (roadDict.Key == null) return;
             _structureRoot = roadDict.Key;
             foreach (var road in roadDict.Value)
             {
                 (Vector2Int structurePosition, Side side) = OnChainBoardDataConverter.GetPositionAndSide(road.position);
-                side = roadCount > 2 ? hoveredSide : side;
                 KeyValuePair<Vector2Int, Side> keyValuePair = new KeyValuePair<Vector2Int, Side>(structurePosition, side);
                 if (_hoveredTiles.Contains(keyValuePair)) continue;
                 

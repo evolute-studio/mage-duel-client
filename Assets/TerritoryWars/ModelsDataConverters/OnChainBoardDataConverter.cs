@@ -204,10 +204,10 @@ namespace TerritoryWars.ModelsDataConverters
             return (position, side);
         }
         
-        public static int GetRootByPositionAndSide(Vector2Int position, Side side)
+        public static byte GetRootByPositionAndSide(Vector2Int position, Side side)
         {
             byte root = GetRootByPosition(position);
-            return root + ((byte)side + 1) % 4; 
+            return (byte)(root + ((byte)side + 1) % 4); 
         }
         
         public static int WhoPlaceTile(evolute_duel_Board board, Vector2Int position)
