@@ -67,6 +67,50 @@ namespace TerritoryWars.Dojo
         
         public UnityEvent OnLocalPlayerSet = new UnityEvent();
 
+        private evolute_duel_Game _gameInProgress;
+        private evolute_duel_Board _boardInProgress;
+        
+        public evolute_duel_Game GameInProgress
+        {
+            get
+            {
+                if(_gameInProgress != null) return _gameInProgress;
+                evolute_duel_Game game = WorldManager.Entities<evolute_duel_Game>()
+                    .FirstOrDefault(g =>
+                        g.GetComponent<evolute_duel_Game>().player.Hex() == LocalBurnerAccount.Address.Hex())?
+                    .GetComponent<evolute_duel_Game>();
+                if (game == null)
+                {
+                    CustomLogger.LogError("Game not found");
+                    return null;
+                }
+                _gameInProgress = game;
+                return game;
+            }
+            set => _gameInProgress = value;
+        }
+        
+        public evolute_duel_Board BoardInProgress
+        {
+            get
+            {
+                if(_boardInProgress != null) return _boardInProgress;
+                evolute_duel_Board board = WorldManager.Entities<evolute_duel_Board>()
+                    .FirstOrDefault(b =>
+                        b.GetComponent<evolute_duel_Board>().player1.Item1.Hex() == LocalBurnerAccount.Address.Hex() ||
+                        b.GetComponent<evolute_duel_Board>().player2.Item1.Hex() == LocalBurnerAccount.Address.Hex())?
+                    .GetComponent<evolute_duel_Board>();
+                if (board == null)
+                {
+                    CustomLogger.LogError("Board not found");
+                    return null;
+                }
+                _boardInProgress = board;
+                return board;
+            }
+            set => _boardInProgress = value;
+        }
+
 
         public void SetupMasterAccount(Action callback)
         {
@@ -139,7 +183,7 @@ namespace TerritoryWars.Dojo
         {
             CustomLogger.LogDojoLoop("SyncEverythingForGame");
             await CustomSynchronizationMaster.SyncPlayerInProgressGame(LocalBurnerAccount.Address);
-            evolute_duel_Game game = WorldManager.Entities<evolute_duel_Game>().FirstOrDefault()?.GetComponent<evolute_duel_Game>();
+            evolute_duel_Game game = GameInProgress;
             FieldElement boardId = game.board_id switch
             {
                 Option<FieldElement>.Some some => some.value,
@@ -149,7 +193,7 @@ namespace TerritoryWars.Dojo
             CustomLogger.LogDojoLoop("SyncEverythingForGame. BoardId: " + boardId.Hex());
             int count = await CustomSynchronizationMaster.SyncBoardWithDependencies(boardId);
             CustomLogger.LogInfo("Board synced: " + WorldManager.Entities<evolute_duel_Board>().Length);
-            evolute_duel_Board board = WorldManager.Entities<evolute_duel_Board>().FirstOrDefault()?.GetComponent<evolute_duel_Board>();
+            evolute_duel_Board board = BoardInProgress;
             FieldElement[] players = new FieldElement[] { board.player1.Item1, board.player2.Item1 };
             IncomingModelsFilter.SetSessionPlayers(players.Select(p => p.Hex()).ToList());
             await CustomSynchronizationMaster.SyncPlayersArray(players);
@@ -167,7 +211,12 @@ namespace TerritoryWars.Dojo
             GameObject[] games = WorldManager.Entities<evolute_duel_Game>();
             if (games.Length > 0)
             {
-                evolute_duel_Game game = games[0].GetComponent<evolute_duel_Game>();
+                evolute_duel_Game game = GameInProgress;
+                if (game == null)
+                {
+                    CustomLogger.LogError("Failed to load game model");
+                    return false;
+                }
                 var player = await CustomSynchronizationMaster.WaitForModelByPredicate<evolute_duel_Player>(
                     p => p.player_id.Hex() == game.player.Hex()
                 );
@@ -191,7 +240,7 @@ namespace TerritoryWars.Dojo
 
         public void LoadGame()
         {
-            GameObject boardObject = WorldManager.Entities<evolute_duel_Board>().FirstOrDefault();
+            GameObject boardObject = BoardInProgress?.gameObject;
             CustomLogger.LogInfo($"LoadGame. Board object: {boardObject}");
             // it's mean that player has an in progress game, so load the session
             if (boardObject != null)
