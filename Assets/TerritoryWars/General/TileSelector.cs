@@ -62,13 +62,6 @@ namespace TerritoryWars.General
 
         private void Update()
         {
-            #if UNITY_EDITOR
-                if (Input.GetKeyDown(KeyCode.Escape))
-                {
-                    StartTilePlacement(new TileData("FFFF"));
-                }
-            #endif
-            
             if (Input.GetMouseButtonDown(0))
             {
                 if (EventSystem.current.IsPointerOverGameObject())
