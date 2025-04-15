@@ -302,6 +302,8 @@ namespace TerritoryWars.General
                 return;
             }
             
+            gameUI.SetActiveSkipButtonPulse(false);
+            
             if (CurrentTurnPlayer == LocalPlayer)
             {
                 StartLocalTurn();
@@ -310,8 +312,6 @@ namespace TerritoryWars.General
             {
                 StartRemoteTurn();
             }
-            
-            gameUI.SetActiveSkipButtonPulse(false);
         }
 
         private void StartLocalTurn()
