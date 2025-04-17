@@ -17,5 +17,11 @@ namespace TerritoryWars.ExternalConnections
             Application.ExternalEval("location.reload();");
 #endif
         }
+        
+        public static void OpenURL(string url){
+#if UNITY_WEBGL && !UNITY_EDITOR
+            Application.ExternalEval($"window.open('{url}', '_blank');");
+#endif
+        }
     }
 }
