@@ -46,6 +46,7 @@ namespace TerritoryWars.General
         
         public delegate void LoadSceneEvent(string name);
         public event LoadSceneEvent OnLoadScene;
+        private Coroutine _loadingCoroutine;
 
         
         public void LoadLobby(Action startAction = null, Action finishAction = null)
@@ -57,7 +58,7 @@ namespace TerritoryWars.General
 
         public void LoadSession(Action startAction = null, Action finishAction = null)
         {
-            Debug.Log("LoadSession");
+            CursorManager.Instance.SetCursor("default");
             ApplicationState.SetState(ApplicationStates.Session);
             LoadSceneWithDealay(Session, startAction, finishAction);
         }
@@ -84,6 +85,14 @@ namespace TerritoryWars.General
         {
             if (_isLoading)
                 return;
+            StartCoroutine(LoadSceneAsync(name));
+        }
+        
+        public void ForceLoadScene(string name)
+        {
+            if (_isLoading) 
+                StopCoroutine(_loadingCoroutine);
+                
             StartCoroutine(LoadSceneAsync(name));
         }
         

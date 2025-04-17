@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -33,6 +34,20 @@ public sealed class Coroutines: MonoBehaviour
             return;
         }
         _instance.StopCoroutine(routine);
+    }
+    
+    public static async Task CoroutineAsync(Action action, float delay = 0f)
+    {
+        var tcs = new TaskCompletionSource<bool>();
+        StartRoutine(WaitForCoroutine(tcs, action, delay));
+        await tcs.Task;
+    }
+        
+    private static IEnumerator WaitForCoroutine(TaskCompletionSource<bool> tcs, Action action, float delay = 0f)
+    {
+        yield return new WaitForSeconds(delay);
+        action();
+        tcs.TrySetResult(true);
     }
     
     // Coroutine as async method

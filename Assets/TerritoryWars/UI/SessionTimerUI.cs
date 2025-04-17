@@ -1,4 +1,6 @@
 using System.Linq;
+using DG.Tweening;
+using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using TMPro;
@@ -12,8 +14,7 @@ namespace TerritoryWars.UI
         [Header("Turn text info")]
         public TextMeshProUGUI TurnText;
         public string LocalPlayerTurnText = "Your turn now";
-        [Tooltip(" @ - player name")]
-        public string OpponentPlayerTurnText = $"Waiting for @ turn";
+        public string OpponentPlayerTurnText = $"Waiting for opponent's turn";
         
         [Header("Hourglass")]
         public SpriteAnimator SpriteAnimator;
@@ -24,17 +25,18 @@ namespace TerritoryWars.UI
         
         [Header("Timer")]
         public TextMeshProUGUI TimerText;
-        public float TurnDuration = 120f;
-        private float _startTurnTime;
+        public TextMeshProUGUI SkipText;
+
+        public float TurnDuration => DojoSessionManager.TurnDuration;
+        private ulong _startTurnTime;
         private float _currentTurnTime => GetTurnTime();
         
         [Header("Events")]
         public UnityEvent OnLocalPlayerTurnEnd;
         public UnityEvent OnOpponentPlayerTurnEnd;
         
-        private bool _isLocalPlayerTurn => SessionManager.Instance.IsLocalPlayerTurn;
-        private bool _isTimerActive => _currentTurnTime > 0;
-        private string _opponentPlayerName = "opponent's";
+        private bool _isLocalPlayerTurn = true;
+        private bool _isTimerActive = false;
         
         
 
@@ -44,10 +46,20 @@ namespace TerritoryWars.UI
             UpdateTurnText();
         }
 
-        public void StartTurnTimer()
+        public void StartTurnTimer(ulong timestamp, bool isLocal)
         {
+            ShowSkipText(false);
             RotateHourglass();
-            _startTurnTime = Time.time;
+            CustomLogger.LogImportant("Start turn timer. Timestamp: " + timestamp + " _startTurnTime: " + _startTurnTime);
+            
+            // checking for the future
+            ulong currentTimestamp = (ulong) (System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
+            timestamp = timestamp > currentTimestamp ? currentTimestamp : timestamp;
+            timestamp = timestamp == 0 ? currentTimestamp : timestamp;
+            
+            _isLocalPlayerTurn = isLocal;
+            _startTurnTime = timestamp;
+            _isTimerActive = true;
             TimerText.color = Color.white;
         }
         
@@ -57,7 +69,7 @@ namespace TerritoryWars.UI
             
             TimerText.text = $"{Mathf.FloorToInt(_currentTurnTime / 60):00}:{Mathf.FloorToInt(_currentTurnTime % 60):00}";
 
-            if (_currentTurnTime <= TurnDuration / 4)
+            if (_currentTurnTime <= TurnDuration / 3f)
             {
                 TimerText.color = new Color(0.866f, 0.08f, 0.236f);
             }
@@ -71,24 +83,56 @@ namespace TerritoryWars.UI
         
         private float GetTurnTime()
         {
-            float turnTime = TurnDuration - (Time.time - _startTurnTime);
+            ulong unixTimestamp = (ulong) (System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
+            float turnTime = TurnDuration - (unixTimestamp - _startTurnTime);
+            if (turnTime < 0.1f)
+            {
+                turnTime = 0;
+            }
             return turnTime < 0 ? 0 : turnTime;
         }
         
         private void EndTimer()
         {
+            _isTimerActive = false;
             CustomLogger.LogInfo("End timer");
             if (_isLocalPlayerTurn)
             {
                 CustomLogger.LogInfo("Local player turn end");
                 OnLocalPlayerTurnEnd?.Invoke();
+                ShowSkipText(true);
             }
             else
             {
                 CustomLogger.LogInfo("Opponent player turn end");
                 OnOpponentPlayerTurnEnd?.Invoke();
+                ShowSkipText(true);
             }
             
+        }
+
+        public void ShowSkipText(bool isActive)
+        {
+            if (isActive)
+            {
+                Sequence sequence = DOTween.Sequence();
+                Color skipTextColor = SkipText.color;
+                skipTextColor.a = 0f;
+                SkipText.color = skipTextColor;
+                SkipText.gameObject.SetActive(true);
+                sequence.Append(SkipText.DOFade(1f, 0.5f));
+                sequence.AppendInterval(5f);
+                sequence.Append(SkipText.DOFade(0f, 0.5f)).OnComplete(() =>
+                {
+                    SkipText.gameObject.SetActive(false);
+                });
+                
+                sequence.Play();
+            }
+            else
+            {
+                SkipText.gameObject.SetActive(false);
+            }
         }
         
         private void RotateHourglass()
@@ -104,16 +148,7 @@ namespace TerritoryWars.UI
         
         private void UpdateTurnText()
         {
-            string baseText;
-            if (_isLocalPlayerTurn)
-            {
-                baseText = LocalPlayerTurnText;
-            }
-            else
-            {
-                baseText = OpponentPlayerTurnText.Replace("@", _opponentPlayerName);
-            }
-            
+            string baseText = _isLocalPlayerTurn ? LocalPlayerTurnText : OpponentPlayerTurnText;
             int visibleDots = 3 - ((int)(_currentTurnTime % 3));
             string dots = string.Join("", new string[3].Select((_, index) => 
                 $"<color=#{(index < visibleDots ? "FFFFFFFF" : "FFFFFF00")}>.</color>"));

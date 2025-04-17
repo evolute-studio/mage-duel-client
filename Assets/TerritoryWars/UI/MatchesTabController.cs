@@ -238,11 +238,11 @@ namespace TerritoryWars.UI
         
         public async void SetActivePanel(bool isActive)
         {
-            if (isActive && MenuUIController.Instance._namePanelController.IsDefaultName())
-            {
-                MenuUIController.Instance._changeNamePanelUIController.SetNamePanelActive(true);
-                return;
-            }
+            // if (isActive && MenuUIController.Instance._namePanelController.IsDefaultName())
+            // {
+            //     MenuUIController.Instance._changeNamePanelUIController.SetNamePanelActive(true);
+            //     return;
+            // }
             
             
             PanelGameObject.SetActive(isActive);
@@ -259,6 +259,7 @@ namespace TerritoryWars.UI
                 DojoGameManager.Instance.CustomSynchronizationMaster.DestroyAllGames();
                 DojoGameManager.Instance.WorldManager.synchronizationMaster.OnEventMessage.RemoveListener(OnEventMessage);
                 ClearAllListItems();
+                CursorManager.Instance.SetCursor("default");
             }
         }
     }

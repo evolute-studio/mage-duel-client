@@ -44,7 +44,6 @@ namespace TerritoryWars.ModelsDataConverters
     
         public static string GetTopTile(Option<byte> top_tile)
         {
-            CustomLogger.LogInfo("Get top tile.");
             var type = top_tile switch
             {
                 Option<byte>.Some someValue => someValue.value.ToString(),
@@ -190,6 +189,14 @@ namespace TerritoryWars.ModelsDataConverters
             return (byte)(tile * 4);
         }
         
+        public static byte[] GetRootsByPosition(Vector2Int position)
+        {
+            int x = position.x - 1;
+            int y = position.y - 1;
+            int tile = x * 8 + y;
+            return new byte[] { (byte)(tile * 4), (byte)(tile * 4 + 1), (byte)(tile * 4 + 2), (byte)(tile * 4 + 3) };
+        }
+        
         public static (Vector2Int, Side) GetPositionAndSide(byte root)
         {
             Vector2Int position = GetPositionByRoot(root);
@@ -197,10 +204,10 @@ namespace TerritoryWars.ModelsDataConverters
             return (position, side);
         }
         
-        public static int GetRootByPositionAndSide(Vector2Int position, Side side)
+        public static byte GetRootByPositionAndSide(Vector2Int position, Side side)
         {
             byte root = GetRootByPosition(position);
-            return root + ((byte)side + 1) % 4; 
+            return (byte)(root + ((byte)side + 1) % 4); 
         }
         
         public static int WhoPlaceTile(evolute_duel_Board board, Vector2Int position)

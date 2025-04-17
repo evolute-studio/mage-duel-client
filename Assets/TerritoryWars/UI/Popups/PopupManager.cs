@@ -1,3 +1,5 @@
+using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using UnityEngine;
@@ -53,6 +55,63 @@ namespace TerritoryWars.UI.Popups
                     MenuUIController.Instance.NewAccount();
                 }
             };
+            MessagePopup.Setup(popupConfig);
+            MessagePopup.SetActive(true);
+        }
+
+        public void ShowInvalidMovePopup()
+        {
+            PopupConfig popupConfig = new PopupConfig
+            {
+                Text = "[Invalid move]\nPlease reload the page or cancel the game",
+                FirstOptionText = "Reload",
+                FirstOptionAction = JSBridge.ReloadPage,
+                SecondOptionText = "Cancel game",
+                SecondOptionAction = () =>
+                {
+                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+                    CustomSceneManager.Instance.LoadLobby();
+                }
+            };
+            
+            MessagePopup.Setup(popupConfig);
+            MessagePopup.SetActive(true);
+        }
+
+        public void ShowCantFinishGamePopup()
+        {
+            PopupConfig popupConfig = new PopupConfig
+            {
+                Text = "[Cannot finish game]\nPlease reload the page or cancel the game",
+                FirstOptionText = "Reload",
+                FirstOptionAction = JSBridge.ReloadPage,
+                SecondOptionText = "Cancel game",
+                SecondOptionAction = () =>
+                {
+                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+                    CustomSceneManager.Instance.LoadLobby();
+                }
+            };
+            
+            MessagePopup.Setup(popupConfig);
+            MessagePopup.SetActive(true);
+        }
+
+        public void NotYourTurnPopup()
+        {
+            PopupConfig popupConfig = new PopupConfig
+            {
+                Text = "[Not your turn]\nPlease reload the page or cancel the game",
+                FirstOptionText = "Reload",
+                FirstOptionAction = JSBridge.ReloadPage,
+                SecondOptionText = "Cancel game",
+                SecondOptionAction = () =>
+                {
+                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+                    CustomSceneManager.Instance.LoadLobby();
+                }
+            };
+            
             MessagePopup.Setup(popupConfig);
             MessagePopup.SetActive(true);
         }

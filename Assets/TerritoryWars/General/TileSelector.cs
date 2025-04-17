@@ -62,13 +62,20 @@ namespace TerritoryWars.General
 
         private void Update()
         {
+            // #if UNITY_EDITOR
+            // if (Input.GetKeyDown(KeyCode.Escape))
+            // {
+            //     StartTilePlacement(new TileData("FFFF"));
+            // }
+            // #endif
+            
             if (Input.GetMouseButtonDown(0))
             {
                 if (EventSystem.current.IsPointerOverGameObject())
                 {
                     return;
                 }
-                
+
 
                 if (isPlacingTile)// && SessionManager.Instance.IsLocalPlayerTurn)
                 {
@@ -126,7 +133,6 @@ namespace TerritoryWars.General
 
         public void StartTilePlacement(TileData tile)
         {
-            CustomLogger.LogWarning("StartTilePlacement Simple");
             GameUI.Instance.SetEndTurnButtonActive(false);
             tilePreview.ResetPosition();
             tilePreview.UpdatePreview(tile);
@@ -138,9 +144,16 @@ namespace TerritoryWars.General
             _currentValidPlacements = board.GetValidPlacements(currentTile);
             if (_currentValidPlacements.Count == 0)
             {
-                EndTilePlacement();
+                if (SessionManager.Instance.CurrentTurnPlayer.JokerCount > 0)
+                {
+                    gameUI.JokerButtonPulse(true);
+                }
+                
+                gameUI.SetActiveSkipButtonPulse(true);
+                // EndTilePlacement();
                 return;
             }
+            
 
             ShowPossiblePlacements(_currentValidPlacements);
             gameUI.SetEndTurnButtonActive(false);
@@ -164,8 +177,8 @@ namespace TerritoryWars.General
             var highlightUpperBorder = new GameObject("HighlightUpperBorder");
             highlight.transform.SetParent(highlightedTiles.transform);
             highlightUpperBorder.transform.SetParent(highlight.transform);
-            highlight.transform.position = board.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
-            highlightUpperBorder.transform.position = board.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
+            highlight.transform.position = Board.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
+            highlightUpperBorder.transform.position = Board.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
             
 
             var spriteRenderer = highlight.AddComponent<SpriteRenderer>();
@@ -493,7 +506,6 @@ namespace TerritoryWars.General
 
         public void StartJokerPlacement()
         {
-            CustomLogger.LogWarning("StartTilePlacement Joker");
             GameUI.Instance.SetEndTurnButtonActive(false);
             tilePreview.ResetPosition();
             

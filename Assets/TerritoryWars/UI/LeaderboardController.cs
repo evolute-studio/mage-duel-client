@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using Dojo;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.UI;
@@ -56,6 +58,10 @@ public class LeaderboardController : MonoBehaviour
         {
             ClearAllListItems();
             FetchData();
+        }
+        else
+        {
+            CursorManager.Instance.SetCursor("default");
         }
     }
 
@@ -133,6 +139,8 @@ public class LeaderboardItem
         private TextMeshProUGUI _placeText;
         private Image _leaderPlaceImage;
         private Button _copyButton;
+        private GameObject _copyDiscribeGameObject;
+        private bool isAnimationPlaying = false;
 
         public LeaderboardItem(GameObject listItem)
         {
@@ -144,6 +152,7 @@ public class LeaderboardItem
             _addressText = leaderboardObjects.Address;
             _placeText = leaderboardObjects.PlaceText;
             _copyButton = leaderboardObjects.CopyButton;
+            _copyDiscribeGameObject = leaderboardObjects.CopyDiscribeGameObject;
             _copyButton.onClick.AddListener(CopyAddress);
         }
         
@@ -178,9 +187,23 @@ public class LeaderboardItem
         public void CopyAddress()
         {
             #if UNITY_WEBGL && !UNITY_EDITOR
-            Application.ExternalEval($"navigator.clipboard.writeText('{Address}')");
+            JSBridge.CopyValue(Address);
             #else
             GUIUtility.systemCopyBuffer = Address;
             #endif
+
+            if (isAnimationPlaying) return;
+            
+            isAnimationPlaying = true;
+            _copyDiscribeGameObject.transform.position = new Vector3(_copyButton.gameObject.transform.position.x,
+                _copyButton.gameObject.transform.position.y + 0.3f, _copyButton.gameObject.transform.position.z);
+            
+            _copyDiscribeGameObject.SetActive(true);
+            _copyDiscribeGameObject.GetComponent<Transform>().DOMoveY(_copyButton.gameObject.transform.position.y + 1,
+                0.5f).OnComplete(() =>
+            {
+                _copyDiscribeGameObject.SetActive(false);
+                isAnimationPlaying = false;
+            });
         }
 }

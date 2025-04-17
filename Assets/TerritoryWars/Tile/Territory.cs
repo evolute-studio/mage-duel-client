@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using TerritoryWars.General;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TerritoryWars.Tile
 {
@@ -8,9 +10,10 @@ namespace TerritoryWars.Tile
         [Header("References")]
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private SpriteMask spriteMask;
-        [SerializeField] private SpriteRenderer fillTexture;
+        [SerializeField] public SpriteRenderer _spriteRenderer;
 
         [Header("Settings")]
+        [SerializeField] private Texture2D texture;
         [SerializeField] private int textureSize = 512;
         [SerializeField] private float lineWidth = 2f;
         [SerializeField] private Color fillColor = Color.white;
@@ -94,16 +97,22 @@ namespace TerritoryWars.Tile
             
             spriteMask.sprite = maskSprite;
             spriteMask.transform.localPosition = bounds.center;
+            
             // spriteMask.transform.localScale = new Vector3(maxSize, maxSize, 1);
 
             
-            if (fillTexture != null)
+            if (_spriteRenderer != null)
             {
-                fillTexture.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-                fillTexture.transform.localPosition = bounds.center;
-                fillTexture.transform.localScale = new Vector3(1.2f, 1.2f, 1);
-                fillTexture.color = fillColor;
+                _spriteRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+                _spriteRenderer.transform.localPosition = bounds.center;
+                _spriteRenderer.transform.localScale = new Vector3(1.2f, 1.2f, 1);
+                _spriteRenderer.color = fillColor;
             }
+        }
+
+        public void SetTexture(bool isContested)
+        {
+            _spriteRenderer.sprite = PrefabsManager.Instance.TileAssetsObject.GetCityGroundTexture(isContested);
         }
 
         private void DrawLine(Texture2D texture, Vector2 start, Vector2 end, Color color)

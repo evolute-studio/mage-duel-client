@@ -34,7 +34,7 @@ namespace TerritoryWars.Tile
 
         [Header("Territory")]
         [SerializeField] private GameObject territoryPrefab;
-        private Territory currentTerritory;
+        public Territory currentTerritory;
         
         public SpriteRenderer TerritorySpriteRenderer;
         
@@ -42,7 +42,7 @@ namespace TerritoryWars.Tile
         private bool isArcSpawned = false;
 
         [ContextMenu("Place Fence")]
-        public void PlaceTerritory()
+        public void PlaceTerritory(bool isContested)
         {
             if (fencePrefab == null || lineRenderer == null || lineRenderer.positionCount < 2)
             {
@@ -55,10 +55,10 @@ namespace TerritoryWars.Tile
                 DestroyImmediate(transform.GetChild(0).gameObject);
             }
 
-            StartCoroutine(PlaceFenceRoutine());
+            StartCoroutine(PlaceTerritoryRoutine(isContested));
         }
 
-        private IEnumerator PlaceFenceRoutine()
+        private IEnumerator PlaceTerritoryRoutine(bool isContested)
         {
             Vector3[] points = new Vector3[lineRenderer.positionCount];
             lineRenderer.GetPositions(points);
@@ -85,8 +85,8 @@ namespace TerritoryWars.Tile
             TerritorySpriteRenderer = currentTerritory.GetComponent<SpriteRenderer>();
             currentTerritory.SetLineRenderer(lineRenderer);
             currentTerritory.GenerateMask();
-
-           
+            currentTerritory.SetTexture(isContested);
+            
             if (arcIndex >= 0 && arcIndex < points.Length - 1 && !isArcSpawned)
             {
                 Vector3 arcPosition = Vector3.Lerp(points[arcIndex], points[arcIndex + 1], 0.5f);
@@ -103,6 +103,22 @@ namespace TerritoryWars.Tile
                 isArcSpawned = true;
                 //transform.parent.GetComponentInParent<TileRotator>().MirrorRotationObjects.Add(arc.transform);
             }
+            
+            // Додаємо PolygonCollider2D з використанням світових координат
+            var polygonCollider = currentTerritory.gameObject.AddComponent<PolygonCollider2D>();
+            Vector2[] colliderPoints = new Vector2[points.Length];
+            for (int i = 0; i < points.Length; i++)
+            {
+                // Конвертуємо локальні координати в світові
+                Vector3 scale = transform.localScale;
+                Vector3 point = new Vector3(points[i].x / scale.x, points[i].y / scale.y, 0);
+                Vector3 worldPoint = transform.TransformPoint(point);
+                colliderPoints[i] = new Vector2(worldPoint.x, worldPoint.y);
+            }
+            polygonCollider.points = colliderPoints;
+            polygonCollider.isTrigger = true;
+            polygonCollider.offset = new Vector2( -currentTerritory.transform.localPosition.x, -currentTerritory.transform.localPosition.y);
+            polygonCollider.gameObject.tag = "City";
 
            
         }

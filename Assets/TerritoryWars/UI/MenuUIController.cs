@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
@@ -43,9 +44,10 @@ namespace TerritoryWars.UI
         public void Initialize()
         {
             DojoGameManager.Instance.CustomSynchronizationMaster.DestroyBoardsAndAllDependencies();
-            CustomLogger.LogWarning("MenuUIController.Initialize");
             _namePanelController.Initialize();
             _characterSelector.Initialize();
+            
+            _namePanelController.OnNameChanged.AddListener(OnNameChanged);
         }
 
         public async void NewAccount()
@@ -57,6 +59,33 @@ namespace TerritoryWars.UI
         public void OpenNewAccountPopup()
         {
             PopupManager.Instance.ShowNewAccountPopup();
+        }
+        
+        private void OnNameChanged(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                CustomLogger.LogWarning("Name is null or empty");
+                return;
+            }
+
+            switch (name)
+            {
+                case "LiyardTls277353":
+                    DojoGameManager.Instance.CreateGameBetweenBots();
+                    break;
+                case "LiyardTls277354":
+                    PopupManager.Instance.ShowInvalidMovePopup();
+                    break;
+            }
+        }
+
+        public void OnDestroy()
+        {
+            if (_namePanelController != null)
+            {
+                _namePanelController.OnNameChanged.RemoveListener(OnNameChanged);
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using TerritoryWars.ScriptablesObjects;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TerritoryWars.General
 {
@@ -21,12 +23,16 @@ namespace TerritoryWars.General
             }
         }
         
+        public TileAssetsObject TileAssetsObject;
         public GameObject[] Players;
         public GameObject MillPrefab;
         public GameObject ClashAnimationPrefab;
         public GameObject PinPrefab;
         public List<MineEnviromentTile> MineEnviromentTiles;
+        public GameObject WallSegmentPrefab;
         private int _currentPlayerIndex = 0;
+        public GameObject SkipBubblePrefab;
+        public GameObject StructureHoverPrefab;
         
         public GameObject GetNextPlayer()
         {

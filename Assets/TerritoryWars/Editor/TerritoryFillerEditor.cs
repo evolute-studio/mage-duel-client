@@ -24,7 +24,7 @@ namespace TerritoryWars.Editor
             
             if (GUILayout.Button("Fill Territory"))
             {
-                territoryFiller.PlaceTerritory();
+                territoryFiller.PlaceTerritory(false);
             }
             
             EditorGUILayout.EndVertical();
