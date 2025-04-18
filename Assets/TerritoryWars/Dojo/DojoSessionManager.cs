@@ -29,6 +29,7 @@ namespace TerritoryWars.Dojo
 
         private int _snapshotTurn = 0;
         private FieldElement _lastMoveId;
+        private ContestProcessor _contestProcessor = new ContestProcessor();
 
         public evolute_duel_Move LastMove
         {
@@ -260,15 +261,19 @@ namespace TerritoryWars.Dojo
                                          SessionManager.Instance.RemotePlayer.Address.Hex() == hostPlayer.Hex();
             if (isCurrentBoard || isHostPlayerInSession)
             {
+                _contestProcessor.SetGameFinished(true);
+                SessionManager.Instance.StructureHoverManager.IsGameFinished = true;
                 CustomLogger.LogExecution($"[GameFinished]");
-                Coroutines.StartRoutine(GameFinishedDelayed());
-                CloseAllStructure();
+                FinishGameContests.FinishGameAction = () =>
+                {
+                    Coroutines.StartRoutine(GameFinishedDelayed());
+                };
             }
         }
 
         private IEnumerator GameFinishedDelayed()
         {
-            yield return new WaitForSeconds(6f);
+            yield return new WaitForSeconds(3f);
             SimpleStorage.ClearCurrentBoardId();
             GameUI.Instance.ShowResultPopUp();
         }
@@ -317,11 +322,13 @@ namespace TerritoryWars.Dojo
             };
             ushort red_points = eventModel.red_points;
             ushort blue_points = eventModel.blue_points;
-
-            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterRoadContest, true, false);
-
-
-
+            
+            _contestProcessor.AddModel(new ContestInformation(root, ContestType.Road,() => 
+            {
+                ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterRoadContest, true,
+                false);
+            }));
+            
             CustomLogger.LogExecution(
                 $"[RoadContestWon] | Player: {winner} | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
         }
@@ -336,9 +343,11 @@ namespace TerritoryWars.Dojo
             ushort red_points = eventModel.red_points;
             ushort blue_points = eventModel.blue_points;
 
-
-            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterRoadContest, true,  false);
-
+            _contestProcessor.AddModel(new ContestInformation(root, ContestType.Road, () =>
+            {
+                ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterRoadContest, true,
+                    false);
+            }));
 
             CustomLogger.LogExecution(
                 $"[RoadContestDraw] | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
@@ -360,9 +369,12 @@ namespace TerritoryWars.Dojo
             ushort red_points = eventModel.red_points;
             ushort blue_points = eventModel.blue_points;
 
-            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterCityContest, false, true);
-
-
+            _contestProcessor.AddModel(new ContestInformation(root, ContestType.City,() =>
+            {
+                ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterCityContest, false,
+                    true);
+            }));
+            
             CustomLogger.LogExecution(
                 $"[CityContestWon] | Player: {winner} | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
         }
@@ -377,7 +389,11 @@ namespace TerritoryWars.Dojo
             ushort red_points = eventModel.red_points;
             ushort blue_points = eventModel.blue_points;
 
-            ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterCityContest, false, true);
+            _contestProcessor.AddModel(new ContestInformation(root, ContestType.City,() =>
+            {
+                ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterCityContest, false,
+                    true);
+            }));
 
             CustomLogger.LogExecution(
                 $"[CityContestDraw] | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
@@ -422,7 +438,6 @@ namespace TerritoryWars.Dojo
             {
                 Coroutines.StartRoutine(RemoteContestAnimation(coord, points, contestAnimation, recoloring, isRoadContest, isCityContest));
             }
-
         }
 
         private Dictionary<evolute_duel_CityNode, List<evolute_duel_CityNode>> cities;
@@ -779,9 +794,14 @@ namespace TerritoryWars.Dojo
                 }
 
             }
-
         }
 
+        public void UpdateRoadsAfterContest(byte root)
+        {
+            
+        }
+
+        
         public void CloseAllStructure()
         {
             SessionManager.Instance.Board.CloseAllStructures();

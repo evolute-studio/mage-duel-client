@@ -1,3 +1,5 @@
+using System;
+using DG.Tweening;
 using UnityEngine;
 
 namespace TerritoryWars.General
@@ -12,6 +14,7 @@ namespace TerritoryWars.General
         [SerializeField] private float minZoom = 2f;
         [SerializeField] private float maxZoom = 4f;
         [SerializeField] private float pinchZoomSpeed = 0.5f;
+        [SerializeField] private float _contestZoom = 2.5f;
 
         private Camera _mainCamera;
         private Camera _camera;
@@ -20,6 +23,7 @@ namespace TerritoryWars.General
         private bool isDragging = false;
         private Vector3 minBounds = new Vector3(-4f, -3f, 0f);
         private Vector3 maxBounds = new Vector3(4f, 4f, 0f);
+        private bool _isCameraMoveLocked = false;
 
         // Для мобільних жестів
         private float lastPinchDistance;
@@ -39,8 +43,18 @@ namespace TerritoryWars.General
         // Update is called once per frame
         void Update()
         {
-            HandlePanning();
-            HandleZoom();
+            if (!_isMainCamera)
+            {
+                _camera.orthographicSize = _mainCamera.orthographicSize;
+                _camera.transform.position = _mainCamera.transform.position;
+                return;
+            }
+            
+            if (!_isCameraMoveLocked)
+            {
+                HandlePanning();
+                HandleZoom();
+            }
         }
 
         private void HandlePanning()
@@ -104,13 +118,6 @@ namespace TerritoryWars.General
 
         private void HandleZoom()
         {
-            if (!_isMainCamera)
-            {
-                _camera.orthographicSize = _mainCamera.orthographicSize;
-                _camera.transform.position = _mainCamera.transform.position;
-                return;
-            }
-
             // Мобільний зум
             if (Input.touchCount == 2)
             {
@@ -148,6 +155,19 @@ namespace TerritoryWars.General
                     _camera.orthographicSize = Mathf.Clamp(newSize, minZoom, maxZoom);
                 }
             }
+        }
+
+        public void SetCameraLock(bool isLocked)
+        {
+            _isCameraMoveLocked = isLocked;
+        }
+        
+        public void SetCameraPosition(Vector3 position, Action callback = null)
+        {
+            _mainCamera.transform.DOMove(position, 0.7f).OnComplete(() =>
+            {
+                callback?.Invoke();
+            });
         }
     }
 }

@@ -70,6 +70,7 @@ namespace TerritoryWars.General
         [SerializeField] private DeckManager deckManager;
         public JokerManager JokerManager;
         public TileSelector TileSelector;
+        public StructureHoverManager StructureHoverManager;
 
         public Vector3[] SpawnPoints;
 

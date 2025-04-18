@@ -416,6 +416,36 @@ namespace TerritoryWars.General
             }
         }
 
+        public void CloseStructure(byte root)
+        {
+            var roadDict = DojoGameManager.Instance.SessionManager.GetRoadByPosition(root);
+            if(roadDict.Key == null) return;
+            
+            HashSet<KeyValuePair<Vector2Int, Side>> tiles = new HashSet<KeyValuePair<Vector2Int, Side>>();
+
+            foreach (var road in roadDict.Value)
+            {
+                (Vector2Int structurePosition, Side side) = OnChainBoardDataConverter.GetPositionAndSide(road.position);
+                KeyValuePair<Vector2Int, Side> keyValuePair = new KeyValuePair<Vector2Int, Side>(structurePosition, side);
+                if (tiles.Contains(keyValuePair)) continue;
+                
+                tiles.Add(keyValuePair);
+                Vector2Int edgeTile = GetEdgeNeighbors(structurePosition.x, structurePosition.y, side);
+                if(edgeTile == new Vector2Int(-1, -1)) continue;
+                KeyValuePair<Vector2Int, Side> edgeKeyValuePair = new KeyValuePair<Vector2Int, Side>(edgeTile, GetOppositeSide(side));
+                if (tiles.Contains(edgeKeyValuePair)) continue;
+                tiles.Add(edgeKeyValuePair);
+            }
+
+            foreach (var tile in tiles)
+            {
+                GameObject tileObject = GetTileObject(tile.Key.x, tile.Key.y);
+                if (tileObject == null || tileObject.TryGetComponent(out TileGenerator tileGenerator)) continue;
+                List<Side> sides = CheckCityTileSidesToEmpty(tile.Key.x, tile.Key.y);
+                tileGenerator.FencePlacerForCloserToBorderCity(sides);
+            }
+        }
+
         public List<Side> CheckCityTileSidesToBorder(int x, int y)
         {
             // returns list int of sides that are closer to the border 
