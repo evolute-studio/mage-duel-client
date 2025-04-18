@@ -63,7 +63,7 @@ namespace TerritoryWars.Dojo
 
         public bool IsLocalPlayer;
         
-        public DojoSessionManager SessionManager;
+        public DojoSessionManager DojoSessionManager;
         
         public UnityEvent OnLocalPlayerSet = new UnityEvent();
 
@@ -252,8 +252,8 @@ namespace TerritoryWars.Dojo
 
         private void RestoreGame()
         {
-            SessionManager?.OnDestroy();
-            SessionManager = new DojoSessionManager(this);
+            DojoSessionManager?.OnDestroy();
+            DojoSessionManager = new DojoSessionManager(this);
             CustomSceneManager.Instance.LoadSession(
                 startAction: () =>
                     CustomSceneManager.Instance.LoadingScreen.SetActive(true, 
@@ -541,8 +541,8 @@ namespace TerritoryWars.Dojo
                 // Start session
                 ApplicationState.SetState(ApplicationStates.Initializing);
                 await SyncEverythingForGame();
-                SessionManager?.OnDestroy();
-                SessionManager = new DojoSessionManager(this);
+                DojoSessionManager?.OnDestroy();
+                DojoSessionManager = new DojoSessionManager(this);
                 CustomSceneManager.Instance.LoadSession();
             }
         }

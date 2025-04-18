@@ -131,7 +131,7 @@ namespace TerritoryWars.General
                 (tilePosition, _) = board.GetNeighborPositionAndSideToEdgeTile(tilePosition.x, tilePosition.y);
             }
             if(tilePosition == new Vector2Int(-1, -1)) return;
-            var cityDict = DojoGameManager.Instance.SessionManager.GetCityByPosition(tilePosition);
+            var cityDict = DojoGameManager.Instance.DojoSessionManager.GetCityByPosition(tilePosition);
             if (cityDict.Key == null) return;
             _structureRoot = cityDict.Key;
             foreach (var city in cityDict.Value)
@@ -169,7 +169,7 @@ namespace TerritoryWars.General
             
             byte rootPosition = OnChainBoardDataConverter.GetRootByPositionAndSide(tilePosition, hoveredSide);
             
-            var roadDict = DojoGameManager.Instance.SessionManager.GetRoadByPosition(rootPosition);
+            var roadDict = DojoGameManager.Instance.DojoSessionManager.GetRoadByPosition(rootPosition);
             if (roadDict.Key == null) return;
             _structureRoot = roadDict.Key;
             foreach (var road in roadDict.Value)
@@ -230,7 +230,7 @@ namespace TerritoryWars.General
             HashSet<KeyValuePair<TileParts, Side>> roadTileParts = new HashSet<KeyValuePair<TileParts, Side>>();
             HashSet<KeyValuePair<Vector2Int, Side>> hoveredTiles = new HashSet<KeyValuePair<Vector2Int, Side>>();
             
-            var roadDict = DojoGameManager.Instance.SessionManager.GetRoadByPosition(rootPosition);
+            var roadDict = DojoGameManager.Instance.DojoSessionManager.GetRoadByPosition(rootPosition);
             if (roadDict.Key == null) return new HashSet<KeyValuePair<TileParts, Side>>();
             foreach (var road in roadDict.Value)
             {
@@ -272,7 +272,7 @@ namespace TerritoryWars.General
             }
             
             if(position == new Vector2Int(-1, -1)) return new List<TileParts>();
-            var cityDict = DojoGameManager.Instance.SessionManager.GetCityByPosition(position);
+            var cityDict = DojoGameManager.Instance.DojoSessionManager.GetCityByPosition(position);
             if (cityDict.Key == null) return new List<TileParts>();
             foreach (var city in cityDict.Value)
             {

@@ -273,7 +273,7 @@ namespace TerritoryWars.Dojo
 
         private IEnumerator GameFinishedDelayed()
         {
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(2f);
             SimpleStorage.ClearCurrentBoardId();
             GameUI.Instance.ShowResultPopUp();
         }
@@ -323,9 +323,10 @@ namespace TerritoryWars.Dojo
             ushort red_points = eventModel.red_points;
             ushort blue_points = eventModel.blue_points;
             
+            
             _contestProcessor.AddModel(new ContestInformation(root, ContestType.Road,() => 
             {
-                ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterRoadContest, true,
+                ContestAnimation(root, new ushort[] { blue_points, red_points }, () => UpdateBoardAfterRoadContest(root), true,
                 false);
             }));
             
@@ -345,7 +346,7 @@ namespace TerritoryWars.Dojo
 
             _contestProcessor.AddModel(new ContestInformation(root, ContestType.Road, () =>
             {
-                ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterRoadContest, true,
+                ContestAnimation(root, new ushort[] { blue_points, red_points }, () => UpdateBoardAfterRoadContest(root), true,
                     false);
             }));
 
@@ -371,7 +372,7 @@ namespace TerritoryWars.Dojo
 
             _contestProcessor.AddModel(new ContestInformation(root, ContestType.City,() =>
             {
-                ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterCityContest, false,
+                ContestAnimation(root, new ushort[] { blue_points, red_points },() =>  UpdateBoardAfterCityContest(root), false,
                     true);
             }));
             
@@ -391,7 +392,7 @@ namespace TerritoryWars.Dojo
 
             _contestProcessor.AddModel(new ContestInformation(root, ContestType.City,() =>
             {
-                ContestAnimation(root, new ushort[] { blue_points, red_points }, UpdateBoardAfterCityContest, false,
+                ContestAnimation(root, new ushort[] { blue_points, red_points }, () => UpdateBoardAfterCityContest(root), false,
                     true);
             }));
 
@@ -704,7 +705,95 @@ namespace TerritoryWars.Dojo
             return city;
         }
 
-        public void UpdateBoardAfterCityContest()
+        public void UpdateBoardAfterCityContest(byte root)
+        {
+            BuildCitySets();
+
+            var city = GetCityByPosition(root);
+            foreach (var node in city.Value)
+            {
+                bool isContested = city.Key.contested;
+                Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
+                if (SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
+                { 
+                    continue;
+                }
+                GameObject tile = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
+                TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
+                int playerOwner;
+                if (city.Key.contested)
+                { 
+                    if (city.Key.blue_points == city.Key.red_points)
+                    { 
+                        playerOwner = 3;
+                    }
+                    else
+                    {
+                        playerOwner = city.Key.blue_points > city.Key.red_points ? 0 : 1;
+                    }
+                }
+                else
+                {
+                    playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
+                }
+                tileGenerator.RecolorHouses(playerOwner, isContested);
+                    
+                if(isContested) tileGenerator.ChangeEnvironmentForContest();
+                    
+                SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
+                    Board.StructureType.City, isContested); 
+            }
+        }
+
+
+        public void UpdateBoardAfterRoadContest(byte root)
+        {
+            BuildRoadSets();
+            
+            var road = GetRoadByPosition(root);
+            
+                foreach (var node in road.Value)
+                {
+                    bool isContest = road.Key.contested;
+                    (Vector2Int position, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
+                    if(SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
+                    {
+                        continue;
+                    }
+                    CustomLogger.LogInfo($"Board: " + SessionManager.Instance.Board);
+                    CustomLogger.LogInfo($"TileObject: " + SessionManager.Instance.Board.GetTileObject(position.x, position.y));
+                    CustomLogger.LogInfo($"TileGenerator: " + SessionManager.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>());
+                    TileGenerator tileGenerator = SessionManager.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>();
+                    int playerOwner;
+                    if (road.Key.contested)
+                    {
+                        if (road.Key.blue_points == road.Key.red_points)
+                        {
+                            playerOwner = 3;
+                        }
+                        else
+                        {
+                            playerOwner = road.Key.blue_points > road.Key.red_points ? 0 : 1;
+                        }
+                    }
+                    else
+                    {
+                        playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
+                    }
+                    tileGenerator.RecolorPinOnSide(playerOwner, (int)side, isContest);
+                    if (isContest)
+                    {
+                        tileGenerator.CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite =
+                            PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(tileGenerator
+                                .CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite);
+                        
+                    }
+                    SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
+                        Board.StructureType.Road, false, isContest);
+                }
+        }
+
+        public void UpdateBoardAfterContests()
         {
             BuildCitySets();
 
@@ -715,16 +804,16 @@ namespace TerritoryWars.Dojo
                     bool isContested = city.Key.contested;
                     Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
                     if (SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
-                    {
+                    { 
                         continue;
                     }
                     GameObject tile = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
                     TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
                     int playerOwner;
                     if (city.Key.contested)
-                    {
+                    { 
                         if (city.Key.blue_points == city.Key.red_points)
-                        {
+                        { 
                             playerOwner = 3;
                         }
                         else
@@ -741,16 +830,12 @@ namespace TerritoryWars.Dojo
                     if(isContested) tileGenerator.ChangeEnvironmentForContest();
                     
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                        Board.StructureType.City, isContested);
+                        Board.StructureType.City, isContested); 
                 }
             }
-        }
-
-
-        public void UpdateBoardAfterRoadContest()
-        {
-            BuildRoadSets();
             
+            BuildRoadSets();
+
             foreach (var road in roads)
             {
                 foreach (var node in road.Value)
@@ -792,15 +877,8 @@ namespace TerritoryWars.Dojo
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                         Board.StructureType.Road, false, isContest);
                 }
-
             }
         }
-
-        public void UpdateRoadsAfterContest(byte root)
-        {
-            
-        }
-
         
         public void CloseAllStructure()
         {

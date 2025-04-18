@@ -10,7 +10,7 @@ public class ContestProcessor
 {
     private List<ContestInformation> _contestActions = new List<ContestInformation>();
     private bool _isProcessing = false;
-    private bool _isGameFinished = false;
+    public bool IsGameFinished = false;
 
     public async Task CheckFinishGame()
     {
@@ -22,13 +22,13 @@ public class ContestProcessor
         {
             await CoroutineAsync(() => {}, 0.1f);
             
-            if (_isGameFinished)
+            if (IsGameFinished)
             {
                 HandleGameFinished();
                 return;
             }
             
-            if (!_isGameFinished)
+            if (!IsGameFinished)
             {
                 List<ContestInformation> actionsToExecute = new List<ContestInformation>(_contestActions);
                 _contestActions.Clear();
@@ -47,7 +47,7 @@ public class ContestProcessor
     
     public void SetGameFinished(bool isGameFinished)
     {
-        _isGameFinished = isGameFinished;
+        IsGameFinished = isGameFinished;
     }
     
     private void HandleGameFinished()

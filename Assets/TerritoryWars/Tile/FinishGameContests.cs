@@ -57,6 +57,7 @@ public class FinishGameContests
                 case ContestType.None:
                     break;
             }
+            
             await CoroutineAsync(() => { }, 6f);
             foreach (var road in roadTileParts)
             {
