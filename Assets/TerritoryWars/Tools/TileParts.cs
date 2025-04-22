@@ -74,7 +74,7 @@ public class TileParts : MonoBehaviour
                     if (borderWall != null)
                     {
                         CompletedBorderWalls[j] = borderWall;
-                    }
+                    } 
                 }
             }
             else
@@ -88,9 +88,9 @@ public class TileParts : MonoBehaviour
 
     public void ContestedWalls(int rotation)
     {
+        CustomLogger.LogImportant($"GameObject: {gameObject.name} ContestedWalls. Rotation: " + rotation);
         WallParent.SetActive(true);
-        CustomLogger.LogImportant("ContestedWalls. Rotation: " + rotation);
-        WallPlacer.gameObject.SetActive(false);
+        WallPlacer?.gameObject.SetActive(false);
 
         for (int i = 0; i < CompletedWalls.Count; i++)
         {

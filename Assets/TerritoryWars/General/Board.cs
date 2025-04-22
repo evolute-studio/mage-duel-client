@@ -50,7 +50,7 @@ namespace TerritoryWars.General
         [SerializeField] private int width = 10;
         [SerializeField] private int height = 10;
         [SerializeField] private GameObject tilePrefab;
-        [SerializeField] private static float tileSpacing = 0.93f;
+        [SerializeField] private static float tileSpacing = 0.965f;
 
         private GameObject[,] tileObjects;
         private TileData[,] tileData;
@@ -195,7 +195,6 @@ namespace TerritoryWars.General
             for (int i = 0; i < availablePositions.Count; i++)
             {
                 TileData tile = new TileData(tilesToSpawn[i]);
-                tile.rotationIndex = rotationTimes - 1;
                 PlaceTile(tile, availablePositions[i].x, availablePositions[i].y, -1);
                 if (tilesToSpawn[i] == fieldTile)
                 {
@@ -350,7 +349,8 @@ namespace TerritoryWars.General
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
                     {
-                        tileGenerator.RecolorHouses(owner, isCityContest, neighborsData[i].rotationIndex);
+                        (_, byte rotation) = OnChainBoardDataConverter.GetTypeAndRotation(neighborsData[i].id);
+                        tileGenerator.RecolorHouses(owner, isCityContest, rotation);
                     }
 
                     if (type == StructureType.All || type == StructureType.Road)
