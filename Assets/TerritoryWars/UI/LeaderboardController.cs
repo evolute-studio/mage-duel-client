@@ -104,7 +104,7 @@ public class LeaderboardController : MonoBehaviour
                 break;
             string playerName = CairoFieldsConverter.GetStringFromFieldElement(players[i].username);
             // start with 0x
-            if(String.IsNullOrEmpty(playerName) || playerName.StartsWith("0x") || playerName.StartsWith("Bot") || players[i].balance <= 0)
+            if(String.IsNullOrEmpty(playerName) || playerName.StartsWith("Bot") || players[i].balance <= 0)
                 continue;
             
             LeaderboardItem leaderboardItem = CreateLeaderboardItem();
