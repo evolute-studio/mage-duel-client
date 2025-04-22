@@ -195,6 +195,7 @@ namespace TerritoryWars.General
             for (int i = 0; i < availablePositions.Count; i++)
             {
                 TileData tile = new TileData(tilesToSpawn[i]);
+                tile.rotationIndex = rotationTimes - 1;
                 PlaceTile(tile, availablePositions[i].x, availablePositions[i].y, -1);
                 if (tilesToSpawn[i] == fieldTile)
                 {
@@ -349,11 +350,7 @@ namespace TerritoryWars.General
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
                     {
-                        foreach (var renderer in tileGenerator.houseRenderers)
-                        {
-                            //renderer.sprite = tileAssets.GetHouseByReference(renderer.sprite, owner);
-                            tileGenerator.RecolorHouses(owner, isCityContest);
-                        }
+                        tileGenerator.RecolorHouses(owner, isCityContest, neighborsData[i].rotationIndex);
                     }
 
                     if (type == StructureType.All || type == StructureType.Road)

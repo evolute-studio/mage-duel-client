@@ -698,13 +698,13 @@ namespace TerritoryWars.Dojo
                 foreach (var node in city.Value)
                 {
                     bool isContested = city.Key.contested;
-                    (_, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
                     Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
                     if (SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
                     {
                         continue;
                     }
                     GameObject tile = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
+                    TileData tileData = SessionManager.Instance.Board.GetTileData(position.x, position.y);
                     TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
                     int playerOwner;
                     if (city.Key.contested)
@@ -722,7 +722,7 @@ namespace TerritoryWars.Dojo
                     {
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                     }
-                    tileGenerator.RecolorHouses(playerOwner, isContested);
+                    tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.rotationIndex);
                     
                     if(isContested) tileGenerator.ChangeEnvironmentForContest();
                     

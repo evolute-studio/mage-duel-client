@@ -20,6 +20,7 @@ public class TileParts : MonoBehaviour
     public GameObject ContestedEnviroment;
     public PolygonCollider2D PolygonCollider2D;
 
+    private GameObject WallParent;
     public GameObject[] CompletedBorderWalls;
     public List<GameObject> CompletedWalls;
     
@@ -56,6 +57,11 @@ public class TileParts : MonoBehaviour
         
         // ContestedWalls
         Transform walls = transform.Find("Walls");
+        if (walls == null)
+        {
+            return;
+        }
+        WallParent = walls.gameObject;
         CompletedBorderWalls = new GameObject[4];
         for (int i = 0; i < walls.childCount; i++)
         {
@@ -70,24 +76,29 @@ public class TileParts : MonoBehaviour
                         CompletedBorderWalls[j] = borderWall;
                     }
                 }
-                continue;
             }
-            CompletedWalls.Add(child);
+            else
+            {
+                CompletedWalls.Add(child);
+            }
+            
             
         }
     }
 
     public void ContestedWalls(int rotation)
     {
+        WallParent.SetActive(true);
         CustomLogger.LogImportant("ContestedWalls. Rotation: " + rotation);
         WallPlacer.gameObject.SetActive(false);
-        
-        foreach (GameObject wall in CompletedWalls){
-            wall.SetActive(false);
-        }
-        if (CompletedWalls[rotation] != null)
+
+        for (int i = 0; i < CompletedWalls.Count; i++)
         {
-            CompletedWalls[rotation].SetActive(true);
+            if (CompletedWalls[i] == null)
+            {
+                continue;
+            }
+            CompletedWalls[i].SetActive(i == rotation);
         }
     }
 

@@ -209,6 +209,7 @@ namespace TerritoryWars.Tile
                 }
             }
             
+            _tileParts ??= GetComponent<TileParts>();
             if (_tileParts.RoadRenderers != null)
             {
                 CustomLogger.LogInfo($"Road renderers : {times} | Houses : {_tileParts.HouseRenderers.Count} | Roads: {_tileParts.RoadRenderers.Length}");

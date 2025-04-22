@@ -75,7 +75,8 @@ namespace TerritoryWars.Tile
         {
             if (CityStructure == null) return;
             GameObject city = SessionManager.Instance.Board.GetTileObject(CityStructure.Position.x, CityStructure.Position.y);
-            city.GetComponent<TileGenerator>().RecolorHouses(CityStructure.OwnerId);
+            TileData tileData = SessionManager.Instance.Board.GetTileData(CityStructure.Position.x, CityStructure.Position.y);
+            city.GetComponent<TileGenerator>().RecolorHouses(CityStructure.OwnerId, rotation: tileData.rotationIndex);
         }
 
         public string GetConfig()

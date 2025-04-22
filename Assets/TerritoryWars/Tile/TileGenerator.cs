@@ -104,7 +104,7 @@ namespace TerritoryWars.Tile
             {
                 if (tile.Config == id)
                 {
-                    CurrentTileGO = Instantiate(tile.TilePrefabGO, transform);
+                        CurrentTileGO = Instantiate(tile.TilePrefabGO, transform);
                     InitializeTile();
                     break;
                 }
@@ -252,7 +252,7 @@ namespace TerritoryWars.Tile
                     _placingTilePosition.y));
             }
         }
-        public void RecolorHouses(int playerId, bool isContest = false, byte rotation = 0)
+        public void RecolorHouses(int playerId, bool isContest = false, int rotation = 0)
         {
             if (tileParts.HouseRenderers == null)
             {
