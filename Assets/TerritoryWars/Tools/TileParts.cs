@@ -20,12 +20,14 @@ public class TileParts : MonoBehaviour
 
     private int DefaultLayerMask = 0; // Default layer
     private int OutlineLayerMask = 31; // Outline layer
+    private int GrayOutlineLayerMask = 32; // Gray layer
 
 
     public void Awake()
     {
         DefaultLayerMask = LayerMask.NameToLayer("Default");
         OutlineLayerMask = LayerMask.NameToLayer("Outline");
+        GrayOutlineLayerMask = LayerMask.NameToLayer("GrayOutline");
         // BorderFences
         Transform borderFences = transform.Find("BorderFence");
         if (borderFences != null)
@@ -64,9 +66,11 @@ public class TileParts : MonoBehaviour
         }
     }
 
-    public void CityOutline(bool isOutline)
+    public void CityOutline(bool isOutline, bool isGray = false)
     {
         int mask = isOutline ? OutlineLayerMask : DefaultLayerMask;
+        mask = isGray ? GrayOutlineLayerMask : mask;
+        
         if (HouseRenderers != null)
         {
             foreach (var house in HouseRenderers)
@@ -122,9 +126,10 @@ public class TileParts : MonoBehaviour
         }
     }
 
-    public void RoadOutline(bool isOutline, Side side = Side.None)
+    public void RoadOutline(bool isOutline, Side side = Side.None, bool isGray = false)
     {
         int mask = isOutline ? OutlineLayerMask : DefaultLayerMask;
+        mask = isGray ? GrayOutlineLayerMask : mask;
         for (int i = 0; i < RoadRenderers.Length; i++)
         {
             if (RoadRenderers[i] != null)

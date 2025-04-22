@@ -425,7 +425,7 @@ namespace TerritoryWars.Dojo
             if (tile)
             {
                 Vector3 position = tile.transform.position;
-                Vector3 offset = new Vector3(0, 0.5f, 0);
+                Vector3 offset = new Vector3(0, 3f, 0);
                 int winner;
                 if (points[0] > points[1])
                     winner = 0;

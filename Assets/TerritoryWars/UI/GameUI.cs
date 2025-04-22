@@ -45,7 +45,6 @@ namespace TerritoryWars.UI
         [SerializeField] private GameObject[] _toggleGameObjects;
         [SerializeField] private GameObject _toggleJokerButton;
         [SerializeField] private GameObject[] _toggleJokerInfoGameObjects;
-        [SerializeField] private CanvasGroup[] _togglersCanvasGroup;
         [SerializeField] private CanvasGroup _deckContainerCanvasGroup;
 
         [SerializeField] private ResultPopUpUI _resultPopUpUI;
@@ -355,9 +354,12 @@ namespace TerritoryWars.UI
             }
         }
 
-        private void SwitchToggle()
+        public void SetFinishGameUI(bool isActive)
         {
-            
+            SetSkipTurnButtonActive(isActive);
+            _deckContainerCanvasGroup.gameObject.SetActive(isActive);
+            SaveSnapshotButton.gameObject.SetActive(isActive);
+            _sessionManager.sessionUI.SessionTimerUI.SetActiveTimer(isActive);
         }
 
         public void SetJokerButtonActive(bool active)

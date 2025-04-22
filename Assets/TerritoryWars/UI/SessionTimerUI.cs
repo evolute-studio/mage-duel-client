@@ -156,5 +156,10 @@ namespace TerritoryWars.UI
             TurnText.text = baseText + dots;
         }
 
+        public void SetActiveTimer(bool active)
+        {
+            gameObject.SetActive(active);
+        }
+
     }
 }

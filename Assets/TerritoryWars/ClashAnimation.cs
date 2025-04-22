@@ -79,7 +79,8 @@ namespace TerritoryWars
         private void FirstAction()
         {
             SwordsAnimator.Play(SwordsAnimations.ToArray());
-            SwordsAnimator.OnAnimationEnd = NextAction;
+            // SwordsAnimator.OnAnimationEnd = NextAction;
+            NextAction();
         }
         
         private void SecondAction()
@@ -151,7 +152,7 @@ namespace TerritoryWars
         
         private void FourthAction()
         {
-            Invoke(nameof(NextAction), 1.5f);
+            Invoke(nameof(NextAction), 1f);
         }
 
         private void FifthAction()

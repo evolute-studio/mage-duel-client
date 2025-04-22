@@ -416,6 +416,20 @@ namespace TerritoryWars.General
             }
         }
 
+        public void CloseCityStructure(byte root)
+        {
+            var city = DojoGameManager.Instance.DojoSessionManager.GetCityByPosition(root);
+
+            foreach (var node in city.Value)
+            {
+                Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
+                GameObject tile = GetTileObject(position.x, position.y);
+                if (tile == null || !tile.TryGetComponent(out TileGenerator tileGenerator)) continue;
+                List<Side> sides = CheckCityTileSidesToEmpty(position.x, position.y);
+                tileGenerator.FencePlacerForCloserToBorderCity(sides);
+            }
+        }
+
         public List<Side> CheckCityTileSidesToBorder(int x, int y)
         {
             // returns list int of sides that are closer to the border 
