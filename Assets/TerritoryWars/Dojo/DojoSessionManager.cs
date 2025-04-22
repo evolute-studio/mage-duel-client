@@ -698,6 +698,7 @@ namespace TerritoryWars.Dojo
                 foreach (var node in city.Value)
                 {
                     bool isContested = city.Key.contested;
+                    (_, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
                     Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
                     if (SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
                     {

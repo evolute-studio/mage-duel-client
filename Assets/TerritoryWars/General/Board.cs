@@ -50,7 +50,7 @@ namespace TerritoryWars.General
         [SerializeField] private int width = 10;
         [SerializeField] private int height = 10;
         [SerializeField] private GameObject tilePrefab;
-        [SerializeField] private static float tileSpacing = 0.63f;
+        [SerializeField] private static float tileSpacing = 0.93f;
 
         private GameObject[,] tileObjects;
         private TileData[,] tileData;

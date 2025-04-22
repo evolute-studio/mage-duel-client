@@ -252,7 +252,7 @@ namespace TerritoryWars.Tile
                     _placingTilePosition.y));
             }
         }
-        public void RecolorHouses(int playerId, bool isContest = false)
+        public void RecolorHouses(int playerId, bool isContest = false, byte rotation = 0)
         {
             if (tileParts.HouseRenderers == null)
             {
@@ -261,16 +261,17 @@ namespace TerritoryWars.Tile
 
             if (isContest)
             {
-                WallPlacer?.PlaceWall(true);
-                foreach (var border in tileParts.CloserToBorderFences)
-                {
-                    border.WallPlacer.PlaceWall(true);
-                }
-
-                foreach (var arc in tileParts.ArcRenderers)
-                {
-                    arc.sprite = TileAssetsObject.StoneArc;
-                }
+                tileParts.ContestedWalls(rotation);
+                //WallPlacer?.PlaceWall(true);
+                // foreach (var border in tileParts.CloserToBorderFences)
+                // {
+                //     border.WallPlacer.PlaceWall(true);
+                // }
+                //
+                // foreach (var arc in tileParts.ArcRenderers)
+                // {
+                //     arc.sprite = TileAssetsObject.StoneArc;
+                // }
             }
             houseRenderers = CurrentTileGO.GetComponentsInChildren<SpriteRenderer>()
                 .ToList().Where(x => x.name == "House").ToList();

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using TerritoryWars.Tile;
+using TerritoryWars.Tools;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class TileParts : MonoBehaviour
 {
@@ -17,6 +19,10 @@ public class TileParts : MonoBehaviour
     public GameObject Enviroment;
     public GameObject ContestedEnviroment;
     public PolygonCollider2D PolygonCollider2D;
+
+    public GameObject[] CompletedBorderWalls;
+    public List<GameObject> CompletedWalls;
+    
 
     private int DefaultLayerMask = 0; // Default layer
     private int OutlineLayerMask = 31; // Outline layer
@@ -46,6 +52,42 @@ public class TileParts : MonoBehaviour
         if (fence != null)
         {
             WallPlacer = fence.GetComponent<WallPlacer>();
+        }
+        
+        // ContestedWalls
+        Transform walls = transform.Find("Walls");
+        CompletedBorderWalls = new GameObject[4];
+        for (int i = 0; i < walls.childCount; i++)
+        {
+            GameObject child = walls.GetChild(i).gameObject;
+            if (child.name == "BorderWalls")
+            {
+                for (int j = 0; j < child.transform.childCount; j++)
+                {
+                    GameObject borderWall = child.transform.GetChild(j).gameObject;
+                    if (borderWall != null)
+                    {
+                        CompletedBorderWalls[j] = borderWall;
+                    }
+                }
+                continue;
+            }
+            CompletedWalls.Add(child);
+            
+        }
+    }
+
+    public void ContestedWalls(int rotation)
+    {
+        CustomLogger.LogImportant("ContestedWalls. Rotation: " + rotation);
+        WallPlacer.gameObject.SetActive(false);
+        
+        foreach (GameObject wall in CompletedWalls){
+            wall.SetActive(false);
+        }
+        if (CompletedWalls[rotation] != null)
+        {
+            CompletedWalls[rotation].SetActive(true);
         }
     }
 
