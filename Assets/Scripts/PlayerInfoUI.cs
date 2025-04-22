@@ -53,10 +53,6 @@ public class PlayerInfoUI : MonoBehaviour
                 joker.color = JokerAvailableColor;
             }
         }
-        CancelGameButton.onClick.AddListener(() =>
-        {
-            CancelGamePopUp.SetActive(true);
-        });
         
         SetPlayersAvatars(charactersObject.GetAvatar(PlayerCharactersManager.GetCurrentCharacterId()), 
             charactersObject.GetAvatar(PlayerCharactersManager.GetOpponentCurrentCharacterId()));
