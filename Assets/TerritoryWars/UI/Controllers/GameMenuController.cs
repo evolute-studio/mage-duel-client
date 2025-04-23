@@ -1,3 +1,5 @@
+using DG.Tweening;
+using NUnit.Framework.Constraints;
 using TerritoryWars.Dojo;
 using UnityEngine;
 
@@ -19,8 +21,7 @@ public class GameMenuController
         _view.SettingsButton.onClick.AddListener(OnSettingsButtonClicked);
         _view.PlaybookButton.onClick.AddListener(OnPlaybookButtonClicked);
         _view.ExitButton.onClick.AddListener(OnExitButtonClicked); 
-        _view.GameMenuButton.onClick.AddListener(() => SetActiveGameMenu(true));
-        _view.GameMenuCloseButton.onClick.AddListener(() => SetActiveGameMenu(false));
+        _view.GameMenuButton.onClick.AddListener(SetActiveGameMenu);
     }
 
     private void OnSnapshotButtonClicked()
@@ -40,12 +41,22 @@ public class GameMenuController
 
     private void OnExitButtonClicked()
     {
-        SetActiveGameMenu(false);
         _view.CancelGamePopUp.SetActive(true);
     }
 
-    private void SetActiveGameMenu(bool active)
+    private void SetActiveGameMenu()
     {
-        _view.GameMenuPanel.SetActive(active);
+        _model.IsGameMenuActive = !_model.IsGameMenuActive;
+        
+        if (_model.IsGameMenuActive)
+        {
+            _view.GameMenuPanel.transform.DOKill();
+            _view.GameMenuPanel.transform.DOMoveY(0f, 0.5f);
+        }
+        else
+        {
+            _view.GameMenuPanel.transform.DOKill();
+            _view.GameMenuPanel.transform.DOMoveY(-80f, 0.5f);
+        }
     }
 }
