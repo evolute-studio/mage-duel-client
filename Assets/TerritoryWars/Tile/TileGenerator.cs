@@ -262,16 +262,6 @@ namespace TerritoryWars.Tile
             if (isContest)
             {
                 tileParts.PlaceContestedWalls(rotation);
-                //WallPlacer?.PlaceWall(true);
-                // foreach (var border in tileParts.CloserToBorderFences)
-                // {
-                //     border.WallPlacer.PlaceWall(true);
-                // }
-                //
-                // foreach (var arc in tileParts.ArcRenderers)
-                // {
-                //     arc.sprite = TileAssetsObject.StoneArc;
-                // }
             }
             houseRenderers = CurrentTileGO.GetComponentsInChildren<SpriteRenderer>()
                 .ToList().Where(x => x.name == "House").ToList();
@@ -279,11 +269,17 @@ namespace TerritoryWars.Tile
             {
                 if (playerId == 3)
                 {
-                    houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites));
+                    houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, isContested: isContest));
                 }
                 else
                 {
-                    houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites, playerId));
+                    var sprites = houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().sprites;
+                    if (sprites.Length > 0 && sprites[0] != null && sprites[0].name ==
+                        "NEW_CONSTRUCTIONS_24")
+                    {
+                        
+                    }
+                    houseRenderers[i].gameObject.GetComponent<SpriteAnimator>().Play(TileAssetsObject.GetHouseByReference(sprites, playerId, isContest));
 
                 }
                 TerritoryFiller territoryFiller = tileParts.TileTerritoryFiller;
@@ -302,7 +298,7 @@ namespace TerritoryWars.Tile
         public void FencePlacerForCloserToBorderCity(List<Side> closerSides)
         {
             if (closerSides == null || tileParts.HouseRenderers == null) return;
-
+            List<Side> closerCitySide = new List<Side>();
             foreach (var side in closerSides)
             {
                 if(_tileData.GetSide(side) != LandscapeType.City) continue;
@@ -310,8 +306,10 @@ namespace TerritoryWars.Tile
                 TileParts.CloserToBorderFence fence = tileParts.CloserToBorderFences.Find(x => x.Side == side);
                 fence.Fence.SetActive(true);
                 fence.WallPlacer.PlaceWall(false);
+                closerCitySide.Add(side);
             }
-            tileParts.SetContestedBorderWalls(closerSides);
+            tileParts.SetContestedBorderWalls(closerCitySide);
+            
         }
 
         public void MinePlaceForCloserToBorderRoad(List<Board.MineTileInfo> closerSides)

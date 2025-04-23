@@ -68,8 +68,8 @@ namespace TerritoryWars.Tile
             {
                 
                 texturePoints[i] = new Vector2(
-                    (localPoints[i].x - center.x) * (textureSize * 0.83f) + (textureSize / 2),
-                    (localPoints[i].y - center.y) * (textureSize * 0.83f) + (textureSize / 2)
+                    (localPoints[i].x - center.x) * (textureSize * 0.5f) + (textureSize / 2),
+                    (localPoints[i].y - center.y) * (textureSize * 0.5f) + (textureSize / 2)
                 );
             }
 
@@ -105,7 +105,7 @@ namespace TerritoryWars.Tile
             {
                 _spriteRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
                 _spriteRenderer.transform.localPosition = bounds.center;
-                _spriteRenderer.transform.localScale = new Vector3(1.2f, 1.2f, 1);
+                _spriteRenderer.transform.localScale = new Vector3(1f, 1f, 1);
                 _spriteRenderer.color = fillColor;
             }
         }

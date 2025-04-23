@@ -18,8 +18,8 @@ namespace TerritoryWars.General
         private bool _isMainCamera = false;
         private Vector3 lastMousePosition;
         private bool isDragging = false;
-        private Vector3 minBounds = new Vector3(-4f, -3f, 0f);
-        private Vector3 maxBounds = new Vector3(4f, 4f, 0f);
+        public Vector3 minBounds = new Vector3(-4f, -3f, 0f);
+        public Vector3 maxBounds = new Vector3(4f, 4f, 0f);
 
         // Для мобільних жестів
         private float lastPinchDistance;

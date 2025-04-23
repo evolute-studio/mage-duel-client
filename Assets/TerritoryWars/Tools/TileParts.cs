@@ -89,7 +89,6 @@ public class TileParts : MonoBehaviour
 
     public void PlaceContestedWalls(int rotation)
     {
-        CustomLogger.LogImportant($"GameObject: {gameObject.name} ContestedWalls. Rotation: " + rotation);
         WallParent.SetActive(true);
         WallPlacer?.gameObject.SetActive(false);
 

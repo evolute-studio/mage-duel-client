@@ -75,11 +75,11 @@ namespace TerritoryWars.ScriptablesObjects
                 if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
                 {
                     if (playerIndex == 0)
-                        return isContested ? GetRandomContestedHouse(playerIndex) : house.DefaultSprites;
+                        return isContested ? house.ContestedSprites : house.DefaultSprites;
                     else
                     {
                         HousesSprites housesSprites = SecondPlayerHousesAnimated[FirstPlayerHousesAnimated.IndexOf(house)];
-                        return isContested ? GetRandomContestedHouse(playerIndex) : housesSprites.DefaultSprites;
+                        return isContested ? house.ContestedSprites : housesSprites.DefaultSprites;
                     }
                 }
             }
@@ -89,11 +89,11 @@ namespace TerritoryWars.ScriptablesObjects
                 if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
                 {
                     if (playerIndex == 1)
-                        return isContested ? GetRandomContestedHouse(playerIndex) : house.DefaultSprites;
+                        return isContested ? house.ContestedSprites : house.DefaultSprites;
                     else
                     {
                         HousesSprites housesSprites = FirstPlayerHousesAnimated[SecondPlayerHousesAnimated.IndexOf(house)];
-                        return isContested ? GetRandomContestedHouse(playerIndex) : housesSprites.DefaultSprites;
+                        return isContested ? house.ContestedSprites : housesSprites.DefaultSprites;
                     }
                 }
             }
@@ -125,7 +125,7 @@ namespace TerritoryWars.ScriptablesObjects
             {
                 if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
                 {
-                    return isContested ? GetRandomContestedHouse(0) : house.DefaultSprites;
+                    return isContested ? house.ContestedSprites : house.DefaultSprites;
                 }
             }
 
@@ -133,7 +133,7 @@ namespace TerritoryWars.ScriptablesObjects
             {
                 if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
                 {
-                    return isContested ? GetRandomContestedHouse(1) : house.DefaultSprites;
+                    return isContested ? house.ContestedSprites : house.DefaultSprites;
                 }
             }
 

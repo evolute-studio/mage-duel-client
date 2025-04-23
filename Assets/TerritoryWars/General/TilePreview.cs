@@ -231,6 +231,7 @@ namespace TerritoryWars.General
 
                     foreach (var segment in segments)
                     {
+                        if (segment == null) continue;
                         segment.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
                     }
                 }
