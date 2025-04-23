@@ -95,6 +95,11 @@ public class FinishGameContests
             if (contest.ContestType == ContestType.City)
             {
                 SessionManager.Instance.Board.CloseCityStructure(contest.Root);
+                cityTileParts = SessionManager.Instance.StructureHoverManager.GetCityTilePartsForHighlight(tile.transform);
+                foreach (TileParts cityTilePart in cityTileParts)
+                {
+                    cityTilePart.CityOutline(true);
+                }
             }
             
             await CoroutineAsync(() => { }, 2f);

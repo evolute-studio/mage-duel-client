@@ -21,8 +21,8 @@ namespace TerritoryWars.General
         private bool _isMainCamera = false;
         private Vector3 lastMousePosition;
         private bool isDragging = false;
-        private Vector3 minBounds = new Vector3(-4f, -3f, 0f);
-        private Vector3 maxBounds = new Vector3(4f, 4f, 0f);
+        private Vector3 minBounds = new Vector3(-8f, -8f, 0f);
+        private Vector3 maxBounds = new Vector3(8f, 8f, 0f);
         private bool _isCameraMoveLocked = false;
 
         // Для мобільних жестів
@@ -80,10 +80,12 @@ namespace TerritoryWars.General
                     Vector3 worldDelta = _camera.ScreenToWorldPoint(touch.position) - 
                                        _camera.ScreenToWorldPoint(lastMousePosition);
                     Vector3 move = -worldDelta;
+                    float horizontalExtent = _mainCamera.orthographicSize * _mainCamera.aspect;
+                    float verticalExtent = _mainCamera.orthographicSize;
 
                     Vector3 newPosition = transform.position + move;
-                    newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
-                    newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y, maxBounds.y);
+                    newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x + horizontalExtent, maxBounds.x - horizontalExtent);
+                    newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y + verticalExtent, maxBounds.y - verticalExtent);
 
                     transform.position = newPosition;
                     lastMousePosition = touch.position;
@@ -106,10 +108,12 @@ namespace TerritoryWars.General
                 Vector3 worldDelta = _camera.ScreenToWorldPoint(Input.mousePosition) - 
                                    _camera.ScreenToWorldPoint(lastMousePosition);
                 Vector3 move = -worldDelta;
+                float horizontalExtent = _mainCamera.orthographicSize * _mainCamera.aspect;
+                float verticalExtent = _mainCamera.orthographicSize;
 
                 Vector3 newPosition = transform.position + move;
-                newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
-                newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y, maxBounds.y);
+                newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x + horizontalExtent, maxBounds.x - horizontalExtent);
+                newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y + verticalExtent, maxBounds.y - verticalExtent);
 
                 transform.position = newPosition;
                 lastMousePosition = Input.mousePosition;
