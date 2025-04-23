@@ -74,6 +74,7 @@ public class TileParts : MonoBehaviour
                     if (borderWall != null)
                     {
                         CompletedBorderWalls[j] = borderWall;
+                        CompletedBorderWalls[j].SetActive(false);
                     } 
                 }
             }
@@ -86,7 +87,7 @@ public class TileParts : MonoBehaviour
         }
     }
 
-    public void ContestedWalls(int rotation)
+    public void PlaceContestedWalls(int rotation)
     {
         CustomLogger.LogImportant($"GameObject: {gameObject.name} ContestedWalls. Rotation: " + rotation);
         WallParent.SetActive(true);
@@ -100,6 +101,22 @@ public class TileParts : MonoBehaviour
             }
             CompletedWalls[i].SetActive(i == rotation);
         }
+
+        PlaceBorderContestedWalls();
+    }
+
+    public void SetContestedBorderWalls(List<Side> sides)
+    {
+        foreach (var side in sides)
+        {
+            CompletedBorderWalls[(int)side].SetActive(true);
+        }
+        
+    }
+    
+    private void PlaceBorderContestedWalls()
+    {
+        WallParent.transform.Find("BorderWalls").gameObject.SetActive(true);
     }
 
     public void ChangeEnvironmentForContest()

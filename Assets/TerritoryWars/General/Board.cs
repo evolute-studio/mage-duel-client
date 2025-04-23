@@ -69,11 +69,6 @@ namespace TerritoryWars.General
 
         }
 
-        public void OnDestroy()
-        {
-            
-        }
-
         private void InitializeBoard()
         {
             tileObjects = new GameObject[width, height];

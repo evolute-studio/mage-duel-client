@@ -261,7 +261,7 @@ namespace TerritoryWars.Tile
 
             if (isContest)
             {
-                tileParts.ContestedWalls(rotation);
+                tileParts.PlaceContestedWalls(rotation);
                 //WallPlacer?.PlaceWall(true);
                 // foreach (var border in tileParts.CloserToBorderFences)
                 // {
@@ -311,6 +311,7 @@ namespace TerritoryWars.Tile
                 fence.Fence.SetActive(true);
                 fence.WallPlacer.PlaceWall(false);
             }
+            tileParts.SetContestedBorderWalls(closerSides);
         }
 
         public void MinePlaceForCloserToBorderRoad(List<Board.MineTileInfo> closerSides)
