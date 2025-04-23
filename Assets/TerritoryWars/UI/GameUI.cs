@@ -190,6 +190,8 @@ namespace TerritoryWars.UI
             _sessionManager.EndTurn();
             UpdateUI();
             SetActiveDeckContainer(false);
+            SetActiveSkipButtonPulse(false);
+            JokerButtonPulse(false);
         }
         
         private void SkipMoveButtonClicked()
@@ -202,15 +204,11 @@ namespace TerritoryWars.UI
 
         public void SetActiveSkipButtonPulse(bool isActive)
         {
+            _skipButtonTween?.Kill();
+            skipTurnButton.transform.localScale = _skipButtonScale;
             if (isActive)
             {
-                skipTurnButton.transform.localScale = _skipButtonScale;
                 _skipButtonTween = skipTurnButton.transform.DOScale(skipTurnButton.transform.localScale.x * 1.1f, 0.8f).SetLoops(-1, LoopType.Yoyo);
-            }
-            else
-            {
-                _skipButtonTween?.Kill();
-                skipTurnButton.transform.localScale = _skipButtonScale;
             }
         }
         

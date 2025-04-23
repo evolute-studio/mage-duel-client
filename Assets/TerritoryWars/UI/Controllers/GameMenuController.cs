@@ -12,16 +12,16 @@ public class GameMenuController
     {
         _view = view;
         _model = new GameMenuModel();
+        _view.Initialize();
         SetupButtons();
     }
 
     private void SetupButtons()
     {
-        _view.SnapshotButton.onClick.AddListener(OnSnapshotButtonClicked);
-        _view.SettingsButton.onClick.AddListener(OnSettingsButtonClicked);
-        _view.PlaybookButton.onClick.AddListener(OnPlaybookButtonClicked);
-        _view.ExitButton.onClick.AddListener(OnExitButtonClicked); 
-        _view.GameMenuButton.onClick.AddListener(SetActiveGameMenu);
+        _view?.SnapshotButton.onClick.AddListener(OnSnapshotButtonClicked);
+        _view?.PlaybookButton.onClick.AddListener(OnPlaybookButtonClicked);
+        _view?.ExitButton.onClick.AddListener(OnExitButtonClicked); 
+        _view?.GameMenuButton.onClick.AddListener(SetActiveGameMenu);
     }
 
     private void OnSnapshotButtonClicked()
@@ -50,13 +50,13 @@ public class GameMenuController
         
         if (_model.IsGameMenuActive)
         {
-            _view.GameMenuPanel.transform.DOKill();
-            _view.GameMenuPanel.transform.DOMoveY(0f, 0.5f);
+            _view.GameMenuPanelRectTransform.DOKill();
+            _view.GameMenuPanelRectTransform.DOAnchorPosY(0f, 0.5f);
         }
         else
         {
-            _view.GameMenuPanel.transform.DOKill();
-            _view.GameMenuPanel.transform.DOMoveY(-80f, 0.5f);
+            _view.GameMenuPanelRectTransform.DOKill();
+            _view.GameMenuPanelRectTransform.DOAnchorPosY(-_view.GameMenuPanelRectTransform.rect.height, 0.5f);
         }
     }
 }
