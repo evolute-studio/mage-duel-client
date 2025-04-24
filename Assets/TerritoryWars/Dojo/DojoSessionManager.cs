@@ -722,6 +722,7 @@ namespace TerritoryWars.Dojo
                     {
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                     }
+                    CustomLogger.LogImportant($"Tile: {tile} | TileData: {tileData} | PlayerOwner: {playerOwner}");
                     tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.rotationIndex);
                     
                     if(isContested) tileGenerator.ChangeEnvironmentForContest();

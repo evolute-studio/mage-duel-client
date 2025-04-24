@@ -80,16 +80,13 @@ namespace TerritoryWars.Tile
             {
                 _tileParts.RoadRenderers = RotateRoadArray(_tileParts.RoadRenderers);
             }
-
-            // foreach (var spriteLayerSwapElement in SpriteLayerSwapElements) - this logic now disabled!
-            // {
-            //     spriteLayerSwapElement.Rotate();
-            // }
+            
             OnRotation?.Invoke();
         }
 
         public void SimpleRotation(Transform obj, int times = 1)
         {
+            if (obj == null) return;
             for (int i = 0; i < times; i++)
             {
                 Vector3 originalPos = obj.localPosition;
@@ -117,6 +114,7 @@ namespace TerritoryWars.Tile
 
         public void MirrorRotation(Transform obj, int times = 1)
         {
+            if (obj == null) return;
             for (int i = 0; i < times; i++)
             {
                 Vector3 originalPos = obj.localPosition;
@@ -131,6 +129,7 @@ namespace TerritoryWars.Tile
 
         public static void GetMirrorRotationStatic(Transform obj, int times = 1)
         {
+            if (obj == null) return;
             for (int i = 0; i < times; i++)
             {
                 Vector3 originalPos = obj.localPosition;

@@ -93,7 +93,7 @@ namespace TerritoryWars.ExternalConnections
         
         public static async void FinishGame(Account account, FieldElement boardId)
         {
-            //return;
+            return;
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(FinishGame)}] " +
                              $"\n Account: {account.Address.Hex()} " +
