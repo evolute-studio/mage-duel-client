@@ -220,8 +220,13 @@ namespace TerritoryWars.Tile
                     house.sprite = TileAssetsObject.GetNotContestedHouse(1, playerId);
                 }
             }
+            
+            foreach (var decoration in tileParts.DecorationsRenderers)
+            {
+                currentGoTileRotator.MirrorRotationObjects.Add(decoration.transform);
+            }
             currentGoTileRotator.RotateTile((_rotation + 3) % 4);
-
+            
             if (arcRenderers != null)
             {
                 AllCityRenderers.AddRange(arcRenderers);

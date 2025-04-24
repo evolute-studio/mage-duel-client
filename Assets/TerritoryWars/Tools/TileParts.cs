@@ -8,6 +8,7 @@ using UnityEngine.Serialization;
 public class TileParts : MonoBehaviour
 {
     public List<SpriteRenderer> HouseRenderers { get; private set; } = new List<SpriteRenderer>();
+    public List<SpriteRenderer> DecorationsRenderers { get; private set; } = new List<SpriteRenderer>();
     public List<SpriteRenderer> ArcRenderers = new List<SpriteRenderer>();
     public TerritoryFiller TileTerritoryFiller;
     public WallPlacer WallPlacer;
@@ -96,6 +97,20 @@ public class TileParts : MonoBehaviour
                 if (house != null)
                 {
                     HouseRenderers.Add(house);
+                }
+            }
+        }
+        
+        // Decorations
+        Transform decorations = transform.Find("Decorations");
+        if (decorations != null)
+        {
+            for (int i = 0; i < decorations.childCount; i++)
+            {
+                SpriteRenderer decoration = decorations.GetChild(i).GetComponent<SpriteRenderer>();
+                if (decoration != null)
+                {
+                    DecorationsRenderers.Add(decoration);
                 }
             }
         }
