@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TerritoryWars.General;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -102,6 +103,14 @@ namespace TerritoryWars.Tile
                 id = parts[0];
                 rotationIndex = int.Parse(parts[1]);
             }
+        }
+        
+        public bool IsCityParallel()
+        {
+            int cityCount = id.Count(c => c == 'C');
+            if (cityCount != 2) return false;
+            if ( (id[0] == 'C' && id[2] == 'C') || (id[1] == 'C' && id[3] == 'C')) return true;
+            return false;
         }
 
         public static string GetRotatedConfig(string config, int times = 1)

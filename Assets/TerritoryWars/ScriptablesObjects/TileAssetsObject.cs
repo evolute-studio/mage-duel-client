@@ -168,7 +168,7 @@ namespace TerritoryWars.ScriptablesObjects
                     randomIndex = Random.Range(0, contestedHouses.QuadrupleHouses.Length);
                     return contestedHouses.QuadrupleHouses[randomIndex];
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(count), "Invalid house count");
+                    throw new ArgumentOutOfRangeException("Invalid house count" + count);
             }
         }
         
