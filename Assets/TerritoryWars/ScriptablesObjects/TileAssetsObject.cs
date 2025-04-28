@@ -11,11 +11,6 @@ namespace TerritoryWars.ScriptablesObjects
     public class TileAssetsObject : ScriptableObject
     {
         [Header("First stage houses")]
-        public List<HousesSprites> FirstPlayerHousesAnimated;
-        public List<HousesSprites> SecondPlayerHousesAnimated;
-        public List<HousesSprites> NeutralHousesAnimated;
-        
-        [Header("First stage houses")]
         public NotContestedHouses FirstPlayerHouses;
         public NotContestedHouses SecondPlayerHouses;
         
@@ -53,88 +48,7 @@ namespace TerritoryWars.ScriptablesObjects
 
         public int CurrentIndex { get; private set; } = 0;
         public int CurrentHouseIndex { get; private set; } = 0;
-
-        public Sprite[] GetNextHouse(int playerIndex, bool chooseHighHouse = false)
-        {
-            playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
-            if (playerIndex == -1)
-            {
-                Sprite[] neutralNextHouseSprites;
-                if (chooseHighHouse)
-                {
-                    neutralNextHouseSprites = NeutralHousesAnimated[1].DefaultSprites;
-                    return neutralNextHouseSprites;
-                }
-                CurrentHouseIndex = (CurrentHouseIndex + 1) % NeutralHousesAnimated.Count;
-                neutralNextHouseSprites = NeutralHousesAnimated[CurrentHouseIndex].DefaultSprites;
-                return neutralNextHouseSprites;
-            }
-
-            if (chooseHighHouse)
-            {
-                List<HousesSprites>[] highHouses = { FirstPlayerHousesAnimated, SecondPlayerHousesAnimated };
-                Sprite[] highHouse = highHouses[playerIndex][1].DefaultSprites;
-                return highHouse;
-            }
-            
-            List<HousesSprites>[] Houses = { FirstPlayerHousesAnimated, SecondPlayerHousesAnimated };
-            CurrentHouseIndex = (CurrentHouseIndex + 1) % Houses[playerIndex].Count;
-            Sprite[] nextHouseSprites = Houses[playerIndex][CurrentHouseIndex].DefaultSprites;
-            return nextHouseSprites;
-        }
         
-        public Sprite[] GetHouseByReference(Sprite[] sprites, int playerIndex)
-        {
-            playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
-            foreach (var house in FirstPlayerHousesAnimated)
-            {
-                if (house.DefaultSprites == sprites)
-                {
-                    if (playerIndex == 0)
-                        return house.DefaultSprites;
-                    else
-                    {
-                        HousesSprites housesSprites = SecondPlayerHousesAnimated[FirstPlayerHousesAnimated.IndexOf(house)];
-                        return housesSprites.DefaultSprites;
-                    }
-                }
-            }
-
-            foreach (var house in SecondPlayerHousesAnimated)
-            {
-                if (house.DefaultSprites == sprites)
-                {
-                    if (playerIndex == 1)
-                        return house.DefaultSprites;
-                    else
-                    {
-                        HousesSprites housesSprites = FirstPlayerHousesAnimated[SecondPlayerHousesAnimated.IndexOf(house)];
-                        return housesSprites.DefaultSprites;
-                    }
-                }
-            }
-
-            int i = 0;
-            foreach (var house in NeutralHousesAnimated)
-            {
-                if (house.DefaultSprites == sprites)
-                {
-                    if (playerIndex == 0)
-                    {
-                        return FirstPlayerHousesAnimated[i].DefaultSprites;
-                    }
-
-                    if (playerIndex == 1)
-                    {
-                        return SecondPlayerHousesAnimated[i].DefaultSprites;
-                    }
-                }
-                i++;
-            }
-
-            return null;
-        }
-
         public Sprite GetNotContestedHouse(int count, int playerIndex)
         {
             playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
@@ -151,6 +65,52 @@ namespace TerritoryWars.ScriptablesObjects
                 default:
                     return null;
             }
+        }
+        
+        public Sprite GetNotContestedHouseByReference(Sprite sprite, int playerIndex)
+        {
+            playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
+            Sprite[] houses = FirstPlayerHouses.SmallHouses;
+            for (int i = 0; i < houses.Length; i++)
+            {
+                if (houses[i] == sprite)
+                {
+                    if (playerIndex == 0)
+                        return houses[i];
+                    return SecondPlayerHouses.SmallHouses[i];
+                }
+            }
+            houses = FirstPlayerHouses.LargeHouses;
+            for (int i = 0; i < houses.Length; i++)
+            {
+                if (houses[i] == sprite)
+                {
+                    if (playerIndex == 0)
+                        return houses[i];
+                    return SecondPlayerHouses.LargeHouses[i];
+                }
+            }
+            houses = SecondPlayerHouses.SmallHouses;
+            for (int i = 0; i < houses.Length; i++)
+            {
+                if (houses[i] == sprite)
+                {
+                    if (playerIndex == 1)
+                        return houses[i];
+                    return FirstPlayerHouses.SmallHouses[i];
+                }
+            }
+            houses = SecondPlayerHouses.LargeHouses;
+            for (int i = 0; i < houses.Length; i++)
+            {
+                if (houses[i] == sprite)
+                {
+                    if (playerIndex == 1)
+                        return houses[i];
+                    return FirstPlayerHouses.LargeHouses[i];
+                }
+            }
+            return null;
         }
 
         public Sprite GetContestedHouses(int count, int playerIndex)
@@ -176,6 +136,36 @@ namespace TerritoryWars.ScriptablesObjects
                     throw new ArgumentOutOfRangeException("Invalid house count" + count);
             }
         }
+
+        public bool IsContestedHouse(Sprite sprite, int count, int playerIndex)
+        {
+            playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
+            var contestedHouses = playerIndex == 0 ? FirstPlayerContestedHouses : SecondPlayerContestedHouses;
+            Sprite[] houses = null;
+            switch (count)
+            {
+                case 1:
+                    houses = contestedHouses.OneHouse;
+                    break;
+                case 2:
+                    houses = contestedHouses.DoubleHouses;
+                    break;
+                case 3:
+                    houses = contestedHouses.TripleHouses;
+                    break;
+                case 4:
+                    houses = contestedHouses.QuadrupleHouses;
+                    break;
+            }
+
+            if (houses != null)
+                foreach (var house in houses)
+                {
+                    if (house == sprite) return true;
+                }
+
+            return false;
+        }
         
         public Sprite GetTree(bool isNorth)
         {
@@ -184,36 +174,6 @@ namespace TerritoryWars.ScriptablesObjects
             return randomTree;
         }
         
-        public Sprite[] GetHouseByReference(Sprite[] sprites, bool isContested = false)
-        {
-            foreach (var house in FirstPlayerHousesAnimated)
-            {
-                if (house.DefaultSprites == sprites)
-                {
-                    return house.DefaultSprites;
-                }
-            }
-
-            foreach (var house in SecondPlayerHousesAnimated)
-            {
-                if (house.DefaultSprites == sprites)
-                {
-                    return house.DefaultSprites;
-                }
-            }
-
-            foreach (var house in NeutralHousesAnimated)
-            {
-                if (house.DefaultSprites == sprites)
-                {
-                    return house.DefaultSprites;
-                }
-            }
-
-            return null;
-        }
-
-
         public Sprite GetContestedRoadByReference(Sprite roadSprite)
         {
             for(int i = 0; i < RoadsSprites.Count; i++)
@@ -259,13 +219,6 @@ namespace TerritoryWars.ScriptablesObjects
             int randomIndex = Random.Range(0, (playerIndex == 0 ? ContestedBlueHouses : ContestedRedHouses).Length);
             Sprite randomContestedHouse = (playerIndex == 0 ? ContestedBlueHouses : ContestedRedHouses)[randomIndex];
             return new Sprite[] {randomContestedHouse};
-        }
-
-        public void BackIndex(int times)
-        {
-            CurrentHouseIndex = (CurrentHouseIndex - times) % FirstPlayerHousesAnimated.Count;
-            if (CurrentHouseIndex < 0)
-                CurrentHouseIndex += FirstPlayerHousesAnimated.Count;
         }
 
         public Sprite GetRandomMountain(bool isSnowy = false)

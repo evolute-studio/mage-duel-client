@@ -157,6 +157,17 @@ public class TileParts : MonoBehaviour
     {
         WallParent.transform.Find("BorderWalls").gameObject.SetActive(true);
     }
+    
+    public void HideForestAreas()
+    {
+        foreach (var area in Areas)
+        {
+            if (area is ForestArea forestArea)
+            {
+                forestArea.gameObject.SetActive(false);
+            }
+        }
+    }
 
     public void ChangeEnvironmentForContest()
     {

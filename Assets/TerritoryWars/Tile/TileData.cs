@@ -17,6 +17,8 @@ namespace TerritoryWars.Tile
         public int rotationIndex = 0;
         public int OwnerId = -1;
         
+        public List<Sprite> HouseSprites = new List<Sprite>();
+        
 
         public TileData(string tileCode)
         {

@@ -169,14 +169,7 @@ namespace TerritoryWars.General
                         renderer.Enviroment.SetActive(false);
                     });
                 
-                TileParts tileParts = tileObjects[startPos.x, startPos.y]
-                    .GetComponentInChildren<TileParts>();
-                foreach (var area in tileParts.Areas)
-                {
-                    if (area == null) continue;
-                    Destroy(area.gameObject);
-                }
-                tileParts.Areas.Clear();
+                tileObjects[startPos.x, startPos.y].GetComponentInChildren<TileParts>().HideForestAreas();
             }
 
             if (endPos != new Vector2Int(9, 0) && endPos != new Vector2Int(0, 9))
@@ -196,15 +189,7 @@ namespace TerritoryWars.General
                     {
                         renderer.Enviroment.SetActive(false);
                     });
-                TileParts tileParts = tileObjects[endPos.x, endPos.y]
-                    .GetComponentInChildren<TileParts>();
-                foreach (var area in tileParts.Areas)
-                {
-                    if (area == null) continue;
-                    Destroy(area.gameObject);
-                }
-                tileParts.Areas.Clear();
-                
+                tileObjects[endPos.x, endPos.y].GetComponentInChildren<TileParts>().HideForestAreas();
             }
 
             for (int i = 0; i < availablePositions.Count; i++)
