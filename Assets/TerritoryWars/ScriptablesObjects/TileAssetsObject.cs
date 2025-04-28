@@ -42,6 +42,8 @@ namespace TerritoryWars.ScriptablesObjects
         public Sprite[] NorthernTrees;
         public Sprite[] SouthernTrees;
 
+        [Header("Flags")] public FlagsOnWall[] FlagsOnWalls;
+
         // 0 - neutral, 1 - first player, 2 - second player
         // 3 - neutral two points, 4 - first player two points, 5 - second player two points
         public Sprite[] Pins; 
@@ -221,7 +223,25 @@ namespace TerritoryWars.ScriptablesObjects
             return new Sprite[] {randomContestedHouse};
         }
 
-        public Sprite GetRandomMountain(bool isSnowy = false)
+        
+        
+
+        public Sprite GetFlagByReference(int winner, Sprite sprite)
+        {
+            for (int i = 0; i < FlagsOnWalls.Length; i++)
+            {
+                for(int j = 0; j < FlagsOnWalls[i].Flags.Length; j++)
+                {
+                    if (FlagsOnWalls[i].Flags[j] == sprite)
+                    {
+                        return FlagsOnWalls[i].Flags[winner];
+                    }
+                }
+            }
+            return null;
+        }
+
+    public Sprite GetRandomMountain(bool isSnowy = false)
         {
             if (isSnowy)
             {
@@ -259,5 +279,12 @@ namespace TerritoryWars.ScriptablesObjects
             public Sprite[] TripleHouses;
             public Sprite[] QuadrupleHouses;
         }
+
+        [Serializable]
+        public class FlagsOnWall
+        {
+            public Sprite[] Flags;
+        }
+        
     }
 }
