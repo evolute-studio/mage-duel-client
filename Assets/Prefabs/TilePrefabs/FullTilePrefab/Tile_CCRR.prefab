@@ -624,7 +624,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5054434491712712948
 Transform:
   m_ObjectHideFlags: 0
@@ -764,7 +764,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   prefab: {fileID: 5875034238149260964, guid: 66e5e4b2c96df89c4a544090394b5dbe, type: 3}
-  treeDensity: 20
+  treeDensity: 40
   boundsY: {x: 0, y: 9}
 --- !u!1 &614720341642827158
 GameObject:
@@ -10657,6 +10657,7 @@ MonoBehaviour:
   Enviroment: {fileID: 7103918044154677289}
   ContestedEnviroment: {fileID: 853189391384079487}
   PolygonCollider2D: {fileID: 0}
+  FlagsOnWalls: {fileID: 0}
   CompletedBorderWalls: []
   CompletedWalls: []
 --- !u!114 &7445246909430285057

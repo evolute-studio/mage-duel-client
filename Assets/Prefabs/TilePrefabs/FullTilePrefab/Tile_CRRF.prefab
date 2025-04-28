@@ -2142,6 +2142,7 @@ MonoBehaviour:
   Enviroment: {fileID: 3685622421375342389}
   ContestedEnviroment: {fileID: 6432604654954017160}
   PolygonCollider2D: {fileID: 0}
+  FlagsOnWalls: {fileID: 0}
   CompletedBorderWalls: []
   CompletedWalls: []
 --- !u!1 &1064965882254985077
@@ -6870,7 +6871,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3307008476859061102
 Transform:
   m_ObjectHideFlags: 0
@@ -7010,7 +7011,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   prefab: {fileID: 5875034238149260964, guid: 66e5e4b2c96df89c4a544090394b5dbe, type: 3}
-  treeDensity: 20
+  treeDensity: 40
   boundsY: {x: 0, y: 9}
 --- !u!1 &5469740544753449485
 GameObject:
@@ -7439,8 +7440,8 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 13
   m_Positions:
-  - {x: -0.27154922, y: 0.0157938, z: 0}
-  - {x: -0.6271858, y: -0.16859818, z: 0}
+  - {x: -0.37873077, y: 0.044402122, z: 0}
+  - {x: -0.71866226, y: -0.1185627, z: 0}
   - {x: -0.9674473, y: 0.0010888577, z: 0}
   - {x: -0.28157806, y: 0.33881307, z: 0}
   - {x: -0.3042755, y: 0.10897136, z: 0}
@@ -7517,7 +7518,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   prefab: {fileID: 5875034238149260964, guid: 66e5e4b2c96df89c4a544090394b5dbe, type: 3}
-  treeDensity: 20
+  treeDensity: 40
   boundsY: {x: 0, y: 9}
 --- !u!1 &5780501385145037923
 GameObject:

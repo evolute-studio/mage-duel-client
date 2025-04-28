@@ -5503,7 +5503,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2148485504275690161
 Transform:
   m_ObjectHideFlags: 0
@@ -5643,7 +5643,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   prefab: {fileID: 5875034238149260964, guid: 66e5e4b2c96df89c4a544090394b5dbe, type: 3}
-  treeDensity: 20
+  treeDensity: 40
   boundsY: {x: 0, y: 9}
 --- !u!1 &4303637546554825886
 GameObject:
@@ -5784,7 +5784,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8714188239649348084
 Transform:
   m_ObjectHideFlags: 0
@@ -5924,7 +5924,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   prefab: {fileID: 5875034238149260964, guid: 66e5e4b2c96df89c4a544090394b5dbe, type: 3}
-  treeDensity: 20
+  treeDensity: 40
   boundsY: {x: 0, y: 9}
 --- !u!1 &4456619231506179008
 GameObject:
@@ -10154,6 +10154,7 @@ MonoBehaviour:
   Enviroment: {fileID: 3805408665897628030}
   ContestedEnviroment: {fileID: 6255204725878776213}
   PolygonCollider2D: {fileID: 0}
+  FlagsOnWalls: {fileID: 0}
   CompletedBorderWalls: []
   CompletedWalls: []
 --- !u!114 &6438371954667073254

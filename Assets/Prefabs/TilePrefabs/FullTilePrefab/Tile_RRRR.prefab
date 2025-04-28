@@ -197,11 +197,11 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 13
   m_Positions:
-  - {x: -0.38804245, y: -0.05334747, z: 0}
-  - {x: -0.5880661, y: -0.1797136, z: 0}
+  - {x: -0.5764847, y: -0.06564173, z: 0}
+  - {x: -0.6870403, y: -0.13876164, z: 0}
   - {x: -0.9674473, y: 0.0010888577, z: 0}
-  - {x: -0.5846367, y: 0.17656082, z: 0}
-  - {x: -0.38976097, y: 0.029679239, z: 0}
+  - {x: -0.75167847, y: 0.11210407, z: 0}
+  - {x: -0.59378433, y: 0.031654686, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.0001
@@ -275,7 +275,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   prefab: {fileID: 5875034238149260964, guid: 66e5e4b2c96df89c4a544090394b5dbe, type: 3}
-  treeDensity: 20
+  treeDensity: 40
   boundsY: {x: 0, y: 9}
 --- !u!1 &1116363127137774696
 GameObject:
@@ -1185,9 +1185,9 @@ LineRenderer:
   m_SortingOrder: 13
   m_Positions:
   - {x: 0.9558296, y: 0.00037002563, z: 0}
-  - {x: 0.59366417, y: -0.16284445, z: 0}
-  - {x: 0.26086426, y: 0.000721246, z: 0}
-  - {x: 0.5758076, y: 0.1796079, z: 0}
+  - {x: 0.6995468, y: -0.11983922, z: 0}
+  - {x: 0.5216217, y: 0.010446191, z: 0}
+  - {x: 0.7030449, y: 0.12555674, z: 0}
   - {x: 0.9468498, y: 0.005108595, z: 0}
   m_Parameters:
     serializedVersion: 3
@@ -1262,7 +1262,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   prefab: {fileID: 5875034238149260964, guid: 66e5e4b2c96df89c4a544090394b5dbe, type: 3}
-  treeDensity: 20
+  treeDensity: 40
   boundsY: {x: 0, y: 9}
 --- !u!1 &5034657415405254815
 GameObject:
@@ -2294,6 +2294,7 @@ MonoBehaviour:
   Enviroment: {fileID: 7517550210854719672}
   ContestedEnviroment: {fileID: 0}
   PolygonCollider2D: {fileID: 0}
+  FlagsOnWalls: {fileID: 0}
   CompletedBorderWalls: []
   CompletedWalls: []
 --- !u!114 &7301718243668488645
@@ -2661,11 +2662,11 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 13
   m_Positions:
-  - {x: 0.3143463, y: -0.30526903, z: 0}
+  - {x: 0.25004578, y: -0.34660694, z: 0}
   - {x: 0.00021362305, y: -0.47792435, z: 0}
-  - {x: -0.37166595, y: -0.2885367, z: 0}
-  - {x: -0.032691956, y: -0.14663088, z: 0}
-  - {x: 0.2004776, y: -0.2218391, z: 0}
+  - {x: -0.23708725, y: -0.36362502, z: 0}
+  - {x: -0.032604218, y: -0.26796904, z: 0}
+  - {x: 0.15818405, y: -0.27971068, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.0001
@@ -2739,7 +2740,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   prefab: {fileID: 5875034238149260964, guid: 66e5e4b2c96df89c4a544090394b5dbe, type: 3}
-  treeDensity: 20
+  treeDensity: 40
   boundsY: {x: 0, y: 9}
 --- !u!1 &7517550210854719672
 GameObject:
@@ -2943,11 +2944,11 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 13
   m_Positions:
-  - {x: 0.19647217, y: 0.23381083, z: 0}
-  - {x: -0.0610466, y: 0.15977243, z: 0}
-  - {x: -0.32331467, y: 0.318755, z: 0}
+  - {x: 0.21413612, y: 0.2212138, z: 0}
+  - {x: -0.012199402, y: 0.14576222, z: 0}
+  - {x: -0.3320179, y: 0.31546423, z: 0}
   - {x: 0.0008678436, y: 0.48062253, z: 0}
-  - {x: 0.2762184, y: 0.34000763, z: 0}
+  - {x: 0.3472824, y: 0.29374057, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.0001
@@ -3021,7 +3022,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 0}
   prefab: {fileID: 5875034238149260964, guid: 66e5e4b2c96df89c4a544090394b5dbe, type: 3}
-  treeDensity: 20
+  treeDensity: 40
   boundsY: {x: 0, y: 9}
 --- !u!1 &8388547098740935963
 GameObject:
