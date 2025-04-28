@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using TerritoryWars.General;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
+using TerritoryWars.UI;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -21,6 +23,7 @@ public class TileParts : MonoBehaviour
     public GameObject Enviroment;
     public GameObject ContestedEnviroment;
     public PolygonCollider2D PolygonCollider2D;
+    public FlagsOnWall FlagsOnWalls;
 
     private GameObject WallParent;
     public GameObject[] CompletedBorderWalls;
@@ -35,6 +38,8 @@ public class TileParts : MonoBehaviour
     {
         DefaultLayerMask = LayerMask.NameToLayer("Default");
         OutlineLayerMask = LayerMask.NameToLayer("Outline");
+
+        FlagsOnWalls = gameObject.GetComponentInChildren<FlagsOnWall>();
         // BorderFences
         Transform borderFences = transform.Find("BorderFence");
         if (borderFences != null)
@@ -123,6 +128,33 @@ public class TileParts : MonoBehaviour
             foreach (var forestArea in forestAreas)
             {
                 Areas.Add(forestArea);
+            }
+        }
+    }
+
+    public void PlaceFlags(int rotation, int winner)
+    {
+        if (FlagsOnWalls == null) return;
+        
+        FlagsOnWalls.gameObject.SetActive(true);
+        for (int i = 0; i < FlagsOnWalls.FlagsGO.Length; i++)
+        {
+            if (FlagsOnWalls.FlagsGO[i] == null)
+            {
+                continue;
+            }
+            FlagsOnWalls.FlagsGO[i].SetActive(i == rotation);
+            SpriteRenderer[] flags = FlagsOnWalls.FlagsGO[i].GetComponentsInChildren<SpriteRenderer>();
+            if (winner != 3)
+            {
+                foreach (var flag in flags)
+                {
+                    if (flag != null)
+                    {
+                        flag.sprite = PrefabsManager.Instance.TileAssetsObject
+                            .GetFlagByReference(SetLocalPlayerData.GetLocalIndex(winner), flag.sprite);
+                    }
+                }
             }
         }
     }

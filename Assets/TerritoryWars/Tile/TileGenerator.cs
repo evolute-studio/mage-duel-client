@@ -273,6 +273,7 @@ namespace TerritoryWars.Tile
             if (isContest)
             {
                 tileParts.PlaceContestedWalls(rotation);
+                tileParts.PlaceFlags(rotation, playerId);
             }
             houseRenderers = CurrentTileGO.GetComponent<TileParts>().HouseRenderers;
 
