@@ -11,6 +11,7 @@ public class TileParts : MonoBehaviour
     public List<SpriteRenderer> DecorationsRenderers { get; private set; } = new List<SpriteRenderer>();
     public List<SpriteRenderer> ArcRenderers = new List<SpriteRenderer>();
     public TerritoryFiller TileTerritoryFiller;
+    public List<Area> Areas { get; private set; } = new List<Area>();
     public WallPlacer WallPlacer;
     public SpriteRenderer[] RoadRenderers = new SpriteRenderer[4];
     public GameObject Mill;
@@ -112,6 +113,16 @@ public class TileParts : MonoBehaviour
                 {
                     DecorationsRenderers.Add(decoration);
                 }
+            }
+        }
+        
+        // ForestAreas
+        ForestArea[] forestAreas = transform.GetComponentsInChildren<ForestArea>();
+        if (forestAreas != null)
+        {
+            foreach (var forestArea in forestAreas)
+            {
+                Areas.Add(forestArea);
             }
         }
     }

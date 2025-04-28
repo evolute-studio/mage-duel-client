@@ -2815,8 +2815,9 @@ GameObject:
   m_Component:
   - component: {fileID: 3973318310881848032}
   - component: {fileID: 4979311857610326354}
+  - component: {fileID: 1708338868313679669}
   m_Layer: 0
-  m_Name: Area
+  m_Name: ForestArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2883,11 +2884,14 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 13
   m_Positions:
-  - {x: 0.9558296, y: 0.00037002563, z: 0}
+  - {x: 0.96621704, y: 0.0007799566, z: 0}
   - {x: 0.00021362305, y: -0.47792435, z: 0}
   - {x: -0.9674473, y: 0.0010888577, z: 0}
-  - {x: 0.0008678436, y: 0.48062253, z: 0}
-  - {x: 0.9468498, y: 0.005108595, z: 0}
+  - {x: -0.621748, y: 0.17345488, z: 0}
+  - {x: 0.0019416809, y: -0.123508275, z: 0}
+  - {x: 0.21902084, y: 0.029266477, z: 3.1056323}
+  - {x: -0.24535751, y: 0.3453017, z: 3.1056323}
+  - {x: -0.002418518, y: 0.46999583, z: 3.1056323}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.0001
@@ -2947,6 +2951,22 @@ LineRenderer:
   m_UseWorldSpace: 0
   m_Loop: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &1708338868313679669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5808189417197661301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b112e797ae8d4b9fb7861e6da54cddcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineRenderer: {fileID: 0}
+  prefab: {fileID: 5875034238149260964, guid: 66e5e4b2c96df89c4a544090394b5dbe, type: 3}
+  treeDensity: 20
+  boundsY: {x: 0, y: 9}
 --- !u!1 &5960955113261069223
 GameObject:
   m_ObjectHideFlags: 0

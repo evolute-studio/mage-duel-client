@@ -167,6 +167,15 @@ namespace TerritoryWars.General
                     {
                         renderer.Enviroment.SetActive(false);
                     });
+                
+                TileParts tileParts = tileObjects[startPos.x, startPos.y]
+                    .GetComponentInChildren<TileParts>();
+                foreach (var area in tileParts.Areas)
+                {
+                    if (area == null) continue;
+                    Destroy(area.gameObject);
+                }
+                tileParts.Areas.Clear();
             }
 
             if (endPos != new Vector2Int(9, 0) && endPos != new Vector2Int(0, 9))
@@ -181,10 +190,19 @@ namespace TerritoryWars.General
                         .GetComponent<SpriteRenderer>().sortingOrder = 20;
                 }
                 tileObjects[endPos.x, endPos.y].GetComponentsInChildren<TileParts>().ToList().ForEach(
-                    renderer =>
+                    renderer => 
                     {
                         renderer.Enviroment.SetActive(false);
                     });
+                TileParts tileParts = tileObjects[endPos.x, endPos.y]
+                    .GetComponentInChildren<TileParts>();
+                foreach (var area in tileParts.Areas)
+                {
+                    if (area == null) continue;
+                    Destroy(area.gameObject);
+                }
+                tileParts.Areas.Clear();
+                
             }
 
             for (int i = 0; i < availablePositions.Count; i++)
@@ -199,6 +217,14 @@ namespace TerritoryWars.General
                         tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer")
                             .GetComponent<SpriteRenderer>().sortingOrder = 20;
                     }
+                    TileParts tileParts = tileObjects[availablePositions[i].x, availablePositions[i].y]
+                        .GetComponentInChildren<TileParts>();
+                    foreach (var area in tileParts.Areas)
+                    {
+                        if (area == null) continue;
+                        Destroy(area.gameObject);
+                    }
+                    tileParts.Areas.Clear();
                 }
                 else if (tilesToSpawn[i] == roadTile)
                 {
