@@ -155,7 +155,8 @@ namespace TerritoryWars.General
                 // Place mountains at start and end positions
                 PlaceTile(new TileData(fieldTile), startPos.x, startPos.y, -1);
                 // Don't place forests, only mountains at other corners
-                tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = tileAssets.GetRandomMountain();
+                tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = 
+                    tileAssets.GetRandomMountain(IsSnowBoardPart(startPos.x, startPos.y));
                 if (swapOrderLayer)
                 {
                     tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer")
@@ -174,7 +175,8 @@ namespace TerritoryWars.General
                 if(GetTileObject(endPos.x, endPos.y) != null)
                     Destroy(GetTileObject(endPos.x, endPos.y));
                 PlaceTile(new TileData(fieldTile), endPos.x, endPos.y, -1);
-                tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = tileAssets.GetRandomMountain();
+                tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite
+                    = tileAssets.GetRandomMountain(IsSnowBoardPart(endPos.x, endPos.y));
                 if (swapOrderLayer)
                 {
                     tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer")
@@ -193,7 +195,8 @@ namespace TerritoryWars.General
                 PlaceTile(tile, availablePositions[i].x, availablePositions[i].y, -1);
                 if (tilesToSpawn[i] == fieldTile)
                 {
-                    tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = tileAssets.GetRandomMountain();
+                    tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite 
+                        = tileAssets.GetRandomMountain(IsSnowBoardPart(availablePositions[i].x, availablePositions[i].y));
                     if (swapOrderLayer)
                     {
                         tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer")
@@ -332,15 +335,6 @@ namespace TerritoryWars.General
             {
                 if(IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
-                    if (neighborsGO[i].GetComponentInChildren<MineTile>() && isRoadContest)
-                    {
-                        MineTile mineTile = neighborsGO[i].GetComponentInChildren<MineTile>();
-                        
-                        mineTile.MineRoad.sprite = 
-                            PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(mineTile.MineRoad
-                                .sprite);
-                    }
-
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
                     {
@@ -379,6 +373,12 @@ namespace TerritoryWars.General
                     }
                 }
             }
+        }
+
+        public bool IsSnowBoardPart(int x, int y)
+        {
+            Debug.Log("X: " + x + " Y: " + y + " | " + ( y > 10 - x ));
+            return y + 1 > 10 - x;
         }
 
         public Vector2Int GetEdgeNeighbors(int x, int y, Side side)

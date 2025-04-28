@@ -24,7 +24,8 @@ namespace TerritoryWars.ScriptablesObjects
         public ContestedHouses SecondPlayerContestedHouses;
         
         
-        public Sprite[] Mountains;
+        public Sprite[] ForestMountains;
+        public Sprite[] SnowMountains;
         public GameObject ForestPrefab;
         public List<Sprite> RoadsSprites;
         public List<Sprite> RoadsSpritesContested;
@@ -256,11 +257,20 @@ namespace TerritoryWars.ScriptablesObjects
                 CurrentHouseIndex += FirstPlayerHousesAnimated.Count;
         }
 
-        public Sprite GetRandomMountain()
+        public Sprite GetRandomMountain(bool isSnowy = false)
         {
-            int randomIndex = Random.Range(0, Mountains.Length);
-            Sprite randomMountain = Mountains[randomIndex];
-            return randomMountain;
+            if (isSnowy)
+            {
+                int randomIndex = Random.Range(0, SnowMountains.Length);
+                Sprite randomMountain = SnowMountains[randomIndex];
+                return randomMountain;
+            }
+            else
+            {
+                int randomIndex = Random.Range(0, ForestMountains.Length);
+                Sprite randomMountain = ForestMountains[randomIndex];
+                return randomMountain;
+            }
         }
 
         [Serializable]
