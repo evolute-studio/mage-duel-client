@@ -240,6 +240,13 @@ public class TileParts : MonoBehaviour
                 }
             }
         }
+        if (CompletedWalls != null)
+        {
+            foreach (var wall in CompletedWalls)
+            {
+                if (wall != null) wall.layer = mask;
+            }
+        }
     }
 
     public void RoadOutline(bool isOutline, Side side = Side.None)
