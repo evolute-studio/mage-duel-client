@@ -225,6 +225,11 @@ namespace TerritoryWars.Tile
             {
                 currentGoTileRotator.MirrorRotationObjects.Add(decoration.transform);
             }
+
+            foreach (var area in tileParts.Areas)
+            {
+                currentGoTileRotator.LineRenderers.Add(area.lineRenderer);
+            }
             currentGoTileRotator.RotateTile((_rotation + 3) % 4);
             
             if (arcRenderers != null)

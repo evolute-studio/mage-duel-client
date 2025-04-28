@@ -42,6 +42,10 @@ namespace TerritoryWars.ScriptablesObjects
         
         public Sprite[] ContestedBlueHouses;
         public Sprite[] ContestedRedHouses;
+        
+        [Header("Trees")]
+        public Sprite[] NorthernTrees;
+        public Sprite[] SouthernTrees;
 
         // 0 - neutral, 1 - first player, 2 - second player
         // 3 - neutral two points, 4 - first player two points, 5 - second player two points
@@ -171,6 +175,13 @@ namespace TerritoryWars.ScriptablesObjects
                 default:
                     throw new ArgumentOutOfRangeException("Invalid house count" + count);
             }
+        }
+        
+        public Sprite GetTree(bool isNorth)
+        {
+            int randomIndex = Random.Range(0, (isNorth ? NorthernTrees : SouthernTrees).Length);
+            Sprite randomTree = (isNorth ? NorthernTrees : SouthernTrees)[randomIndex];
+            return randomTree;
         }
         
         public Sprite[] GetHouseByReference(Sprite[] sprites, bool isContested = false)
