@@ -6,4 +6,5 @@ public class MineEnviromentTile
 {
     public GameObject MineTile;
     public Side Direction;
+    public bool IsSnowy;
 }
