@@ -183,7 +183,7 @@ namespace TerritoryWars.Tile
             TerritoryFiller territoryFiller = tileParts.TileTerritoryFiller;
             WallPlacer = tileParts.WallPlacer;
             List<Transform> pillars = null;
-            Transform[] pins = tileParts.PinsPositions;
+            
             if (WallPlacer != null)
             {
                 pillars = WallPlacer.GetPillars().ToList();
@@ -231,6 +231,7 @@ namespace TerritoryWars.Tile
                 currentGoTileRotator.LineRenderers.Add(area.lineRenderer);
             }
             currentGoTileRotator.RotateTile((_rotation + 3) % 4);
+            Transform[] pins = tileParts.PinsPositions;
             
             if (arcRenderers != null)
             {
