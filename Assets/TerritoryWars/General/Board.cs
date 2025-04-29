@@ -388,21 +388,21 @@ namespace TerritoryWars.General
 
         public int IsSnowBoardPart(int x, int y)
         {
-            if (x < 5 & y < 5) // the numbers indicate the part of the board
+            if (x < 4 & y < 4) // the numbers indicate the part of the board
             {
                 return 0;
             }
-            if (x <= 5 & y >= 5)
+            if (x > 4 & y > 4)
+            {
+                return 3;
+            }
+            if (x <= 4 & y >= 4)
             {
                 return 1;
             }
-            if (x >= 5 & y <= 5)
+            if (x >= 4 & y <= 4)
             {
                 return 2;
-            }
-            if (x > 5 & y > 5)
-            {
-                return 3;
             }
 
             return -1;
