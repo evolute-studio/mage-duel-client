@@ -21,6 +21,7 @@ namespace TerritoryWars.ScriptablesObjects
         
         public Sprite[] ForestMountains;
         public Sprite[] SnowMountains;
+        public Sprite[] ForestMountainsWithoutClouds;
         public GameObject ForestPrefab;
         public List<Sprite> RoadsSprites;
         public List<Sprite> RoadsSpritesContested;
@@ -241,20 +242,38 @@ namespace TerritoryWars.ScriptablesObjects
             return null;
         }
 
-    public Sprite GetRandomMountain(bool isSnowy = false)
-        {
-            if (isSnowy)
+    public Sprite GetRandomMountain(int boardPart)
+    {
+            int randomIndex;
+            Sprite randomMountain;
+        
+            switch (boardPart)
             {
-                int randomIndex = Random.Range(0, SnowMountains.Length);
-                Sprite randomMountain = SnowMountains[randomIndex];
-                return randomMountain;
+                case 0:
+                    // with clouds
+                    randomIndex = Random.Range(0, ForestMountains.Length);
+                    randomMountain = ForestMountains[randomIndex];
+                    return randomMountain;
+                    break;
+                case 1:
+                case 2:
+                    // without clouds
+                    randomIndex = Random.Range(0, ForestMountainsWithoutClouds.Length);
+                    randomMountain = ForestMountainsWithoutClouds[randomIndex];
+                    return randomMountain;
+                    break;
+                case 3:
+                    // snow
+                    randomIndex = Random.Range(0, SnowMountains.Length);
+                    randomMountain = SnowMountains[randomIndex];
+                    return randomMountain;
+                    break;
+                case -1:
+                    // without clouds
+                    return null;
+                    break;
             }
-            else
-            {
-                int randomIndex = Random.Range(0, ForestMountains.Length);
-                Sprite randomMountain = ForestMountains[randomIndex];
-                return randomMountain;
-            }
+            return null;
         }
 
         [Serializable]

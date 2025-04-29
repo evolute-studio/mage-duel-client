@@ -6,5 +6,5 @@ public class MineEnviromentTile
 {
     public GameObject MineTile;
     public Side Direction;
-    public bool IsSnowy;
+    public int BoardPart;
 }

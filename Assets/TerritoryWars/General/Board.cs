@@ -386,10 +386,26 @@ namespace TerritoryWars.General
             }
         }
 
-        public bool IsSnowBoardPart(int x, int y)
+        public int IsSnowBoardPart(int x, int y)
         {
-            Debug.Log("X: " + x + " Y: " + y + " | " + ( y > 10 - x ));
-            return y + 1 > 10 - x;
+            if (x < 5 & y < 5) // the numbers indicate the part of the board
+            {
+                return 0;
+            }
+            if (x <= 5 & y >= 5)
+            {
+                return 1;
+            }
+            if (x >= 5 & y <= 5)
+            {
+                return 2;
+            }
+            if (x > 5 & y > 5)
+            {
+                return 3;
+            }
+
+            return -1;
         }
 
         public Vector2Int GetEdgeNeighbors(int x, int y, Side side)
