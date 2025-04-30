@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TerritoryWars.General;
+using TerritoryWars.ModelsDataConverters;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -99,12 +100,8 @@ namespace TerritoryWars.Tile
 
         public void SetConfig(string config)
         {
-            string[] parts = config.Split(':');
-            if (parts.Length == 2)
-            {
-                id = parts[0];
-                rotationIndex = int.Parse(parts[1]);
-            }
+            id = config;
+            (_, rotationIndex) = OnChainBoardDataConverter.GetTypeAndRotation(config);
         }
         
         public bool IsCityParallel()

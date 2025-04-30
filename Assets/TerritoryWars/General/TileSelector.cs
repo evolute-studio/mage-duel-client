@@ -574,7 +574,7 @@ namespace TerritoryWars.General
         {
             try
             {
-                currentTile = tile;
+                currentTile.SetConfig(tile.id);
                 selectedPosition = new Vector2Int(x, y);
                 isPlacingTile = true;
 
