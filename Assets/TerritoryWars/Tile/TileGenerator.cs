@@ -367,11 +367,11 @@ namespace TerritoryWars.Tile
             {
                 if(_tileData.GetSide(side.Direction) != LandscapeType.Road) continue;
                 
-                bool isSnowy = SessionManager.Instance.Board.IsSnowBoardPart(side.TileBoardPosition.x, side.TileBoardPosition.y);
+                int snowBoardPart = SessionManager.Instance.Board.IsSnowBoardPart(side.TileBoardPosition.x, side.TileBoardPosition.y);
 
                 foreach (var prefab in PrefabsManager.Instance.MineEnviromentTiles)
                 {
-                    if (prefab.Direction == side.Direction && prefab.IsSnowy == isSnowy)
+                    if (prefab.Direction == side.Direction && prefab.BoardPart == snowBoardPart)
                     {
                         GameObject mine = Instantiate(prefab.MineTile, side.Position, Quaternion.identity,
                             SessionManager.Instance.Board.GetTileObject(side.TileBoardPosition.x, side.TileBoardPosition.y).transform);
