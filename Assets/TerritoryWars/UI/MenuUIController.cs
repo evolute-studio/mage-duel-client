@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using TerritoryWars.UI.Popups;
@@ -30,8 +31,8 @@ namespace TerritoryWars.UI
 
         public void Start()
         {
-            
             Initialize();
+            WrapperConnectorTest.GetUsername();
             //DojoGameManager.Instance.SessionManager = null;
         }
 

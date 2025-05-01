@@ -7,6 +7,7 @@ using TerritoryWars.Dojo;
 using TerritoryWars.Tools;
 using UnityEngine;
 using System.Threading.Tasks;
+using TerritoryWars.ExternalConnections;
 
 namespace TerritoryWars.General
 {
@@ -26,21 +27,41 @@ namespace TerritoryWars.General
 
     public class EntryPoint : MonoBehaviour
     {
+        public static EntryPoint Instance { get; private set; }
+        
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+        
         public WorldManager WorldManager;
         public DojoGameManager DojoGameManager;
         public DojoGameController DojoGameGUIController;
         public bool UseDojoGUIController = false;
         
         private float startConenctionTime;
-        
 
-        public async void Start()
+        public void ControllerLogin()
         {
+            ApplicationState.IsController = true;
+            WrapperConnectorTest.ControllerLogin();
+        }
+
+        public async void GuestLogin()
+        {
+            ApplicationState.IsController = false;
             CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
             await InitializeGameAsync();
         }
         
-        private async Task InitializeGameAsync()
+        public async Task InitializeGameAsync()
         {
             InitDataStorage();
             
