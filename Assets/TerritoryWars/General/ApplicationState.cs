@@ -14,6 +14,7 @@ namespace TerritoryWars.General
     {
         public static ApplicationStates CurrentState = ApplicationStates.Initializing;
         public static bool IsController = false;
+        public static bool IsLoggedIn = false;
         
         public static void SetState(ApplicationStates state)
         {

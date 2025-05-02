@@ -21,27 +21,22 @@ namespace TerritoryWars.ExternalConnections
                 Destroy(gameObject);
             }
         }
-
-        public void LoginController()
+        
+        public void OnControllerLogin()
+        {
+            CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
+            CustomLogger.LogDojoLoop("Controller logged in");
+            EntryPoint.Instance.InitializeControllerGameAsync();
+        }
+        
+        public void OnControllerNotLoggedIn()
         {
             
         }
-
         public void OnUsernameReceived(string username)
         {
             Debug.Log("Username received: " + username);
             MenuUIController.Instance?._namePanelController.SetName(username);
-        }
-
-        public void OnControllerLogin()
-        {
-            CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
-            EntryPoint.Instance.InitializeGameAsync();
-        }
-
-        public void OnControllerNotLoggedIn()
-        {
-            EntryPoint.Instance.InitializeGameAsync();
         }
     }
 }

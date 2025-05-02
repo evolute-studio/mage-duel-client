@@ -48,20 +48,83 @@ namespace TerritoryWars.General
         
         private float startConenctionTime;
 
-        public void ControllerLogin()
+        public void Start()
+        {
+            CustomLogger.LogDojoLoop("Starting Loading Game");
+            CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
+            bool isControllerLogged = WrapperConnectorCalls.IsControllerLoggedIn();
+            if(isControllerLogged)
+            {
+                CustomLogger.LogDojoLoop("Controller is logged in");
+                ControllerLogin();
+            }
+            else
+            {
+                CustomLogger.LogDojoLoop("Controller is not logged in");
+                CustomSceneManager.Instance.LoadingScreen.SetActive(false);
+            }
+        }
+        
+        public async void ControllerLogin()
         {
             ApplicationState.IsController = true;
-            WrapperConnectorTest.ControllerLogin();
+            WrapperConnectorCalls.ControllerLogin();
         }
 
         public async void GuestLogin()
         {
             ApplicationState.IsController = false;
             CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
-            await InitializeGameAsync();
+            await InitializeGuestGameAsync();
         }
         
-        public async Task InitializeGameAsync()
+        public async Task InitializeControllerGameAsync()
+        {
+            if (ApplicationState.IsLoggedIn)
+            {
+                CustomLogger.LogDojoLoop("Already logged in");
+                return;
+            }
+            ApplicationState.IsLoggedIn = true;
+            ApplicationState.IsController = true;
+            
+            InitDataStorage();
+            
+            try
+            {
+                CustomLogger.LogDojoLoop("Starting OnChain mode initialization");
+                
+                // 1. Setup Account
+                CustomLogger.LogDojoLoop("Setting up account");
+                await SetupAccountAsync();
+                
+                // 2. Create Burners
+                CustomLogger.LogDojoLoop("Creating burner accounts");
+                await DojoGameManager.CreateBurners();
+                
+                //
+                // await CoroutineAsync(() => { }, 2f);
+                //
+                CustomLogger.LogDojoLoop("Creating bot");
+                await DojoGameManager.CreateBot();
+                
+                // 3. Sync Initial Models
+                CustomLogger.LogDojoLoop("Syncing initial models");
+                await DojoGameManager.SyncInitialModels();
+                
+                // 4. Load Game
+                CustomLogger.LogDojoLoop("Checking previous game");
+                DojoGameManager.LoadGame();
+                
+                CustomLogger.LogDojoLoop("Initialization completed successfully");
+            }
+            catch (Exception e)
+            {
+                CustomLogger.LogError($"Initialization failed:", e);
+            }
+        }
+        
+        public async Task InitializeGuestGameAsync()
         {
             InitDataStorage();
             
