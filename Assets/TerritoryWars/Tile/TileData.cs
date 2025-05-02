@@ -77,7 +77,7 @@ namespace TerritoryWars.Tile
 
         public string GetConfig()
         {
-            return id + ":" + rotationIndex;
+            return id; //+ ":" + rotationIndex;
         }
         
         public List<Side> GetRoadSides()

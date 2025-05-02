@@ -176,6 +176,7 @@ namespace TerritoryWars.General
             SessionManager.Instance.TileSelector.SetCurrentTile(new TileData("FFFF"));
             tileGenerator.Generate(new TileData("FFFF"));
             tileGeneratorForUI.Generate(new TileData("FFFF"));
+            tileGenerator.tileParts.HideForestAreas();
         }
 
         public void SetPosition(int x, int y)
@@ -261,6 +262,7 @@ namespace TerritoryWars.General
                 groundRenderers.Add(tileGenerator.CurrentTileGO.transform.Find("Grass").GetComponent<SpriteRenderer>());
                 groundRenderers.AddRange(tileGenerator.CurrentTileGO.transform.Find("Ground")
                     .GetComponentsInChildren<SpriteRenderer>());
+                groundRenderers.Add(tileGenerator.tileParts.HangingGrass);
 
                 foreach (var renderers in groundRenderers)
                 {

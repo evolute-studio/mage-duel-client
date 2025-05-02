@@ -24,6 +24,7 @@ public class TileParts : MonoBehaviour
     public GameObject ContestedEnviroment;
     public PolygonCollider2D PolygonCollider2D;
     public FlagsOnWall FlagsOnWalls;
+    public SpriteRenderer HangingGrass;
 
     private GameObject WallParent;
     public GameObject[] CompletedBorderWalls;
@@ -129,6 +130,14 @@ public class TileParts : MonoBehaviour
             {
                 Areas.Add(forestArea);
             }
+        }
+    }
+
+    public void SpawnTileObjects(bool isBoarderTile = false)
+    {
+        if (HangingGrass.sprite == null && HangingGrass != null)
+        {
+            HangingGrass.sprite = PrefabsManager.Instance.TileAssetsObject.GetHangingGrass();
         }
     }
 

@@ -21,7 +21,7 @@ namespace TerritoryWars.Tile
         public TileConnector[] connectors;
         public SpriteRenderer RoadRenderer;
         public TileAssetsObject TileAssetsObject => PrefabsManager.Instance.TileAssetsObject;
-        [FormerlySerializedAs("TileRenderers")] public TileParts tileParts;
+        public TileParts tileParts;
         public TileJokerAnimator TileJokerAnimator;
 
         public TileRotator TileRotator;
@@ -257,6 +257,8 @@ namespace TerritoryWars.Tile
             {
                 GenerateRoadPins(pins);
             }
+            
+            tileParts.SpawnTileObjects();
 
             if (SessionManager.Instance.TileSelector.selectedPosition != null || _isTilePlacing)
             {

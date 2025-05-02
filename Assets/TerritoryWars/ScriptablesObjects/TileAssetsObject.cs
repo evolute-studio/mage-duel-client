@@ -30,8 +30,8 @@ namespace TerritoryWars.ScriptablesObjects
         public Sprite[] StonePillars;
         public Sprite[] WoodenWallSprites;
         public Sprite[] StoneWallSprites;
-        public Sprite WoodenArc;
-        public Sprite StoneArc;
+
+        public Sprite[] HangingGrass; 
         
         public Sprite MudCityTextureSprite;
         public Sprite StoneCityTextureSprite;
@@ -188,8 +188,6 @@ namespace TerritoryWars.ScriptablesObjects
             }
             return roadSprite;
         }
-        
-        
 
         public Sprite GetPillar(bool isContested)
         {
@@ -223,10 +221,14 @@ namespace TerritoryWars.ScriptablesObjects
             Sprite randomContestedHouse = (playerIndex == 0 ? ContestedBlueHouses : ContestedRedHouses)[randomIndex];
             return new Sprite[] {randomContestedHouse};
         }
-
         
+        public Sprite GetHangingGrass()
+        {
+            int randomIndex = Random.Range(0, HangingGrass.Length);
+            Sprite randomHangingGrass = HangingGrass[randomIndex];
+            return randomHangingGrass;
+        }
         
-
         public Sprite GetFlagByReference(int winner, Sprite sprite)
         {
             for (int i = 0; i < FlagsOnWalls.Length; i++)
@@ -250,11 +252,6 @@ namespace TerritoryWars.ScriptablesObjects
             switch (boardPart)
             {
                 case 0:
-                    // with clouds
-                    randomIndex = Random.Range(0, ForestMountains.Length);
-                    randomMountain = ForestMountains[randomIndex];
-                    return randomMountain;
-                    break;
                 case 1:
                 case 2:
                     // without clouds
