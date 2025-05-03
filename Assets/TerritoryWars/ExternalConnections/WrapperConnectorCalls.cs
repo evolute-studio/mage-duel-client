@@ -20,6 +20,9 @@ namespace TerritoryWars.ExternalConnections
 
         [DllImport("__Internal")]
         private static extern string get_controller_username();
+
+        [DllImport("__Internal")]
+        private static extern void execute_controller(string transaction);
         
         public static bool IsControllerLoggedIn()
         {
@@ -57,6 +60,23 @@ namespace TerritoryWars.ExternalConnections
             return null;
 #endif
         }
-        
+
+        public static void ExecuteController(string transaction)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            CustomLogger.LogDojoLoop("ExecuteController");
+            execute_controller(transaction);
+#else
+            CustomLogger.LogDojoLoop("ExecuteController called in non-WebGL build");
+#endif
+        }
+
+        public static string GetTransaction(string contractAddress, string entryPoint, string calldata)
+        {
+            return $"{{" +
+                   $"\"contractAddress\":\"{contractAddress}\"," +
+                   $"\"entrypoint\":\"{entryPoint}\",\"calldata\":[{calldata}]}}";
+        }
+
     }
 }

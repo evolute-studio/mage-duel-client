@@ -101,7 +101,9 @@ namespace TerritoryWars.General
                 // 2. Create Burners
                 CustomLogger.LogDojoLoop("Creating burner accounts");
                 await DojoGameManager.CreateBurners();
-                
+
+                FieldElement controllerAddress = new FieldElement(WrapperConnector.instance.address);
+                DojoGameManager.SetLocalControllerAccount(controllerAddress);
                 //
                 // await CoroutineAsync(() => { }, 2f);
                 //

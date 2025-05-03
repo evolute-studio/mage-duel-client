@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dojo.Starknet;
+using TerritoryWars.Contracts;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
@@ -24,46 +25,72 @@ namespace TerritoryWars.ExternalConnections
         // }
         
         #region Game Actions
-        public static async Task CreateGame(Account account)
+        public static async Task CreateGame(GeneralAccount account)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithLoading(LoadingScreen.waitAnotherPlayerText, () => CancelGame(account))
                 .WithMessage($"DojoCall: [{nameof(CreateGame)}] " +
                              $"\n Account: {account.Address.Hex()}");
-            await TryExecuteAction(
-                account,
-                () => GameContract.create_game(account),
-                executeConfig
-            );
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.create_game());
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.create_game(account.Account),
+                    executeConfig
+                );
+            }
+            
         }
         
-        public static async void CreateGameFromSnapshot(Account account, FieldElement snapshotId)
+        public static async void CreateGameFromSnapshot(GeneralAccount account, FieldElement snapshotId)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithLoading(LoadingScreen.waitAnotherPlayerText, () => CancelGame(account))
                 .WithMessage($"DojoCall: [{nameof(CreateGameFromSnapshot)}] " +
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n SnapshotId: {snapshotId.Hex()}");
-            await TryExecuteAction(
-                account,
-                () => GameContract.create_game_from_snapshot(account, snapshotId),
-                executeConfig
-            );
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.create_game_from_snapshot(snapshotId));
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.create_game_from_snapshot(account.Account, snapshotId),
+                    executeConfig
+                );
+            }
+            
+            
         }
         
         // this method also have to use SessionManager = new DojoSessionManager(this); but I gonna refactor DojoSessionManager first
-        public static async void JoinGame(Account account, FieldElement hostPlayer)
+        public static async void JoinGame(GeneralAccount account, FieldElement hostPlayer)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithLoading(LoadingScreen.connectingText, () => CancelGame(account))
                 .WithMessage($"DojoCall: [{nameof(JoinGame)}] " +
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n HostPlayer: {hostPlayer.Hex()}");
-            await TryExecuteAction(
-                account,
-                () => GameContract.join_game(account, hostPlayer),
-                executeConfig
-            );
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.join_game(hostPlayer));
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.join_game(account.Account, hostPlayer),
+                    executeConfig
+                );
+            }
         }
         
         private static void ReturnToMenu()
@@ -72,7 +99,7 @@ namespace TerritoryWars.ExternalConnections
                 CustomSceneManager.Instance.LoadLobby();
         }
         
-        public static async void CancelGame(Account account)
+        public static async void CancelGame(GeneralAccount account)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(CancelGame)}] " +
@@ -83,102 +110,164 @@ namespace TerritoryWars.ExternalConnections
                     CustomSceneManager.Instance.LoadingScreen.SetActive(false);
                     ReturnToMenu();
                 });
-                
-            await TryExecuteAction(
-                account,
-                () => GameContract.cancel_game(account),
-                executeConfig
-            );
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.cancel_game());
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.cancel_game(account.Account),
+                    executeConfig
+                );
+            }
         }
         
-        public static async void FinishGame(Account account, FieldElement boardId)
+        public static async void FinishGame(GeneralAccount account, FieldElement boardId)
         {
-            return;
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(FinishGame)}] " +
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n BoardId: {boardId.Hex()}");
-            await TryExecuteAction(
-                account,
-                () => GameContract.finish_game(account, boardId),
-                executeConfig
-            );
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.finish_game(boardId));
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.finish_game(account.Account, boardId),
+                    executeConfig
+                );
+            }
         }
         
-        public static async void MakeMove(Account account, Option<byte> joker_tile, byte rotation, byte col, byte row)
+        public static async void MakeMove(GeneralAccount account, Option<byte> joker_tile, byte rotation, byte col, byte row)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(MakeMove)}] " +
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n JokerTile: {joker_tile.Unwrap()} Rotation: {rotation} Col: {col} Row: {row}");
-            await TryExecuteAction(
-                account,
-                () => GameContract.make_move(account, joker_tile, rotation, col, row),
-                executeConfig
-            );
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.make_move(joker_tile, rotation, col, row));
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.make_move(account.Account, joker_tile, rotation, col, row),
+                    executeConfig
+                );
+            }
         }
 
-        public static async void CreateSnapshot(Account account, FieldElement boardId, byte moveNumber)
+        public static async void CreateSnapshot(GeneralAccount account, FieldElement boardId, byte moveNumber)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(CreateSnapshot)}] " +
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n BoardId: {boardId.Hex()} MoveNumber: {moveNumber}");
-            await TryExecuteAction(
-                account,
-                () => GameContract.create_snapshot(account, boardId, moveNumber),
-                executeConfig
-            );
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.create_snapshot(boardId, moveNumber));
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.create_snapshot(account.Account, boardId, moveNumber),
+                    executeConfig
+                );
+            }
         }
 
-        public static async void SkipMove(Account account)
+        public static async void SkipMove(GeneralAccount account)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(SkipMove)}] " +
                              $"\n Account: {account.Address.Hex()}");
-            await TryExecuteAction(
-                account,
-                () => GameContract.skip_move(account),
-                executeConfig
-            );
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.skip_move());
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.skip_move(account.Account),
+                    executeConfig
+                );
+            }
         }
         #endregion
 
         
         #region Player Profile Actions
-        public static async Task ChangeUsername(Account account, FieldElement name)
+        public static async Task ChangeUsername(GeneralAccount account, FieldElement name)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(ChangeUsername)}] " +
                              $"\n Account: {account.Address.Hex()} " +
                              $"\n Name: { CairoFieldsConverter.GetStringFromFieldElement(name)}");
-            await TryExecuteAction(
-                account,
-                () => PlayerProfileActionsContract.change_username(account, name),
-                executeConfig
-            );
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.change_username(name));
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => PlayerProfileActionsContract.change_username(account.Account, name),
+                    executeConfig
+                );
+            }
         }
         
-        public static async void ChangeSkin(Account account, int skinId)
+        public static async void ChangeSkin(GeneralAccount account, int skinId)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(ChangeSkin)}]");
-            await TryExecuteAction(
-                account,
-                () => PlayerProfileActionsContract.change_skin(account, (byte)skinId),
-                executeConfig
-            );
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.change_skin(skinId));
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => PlayerProfileActionsContract.change_skin(account.Account, (byte)skinId),
+                    executeConfig
+                );
+            }
         }
         
-        public static async void BecameBot(Account account)
+        public static async void BecameBot(GeneralAccount account)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(BecameBot)}]");
-            await TryExecuteAction(
-                account,
-                () => PlayerProfileActionsContract.become_bot(account),
-                executeConfig
-            );
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.become_bot());
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => PlayerProfileActionsContract.become_bot(account.Account),
+                    executeConfig
+                );
+            }
         }
         
         #endregion
@@ -218,6 +307,19 @@ namespace TerritoryWars.ExternalConnections
                 return false;
             }
         }
+
+        private static void ExecuteController(string transaction, ExecuteConfig config = null)
+        {
+            config ??= new ExecuteConfig();
+            config.OnStartAction?.Invoke();
+            if (config.WithLoadingScreen)
+                CustomSceneManager.Instance.LoadingScreen.SetActive(true, config.CancelAction, config.LoadingText);
+            if (!String.IsNullOrEmpty(config.Message))
+                CustomLogger.LogExecution(config.Message + " success");
+            WrapperConnectorCalls.ExecuteController(transaction);
+            config.OnSuccessAction?.Invoke();
+        }
+        
         #endregion
 
         private static async void ContractNotFoundHandler(Account account)
@@ -238,14 +340,14 @@ namespace TerritoryWars.ExternalConnections
         private static async void PlayerContractNotFoundHandler()
         {
             CustomLogger.LogError("The Player contract was not found. Maybe a problem in creating an account");
-            await DojoGameManager.Instance.CreateLocalAccount(true);
+            await DojoGameManager.Instance.CreateAccount(true);
             CustomSceneManager.Instance.LoadLobby();
         }
         
         private static async void BotContractNotFoundHandler()
         {
             CustomLogger.LogError("The Bot contract was not found. Maybe a problem in creating an account");
-            CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+            CancelGame(DojoGameManager.Instance.LocalAccount);
             await DojoGameManager.Instance.GetBotForGame(true);
             CustomSceneManager.Instance.LoadLobby();
         }

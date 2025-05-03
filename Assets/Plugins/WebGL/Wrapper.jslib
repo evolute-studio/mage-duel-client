@@ -15,4 +15,7 @@ mergeInto(LibraryManager.library, {
         console.log("IsControllerLoggedIn called");
         return window.unityConnector.IsControllerLoggedIn() ? 1 : 0;
     }
+    execute_controller: function(transaction) {
+        return window.unityConnector.ExecuteTransaction(transaction);
+    }
 }); 

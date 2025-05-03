@@ -23,7 +23,7 @@ namespace TerritoryWars.Dojo
         public bool IsGameWithBotAsPlayer { get; private set; }
 
         public static float TurnDuration = 60f;
-        private Account _localPlayerAccount => _dojoGameManager.LocalBurnerAccount;
+        private GeneralAccount _localPlayerAccount => _dojoGameManager.LocalAccount;
         private evolute_duel_Board _localPlayerBoard;
         private int _moveCount = 0;
 
@@ -824,7 +824,7 @@ namespace TerritoryWars.Dojo
 
         public evolute_duel_Board GetLocalPlayerBoard()
         {
-            return GetBoard(_dojoGameManager.LocalBurnerAccount.Address.Hex());
+            return GetBoard(_dojoGameManager.LocalAccount.Address.Hex());
         }
 
         public evolute_duel_Board GetBoard(string playerAddress)
@@ -853,7 +853,7 @@ namespace TerritoryWars.Dojo
 
         public void MakeMove(TileData data, int x, int y, bool isJoker)
         {
-            Account account = _dojoGameManager.LocalBurnerAccount;
+            GeneralAccount account = _dojoGameManager.LocalAccount;
             var serverTypes = DojoConverter.MoveClientToServer(data, x, y, isJoker);
             DojoConnector.MakeMove(account, serverTypes.joker_tile, serverTypes.rotation, serverTypes.col, serverTypes.row);
         }

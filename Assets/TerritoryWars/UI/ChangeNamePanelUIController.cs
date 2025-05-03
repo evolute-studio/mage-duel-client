@@ -57,7 +57,7 @@ public class ChangeNamePanelUIController : MonoBehaviour
         {
             //SetNamePanelActive(false);
             DojoConnector.ChangeUsername(
-                DojoGameManager.Instance.LocalBurnerAccount,
+                DojoGameManager.Instance.LocalAccount,
                 CairoFieldsConverter.GetFieldElementFromString(_name));
             SetNamePanelControlActive(false);
             evolute_duel_Player profile = DojoGameManager.Instance.GetLocalPlayerData();

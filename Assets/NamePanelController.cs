@@ -44,9 +44,9 @@ public class NamePanelController : MonoBehaviour
         {
             CustomLogger.LogWarning("Player profile is null");
             
-            string defaultName = DojoGameManager.Instance.LocalBurnerAccount.Address.Hex().Substring(0, 10);
+            string defaultName = DojoGameManager.Instance.LocalAccount.Address.Hex().Substring(0, 10);
             DojoConnector.ChangeUsername(
-                DojoGameManager.Instance.LocalBurnerAccount,
+                DojoGameManager.Instance.LocalAccount,
                 CairoFieldsConverter.GetFieldElementFromString(defaultName));
             SetName(defaultName);
             SetEvoluteBalance(0);

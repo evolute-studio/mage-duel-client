@@ -54,7 +54,7 @@ namespace TerritoryWars.UI
 
         public async void NewAccount()
         {
-            await DojoGameManager.Instance.CreateLocalAccount(true);
+            await DojoGameManager.Instance.CreateAccount(true);
             Initialize();
         }
 

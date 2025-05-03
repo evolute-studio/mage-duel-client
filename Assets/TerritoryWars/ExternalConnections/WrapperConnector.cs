@@ -9,6 +9,9 @@ namespace TerritoryWars.ExternalConnections
     {
         public static WrapperConnector instance;
         
+        public string username;
+        public string address;
+        
         private void Awake()
         {
             if (instance == null)
@@ -22,8 +25,10 @@ namespace TerritoryWars.ExternalConnections
             }
         }
         
-        public void OnControllerLogin()
+        public void OnControllerLogin(string username, string address)
         {
+            this.username = username;
+            this.address = address;
             CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
             CustomLogger.LogDojoLoop("Controller logged in");
             EntryPoint.Instance.InitializeControllerGameAsync();
