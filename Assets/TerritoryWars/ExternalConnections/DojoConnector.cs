@@ -34,7 +34,7 @@ namespace TerritoryWars.ExternalConnections
                              $"\n Account: {account.Address.Hex()}");
             if (account.IsController)
             {
-                ExecuteController(ControllerContracts.create_game());
+                ExecuteController(ControllerContracts.create_game(), executeConfig);
             }
             else
             {
@@ -57,7 +57,7 @@ namespace TerritoryWars.ExternalConnections
             
             if (account.IsController)
             {
-                ExecuteController(ControllerContracts.create_game_from_snapshot(snapshotId));
+                ExecuteController(ControllerContracts.create_game_from_snapshot(snapshotId), executeConfig);
             }
             else
             {
@@ -82,7 +82,7 @@ namespace TerritoryWars.ExternalConnections
             
             if (account.IsController)
             {
-                ExecuteController(ControllerContracts.join_game(hostPlayer));
+                ExecuteController(ControllerContracts.join_game(hostPlayer), executeConfig);
             }
             else
             {
@@ -114,7 +114,7 @@ namespace TerritoryWars.ExternalConnections
             
             if (account.IsController)
             {
-                ExecuteController(ControllerContracts.cancel_game());
+                ExecuteController(ControllerContracts.cancel_game(), executeConfig);
             }
             else
             {
@@ -135,7 +135,7 @@ namespace TerritoryWars.ExternalConnections
             
             if (account.IsController)
             {
-                ExecuteController(ControllerContracts.finish_game(boardId));
+                ExecuteController(ControllerContracts.finish_game(boardId), executeConfig);
             }
             else
             {
@@ -156,7 +156,7 @@ namespace TerritoryWars.ExternalConnections
             
             if (account.IsController)
             {
-                ExecuteController(ControllerContracts.make_move(joker_tile, rotation, col, row));
+                ExecuteController(ControllerContracts.make_move(joker_tile, rotation, col, row), executeConfig);
             }
             else
             {
@@ -178,7 +178,7 @@ namespace TerritoryWars.ExternalConnections
             
             if (account.IsController)
             {
-                ExecuteController(ControllerContracts.create_snapshot(boardId, moveNumber));
+                ExecuteController(ControllerContracts.create_snapshot(boardId, moveNumber), executeConfig);
             }
             else
             {
@@ -198,7 +198,7 @@ namespace TerritoryWars.ExternalConnections
             
             if (account.IsController)
             {
-                ExecuteController(ControllerContracts.skip_move());
+                ExecuteController(ControllerContracts.skip_move(), executeConfig);
             }
             else
             {
@@ -222,7 +222,7 @@ namespace TerritoryWars.ExternalConnections
             
             if (account.IsController)
             {
-                ExecuteController(ControllerContracts.change_username(name));
+                ExecuteController(ControllerContracts.change_username(name), executeConfig);
             }
             else
             {
@@ -241,7 +241,7 @@ namespace TerritoryWars.ExternalConnections
             
             if (account.IsController)
             {
-                ExecuteController(ControllerContracts.change_skin(skinId));
+                ExecuteController(ControllerContracts.change_skin(skinId), executeConfig);
             }
             else
             {
@@ -260,7 +260,7 @@ namespace TerritoryWars.ExternalConnections
             
             if (account.IsController)
             {
-                ExecuteController(ControllerContracts.become_bot());
+                ExecuteController(ControllerContracts.become_bot(), executeConfig);
             }
             else
             {

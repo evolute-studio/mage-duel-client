@@ -32,9 +32,6 @@ namespace TerritoryWars.UI
         public void Start()
         {
             Initialize();
-            string username = WrapperConnectorCalls.GetUsername();
-            CustomLogger.LogDojoLoop("[Unity] Received username: " + username);
-            //DojoGameManager.Instance.SessionManager = null;
         }
 
         private void Initialize(List<GameObject> list)

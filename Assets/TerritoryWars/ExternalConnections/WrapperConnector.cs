@@ -39,11 +39,6 @@ namespace TerritoryWars.ExternalConnections
         {
             
         }
-        public void OnUsernameReceived(string username)
-        {
-            Debug.Log("Username received: " + username);
-            MenuUIController.Instance?._namePanelController.SetName(username);
-        }
         
         struct ControllerLoginData
         {
