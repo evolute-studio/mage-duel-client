@@ -157,6 +157,9 @@ namespace TerritoryWars.General
                 // Don't place forests, only mountains at other corners
                 tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = 
                     tileAssets.GetRandomMountain(IsSnowBoardPart(startPos.x, startPos.y));
+                tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer").localScale = new Vector3(1, 1, 1);
+                tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>()
+                    .sortingOrder = 14;
                 if (swapOrderLayer)
                 {
                     tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer")
@@ -179,6 +182,9 @@ namespace TerritoryWars.General
                 PlaceTile(new TileData(fieldTile), endPos.x, endPos.y, -1);
                 tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite
                     = tileAssets.GetRandomMountain(IsSnowBoardPart(endPos.x, endPos.y));
+                tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer").localScale = new Vector3(1, 1, 1);
+                tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>()
+                    .sortingOrder = 14;
                 if (swapOrderLayer)
                 {
                     tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer")
@@ -200,6 +206,9 @@ namespace TerritoryWars.General
                 {
                     tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite 
                         = tileAssets.GetRandomMountain(IsSnowBoardPart(availablePositions[i].x, availablePositions[i].y));
+                    tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer").localScale = new Vector3(1, 1, 1);
+                    tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer")
+                        .GetComponent<SpriteRenderer>().sortingOrder = 14; 
                     if (swapOrderLayer)
                     {
                         tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer")
