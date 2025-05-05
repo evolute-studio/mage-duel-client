@@ -25,10 +25,11 @@ namespace TerritoryWars.ExternalConnections
             }
         }
         
-        public void OnControllerLogin(string username, string address)
+        public void OnControllerLogin(string data)
         {
-            this.username = username;
-            this.address = address;
+            ControllerLoginData loginData = JsonUtility.FromJson<ControllerLoginData>(data);
+            username = loginData.username;
+            address = loginData.address;
             CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
             CustomLogger.LogDojoLoop("Controller logged in");
             EntryPoint.Instance.InitializeControllerGameAsync();
@@ -42,6 +43,12 @@ namespace TerritoryWars.ExternalConnections
         {
             Debug.Log("Username received: " + username);
             MenuUIController.Instance?._namePanelController.SetName(username);
+        }
+        
+        struct ControllerLoginData
+        {
+            public string username;
+            public string address;
         }
     }
 }

@@ -7,6 +7,7 @@ using TerritoryWars.Dojo;
 using TerritoryWars.Tools;
 using UnityEngine;
 using System.Threading.Tasks;
+using TerritoryWars.Contracts;
 using TerritoryWars.ExternalConnections;
 
 namespace TerritoryWars.General
@@ -46,10 +47,22 @@ namespace TerritoryWars.General
         public DojoGameController DojoGameGUIController;
         public bool UseDojoGUIController = false;
         
+        
+        public Game game_contract;
+        public Player_profile_actions player_profile_actions;
+        
         private float startConenctionTime;
 
         public void Start()
         {
+            #if !UNITY_EDITOR && UNITY_WEBGL
+            WrapperConnectorCalls.ConnectionData connection = WrapperConnectorCalls.GetConnectionData();
+            game_contract.contractAddress = connection.gameAddress;
+            player_profile_actions.contractAddress = connection.playerProfileActionsAddress;
+            ControllerContracts.EVOLUTE_DUEL_GAME_ADDRESS = connection.gameAddress;
+            ControllerContracts.EVOLUTE_DUEL_PLAYER_PROFILE_ACTIONS_ADDRESS = connection.playerProfileActionsAddress;
+            #endif
+
             CustomLogger.LogDojoLoop("Starting Loading Game");
             CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
             bool isControllerLogged = WrapperConnectorCalls.IsControllerLoggedIn();
@@ -102,6 +115,7 @@ namespace TerritoryWars.General
                 CustomLogger.LogDojoLoop("Creating burner accounts");
                 await DojoGameManager.CreateBurners();
 
+                CustomLogger.LogDojoLoop("Creating local controller player");
                 FieldElement controllerAddress = new FieldElement(WrapperConnector.instance.address);
                 DojoGameManager.SetLocalControllerAccount(controllerAddress);
                 //
@@ -141,7 +155,9 @@ namespace TerritoryWars.General
                 // 2. Create Burners
                 CustomLogger.LogDojoLoop("Creating burner accounts");
                 await DojoGameManager.CreateBurners();
-                
+
+                CustomLogger.LogDojoLoop("Creating local player");
+                await DojoGameManager.CreateLocalPlayer();
                 //
                 // await CoroutineAsync(() => { }, 2f);
                 //

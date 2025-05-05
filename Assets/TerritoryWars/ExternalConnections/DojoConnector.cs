@@ -7,6 +7,7 @@ using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
+using UnityEngine;
 
 namespace TerritoryWars.ExternalConnections
 {
@@ -159,6 +160,7 @@ namespace TerritoryWars.ExternalConnections
             }
             else
             {
+                Debug.Log(ControllerContracts.make_move(joker_tile, rotation, col, row));
                 await TryExecuteAction(
                     account.Account,
                     () => GameContract.make_move(account.Account, joker_tile, rotation, col, row),

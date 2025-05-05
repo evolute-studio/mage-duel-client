@@ -24,6 +24,9 @@ namespace TerritoryWars.ExternalConnections
         [DllImport("__Internal")]
         private static extern void execute_controller(string transaction);
         
+        [DllImport("__Internal")]
+        private static extern string get_connection_data();
+        
         public static bool IsControllerLoggedIn()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -71,12 +74,29 @@ namespace TerritoryWars.ExternalConnections
 #endif
         }
 
-        public static string GetTransaction(string contractAddress, string entryPoint, string calldata)
+        public static ConnectionData GetConnectionData()
         {
-            return $"{{" +
-                   $"\"contractAddress\":\"{contractAddress}\"," +
-                   $"\"entrypoint\":\"{entryPoint}\",\"calldata\":[{calldata}]}}";
+#if UNITY_WEBGL && !UNITY_EDITOR
+            string connectionData = get_connection_data();
+            Debug.Log("Connection data: " + connectionData);
+            CustomLogger.LogDojoLoop("GetConnectionData");
+            ConnectionData data = JsonUtility.FromJson<ConnectionData>(connectionData);
+            return data;
+#else
+            CustomLogger.LogDojoLoop("GetConnectionData called in non-WebGL build");
+            return new ConnectionData();
+#endif
+            
         }
+        
+        public struct ConnectionData
+        {
+            public string rpcUrl;
+            public string gameAddress;
+            public string playerProfileActionsAddress;
+        }
+        
+        
 
     }
 }

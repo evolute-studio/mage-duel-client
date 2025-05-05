@@ -141,6 +141,7 @@ namespace TerritoryWars.Dojo
         public void SetLocalControllerAccount(FieldElement address)
         {
             LocalAccount = new GeneralAccount(address);
+            SimpleStorage.SetPlayerAddress(LocalAccount.Address.Hex());
             IncomingModelsFilter.SetLocalPlayerId(LocalAccount.Address.Hex());
         }
         
@@ -148,6 +149,7 @@ namespace TerritoryWars.Dojo
         {
             Account account = await TryCreateAccount(3, false);
             LocalAccount = new GeneralAccount(account);
+            SimpleStorage.SetPlayerAddress(LocalAccount.Address.Hex());
             IncomingModelsFilter.SetLocalPlayerId(LocalAccount.Address.Hex());
         }
 

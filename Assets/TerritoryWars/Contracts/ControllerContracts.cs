@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Dojo.Starknet;
+using UnityEngine;
 
 namespace TerritoryWars.Contracts
 {
@@ -23,142 +25,196 @@ namespace TerritoryWars.Contracts
 
         public static string create_game()
         {
-            return new Transaction
+            Transaction tx = new Transaction()
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "create_game",
                 calldata = new string[] { }
-            }.ToString();
+            };
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string create_game_from_snapshot(FieldElement snapshotId)
         {
-            return new Transaction
+            Transaction tx = new Transaction()
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "create_game_from_snapshot",
                 calldata = new string[] { snapshotId.Hex() }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string create_snapshot(FieldElement boardId, byte moveNumber)
         {
-            return new Transaction
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "create_snapshot",
                 calldata = new string[] { boardId.Hex(), moveNumber.ToString() }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string finish_game(FieldElement boardId)
         {
-            return new Transaction
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "finish_game",
                 calldata = new string[] { boardId.Hex() }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string join_game(FieldElement hostPlayer)
         {
-            return new Transaction
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "join_game",
                 calldata = new string[] { hostPlayer.Hex() }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string make_move(Option<byte> jokerTile, byte rotation, byte col, byte row)
         {
-            return new Transaction
+            List<string> calldata = new List<string>();
+            if(jokerTile is Option<byte>.Some)
+                calldata.Add("0x0");
+            else
+            {
+                calldata.Add("0x1");
+            }
+            if (jokerTile is Option<byte>.Some) calldata.Add(jokerTile.Unwrap().ToString());
+            calldata.Add(rotation.ToString());
+            calldata.Add(col.ToString());
+            calldata.Add(row.ToString());
+            
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "make_move",
-                calldata = new string[] { jokerTile.Unwrap().ToString(), rotation.ToString(), col.ToString(), row.ToString() }
-            }.ToString();
+                calldata = calldata.ToArray(),
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string skip_move()
         {
-            return new Transaction
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "skip_move",
                 calldata = new string[] { }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string cancel_game()
         {
-            return new Transaction
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "cancel_game",
                 calldata = new string[] { }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string active_skin()
         {
-            return new Transaction
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "active_skin",
                 calldata = new string[] { }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string balance()
         {
-            return new Transaction
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "balance",
                 calldata = new string[] { }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string become_bot()
         {
-            return new Transaction
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "become_bot",
                 calldata = new string[] { }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string change_skin(int skinId)
         {
-            return new Transaction
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_PLAYER_PROFILE_ACTIONS_ADDRESS,
                 entrypoint = "change_skin",
                 calldata = new string[] { skinId.ToString() }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
         }
 
         public static string change_username(FieldElement newUsername)
         {
-            return new Transaction
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_PLAYER_PROFILE_ACTIONS_ADDRESS,
                 entrypoint = "change_username",
                 calldata = new string[] { newUsername.GetString() }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            Debug.Log($"Change username transaction: {json}");
+            return json;
         }
 
         public static string username()
         {
-            return new Transaction
+            Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_PLAYER_PROFILE_ACTIONS_ADDRESS,
                 entrypoint = "username",
                 calldata = new string[] { }
-            }.ToString();
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
 
 
         }
