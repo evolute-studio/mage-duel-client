@@ -92,6 +92,7 @@ namespace TerritoryWars.ExternalConnections
         public struct ConnectionData
         {
             public string rpcUrl;
+            public string toriiUrl;
             public string gameAddress;
             public string playerProfileActionsAddress;
         }

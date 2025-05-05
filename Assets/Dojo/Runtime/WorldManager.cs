@@ -15,8 +15,14 @@ namespace Dojo
         public ToriiWasmClient wasmClient;
         [SerializeField] public WorldManagerData dojoConfig;
 
-        async void Awake()
+        public async void Initialize(string rpcUrl = null, string toriiUrl = null)
         {
+            if (rpcUrl != null && toriiUrl != null)
+            {
+                dojoConfig.rpcUrl = rpcUrl;
+                dojoConfig.toriiUrl = toriiUrl;
+            }
+            
 #if UNITY_WEBGL && !UNITY_EDITOR
             wasmClient = new ToriiWasmClient(dojoConfig.toriiUrl, dojoConfig.relayWebrtcUrl, dojoConfig.worldAddress);
             await wasmClient.CreateClient();

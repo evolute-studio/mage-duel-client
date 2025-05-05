@@ -61,8 +61,10 @@ namespace TerritoryWars.General
             player_profile_actions.contractAddress = connection.playerProfileActionsAddress;
             ControllerContracts.EVOLUTE_DUEL_GAME_ADDRESS = connection.gameAddress;
             ControllerContracts.EVOLUTE_DUEL_PLAYER_PROFILE_ACTIONS_ADDRESS = connection.playerProfileActionsAddress;
+            DojoGameManager.Instance.WorldManager.Initialize(connection.rpcUrl, connection.toriiUrl);
             #endif
-
+            
+            DojoGameManager.Instance.WorldManager.Initialize();
             CustomLogger.LogDojoLoop("Starting Loading Game");
             CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
             bool isControllerLogged = WrapperConnectorCalls.IsControllerLoggedIn();
