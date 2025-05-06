@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using TerritoryWars.General;
 using TerritoryWars.Tile;
+using TerritoryWars.Tools;
+using TerritoryWars.UI;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class TileParts : MonoBehaviour
 {
-    public List<SpriteRenderer> HouseRenderers;
+    public List<SpriteRenderer> HouseRenderers { get; private set; } = new List<SpriteRenderer>();
+    public List<SpriteRenderer> DecorationsRenderers { get; private set; } = new List<SpriteRenderer>();
     public List<SpriteRenderer> ArcRenderers = new List<SpriteRenderer>();
     public TerritoryFiller TileTerritoryFiller;
+    public List<Area> Areas { get; private set; } = new List<Area>();
     public WallPlacer WallPlacer;
     public SpriteRenderer[] RoadRenderers = new SpriteRenderer[4];
     public GameObject Mill;
@@ -17,6 +23,13 @@ public class TileParts : MonoBehaviour
     public GameObject Enviroment;
     public GameObject ContestedEnviroment;
     public PolygonCollider2D PolygonCollider2D;
+    public FlagsOnWall FlagsOnWalls;
+    public SpriteRenderer HangingGrass;
+
+    private GameObject WallParent;
+    public GameObject[] CompletedBorderWalls;
+    public List<GameObject> CompletedWalls;
+    
 
     private int DefaultLayerMask = 0; // Default layer
     private int OutlineLayerMask = 31; // Outline layer
@@ -26,6 +39,8 @@ public class TileParts : MonoBehaviour
     {
         DefaultLayerMask = LayerMask.NameToLayer("Default");
         OutlineLayerMask = LayerMask.NameToLayer("Outline");
+
+        FlagsOnWalls = gameObject.GetComponentInChildren<FlagsOnWall>();
         // BorderFences
         Transform borderFences = transform.Find("BorderFence");
         if (borderFences != null)
@@ -46,6 +61,152 @@ public class TileParts : MonoBehaviour
         if (fence != null)
         {
             WallPlacer = fence.GetComponent<WallPlacer>();
+        }
+        
+        // ContestedWalls
+        Transform walls = transform.Find("Walls");
+        if (walls == null)
+        {
+            return;
+        }
+        WallParent = walls.gameObject;
+        CompletedBorderWalls = new GameObject[4];
+        for (int i = 0; i < walls.childCount; i++)
+        {
+            GameObject child = walls.GetChild(i).gameObject;
+            if (child.name == "BorderWalls")
+            {
+                for (int j = 0; j < child.transform.childCount; j++)
+                {
+                    GameObject borderWall = child.transform.GetChild(j).gameObject;
+                    if (borderWall != null)
+                    {
+                        CompletedBorderWalls[j] = borderWall;
+                        CompletedBorderWalls[j].SetActive(false);
+                    } 
+                }
+            }
+            else
+            {
+                CompletedWalls.Add(child);
+            }
+            
+            
+        }
+        
+        // Houses
+        Transform houses = transform.Find("Houses");
+        if (houses != null)
+        {
+            for (int i = 0; i < houses.childCount; i++)
+            {
+                SpriteRenderer house = houses.GetChild(i).GetComponent<SpriteRenderer>();
+                if (house != null)
+                {
+                    HouseRenderers.Add(house);
+                }
+            }
+        }
+        
+        // Decorations
+        Transform decorations = transform.Find("Decorations");
+        if (decorations != null)
+        {
+            for (int i = 0; i < decorations.childCount; i++)
+            {
+                SpriteRenderer decoration = decorations.GetChild(i).GetComponent<SpriteRenderer>();
+                if (decoration != null)
+                {
+                    DecorationsRenderers.Add(decoration);
+                }
+            }
+        }
+        
+        // ForestAreas
+        ForestArea[] forestAreas = transform.GetComponentsInChildren<ForestArea>();
+        if (forestAreas != null)
+        {
+            foreach (var forestArea in forestAreas)
+            {
+                Areas.Add(forestArea);
+            }
+        }
+    }
+
+    public void SpawnTileObjects(bool isBoarderTile = false)
+    {
+        if (HangingGrass.sprite == null && HangingGrass != null)
+        {
+            HangingGrass.sprite = PrefabsManager.Instance.TileAssetsObject.GetHangingGrass();
+        }
+    }
+
+    public void PlaceFlags(int rotation, int winner)
+    {
+        if (FlagsOnWalls == null) return;
+        
+        FlagsOnWalls.gameObject.SetActive(true);
+        for (int i = 0; i < FlagsOnWalls.FlagsGO.Length; i++)
+        {
+            if (FlagsOnWalls.FlagsGO[i] == null)
+            {
+                continue;
+            }
+            FlagsOnWalls.FlagsGO[i].SetActive(i == rotation);
+            SpriteRenderer[] flags = FlagsOnWalls.FlagsGO[i].GetComponentsInChildren<SpriteRenderer>();
+            if (winner != 3)
+            {
+                foreach (var flag in flags)
+                {
+                    if (flag != null)
+                    {
+                        flag.sprite = PrefabsManager.Instance.TileAssetsObject
+                            .GetFlagByReference(SetLocalPlayerData.GetLocalIndex(winner), flag.sprite);
+                    }
+                }
+            }
+        }
+    }
+
+    public void PlaceContestedWalls(int rotation)
+    {
+        WallParent.SetActive(true);
+        WallPlacer?.gameObject.SetActive(false);
+
+        for (int i = 0; i < CompletedWalls.Count; i++)
+        {
+            if (CompletedWalls[i] == null)
+            {
+                continue;
+            }
+            CompletedWalls[i].SetActive(i == rotation);
+        }
+
+        PlaceBorderContestedWalls();
+    }
+
+    public void SetContestedBorderWalls(List<Side> sides)
+    {
+        foreach (var side in sides)
+        {
+            CompletedBorderWalls[(int)side].SetActive(true);
+        }
+        
+    }
+    
+    private void PlaceBorderContestedWalls()
+    {
+        WallParent.transform.Find("BorderWalls").gameObject.SetActive(true);
+    }
+    
+    public void HideForestAreas()
+    {
+        foreach (var area in Areas)
+        {
+            if (area is ForestArea forestArea)
+            {
+                forestArea.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -118,6 +279,13 @@ public class TileParts : MonoBehaviour
                         if (wall != null) wall.gameObject.layer = mask;
                     }
                 }
+            }
+        }
+        if (CompletedWalls != null)
+        {
+            foreach (var wall in CompletedWalls)
+            {
+                if (wall != null) wall.layer = mask;
             }
         }
     }

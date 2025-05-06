@@ -10,10 +10,18 @@ namespace TerritoryWars.ScriptablesObjects
     [CreateAssetMenu(fileName = "TileAssetsObject", menuName = "TileAssetsObject", order = 0)]
     public class TileAssetsObject : ScriptableObject
     {
-        public List<HousesSprites> FirstPlayerHousesAnimated;
-        public List<HousesSprites> SecondPlayerHousesAnimated;
-        public List<HousesSprites> NeutralHousesAnimated;
-        public Sprite[] Mountains;
+        [Header("First stage houses")]
+        public NotContestedHouses FirstPlayerHouses;
+        public NotContestedHouses SecondPlayerHouses;
+        
+        [Header("Second stage houses")]
+        public ContestedHouses FirstPlayerContestedHouses;
+        public ContestedHouses SecondPlayerContestedHouses;
+        
+        
+        public Sprite[] ForestMountains;
+        public Sprite[] SnowMountains;
+        public Sprite[] ForestMountainsWithoutClouds;
         public GameObject ForestPrefab;
         public List<Sprite> RoadsSprites;
         public List<Sprite> RoadsSpritesContested;
@@ -22,14 +30,20 @@ namespace TerritoryWars.ScriptablesObjects
         public Sprite[] StonePillars;
         public Sprite[] WoodenWallSprites;
         public Sprite[] StoneWallSprites;
-        public Sprite WoodenArc;
-        public Sprite StoneArc;
+
+        public Sprite[] HangingGrass; 
         
         public Sprite MudCityTextureSprite;
         public Sprite StoneCityTextureSprite;
         
         public Sprite[] ContestedBlueHouses;
         public Sprite[] ContestedRedHouses;
+        
+        [Header("Trees")]
+        public Sprite[] NorthernTrees;
+        public Sprite[] SouthernTrees;
+
+        [Header("Flags")] public FlagsOnWall[] FlagsOnWalls;
 
         // 0 - neutral, 1 - first player, 2 - second player
         // 3 - neutral two points, 4 - first player two points, 5 - second player two points
@@ -37,118 +51,132 @@ namespace TerritoryWars.ScriptablesObjects
 
         public int CurrentIndex { get; private set; } = 0;
         public int CurrentHouseIndex { get; private set; } = 0;
-
-        public Sprite[] GetNextHouse(int playerIndex, bool chooseHighHouse = false)
+        
+        public Sprite GetNotContestedHouse(int count, int playerIndex)
         {
             playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
-            if (playerIndex == -1)
+            var notContestedHouses = playerIndex == 0 ? FirstPlayerHouses : SecondPlayerHouses;
+            int randomIndex;
+            switch (count)
             {
-                Sprite[] neutralNextHouseSprites;
-                if (chooseHighHouse)
-                {
-                    neutralNextHouseSprites = NeutralHousesAnimated[1].DefaultSprites;
-                    return neutralNextHouseSprites;
-                }
-                CurrentHouseIndex = (CurrentHouseIndex + 1) % NeutralHousesAnimated.Count;
-                neutralNextHouseSprites = NeutralHousesAnimated[CurrentHouseIndex].DefaultSprites;
-                return neutralNextHouseSprites;
+                case 1:
+                    randomIndex = Random.Range(0, notContestedHouses.SmallHouses.Length);
+                    return notContestedHouses.SmallHouses[randomIndex];
+                case 2:
+                    randomIndex = Random.Range(0, notContestedHouses.LargeHouses.Length);
+                    return notContestedHouses.LargeHouses[randomIndex];
+                default:
+                    return null;
             }
-
-            if (chooseHighHouse)
-            {
-                List<HousesSprites>[] highHouses = { FirstPlayerHousesAnimated, SecondPlayerHousesAnimated };
-                Sprite[] highHouse = highHouses[playerIndex][1].DefaultSprites;
-                return highHouse;
-            }
-            
-            List<HousesSprites>[] Houses = { FirstPlayerHousesAnimated, SecondPlayerHousesAnimated };
-            CurrentHouseIndex = (CurrentHouseIndex + 1) % Houses[playerIndex].Count;
-            Sprite[] nextHouseSprites = Houses[playerIndex][CurrentHouseIndex].DefaultSprites;
-            return nextHouseSprites;
         }
         
-        public Sprite[] GetHouseByReference(Sprite[] sprites, int playerIndex, bool isContested = false)
+        public Sprite GetNotContestedHouseByReference(Sprite sprite, int playerIndex)
         {
             playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
-            foreach (var house in FirstPlayerHousesAnimated)
+            Sprite[] houses = FirstPlayerHouses.SmallHouses;
+            for (int i = 0; i < houses.Length; i++)
             {
-                if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
+                if (houses[i] == sprite)
                 {
                     if (playerIndex == 0)
-                        return isContested ? GetRandomContestedHouse(playerIndex) : house.DefaultSprites;
-                    else
-                    {
-                        HousesSprites housesSprites = SecondPlayerHousesAnimated[FirstPlayerHousesAnimated.IndexOf(house)];
-                        return isContested ? GetRandomContestedHouse(playerIndex) : housesSprites.DefaultSprites;
-                    }
+                        return houses[i];
+                    return SecondPlayerHouses.SmallHouses[i];
                 }
             }
-
-            foreach (var house in SecondPlayerHousesAnimated)
+            houses = FirstPlayerHouses.LargeHouses;
+            for (int i = 0; i < houses.Length; i++)
             {
-                if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
-                {
-                    if (playerIndex == 1)
-                        return isContested ? GetRandomContestedHouse(playerIndex) : house.DefaultSprites;
-                    else
-                    {
-                        HousesSprites housesSprites = FirstPlayerHousesAnimated[SecondPlayerHousesAnimated.IndexOf(house)];
-                        return isContested ? GetRandomContestedHouse(playerIndex) : housesSprites.DefaultSprites;
-                    }
-                }
-            }
-
-            int i = 0;
-            foreach (var house in NeutralHousesAnimated)
-            {
-                if (house.DefaultSprites == sprites)
+                if (houses[i] == sprite)
                 {
                     if (playerIndex == 0)
-                    {
-                        return FirstPlayerHousesAnimated[i].DefaultSprites;
-                    }
-
+                        return houses[i];
+                    return SecondPlayerHouses.LargeHouses[i];
+                }
+            }
+            houses = SecondPlayerHouses.SmallHouses;
+            for (int i = 0; i < houses.Length; i++)
+            {
+                if (houses[i] == sprite)
+                {
                     if (playerIndex == 1)
-                    {
-                        return SecondPlayerHousesAnimated[i].DefaultSprites;
-                    }
+                        return houses[i];
+                    return FirstPlayerHouses.SmallHouses[i];
                 }
-                i++;
             }
-
-            return null;
-        }
-        
-        public Sprite[] GetHouseByReference(Sprite[] sprites, bool isContested = false)
-        {
-            foreach (var house in FirstPlayerHousesAnimated)
+            houses = SecondPlayerHouses.LargeHouses;
+            for (int i = 0; i < houses.Length; i++)
             {
-                if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
+                if (houses[i] == sprite)
                 {
-                    return isContested ? GetRandomContestedHouse(0) : house.DefaultSprites;
+                    if (playerIndex == 1)
+                        return houses[i];
+                    return FirstPlayerHouses.LargeHouses[i];
                 }
             }
-
-            foreach (var house in SecondPlayerHousesAnimated)
-            {
-                if (house.DefaultSprites == sprites || house.ContestedSprites == sprites)
-                {
-                    return isContested ? GetRandomContestedHouse(1) : house.DefaultSprites;
-                }
-            }
-
-            foreach (var house in NeutralHousesAnimated)
-            {
-                if (house.DefaultSprites == sprites)
-                {
-                    return isContested ? house.ContestedSprites : house.DefaultSprites;
-                }
-            }
-
             return null;
         }
 
+        public Sprite GetContestedHouses(int count, int playerIndex)
+        {
+            playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
+            var contestedHouses = playerIndex == 0 ? FirstPlayerContestedHouses : SecondPlayerContestedHouses;
+            int randomIndex;
+            switch (count)
+            {
+                case 1:
+                    randomIndex = Random.Range(0, contestedHouses.OneHouse.Length);
+                    return contestedHouses.OneHouse[randomIndex];
+                case 2:
+                    randomIndex = Random.Range(0, contestedHouses.DoubleHouses.Length);
+                    return contestedHouses.DoubleHouses[randomIndex];
+                case 3:
+                    randomIndex = Random.Range(0, contestedHouses.TripleHouses.Length);
+                    return contestedHouses.TripleHouses[randomIndex];
+                case 4:
+                    randomIndex = Random.Range(0, contestedHouses.QuadrupleHouses.Length);
+                    return contestedHouses.QuadrupleHouses[randomIndex];
+                default:
+                    throw new ArgumentOutOfRangeException("Invalid house count" + count);
+            }
+        }
 
+        public bool IsContestedHouse(Sprite sprite, int count, int playerIndex)
+        {
+            playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
+            var contestedHouses = playerIndex == 0 ? FirstPlayerContestedHouses : SecondPlayerContestedHouses;
+            Sprite[] houses = null;
+            switch (count)
+            {
+                case 1:
+                    houses = contestedHouses.OneHouse;
+                    break;
+                case 2:
+                    houses = contestedHouses.DoubleHouses;
+                    break;
+                case 3:
+                    houses = contestedHouses.TripleHouses;
+                    break;
+                case 4:
+                    houses = contestedHouses.QuadrupleHouses;
+                    break;
+            }
+
+            if (houses != null)
+                foreach (var house in houses)
+                {
+                    if (house == sprite) return true;
+                }
+
+            return false;
+        }
+        
+        public Sprite GetTree(bool isNorth)
+        {
+            int randomIndex = Random.Range(0, (isNorth ? NorthernTrees : SouthernTrees).Length);
+            Sprite randomTree = (isNorth ? NorthernTrees : SouthernTrees)[randomIndex];
+            return randomTree;
+        }
+        
         public Sprite GetContestedRoadByReference(Sprite roadSprite)
         {
             for(int i = 0; i < RoadsSprites.Count; i++)
@@ -160,8 +188,6 @@ namespace TerritoryWars.ScriptablesObjects
             }
             return roadSprite;
         }
-        
-        
 
         public Sprite GetPillar(bool isContested)
         {
@@ -195,26 +221,86 @@ namespace TerritoryWars.ScriptablesObjects
             Sprite randomContestedHouse = (playerIndex == 0 ? ContestedBlueHouses : ContestedRedHouses)[randomIndex];
             return new Sprite[] {randomContestedHouse};
         }
-
-        public void BackIndex(int times)
+        
+        public Sprite GetHangingGrass()
         {
-            CurrentHouseIndex = (CurrentHouseIndex - times) % FirstPlayerHousesAnimated.Count;
-            if (CurrentHouseIndex < 0)
-                CurrentHouseIndex += FirstPlayerHousesAnimated.Count;
+            int randomIndex = Random.Range(0, HangingGrass.Length);
+            Sprite randomHangingGrass = HangingGrass[randomIndex];
+            return randomHangingGrass;
+        }
+        
+        public Sprite GetFlagByReference(int winner, Sprite sprite)
+        {
+            for (int i = 0; i < FlagsOnWalls.Length; i++)
+            {
+                for(int j = 0; j < FlagsOnWalls[i].Flags.Length; j++)
+                {
+                    if (FlagsOnWalls[i].Flags[j] == sprite)
+                    {
+                        return FlagsOnWalls[i].Flags[winner];
+                    }
+                }
+            }
+            return null;
         }
 
-        public Sprite GetRandomMountain()
-        {
-            int randomIndex = Random.Range(0, Mountains.Length);
-            Sprite randomMountain = Mountains[randomIndex];
-            return randomMountain;
+    public Sprite GetRandomMountain(int boardPart)
+    {
+            int randomIndex;
+            Sprite randomMountain;
+        
+            switch (boardPart)
+            {
+                case 0:
+                case 1:
+                case 2:
+                    // without clouds
+                    randomIndex = Random.Range(0, ForestMountainsWithoutClouds.Length);
+                    randomMountain = ForestMountainsWithoutClouds[randomIndex];
+                    return randomMountain;
+                    break;
+                case 3:
+                    // snow
+                    randomIndex = Random.Range(0, SnowMountains.Length);
+                    randomMountain = SnowMountains[randomIndex];
+                    return randomMountain;
+                    break;
+                case -1:
+                    // without clouds
+                    return null;
+                    break;
+            }
+            return null;
         }
 
         [Serializable]
         public class HousesSprites
         {
             [FormerlySerializedAs("HousesSprites")] public Sprite[] DefaultSprites;
-            [FormerlySerializedAs("ContestedHousesSprites")] public Sprite[] ContestedSprites;
         }
+
+
+        [Serializable]
+        public class NotContestedHouses
+        {
+            public Sprite[] SmallHouses;
+            public Sprite[] LargeHouses;
+        }
+        
+        [Serializable]
+        public class ContestedHouses
+        {
+            public Sprite[] OneHouse;
+            public Sprite[] DoubleHouses;
+            public Sprite[] TripleHouses;
+            public Sprite[] QuadrupleHouses;
+        }
+
+        [Serializable]
+        public class FlagsOnWall
+        {
+            public Sprite[] Flags;
+        }
+        
     }
 }

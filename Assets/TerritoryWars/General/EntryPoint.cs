@@ -7,6 +7,8 @@ using TerritoryWars.Dojo;
 using TerritoryWars.Tools;
 using UnityEngine;
 using System.Threading.Tasks;
+using TerritoryWars.Contracts;
+using TerritoryWars.ExternalConnections;
 
 namespace TerritoryWars.General
 {
@@ -26,21 +28,121 @@ namespace TerritoryWars.General
 
     public class EntryPoint : MonoBehaviour
     {
+        public static EntryPoint Instance { get; private set; }
+        
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+        
         public WorldManager WorldManager;
         public DojoGameManager DojoGameManager;
         public DojoGameController DojoGameGUIController;
         public bool UseDojoGUIController = false;
         
-        private float startConenctionTime;
         
+        public Game game_contract;
+        public Player_profile_actions player_profile_actions;
+        
+        private float startConenctionTime;
 
-        public async void Start()
+        public void Start()
         {
+            #if !UNITY_EDITOR && UNITY_WEBGL
+            WrapperConnectorCalls.ConnectionData connection = WrapperConnectorCalls.GetConnectionData();
+            game_contract.contractAddress = connection.gameAddress;
+            player_profile_actions.contractAddress = connection.playerProfileActionsAddress;
+            ControllerContracts.EVOLUTE_DUEL_GAME_ADDRESS = connection.gameAddress;
+            ControllerContracts.EVOLUTE_DUEL_PLAYER_PROFILE_ACTIONS_ADDRESS = connection.playerProfileActionsAddress;
+            DojoGameManager.Instance.WorldManager.Initialize(connection.rpcUrl, connection.toriiUrl);
+            #endif
+            
+            DojoGameManager.Instance.WorldManager.Initialize();
+            CustomLogger.LogDojoLoop("Starting Loading Game");
             CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
-            await InitializeGameAsync();
+            bool isControllerLogged = WrapperConnectorCalls.IsControllerLoggedIn();
+            if(isControllerLogged)
+            {
+                CustomLogger.LogDojoLoop("Controller is logged in");
+                ControllerLogin();
+            }
+            else
+            {
+                CustomLogger.LogDojoLoop("Controller is not logged in");
+                CustomSceneManager.Instance.LoadingScreen.SetActive(false);
+            }
         }
         
-        private async Task InitializeGameAsync()
+        public async void ControllerLogin()
+        {
+            ApplicationState.IsController = true;
+            WrapperConnectorCalls.ControllerLogin();
+        }
+
+        public async void GuestLogin()
+        {
+            ApplicationState.IsController = false;
+            CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
+            await InitializeGuestGameAsync();
+        }
+        
+        public async Task InitializeControllerGameAsync()
+        {
+            if (ApplicationState.IsLoggedIn)
+            {
+                CustomLogger.LogDojoLoop("Already logged in");
+                return;
+            }
+            ApplicationState.IsLoggedIn = true;
+            ApplicationState.IsController = true;
+            
+            InitDataStorage();
+            
+            try
+            {
+                CustomLogger.LogDojoLoop("Starting OnChain mode initialization");
+                
+                // 1. Setup Account
+                CustomLogger.LogDojoLoop("Setting up account");
+                await SetupAccountAsync();
+                
+                // 2. Create Burners
+                CustomLogger.LogDojoLoop("Creating burner accounts");
+                await DojoGameManager.CreateBurners();
+
+                CustomLogger.LogDojoLoop("Creating local controller player");
+                FieldElement controllerAddress = new FieldElement(WrapperConnector.instance.address);
+                DojoGameManager.SetLocalControllerAccount(controllerAddress);
+                //
+                // await CoroutineAsync(() => { }, 2f);
+                //
+                CustomLogger.LogDojoLoop("Creating bot");
+                await DojoGameManager.CreateBot();
+                
+                // 3. Sync Initial Models
+                CustomLogger.LogDojoLoop("Syncing initial models");
+                await DojoGameManager.SyncInitialModels();
+                
+                // 4. Load Game
+                CustomLogger.LogDojoLoop("Checking previous game");
+                DojoGameManager.LoadGame();
+                
+                CustomLogger.LogDojoLoop("Initialization completed successfully");
+            }
+            catch (Exception e)
+            {
+                CustomLogger.LogError($"Initialization failed:", e);
+            }
+        }
+        
+        public async Task InitializeGuestGameAsync()
         {
             InitDataStorage();
             
@@ -55,7 +157,9 @@ namespace TerritoryWars.General
                 // 2. Create Burners
                 CustomLogger.LogDojoLoop("Creating burner accounts");
                 await DojoGameManager.CreateBurners();
-                
+
+                CustomLogger.LogDojoLoop("Creating local player");
+                await DojoGameManager.CreateLocalPlayer();
                 //
                 // await CoroutineAsync(() => { }, 2f);
                 //

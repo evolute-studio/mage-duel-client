@@ -126,13 +126,16 @@ namespace TerritoryWars.General
         }
         public void SetCurrentTile(TileData tile)
         {
+            CustomLogger.LogImportant($"[SetCurrentTile]");
             currentTile = tile;
             gameUI.UpdateUI();
             tilePreview.UpdatePreview(tile);
+            currentTile.HouseSprites.AddRange(tilePreview.HouseSprites);
         }
 
         public void StartTilePlacement(TileData tile)
         {
+            CustomLogger.LogImportant($"[StartTilePlacement]");
             GameUI.Instance.SetEndTurnButtonActive(false);
             tilePreview.ResetPosition();
             tilePreview.UpdatePreview(tile);
@@ -427,29 +430,12 @@ namespace TerritoryWars.General
             tilePreview.PlaceTile(CompleteTilePlacement);
         }
 
-        public void PlaceTile(TileData tileData, ValidPlacement validPlacement, int playerId)
-        {
-            // first check if it is possible to place the tile
-            bool isPossible = board.CanPlaceTile(tileData, validPlacement.x, validPlacement.y);
-            if (!isPossible)
-            {
-                CustomLogger.LogWarning($"TileSelector: PlaceTile: Can't place tile. Config: {tileData.id} " +
-                                        $"Position: {validPlacement.x} {validPlacement.y}");
-                return;
-            }
-
-            tilePreview.PlaceTile( () =>
-            {
-                board.PlaceTile(currentTile, validPlacement.x, validPlacement.y, playerId);
-            });
-        }
-
         public void CompleteTilePlacement()
         {
             try
             {
                 if (!selectedPosition.HasValue) return;
-
+                
                 if (board.PlaceTile(currentTile, selectedPosition.Value.x, selectedPosition.Value.y,
                         SessionManager.Instance.CurrentTurnPlayer.LocalId))
                 {
@@ -588,7 +574,7 @@ namespace TerritoryWars.General
         {
             try
             {
-                currentTile = tile;
+                currentTile.SetConfig(tile.id);
                 selectedPosition = new Vector2Int(x, y);
                 isPlacingTile = true;
 

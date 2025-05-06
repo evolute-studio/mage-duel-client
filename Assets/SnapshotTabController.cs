@@ -83,7 +83,7 @@ public class SnapshotTabController : MonoBehaviour
             {
                 if (_snapshotObjects.Contains(snapshot)) continue;
                 if (!snapshot.TryGetComponent(out evolute_duel_Snapshot snapshotModel)) return;
-                if (!snapshotModel.player.Hex().Equals(DojoGameManager.Instance.LocalBurnerAccount.Address.Hex())) continue;
+                if (!snapshotModel.player.Hex().Equals(DojoGameManager.Instance.LocalAccount.Address.Hex())) continue;
                 
                 evolute_duel_Player player = await DojoGameManager.Instance.CustomSynchronizationMaster.WaitForModelByPredicate<evolute_duel_Player>(
                     p => p.player_id.Hex() == snapshotModel.player.Hex()
@@ -100,7 +100,7 @@ public class SnapshotTabController : MonoBehaviour
                 snapshotListItem.UpdateItem(playerName, evoluteBalance, moveNumber, () =>
                 {
                     SetActivePanel(false);
-                    DojoConnector.CreateGameFromSnapshot(DojoGameManager.Instance.LocalBurnerAccount, snapshotModel.snapshot_id);
+                    DojoConnector.CreateGameFromSnapshot(DojoGameManager.Instance.LocalAccount, snapshotModel.snapshot_id);
                 });
                 _snapshotObjects.Add(snapshot);
                 

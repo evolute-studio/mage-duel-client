@@ -146,6 +146,41 @@ namespace Dojo.Starknet
             return "0x" + BitConverter.ToString(inner.data.ToArray()).Replace("-", "").ToLower();
         }
 
+        public string GetString()
+        {
+            try
+            {
+                var hexString = Hex();
+                
+               
+                if (hexString.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+                {
+                    hexString = hexString.Substring(2);
+                }
+
+                
+                if (hexString.Length % 2 != 0)
+                {
+                    hexString = "0" + hexString;
+                }
+
+                
+                var bytes = Enumerable.Range(0, hexString.Length / 2)
+                    .Select(x => Convert.ToByte(hexString.Substring(x * 2, 2), 16))
+                    .ToArray();
+
+               
+                var result = Encoding.ASCII.GetString(bytes).TrimEnd('\0');
+                
+                
+                return new string(result.Where(c => c >= 32 && c <= 126).ToArray());
+            }
+            catch (Exception e)
+            {
+                return string.Empty; 
+            }
+        }
+
         public void OnAfterDeserialize()
         {
             inner = new FieldElement(hex).inner;

@@ -58,7 +58,7 @@ namespace TerritoryWars.General
             if (!CustomSceneManager.Instance.LoadingScreen.IsLoading)
             {
                 CustomSceneManager.Instance.LoadingScreen.SetActive(true, 
-                    () => DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount), 
+                    () => DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount), 
                     LoadingScreen.connectingText);
             }
         }
@@ -127,7 +127,7 @@ namespace TerritoryWars.General
 
         private void FinishGame()
         {
-            DojoConnector.FinishGame(DojoGameManager.Instance.LocalBurnerAccount,
+            DojoConnector.FinishGame(DojoGameManager.Instance.LocalAccount,
                 DojoGameManager.Instance.SessionManager.LocalPlayerBoard.id);
         }
         
@@ -251,7 +251,7 @@ namespace TerritoryWars.General
             
             CurrentTurnPlayer = Players[0];
             
-            LocalPlayer = Players[0].Address.Hex() == DojoGameManager.Instance.LocalBurnerAccount.Address.Hex() 
+            LocalPlayer = Players[0].Address.Hex() == DojoGameManager.Instance.LocalAccount.Address.Hex() 
                 ? Players[0] : Players[1];
             RemotePlayer = LocalPlayer == Players[0] ? Players[1] : Players[0];
             Players[0].SetAnimatorController(sessionUI.charactersObject.GetAnimatorController(PlayersData[0].skin_id));
@@ -271,8 +271,8 @@ namespace TerritoryWars.General
                 .SetEase(Ease.OutQuad);
             
             Camera camera = Camera.main;
-            float startOrthographicSize = 5.5f;
-            float endOrthographicSize = 5f;
+            float startOrthographicSize = 7f;
+            float endOrthographicSize = 6f;
             camera.orthographicSize = startOrthographicSize;
             Sequence sequence = DOTween.Sequence();
             sequence.AppendInterval(0.5f);

@@ -159,11 +159,11 @@ namespace TerritoryWars.UI
                     matchListItem.UpdateItem(playerName, evoluteBalance, status, player.player_id.Hex(), moveNumber,() =>
                     {
                         SetActivePanel(false);
-                        DojoConnector.JoinGame(DojoGameManager.Instance.LocalBurnerAccount, gameModel.player);
+                        DojoConnector.JoinGame(DojoGameManager.Instance.LocalAccount, gameModel.player);
                         SimpleStorage.SetIsGameWithBot(false);
                     });
                 
-                    if (playerName == DojoGameManager.Instance.LocalBurnerAccount.Address.Hex())
+                    if (playerName == DojoGameManager.Instance.LocalAccount.Address.Hex())
                     {
                         matchListItem.SetAwaiting(true);
                     }
@@ -225,7 +225,7 @@ namespace TerritoryWars.UI
         public void CreateMatch()
         {
             SetActivePanel(false);
-            DojoConnector.CreateGame(DojoGameManager.Instance.LocalBurnerAccount);
+            DojoConnector.CreateGame(DojoGameManager.Instance.LocalAccount);
             SimpleStorage.SetIsGameWithBot(false);
         }
 
@@ -255,7 +255,7 @@ namespace TerritoryWars.UI
             else
             {
                 ApplicationState.SetState(ApplicationStates.Menu);
-                DojoGameManager.Instance.CustomSynchronizationMaster.DestroyPlayersExceptLocal(DojoGameManager.Instance.LocalBurnerAccount.Address);
+                DojoGameManager.Instance.CustomSynchronizationMaster.DestroyPlayersExceptLocal(DojoGameManager.Instance.LocalAccount.Address);
                 DojoGameManager.Instance.CustomSynchronizationMaster.DestroyAllGames();
                 DojoGameManager.Instance.WorldManager.synchronizationMaster.OnEventMessage.RemoveListener(OnEventMessage);
                 ClearAllListItems();

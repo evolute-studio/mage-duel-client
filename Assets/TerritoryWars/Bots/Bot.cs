@@ -1,11 +1,12 @@
 using Dojo.Starknet;
 using TerritoryWars.Dojo;
+using TerritoryWars.General;
 
 namespace TerritoryWars.Bots
 {
     public class Bot
     {
-        public Account Account => AccountModule.Account;
+        public GeneralAccount Account => AccountModule.Account;
         public bool IsDebug = false;
         
         public BotAccountModule AccountModule { get; private set; }
@@ -15,7 +16,7 @@ namespace TerritoryWars.Bots
         public BotDebugModule DebugModule { get; private set; }
         //public BotEventsModule EventsModule { get; private set; }
 
-        public void Initialize(Account account)
+        public void Initialize(GeneralAccount account)
         {
             AccountModule = new BotAccountModule(this, account);
             InputModule = new BotInputModule(this);

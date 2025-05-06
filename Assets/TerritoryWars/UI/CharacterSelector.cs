@@ -147,7 +147,7 @@ namespace TerritoryWars.UI
             currentCharacterIndex = characters[1].CharacterId;
             characters[1].Locker?.Unlock();
             PlayerCharactersManager.SaveCharacter(characters[1].CharacterId);
-            DojoConnector.ChangeSkin(DojoGameManager.Instance.LocalBurnerAccount, characters[1].CharacterId);
+            DojoConnector.ChangeSkin(DojoGameManager.Instance.LocalAccount, characters[1].CharacterId);
             UpdateButtons();
         }
 

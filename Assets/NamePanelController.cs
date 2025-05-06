@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TerritoryWars;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
+using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
 using UnityEngine;
@@ -42,24 +43,31 @@ public class NamePanelController : MonoBehaviour
         evolute_duel_Player profile = DojoGameManager.Instance.GetLocalPlayerData();
         if(profile == null)
         {
-            CustomLogger.LogWarning("Player profile is null");
-            
-            string defaultName = DojoGameManager.Instance.LocalBurnerAccount.Address.Hex().Substring(0, 10);
-            DojoConnector.ChangeUsername(
-                DojoGameManager.Instance.LocalBurnerAccount,
-                CairoFieldsConverter.GetFieldElementFromString(defaultName));
-            SetName(defaultName);
-            SetEvoluteBalance(0);
+            CreateModelForNewPlayer();
             return;
+        }
+        string name = CairoFieldsConverter.GetStringFromFieldElement(profile.username);
+        SetName(name);
+        SetEvoluteBalance(profile.balance);
+    }
+
+    private void CreateModelForNewPlayer()
+    {
+        CustomLogger.LogWarning("Player profile is null");
+        string username;
+        if (ApplicationState.IsController)
+        {
+            username = WrapperConnector.instance.username;
         }
         else
         {
-            string name = CairoFieldsConverter.GetStringFromFieldElement(profile.username);
-            SetName(name);
-            SetEvoluteBalance(profile.balance);
-            //DojoGameManager.Instance.WorldManager.synchronizationMaster.OnSynchronized.RemoveListener(Initialize);
+            username = DojoGameManager.Instance.LocalAccount.Address.Hex().Substring(0, 10);
         }
-        
+        DojoConnector.ChangeUsername(
+            DojoGameManager.Instance.LocalAccount,
+            CairoFieldsConverter.GetFieldElementFromString(username));
+        SetName(username);
+        SetEvoluteBalance(0);
     }
 
     public void CallChangeNamePanel()

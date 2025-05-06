@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using TerritoryWars.UI.Popups;
@@ -30,9 +31,7 @@ namespace TerritoryWars.UI
 
         public void Start()
         {
-            
             Initialize();
-            //DojoGameManager.Instance.SessionManager = null;
         }
 
         private void Initialize(List<GameObject> list)
@@ -52,7 +51,7 @@ namespace TerritoryWars.UI
 
         public async void NewAccount()
         {
-            await DojoGameManager.Instance.CreateLocalAccount(true);
+            await DojoGameManager.Instance.CreateAccount(true);
             Initialize();
         }
 

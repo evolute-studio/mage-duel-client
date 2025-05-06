@@ -123,43 +123,6 @@ namespace TerritoryWars.Tile
            
         }
 
-        private IEnumerator PlaceFenceSegmentRoutine(Vector3 start, Vector3 end)
-        {
-            Vector2 direction = (end - start).normalized;
-
-            if (float.IsNaN(direction.x) || float.IsNaN(direction.y))
-            {
-                Debug.LogError($"Invalid direction: {direction}, start: {start}, end: {end}");
-                yield break;
-            }
-            
-            int spriteIndex = GetIsometricDirectionIndex(direction);
-            float distance = Vector2.Distance(start, end);
-
-            int fenceCount = Mathf.FloorToInt(distance / fenceWidth);
-            if (fenceCount < 1) fenceCount = 1;
-
-            float actualSpacing = distance / fenceCount;
-
-            for (int i = 0; i < fenceCount; i++)
-            {
-                float t = (i + 0.5f) / fenceCount;
-                Vector3 localPosition = Vector3.Lerp(start, end, t);
-
-                GameObject fence = Instantiate(fencePrefab, transform);
-                fence.transform.localPosition = new Vector3(localPosition.x, localPosition.y, 0);
-                fence.transform.position += transform.position;
-
-                var spriteRenderer = fence.GetComponent<SpriteRenderer>();
-                if (spriteRenderer != null)
-                {
-                    spriteRenderer.sprite = GetFenceSprite(spriteIndex);
-                }
-
-                yield return new WaitForSeconds(spawnDelay);
-            }
-        }
-
         private int GetIsometricDirectionIndex(Vector2 direction)
         {
             
