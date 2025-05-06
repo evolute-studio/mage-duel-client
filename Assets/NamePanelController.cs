@@ -90,6 +90,7 @@ public class NamePanelController : MonoBehaviour
     public void SetEvoluteBalance(int value)
     {
         EvoluteBalance = value;
-        EvoluteCountText.text = " x " + value.ToString();
+        EvoluteCountText.text = value.ToString();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(EvoluteCountText.rectTransform);
     }
 }
