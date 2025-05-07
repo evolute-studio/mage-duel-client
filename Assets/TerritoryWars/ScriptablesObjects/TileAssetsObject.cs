@@ -13,6 +13,7 @@ namespace TerritoryWars.ScriptablesObjects
         [Header("First stage houses")]
         public NotContestedHouses FirstPlayerHouses;
         public NotContestedHouses SecondPlayerHouses;
+        public NotContestedHouses NeutralPlayerHouses;
         
         [Header("Second stage houses")]
         public ContestedHouses FirstPlayerContestedHouses;
@@ -54,6 +55,12 @@ namespace TerritoryWars.ScriptablesObjects
         
         public Sprite GetNotContestedHouse(int count, int playerIndex)
         {
+            if (playerIndex == -1)
+            {
+                int randomNeutralIndex = Random.Range(0,NeutralPlayerHouses.SmallHouses.Length);
+                return NeutralPlayerHouses.SmallHouses[randomNeutralIndex];
+            }
+            
             playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
             var notContestedHouses = playerIndex == 0 ? FirstPlayerHouses : SecondPlayerHouses;
             int randomIndex;
