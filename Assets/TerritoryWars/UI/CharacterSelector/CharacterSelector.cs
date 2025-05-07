@@ -43,6 +43,7 @@ namespace TerritoryWars.UI.CharacterSelector
         {
             _currentSelectedCharacterId = PlayerCharactersManager.GetCurrentCharacterId();
             _currentCharacterId = _currentSelectedCharacterId;
+            InitializeCharacter(Characters.First(x => x.CharacterId == _currentSelectedCharacterId));
 
             foreach (var character in Characters)
             {
@@ -117,13 +118,18 @@ namespace TerritoryWars.UI.CharacterSelector
             var characterItem = CharacterItems[Characters.Count/2];
             _currentCharacterId = characterItem.character.CharacterId;
             characterItem.SetHighlight(true);
-            Debug.Log($"characterItem.character.CharacterId: {characterItem.character.CharacterId} _currentSelectedCharacterId: {_currentSelectedCharacterId}");
             DescriptionPanel.SetInfo(characterItem.character, _playerBalance, characterItem.character.CharacterId == _currentSelectedCharacterId);
-            CharacterAnimator.Play(characterItem.character.IdleSprites, characterItem.character.IdleAnimationDuration);
-            CharacterAnimator.PlaySpecial(characterItem.character.SelectedSprites, characterItem.character.SelectedAnimationDuration);
-            CharacterShadow.sprite = characterItem.character.ShadowSprite;
+            InitializeCharacter(characterItem.character);
+        }
+
+        private void InitializeCharacter(Character character)
+        {
+            Debug.Log($"characterItem.character.CharacterId: {character.CharacterId} _currentSelectedCharacterId: {_currentSelectedCharacterId}");
+            CharacterAnimator.Play(character.IdleSprites, character.IdleAnimationDuration);
+            CharacterAnimator.PlaySpecial(character.SelectedSprites, character.SelectedAnimationDuration);
+            CharacterShadow.sprite = character.ShadowSprite;
             CharacterShadow.GetComponent<RectTransform>().anchoredPosition =
-                characterItem.character.CharacterShadowPosition;
+                character.CharacterShadowPosition;
         }
 
         public void ShiftCharacters(bool isRight)
