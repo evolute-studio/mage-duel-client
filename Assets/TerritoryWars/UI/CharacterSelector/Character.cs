@@ -19,5 +19,9 @@ namespace TerritoryWars.UI.CharacterSelector
         public Sprite[] IdleSprites;
         public float SelectedAnimationDuration = 0.5f;
         public Sprite[] SelectedSprites;
+        
+        public Sprite ShadowSprite;
+        public Vector2 CharacterShadowPosition = new Vector2(-32.6f, -104f);
+        public float HintPositionY = 540f;
     }
 }

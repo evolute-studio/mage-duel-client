@@ -224,7 +224,10 @@ MonoBehaviour:
     CharacterDescription: 
     CharacterCost: 0
     IsUnlocked: 0
+    IsEquipped: 0
+    IdleAnimationDuration: 1
     IdleSprites: []
+    SelectedAnimationDuration: 0.5
     SelectedSprites: []
   CharacterIconSprite: {fileID: 1922713568538088755}
   HighlightObject: {fileID: 1316542137984376318}
@@ -340,8 +343,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 86.599976, y: -77.29002}
-  m_SizeDelta: {x: 29.35, y: 52.31}
+  m_AnchoredPosition: {x: 68.966, y: -68.966}
+  m_SizeDelta: {x: 68.96552, y: 68.96552}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2889686313173658349
 CanvasRenderer:
@@ -371,7 +374,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -3977664147912630366, guid: 13d0720239aaa247e9abc7de2d618541, type: 3}
+  m_Sprite: {fileID: -75479096, guid: 13d0720239aaa247e9abc7de2d618541, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

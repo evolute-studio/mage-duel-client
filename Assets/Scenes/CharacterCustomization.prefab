@@ -128,9 +128,11 @@ MonoBehaviour:
   loop: 1
   delay: 0.14
   randomizeStart: 1
+  randomSpriteStart: 0
   maxRandomDelay: 0.2
   waitBetweenLoops: 0
   playOnAwake: 1
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &418126592964979361
 GameObject:
   m_ObjectHideFlags: 0
@@ -181,6 +183,7 @@ MonoBehaviour:
   characters:
   - MainObject: {fileID: 1339528408834863430}
     CharacterObject: {fileID: 7644188726348639840}
+    CharacterId: 0
     CharacterRenderer: {fileID: 0}
     CharacterAnimator: {fileID: 0}
     RockObject: {fileID: 5889548604075101870}
@@ -207,8 +210,10 @@ MonoBehaviour:
     - {fileID: 9104915613030031129, guid: 7bef83afa789f6c4e93798de8ad5ddbb, type: 3}
     - {fileID: 269734519438417208, guid: 7bef83afa789f6c4e93798de8ad5ddbb, type: 3}
     - {fileID: -7244589549716353255, guid: 7bef83afa789f6c4e93798de8ad5ddbb, type: 3}
+    Locker: {fileID: 0}
   - MainObject: {fileID: 3773498799652336425}
     CharacterObject: {fileID: 4554162114718016548}
+    CharacterId: 0
     CharacterRenderer: {fileID: 0}
     CharacterAnimator: {fileID: 0}
     RockObject: {fileID: 2298435080203737281}
@@ -240,8 +245,10 @@ MonoBehaviour:
     - {fileID: -5684482156367956648, guid: 6b64ad2389a12b143aa3a48f2e1312b3, type: 3}
     - {fileID: -5684482156367956648, guid: 6b64ad2389a12b143aa3a48f2e1312b3, type: 3}
     - {fileID: -5684482156367956648, guid: 6b64ad2389a12b143aa3a48f2e1312b3, type: 3}
+    Locker: {fileID: 0}
   - MainObject: {fileID: 7090834219069967075}
     CharacterObject: {fileID: 405011782698592464}
+    CharacterId: 0
     CharacterRenderer: {fileID: 0}
     CharacterAnimator: {fileID: 0}
     RockObject: {fileID: 2128902931374169977}
@@ -268,6 +275,7 @@ MonoBehaviour:
     - {fileID: -8623476579441061914, guid: 18b419f3b5bc20342b521f10a024e474, type: 3}
     - {fileID: 6312289360088536185, guid: 18b419f3b5bc20342b521f10a024e474, type: 3}
     - {fileID: -1275791352653629626, guid: 18b419f3b5bc20342b521f10a024e474, type: 3}
+    Locker: {fileID: 0}
   positions:
   - {x: -2.59, y: 0.29, z: 0}
   - {x: 0.48, y: -1.51, z: 0}
@@ -282,6 +290,15 @@ MonoBehaviour:
   - {r: 0.5176471, g: 0.5176471, b: 0.5176471, a: 1}
   order: feffffff00000000ffffffff
   animationDuration: 0.5
+  ApplyButton: {fileID: 0}
+  ApplyButtonText: {fileID: 0}
+  NotActiveButton: {fileID: 0}
+  CostTextParent: {fileID: 0}
+  CostText: {fileID: 0}
+  AppliedText: {fileID: 0}
+  ApplyButtonImage: {fileID: 0}
+  ActiveButtonSprite: {fileID: 0}
+  DisabledButtonSprite: {fileID: 0}
 --- !u!1 &1339528408834863430
 GameObject:
   m_ObjectHideFlags: 0
@@ -650,9 +667,11 @@ MonoBehaviour:
   loop: 1
   delay: 0.07
   randomizeStart: 0
+  randomSpriteStart: 0
   maxRandomDelay: 0.2
   waitBetweenLoops: 0
   playOnAwake: 1
+  _spriteRenderer: {fileID: 0}
 --- !u!1 &5889548604075101870
 GameObject:
   m_ObjectHideFlags: 0
@@ -901,6 +920,8 @@ MonoBehaviour:
   loop: 1
   delay: 0.07
   randomizeStart: 1
+  randomSpriteStart: 0
   maxRandomDelay: 0.2
   waitBetweenLoops: 0
   playOnAwake: 1
+  _spriteRenderer: {fileID: 0}

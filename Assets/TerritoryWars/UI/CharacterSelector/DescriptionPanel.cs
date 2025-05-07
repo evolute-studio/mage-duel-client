@@ -12,6 +12,7 @@ namespace TerritoryWars.UI.CharacterSelector
         public GameObject EvoluteIcon;
         public Button ApplyButton;
         public TextMeshProUGUI ButtonText;
+        public GameObject LockerButtonIcon;
 
         public bool IsOwned;
         public bool IsEquipped;
@@ -25,14 +26,16 @@ namespace TerritoryWars.UI.CharacterSelector
                 EvoluteIcon.SetActive(false);
                 CharacterCostText.text = "Owned";
                 ApplyButton.interactable = !equipped;
-                ButtonText.text = equipped ? "Equipped" : "Apply";
+                ButtonText.text = equipped ? "Equipped" : "Equip";
+                LockerButtonIcon.SetActive(false);
             }
             else
             {
                 EvoluteIcon.SetActive(true);
                 CharacterCostText.text = $" x {character.CharacterCost.ToString()} to unlock";
                 ApplyButton.interactable = false;
-                ButtonText.text = "Locked";
+                ButtonText.text = "Equip";
+                LockerButtonIcon.SetActive(true);
             }
             
         }

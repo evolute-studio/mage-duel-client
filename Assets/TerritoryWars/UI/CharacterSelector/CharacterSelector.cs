@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace TerritoryWars.UI.CharacterSelector
 {
@@ -18,9 +20,11 @@ namespace TerritoryWars.UI.CharacterSelector
 
         [Header("References")]
         public SpriteAnimator CharacterAnimator;
+        public Image CharacterShadow;
         public GameObject CharacterSelectorObject;
         public CanvasGroup CanvasGroup;
         public CursorOnHover ForegroundCursorOnHover;
+        public GameObject Hint;
         
         private int _currentSelectedCharacterId = 1;
         private int _currentCharacterIndex = 1;
@@ -75,6 +79,17 @@ namespace TerritoryWars.UI.CharacterSelector
                 DOTween.To(() => CanvasGroup.alpha, x => CanvasGroup.alpha = x, 1, 0.5f);
                 ForegroundCursorOnHover.onEnter?.Invoke();
                 ForegroundCursorOnHover.enabled = false;
+                Hint.SetActive(false);
+                RectTransform rectTransform = Hint.GetComponent<RectTransform>();
+                Vector3 position = rectTransform.anchoredPosition;
+                position.y = Characters.First(x => x.CharacterId == _currentSelectedCharacterId).HintPositionY;
+                rectTransform.anchoredPosition = position;
+                for (int i = 0; i < CharacterSelectorObject.transform.childCount; i++)
+                {
+                    Transform child = CharacterSelectorObject.transform.GetChild(i);
+                    child.transform.localScale = Vector3.zero;
+                    child.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
+                }
             }
             else
             {
@@ -89,8 +104,14 @@ namespace TerritoryWars.UI.CharacterSelector
                         CharacterSelectorObject.SetActive(false);
                         ForegroundCursorOnHover.onExit?.Invoke();
                         ForegroundCursorOnHover.enabled = true;
+                        Hint.SetActive(true);
                     });
-                
+                for (int i = 0; i < CharacterSelectorObject.transform.childCount; i++)
+                {
+                    Transform child = CharacterSelectorObject.transform.GetChild(i);
+                    child.transform.DOKill();
+                    child.transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
+                }
             }
         }
 
@@ -108,6 +129,9 @@ namespace TerritoryWars.UI.CharacterSelector
             DescriptionPanel.SetInfo(characterItem.character, _playerBalance, characterItem.character.CharacterId == _currentSelectedCharacterId);
             CharacterAnimator.Play(characterItem.character.IdleSprites, characterItem.character.IdleAnimationDuration);
             CharacterAnimator.PlaySpecial(characterItem.character.SelectedSprites, characterItem.character.SelectedAnimationDuration);
+            CharacterShadow.sprite = characterItem.character.ShadowSprite;
+            CharacterShadow.GetComponent<RectTransform>().anchoredPosition =
+                characterItem.character.CharacterShadowPosition;
         }
 
         public void ShiftCharacters(bool isRight)

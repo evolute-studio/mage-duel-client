@@ -83,6 +83,7 @@ public class NamePanelController : MonoBehaviour
     
     public void SetName(string name)
     {
+        return;
         PlayerNameText.text = name;
         OnNameChanged?.Invoke(name);
     }
