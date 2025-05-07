@@ -2720,7 +2720,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 379978108}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1465496568}
+        m_TargetAssemblyTypeName: TerritoryWars.UI.CharacterSelector.CharacterSelector,
+          Assembly-CSharp
+        m_MethodName: EquipCurrentCharacter
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &379978108
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10061,6 +10074,8 @@ MonoBehaviour:
     CharacterDescription: Sun Mage
     CharacterCost: 0
     IsUnlocked: 0
+    IsEquipped: 0
+    IdleAnimationDuration: 1
     IdleSprites:
     - {fileID: 1291404879975149935, guid: 7bef83afa789f6c4e93798de8ad5ddbb, type: 3}
     - {fileID: -8851675190244076053, guid: 7bef83afa789f6c4e93798de8ad5ddbb, type: 3}
@@ -10077,6 +10092,7 @@ MonoBehaviour:
     - {fileID: 9024115502849083016, guid: 7bef83afa789f6c4e93798de8ad5ddbb, type: 3}
     - {fileID: -8851675190244076053, guid: 7bef83afa789f6c4e93798de8ad5ddbb, type: 3}
     - {fileID: 1291404879975149935, guid: 7bef83afa789f6c4e93798de8ad5ddbb, type: 3}
+    SelectedAnimationDuration: 0.5
     SelectedSprites:
     - {fileID: 2874433525260898121, guid: 7bef83afa789f6c4e93798de8ad5ddbb, type: 3}
     - {fileID: -3418119673784368751, guid: 7bef83afa789f6c4e93798de8ad5ddbb, type: 3}
@@ -10089,6 +10105,8 @@ MonoBehaviour:
     CharacterDescription: Moon Mage
     CharacterCost: 0
     IsUnlocked: 0
+    IsEquipped: 0
+    IdleAnimationDuration: 1
     IdleSprites:
     - {fileID: -7777624132969497184, guid: 6b64ad2389a12b143aa3a48f2e1312b3, type: 3}
     - {fileID: 8694571798386094655, guid: 6b64ad2389a12b143aa3a48f2e1312b3, type: 3}
@@ -10105,6 +10123,7 @@ MonoBehaviour:
     - {fileID: -3891146731967295747, guid: 6b64ad2389a12b143aa3a48f2e1312b3, type: 3}
     - {fileID: 8694571798386094655, guid: 6b64ad2389a12b143aa3a48f2e1312b3, type: 3}
     - {fileID: -7777624132969497184, guid: 6b64ad2389a12b143aa3a48f2e1312b3, type: 3}
+    SelectedAnimationDuration: 1
     SelectedSprites:
     - {fileID: 6244654568807796386, guid: 6b64ad2389a12b143aa3a48f2e1312b3, type: 3}
     - {fileID: 4307691732985569291, guid: 6b64ad2389a12b143aa3a48f2e1312b3, type: 3}
@@ -10122,6 +10141,8 @@ MonoBehaviour:
     CharacterDescription: Bandicoot Mage
     CharacterCost: 100
     IsUnlocked: 0
+    IsEquipped: 0
+    IdleAnimationDuration: 1
     IdleSprites:
     - {fileID: 2147341191400798251, guid: 7356f13db0c0f9c4b891ca48d6ca5ce5, type: 3}
     - {fileID: 7453814903200730467, guid: 7356f13db0c0f9c4b891ca48d6ca5ce5, type: 3}
@@ -10138,6 +10159,7 @@ MonoBehaviour:
     - {fileID: -4416106449937321268, guid: 7356f13db0c0f9c4b891ca48d6ca5ce5, type: 3}
     - {fileID: 7453814903200730467, guid: 7356f13db0c0f9c4b891ca48d6ca5ce5, type: 3}
     - {fileID: 2147341191400798251, guid: 7356f13db0c0f9c4b891ca48d6ca5ce5, type: 3}
+    SelectedAnimationDuration: 0.5
     SelectedSprites:
     - {fileID: 1954381830469734688, guid: 18b419f3b5bc20342b521f10a024e474, type: 3}
     - {fileID: 8947515348877981040, guid: 18b419f3b5bc20342b521f10a024e474, type: 3}
@@ -10150,6 +10172,8 @@ MonoBehaviour:
     CharacterDescription: Golem
     CharacterCost: 500
     IsUnlocked: 0
+    IsEquipped: 0
+    IdleAnimationDuration: 1
     IdleSprites:
     - {fileID: -2109564199, guid: 9f54c6834d456a5468eede9cfcc14811, type: 3}
     - {fileID: 1981452144, guid: 9f54c6834d456a5468eede9cfcc14811, type: 3}
@@ -10165,6 +10189,7 @@ MonoBehaviour:
     - {fileID: -268248911, guid: 9f54c6834d456a5468eede9cfcc14811, type: 3}
     - {fileID: 236801169, guid: 9f54c6834d456a5468eede9cfcc14811, type: 3}
     - {fileID: 306203158, guid: 9f54c6834d456a5468eede9cfcc14811, type: 3}
+    SelectedAnimationDuration: 1
     SelectedSprites:
     - {fileID: -176756537, guid: 9f54c6834d456a5468eede9cfcc14811, type: 3}
     - {fileID: -1810764685, guid: 9f54c6834d456a5468eede9cfcc14811, type: 3}

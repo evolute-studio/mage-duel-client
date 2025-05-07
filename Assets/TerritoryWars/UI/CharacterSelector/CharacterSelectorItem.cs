@@ -5,6 +5,8 @@ namespace TerritoryWars.UI.CharacterSelector
 {
     public class CharacterSelectorItem : MonoBehaviour
     {
+        public RectTransform rectTransform;
+        
         public Character character;
         public Image CharacterIconSprite;
         public GameObject HighlightObject;

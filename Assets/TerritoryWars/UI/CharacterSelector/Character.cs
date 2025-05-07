@@ -13,8 +13,11 @@ namespace TerritoryWars.UI.CharacterSelector
         public string CharacterDescription;
         public int CharacterCost;
         public bool IsUnlocked;
+        public bool IsEquipped;
         
+        public float IdleAnimationDuration = 1f;
         public Sprite[] IdleSprites;
+        public float SelectedAnimationDuration = 0.5f;
         public Sprite[] SelectedSprites;
     }
 }

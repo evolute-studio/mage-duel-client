@@ -140,7 +140,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1515944905279351825, guid: 13d0720239aaa247e9abc7de2d618541, type: 3}
+  m_Sprite: {fileID: -937211663, guid: 13d0720239aaa247e9abc7de2d618541, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -216,10 +216,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37038f3ec44842cab65c6699ea6df07e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rectTransform: {fileID: 6767545299233981850}
+  character:
+    CharacterId: 0
+    CharacterIcon: {fileID: 0}
+    CharacterName: 
+    CharacterDescription: 
+    CharacterCost: 0
+    IsUnlocked: 0
+    IdleSprites: []
+    SelectedSprites: []
   CharacterIconSprite: {fileID: 1922713568538088755}
   HighlightObject: {fileID: 1316542137984376318}
   EquippedIconObject: {fileID: 6879741789288411370}
   LockedIconObject: {fileID: 3339215387617554125}
+  canvasGroup: {fileID: 6411287757483235789}
 --- !u!1 &3339215387617554125
 GameObject:
   m_ObjectHideFlags: 0
