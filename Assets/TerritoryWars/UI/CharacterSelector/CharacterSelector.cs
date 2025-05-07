@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using TerritoryWars.General;
+using TerritoryWars.Tools;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -9,11 +10,14 @@ namespace TerritoryWars.UI.CharacterSelector
 {
     public class CharacterSelector : MonoBehaviour
     {
+        [Header("Data")]
         public List<Character> Characters;
         public List<CharacterSelectorItem> CharacterItems;
         public DescriptionPanel DescriptionPanel;
         public Vector2[] CharacterItemsPositions;
 
+        [Header("References")]
+        public SpriteAnimator CharacterAnimator;
         public GameObject CharacterSelectorObject;
         public CanvasGroup CanvasGroup;
         public CursorOnHover ForegroundCursorOnHover;
@@ -99,8 +103,10 @@ namespace TerritoryWars.UI.CharacterSelector
                     .SetEquipped(Characters[i].CharacterId == _currentSelectedCharacterIndex);
 
             }
-            CharacterItems[Characters.Count/2].SetHighlight(true);
-            DescriptionPanel.SetInfo(CharacterItems[Characters.Count/2].character, _playerBalance, CharacterItems[Characters.Count/2].character.CharacterId == _currentSelectedCharacterIndex);
+            var characterItem = CharacterItems[Characters.Count/2];
+            characterItem.SetHighlight(true);
+            DescriptionPanel.SetInfo(characterItem.character, _playerBalance, characterItem.character.CharacterId == _currentSelectedCharacterIndex);
+            CharacterAnimator.Play(characterItem.character.IdleSprites);
         }
 
         public void ShiftCharacters(bool isRight)
@@ -126,6 +132,12 @@ namespace TerritoryWars.UI.CharacterSelector
                 }
 
                 Characters[^1] = temp;
+            }
+
+            foreach (var item in CharacterItems)
+            {
+                
+                
             }
 
             InitializeCharacters();
