@@ -120,6 +120,22 @@ namespace TerritoryWars.ScriptablesObjects
                     return FirstPlayerHouses.LargeHouses[i];
                 }
             }
+            houses = NeutralPlayerHouses.SmallHouses;
+            for (int i = 0; i < houses.Length; i++)
+            {
+                if (houses[i] == sprite)
+                {
+                    if (playerIndex == 1)
+                    {
+                        return SecondPlayerHouses.SmallHouses[i];
+                    }
+
+                    if (playerIndex == 0)
+                    {
+                        return FirstPlayerHouses.SmallHouses[i];
+                    }
+                }
+            }
             return null;
         }
 
