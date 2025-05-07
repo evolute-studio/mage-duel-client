@@ -5030,7 +5030,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &612688064
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5045,10 +5045,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1835908246}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1600, y: 900}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &612688065
 MonoBehaviour:
@@ -5063,7 +5063,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -10351,7 +10351,7 @@ MonoBehaviour:
     - {fileID: -1275791352653629626, guid: 18b419f3b5bc20342b521f10a024e474, type: 3}
     ShadowSprite: {fileID: -1768981574596086536, guid: 071ceeb884033476e8acb72437c391f4, type: 3}
     CharacterShadowPosition: {x: -47.2, y: -98.3}
-    HintPositionY: 540
+    HintPositionY: 473.5
   - CharacterId: 3
     CharacterIcon: {fileID: 4606464023611690380, guid: 13d0720239aaa247e9abc7de2d618541, type: 3}
     CharacterName: Golem
@@ -13376,7 +13376,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a54ddac7e65a4b85b775c61f118ddadc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Image: {fileID: 1467845905}
+  DefaultImage: {fileID: 1467845905}
+  DarkenImage: {fileID: 612688065}
   DefaultBackgroundSprite: {fileID: -4894991498400180920, guid: 1c8598b5c5a1b8c09991501bf8419713, type: 3}
   DarkenBackgroundSprite: {fileID: 2986500388495057270, guid: d4c437df9c0014536b6d6bf364c0c16a, type: 3}
 --- !u!1 &1899975276

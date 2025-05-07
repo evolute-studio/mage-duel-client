@@ -1,11 +1,14 @@
+using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace TerritoryWars.UI.Menu
 {
     public class MenuBackground : MonoBehaviour
     {
-        public Image Image;
+        public Image DefaultImage;
+        public Image DarkenImage;
         
         public Sprite DefaultBackgroundSprite;
         public Sprite DarkenBackgroundSprite;
@@ -14,11 +17,11 @@ namespace TerritoryWars.UI.Menu
         {
             if (darken)
             {
-                Image.sprite = DarkenBackgroundSprite;
+                DarkenImage.DOFade(1, 0.5f);
             }
             else
             {
-                Image.sprite = DefaultBackgroundSprite;
+                DarkenImage.DOFade(0, 0.5f);
             }
         }
     }
