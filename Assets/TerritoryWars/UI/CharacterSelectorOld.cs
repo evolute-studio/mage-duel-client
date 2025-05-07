@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace TerritoryWars.UI
 {
-    public class CharacterSelector : MonoBehaviour
+    public class CharacterSelectorOld : MonoBehaviour
     {
         public Character[] characters;
 
