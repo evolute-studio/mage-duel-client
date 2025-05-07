@@ -61,7 +61,7 @@ public class NamePanelController : MonoBehaviour
         }
         else
         {
-            username = DojoGameManager.Instance.LocalAccount.Address.Hex().Substring(0, 10);
+            username = DojoGameManager.Instance.LocalAccount.Address.Hex().Substring(0, 9);
         }
         DojoConnector.ChangeUsername(
             DojoGameManager.Instance.LocalAccount,
@@ -83,7 +83,6 @@ public class NamePanelController : MonoBehaviour
     
     public void SetName(string name)
     {
-        return;
         PlayerNameText.text = name;
         OnNameChanged?.Invoke(name);
     }

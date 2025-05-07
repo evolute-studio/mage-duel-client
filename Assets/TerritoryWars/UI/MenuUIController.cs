@@ -46,8 +46,7 @@ namespace TerritoryWars.UI
         {
             DojoGameManager.Instance.CustomSynchronizationMaster.DestroyBoardsAndAllDependencies();
             _namePanelController.Initialize();
-            characterSelectorOld.Initialize();
-            
+            CharacterSelector.Initialize();
             _namePanelController.OnNameChanged.AddListener(OnNameChanged);
         }
 

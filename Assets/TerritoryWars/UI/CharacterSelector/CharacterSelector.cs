@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using UnityEngine;
@@ -27,43 +29,31 @@ namespace TerritoryWars.UI.CharacterSelector
         public GameObject Hint;
         
         private int _currentSelectedCharacterId = 1;
-        private int _currentCharacterIndex = 1;
-        private List<int> _unlockedCharacters = new List<int>() { 0, 1 };
-        private int _playerBalance = 0;
+        private int _currentCharacterId = 1;
+        private List<int> _unlockedCharacters = new List<int>();
+        private int _playerBalance => MenuUIController.Instance._namePanelController.EvoluteBalance;
 
-        public void Start()
-        {
-            Initialize();
-            SetActive(false);
-        }
+        // public void Start()
+        // {
+        //     Initialize();
+        //     SetActive(false);
+        // }
 
         public void Initialize()
         {
-            // if (MenuUIController.Instance._namePanelController.EvoluteBalance == 0)
-            // {
-            //     PlayerCharactersManager.ClearAvailableCharacters();
-            // }
-            
-            //_currentSelectedCharacterIndex = PlayerCharactersManager.GetCurrentCharacterId();
-            
-            //List<int> unlockedCharacters = PlayerCharactersManager.GetAvailableCharacters();
+            _currentSelectedCharacterId = PlayerCharactersManager.GetCurrentCharacterId();
+            _currentCharacterId = _currentSelectedCharacterId;
 
             foreach (var character in Characters)
             {
-                character.IsUnlocked = _unlockedCharacters.Contains(character.CharacterId);
+                character.IsUnlocked = _playerBalance >= character.CharacterCost;
+                _unlockedCharacters.Add(character.CharacterId);
             }
             
             while(_currentSelectedCharacterId != Characters[2].CharacterId)
             {
                 ShiftCharacters(true);
             }
-            //
-            //
-            // UpdateButtons();
-            // foreach (var character in characters)
-            // {
-            //     character.Initialize();
-            // }
         }
         
         public void SetActive(bool active)
@@ -125,7 +115,9 @@ namespace TerritoryWars.UI.CharacterSelector
                     .SetEquipped(Characters[cIndex].CharacterId == _currentSelectedCharacterId);
             }
             var characterItem = CharacterItems[Characters.Count/2];
+            _currentCharacterId = characterItem.character.CharacterId;
             characterItem.SetHighlight(true);
+            Debug.Log($"characterItem.character.CharacterId: {characterItem.character.CharacterId} _currentSelectedCharacterId: {_currentSelectedCharacterId}");
             DescriptionPanel.SetInfo(characterItem.character, _playerBalance, characterItem.character.CharacterId == _currentSelectedCharacterId);
             CharacterAnimator.Play(characterItem.character.IdleSprites, characterItem.character.IdleAnimationDuration);
             CharacterAnimator.PlaySpecial(characterItem.character.SelectedSprites, characterItem.character.SelectedAnimationDuration);
@@ -137,7 +129,6 @@ namespace TerritoryWars.UI.CharacterSelector
         public void ShiftCharacters(bool isRight)
         {
             int shift = isRight ? 1 : -1;
-            _currentCharacterIndex = (_currentCharacterIndex + shift + Characters.Count) % Characters.Count;
             if (isRight)
             {
                 Character temp = Characters[^1];
@@ -185,14 +176,15 @@ namespace TerritoryWars.UI.CharacterSelector
 
         public void EquipCurrentCharacter()
         {
-            Character currentCharacter = Characters[_currentSelectedCharacterId];
+            Character currentCharacter = Characters.First(x => x.CharacterId == _currentCharacterId);
             if (!currentCharacter.IsUnlocked || currentCharacter.CharacterId == _currentSelectedCharacterId)
             {
                 return;
             }
-            
             _currentSelectedCharacterId = currentCharacter.CharacterId;
             InitializeCharacters();
+            DojoConnector.ChangeSkin(DojoGameManager.Instance.LocalAccount, currentCharacter.CharacterId);
+            
         }
     }
 }
