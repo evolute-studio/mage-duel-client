@@ -37,6 +37,15 @@ namespace TerritoryWars.Tile
         {
             ApplyRotation();
         }
+        
+        [ContextMenu("Rotate LineRenderer")]
+        public void RotateLineRenderer()
+        {
+            foreach (var lineRenderer in LineRenderers)
+            {
+                LineRotation(lineRenderer);
+            }
+        }
 
         public void RotateCounterClockwise()
         {
