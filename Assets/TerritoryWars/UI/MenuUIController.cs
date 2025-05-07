@@ -6,6 +6,7 @@ using TerritoryWars.General;
 using TerritoryWars.Tools;
 using TerritoryWars.UI.Popups;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TerritoryWars.UI
 {
@@ -27,7 +28,8 @@ namespace TerritoryWars.UI
         
         public NamePanelController _namePanelController;
         public ChangeNamePanelUIController _changeNamePanelUIController;
-        public CharacterSelector _characterSelector;
+        public CharacterSelector.CharacterSelector CharacterSelector;
+        [FormerlySerializedAs("_characterSelector")] public CharacterSelectorOld characterSelectorOld;
 
         public void Start()
         {
@@ -44,8 +46,7 @@ namespace TerritoryWars.UI
         {
             DojoGameManager.Instance.CustomSynchronizationMaster.DestroyBoardsAndAllDependencies();
             _namePanelController.Initialize();
-            _characterSelector.Initialize();
-            
+            CharacterSelector.Initialize();
             _namePanelController.OnNameChanged.AddListener(OnNameChanged);
         }
 

@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace TerritoryWars.UI
 {
-    public class CharacterSelector : MonoBehaviour
+    public class CharacterSelectorOld : MonoBehaviour
     {
         public Character[] characters;
 
@@ -116,7 +116,7 @@ namespace TerritoryWars.UI
                     sequence.AppendInterval(animationDuration * 0.5f);
                     sequence.AppendCallback(() =>
                     {
-                        characters[1].CharacterAnimator.PlaySpecial(characters[1].SelectedSprites);
+                        characters[1].CharacterAnimator.PlaySpecial(characters[1].SelectedSprites, 1);
                     });
                     sequence.Play();
                 }

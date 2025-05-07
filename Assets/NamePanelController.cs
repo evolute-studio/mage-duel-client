@@ -61,7 +61,7 @@ public class NamePanelController : MonoBehaviour
         }
         else
         {
-            username = DojoGameManager.Instance.LocalAccount.Address.Hex().Substring(0, 10);
+            username = DojoGameManager.Instance.LocalAccount.Address.Hex().Substring(0, 9);
         }
         DojoConnector.ChangeUsername(
             DojoGameManager.Instance.LocalAccount,
@@ -90,6 +90,7 @@ public class NamePanelController : MonoBehaviour
     public void SetEvoluteBalance(int value)
     {
         EvoluteBalance = value;
-        EvoluteCountText.text = " x " + value.ToString();
+        EvoluteCountText.text = value.ToString();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(EvoluteCountText.rectTransform);
     }
 }

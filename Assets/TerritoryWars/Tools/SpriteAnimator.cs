@@ -68,10 +68,14 @@ namespace TerritoryWars.Tools
             StartCoroutine(Animate());
         }
 
-        public SpriteAnimator Play(Sprite[] animation)
+        public SpriteAnimator Play(Sprite[] animation, float duration = default)
         {
             Stop();
             sprites = animation;
+            if (duration > 0)
+            {
+                this.duration = duration;
+            }
             Play();
             return this;
         }
@@ -157,13 +161,13 @@ namespace TerritoryWars.Tools
             }
         }
         
-        public void PlaySpecial(Sprite[] specialSprites)
+        public void PlaySpecial(Sprite[] specialSprites, float duration)
         {
             Stop();
-            StartCoroutine(SpecialAnimation(specialSprites, () => Play()));
+            StartCoroutine(SpecialAnimation(specialSprites, duration, () => Play()));
         }
 
-        private IEnumerator SpecialAnimation(Sprite[] specialSprites, Action callback = null)
+        private IEnumerator SpecialAnimation(Sprite[] specialSprites, float duration, Action callback = null)
         {
             foreach (var sprite in specialSprites)
             {
