@@ -13,7 +13,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace TerritoryWars.UI
+namespace TerritoryWars.UI.MatchTab
 {
     public class MatchesTabController : MonoBehaviour
     {
@@ -46,7 +46,7 @@ namespace TerritoryWars.UI
         public MatchListItem CreateListItem()
         {
             GameObject listItem = Instantiate(MatchListItemPrefab, ListItemParent);
-            MatchListItem matchListItem = new MatchListItem(listItem);
+            MatchListItem matchListItem = listItem.GetComponent<MatchListItem>();
             _matchListItems.Add(matchListItem);
             return matchListItem;
         }
@@ -162,11 +162,6 @@ namespace TerritoryWars.UI
                         DojoConnector.JoinGame(DojoGameManager.Instance.LocalAccount, gameModel.player);
                         SimpleStorage.SetIsGameWithBot(false);
                     });
-                
-                    if (playerName == DojoGameManager.Instance.LocalAccount.Address.Hex())
-                    {
-                        matchListItem.SetAwaiting(true);
-                    }
                 }
                 else
                 {
@@ -262,75 +257,5 @@ namespace TerritoryWars.UI
                 CursorManager.Instance.SetCursor("default");
             }
         }
-    }
-
-    public class MatchListItem
-    {
-        public GameObject ListItem;
-        public string PlayerName;
-        public int EvoluteCount;
-        public string HostPlayer;
-
-        private TextMeshProUGUI _playerNameText;
-        //private TextMeshProUGUI _gameIdText;
-        private TextMeshProUGUI _evoluteCountText;
-        private TextMeshProUGUI _moveNumberText;
-        private TextMeshProUGUI _statusText;
-        private TextMeshProUGUI _awaitText;
-        private Button _playButton;
-
-        public MatchListItem(GameObject listItem)
-        {
-            ListItem = listItem;
-            _playerNameText = listItem.transform.Find("Content/PlayerNameText").GetComponent<TextMeshProUGUI>();
-            //_gameIdText = listItem.transform.Find("Content/GameIdText").GetComponent<TextMeshProUGUI>();
-            _evoluteCountText = listItem.transform.Find("Content/EvoluteCountGO/EvoluteCountText").GetComponent<TextMeshProUGUI>();
-            _moveNumberText = listItem.transform.Find("Content/MoveNumber/MoveNumberText").GetComponent<TextMeshProUGUI>();
-            _awaitText = listItem.transform.Find("Content/AwaitText").GetComponent<TextMeshProUGUI>();
-            _playButton = listItem.transform.Find("Content/PlayButton").GetComponent<Button>();
-            _awaitText.gameObject.SetActive(false);
-            _awaitText.text = "Await...";
-        }
-        public void UpdateItem(string playerName, int evoluteBalance, string status, string hostPlayer, int moveNumber = 0, UnityAction onJoin = null)
-        {
-            PlayerName = playerName;
-            EvoluteCount = evoluteBalance;
-            HostPlayer = hostPlayer;
-
-            _playerNameText.text = PlayerName;
-            _evoluteCountText.text = " x " + EvoluteCount.ToString();
-            _moveNumberText.gameObject.SetActive(moveNumber > 0);
-            _moveNumberText.text = "Moves: " + moveNumber;
-            //_gameIdText.text = GameId;
-
-            _playButton.onClick.RemoveAllListeners();
-
-            if (status != "Created")
-            {
-                _playButton.interactable = false;
-            }
-            else
-            {
-                _playButton.interactable = true;
-                if (onJoin != null)
-                {
-                    _playButton.onClick.AddListener(onJoin);
-                }
-            }
-        }
-        
-        public void SetAwaiting(bool isAwaiting)
-        {
-            _playButton.gameObject.SetActive(!isAwaiting);
-            _awaitText.gameObject.SetActive(isAwaiting);
-            _awaitText.text = "Awaiting...";
-        }
-        
-        public void SetActive(bool isActive)
-        {
-            ListItem.SetActive(isActive);
-        }
-        
-        
     }
 }
