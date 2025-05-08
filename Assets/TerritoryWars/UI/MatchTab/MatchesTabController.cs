@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DG.Tweening;
 using Dojo;
 using Dojo.Starknet;
 using TerritoryWars.Dojo;
@@ -27,6 +28,8 @@ namespace TerritoryWars.UI.MatchTab
         public GameObject BackgroundPlaceholderGO;
         public Button CreateMatchButton;
         public Button CreateBotMatchButton;
+        public CanvasGroup canvasGroup;
+        public GameObject CloseButtonGO;
         
         private int _createdMatchesCount = 0;
         private int _inProgressMatchesCount = 0;
@@ -233,19 +236,19 @@ namespace TerritoryWars.UI.MatchTab
         
         public async void SetActivePanel(bool isActive)
         {
-            // if (isActive && MenuUIController.Instance._namePanelController.IsDefaultName())
-            // {
-            //     MenuUIController.Instance._changeNamePanelUIController.SetNamePanelActive(true);
-            //     return;
-            // }
-            
-            
-            PanelGameObject.SetActive(isActive);
             if (isActive)
-            {
+            { 
+                PanelGameObject.SetActive(true);
                 ApplicationState.SetState(ApplicationStates.MatchTab);
                 FetchData();
                 DojoGameManager.Instance.WorldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
+                canvasGroup.alpha = 0;
+                PanelGameObject.transform.localScale = Vector3.zero;
+                PanelGameObject.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
+                canvasGroup.DOFade(1, 0.5f).SetEase(Ease.OutBack).OnComplete(() =>
+                {
+                    //CloseButtonGO.SetActive(true);
+                });
             }
             else
             {
@@ -255,6 +258,11 @@ namespace TerritoryWars.UI.MatchTab
                 DojoGameManager.Instance.WorldManager.synchronizationMaster.OnEventMessage.RemoveListener(OnEventMessage);
                 ClearAllListItems();
                 CursorManager.Instance.SetCursor("default");
+                canvasGroup.DOFade(0, 0.5f).SetEase(Ease.OutBack);
+                PanelGameObject.transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.OutBack).OnComplete(() =>
+                {
+                    PanelGameObject.SetActive(false);
+                });
             }
         }
     }

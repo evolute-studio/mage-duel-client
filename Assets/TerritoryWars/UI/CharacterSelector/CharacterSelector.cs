@@ -67,7 +67,7 @@ namespace TerritoryWars.UI.CharacterSelector
                 CanvasGroup.interactable = true;
                 CanvasGroup.blocksRaycasts = true;
 
-                DOTween.To(() => CanvasGroup.alpha, x => CanvasGroup.alpha = x, 1, 0.5f);
+                DOTween.To(() => CanvasGroup.alpha, x => CanvasGroup.alpha = x, 1, 0.25f);
                 ForegroundCursorOnHover.onEnter?.Invoke();
                 ForegroundCursorOnHover.enabled = false;
                 Hint.SetActive(false);
@@ -78,8 +78,8 @@ namespace TerritoryWars.UI.CharacterSelector
                 for (int i = 0; i < CharacterSelectorObject.transform.childCount; i++)
                 {
                     Transform child = CharacterSelectorObject.transform.GetChild(i);
-                    child.transform.localScale = Vector3.zero;
-                    child.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
+                    child.transform.localScale = Vector3.one * 0.75f;
+                    child.transform.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutBack);
                 }
             }
             else
@@ -89,7 +89,7 @@ namespace TerritoryWars.UI.CharacterSelector
                 CanvasGroup.interactable = false;
                 CanvasGroup.blocksRaycasts = false;
                 
-                DOTween.To(() => CanvasGroup.alpha, x => CanvasGroup.alpha = x, 0, 0.5f)
+                DOTween.To(() => CanvasGroup.alpha, x => CanvasGroup.alpha = x, 0, 0.25f)
                     .OnComplete(() =>
                     {
                         CharacterSelectorObject.SetActive(false);
@@ -101,7 +101,7 @@ namespace TerritoryWars.UI.CharacterSelector
                 {
                     Transform child = CharacterSelectorObject.transform.GetChild(i);
                     child.transform.DOKill();
-                    child.transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
+                    child.transform.DOScale(Vector3.one * 0.75f, 0.25f).SetEase(Ease.InBack);
                 }
             }
         }

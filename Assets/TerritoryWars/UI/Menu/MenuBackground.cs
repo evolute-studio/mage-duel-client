@@ -13,15 +13,17 @@ namespace TerritoryWars.UI.Menu
         public Sprite DefaultBackgroundSprite;
         public Sprite DarkenBackgroundSprite;
         
+        public float TransitionTime = 0.5f;
+        
         public void SetBackground(bool darken)
         {
             if (darken)
             {
-                DarkenImage.DOFade(1, 0.5f);
+                DarkenImage.DOFade(1, TransitionTime);
             }
             else
             {
-                DarkenImage.DOFade(0, 0.5f);
+                DarkenImage.DOFade(0, TransitionTime);
             }
         }
     }
