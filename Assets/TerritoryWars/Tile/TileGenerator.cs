@@ -268,6 +268,9 @@ namespace TerritoryWars.Tile
                 
                 MinePlaceForCloserToBorderRoad(SessionManager.Instance.Board.CheckRoadTileSidesToBorder(_placingTilePosition.x,
                     _placingTilePosition.y));
+
+                tileParts.GrassSpriteRenderer.sprite = SessionManager.Instance.Board.IsNeedToPlaceSnowGrass(_placingTilePosition.x, _placingTilePosition.y)
+                    ? PrefabsManager.Instance.TileAssetsObject.NorthernGrass : tileParts.GrassSpriteRenderer.sprite;
             }
         }
         public void RecolorHouses(int playerId, bool isContest = false, int rotation = 0)
