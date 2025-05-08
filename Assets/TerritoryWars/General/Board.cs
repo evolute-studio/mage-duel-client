@@ -399,19 +399,19 @@ namespace TerritoryWars.General
         {
             if (x < 4 & y < 4) // the numbers indicate the part of the board
             {
-                return 0;
+                return 0; // default mountain
             }
             if (x > 4 & y > 4)
             {
-                return 3;
+                return 3; // snow mountain
             }
             if (x <= 4 & y >= 4)
             {
-                return 1;
+                return 1; // player mountain
             }
             if (x >= 4 & y <= 4)
             {
-                return 2;
+                return 2; // player mountain
             }
 
             return -1;
@@ -550,6 +550,32 @@ namespace TerritoryWars.General
         {
             return x == 0 || x == width - 1 || y == 0 || y == height - 1;
         }
+        
+        public bool IsNeedToPlaceSnowGrass(int x, int y)
+        {
+            CheckSnowBoardPart();
+            return (x >= 5) && (y >= 5) && ((x + y) > 13);
+        }
+
+        public void CheckSnowBoardPart()
+        {
+            for (int x = 0; x <= 9; x++)
+            {
+                for (int y = 0; y <= 9; y++)
+                {
+                    if (x + y == 13 && tileObjects[x, y] != null && tileObjects[x, y].TryGetComponent(out TileParts tileParts))
+                    { 
+                        
+                    }
+                }
+            }
+        }
+
+        // public int CheckSnowNeighborsForTile(int x, int y)
+        // {
+        //     List<int> snowNeighbors = new List<int>();
+        //     if()
+        // }
 
         public (Vector2Int, Side) GetNeighborPositionAndSideToEdgeTile(int x, int y)
         {
