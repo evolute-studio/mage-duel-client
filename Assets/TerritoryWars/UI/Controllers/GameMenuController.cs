@@ -26,7 +26,7 @@ public class GameMenuController
 
     private void OnSnapshotButtonClicked()
     {
-        DojoGameManager.Instance.SessionManager.CreateSnapshot();
+        DojoGameManager.Instance.DojoSessionManager.CreateSnapshot();
     }
 
     private void OnSettingsButtonClicked()
