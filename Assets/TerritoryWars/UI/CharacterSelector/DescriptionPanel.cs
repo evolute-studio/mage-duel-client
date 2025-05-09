@@ -27,7 +27,8 @@ namespace TerritoryWars.UI.CharacterSelector
                 CharacterCostText.text = "Owned";
                 ApplyButton.interactable = !equipped;
                 ButtonText.text = equipped ? "Equipped" : "Equip";
-                LockerButtonIcon.SetActive(false);
+                LockerButtonIcon.SetActive(equipped);
+                
             }
             else
             {
@@ -35,7 +36,7 @@ namespace TerritoryWars.UI.CharacterSelector
                 CharacterCostText.text = $" x {character.CharacterCost.ToString()} to unlock";
                 ApplyButton.interactable = false;
                 ButtonText.text = "Equip";
-                LockerButtonIcon.SetActive(true);
+                LockerButtonIcon.SetActive(equipped);
             }
             
         }

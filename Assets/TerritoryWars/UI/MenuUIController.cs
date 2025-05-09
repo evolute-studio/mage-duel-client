@@ -80,6 +80,17 @@ namespace TerritoryWars.UI
             }
         }
 
+        public void OpenControllerProfile()
+        {
+            WrapperConnectorCalls.ControllerProfile();
+        }
+
+        public void ControllerLogout()
+        {
+            WrapperConnectorCalls.ControllerLogout();
+            JSBridge.ReloadPage();
+        }
+
         public void OnDestroy()
         {
             if (_namePanelController != null)

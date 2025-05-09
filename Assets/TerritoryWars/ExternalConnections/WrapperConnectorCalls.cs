@@ -17,6 +17,12 @@ namespace TerritoryWars.ExternalConnections
         
         [DllImport("__Internal")]
         private static extern void controller_login();
+        
+        [DllImport("__Internal")]
+        private static extern void controller_logout();
+        
+        [DllImport("__Internal")]
+        private static extern void open_controller_profile();
 
         [DllImport("__Internal")]
         private static extern string get_controller_username();
@@ -49,7 +55,27 @@ namespace TerritoryWars.ExternalConnections
         #else
             CustomLogger.LogDojoLoop("ControllerLogin called in non-WebGL build");
         #endif
-    }
+        }
+
+        public static void ControllerLogout()
+        {
+        #if UNITY_WEBGL && !UNITY_EDITOR
+            CustomLogger.LogDojoLoop("ControllerLogout");
+            controller_logout();
+#else
+            CustomLogger.LogDojoLoop("ControllerLogout called in non-WebGL build");
+#endif
+        }
+
+        public static void ControllerProfile()
+        {
+            #if UNITY_WEBGL && !UNITY_EDITOR
+            CustomLogger.LogDojoLoop("ControllerProfile");
+            open_controller_profile();
+#else
+            CustomLogger.LogDojoLoop("ControllerProfile called in non-WebGL build");
+#endif
+        }
 
         public static string GetUsername()
         {
@@ -96,6 +122,7 @@ namespace TerritoryWars.ExternalConnections
             public string gameAddress;
             public string playerProfileActionsAddress;
             public string worldAddress;
+            public int slotDataVersion;
         }
         
         

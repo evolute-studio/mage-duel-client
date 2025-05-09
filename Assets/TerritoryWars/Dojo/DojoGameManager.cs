@@ -101,7 +101,6 @@ namespace TerritoryWars.Dojo
                     .GetComponent<evolute_duel_Board>();
                 if (board == null)
                 {
-                    CustomLogger.LogError("Board not found");
                     return null;
                 }
                 _boardInProgress = board;

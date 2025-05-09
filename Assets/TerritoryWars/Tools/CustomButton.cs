@@ -30,16 +30,20 @@ namespace TerritoryWars.Tools
         protected void Awake()
         { ;
             Image = GetComponent<Image>();
-            if (Image == null)
+            if (!Image)
             {
                 Debug.LogError("CustomButton requires an Image component.");
             }
             _button = GetComponent<Button>();
-            if (_button == null)
+            if (!_button)
             {
                 Debug.LogError("CustomButton requires a Button component.");
             }
-            _defaultContentPosition = ButtonContent.anchoredPosition;
+            if(ButtonContent)
+            {
+                _defaultContentPosition = ButtonContent.anchoredPosition;
+            }
+            
         }
         
         public void OnPointerEnter(PointerEventData eventData)
@@ -79,7 +83,7 @@ namespace TerritoryWars.Tools
             if (PressedSprite != null && Image != null)
             {
                 HoverImage.sprite = PressedHoverOutlineSprite;
-                ButtonContent.anchoredPosition = new Vector2(_defaultContentPosition.x, _defaultContentPosition.y + PressedContentOffsetY);
+                if(ButtonContent) ButtonContent.anchoredPosition = new Vector2(_defaultContentPosition.x, _defaultContentPosition.y + PressedContentOffsetY);
                 Image.DOKill();
                 Sequence seq = DOTween.Sequence();
                 Image.sprite = PressedSprite;
@@ -88,7 +92,7 @@ namespace TerritoryWars.Tools
                 {
                     Image.sprite = DefaultSprite;
                     HoverImage.sprite = HoverOutlineSprite;
-                    ButtonContent.anchoredPosition = _defaultContentPosition;
+                    if(ButtonContent) ButtonContent.anchoredPosition = _defaultContentPosition;
                 });
                 seq.Play();
             }

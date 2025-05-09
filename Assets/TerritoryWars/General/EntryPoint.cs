@@ -50,6 +50,7 @@ namespace TerritoryWars.General
         
         public Game game_contract;
         public Player_profile_actions player_profile_actions;
+        private int currentDataVersion;
         
         private float startConenctionTime;
 
@@ -63,6 +64,7 @@ namespace TerritoryWars.General
             ControllerContracts.EVOLUTE_DUEL_GAME_ADDRESS = connection.gameAddress;
             ControllerContracts.EVOLUTE_DUEL_PLAYER_PROFILE_ACTIONS_ADDRESS = connection.playerProfileActionsAddress;
             DojoGameManager.Instance.WorldManager.Initialize(connection.rpcUrl, connection.toriiUrl);
+            currentDataVersion = connection.slotDataVersion;
             #endif
             
             DojoGameManager.Instance.WorldManager.Initialize();
@@ -220,36 +222,16 @@ namespace TerritoryWars.General
         }
         
 
-        
-        
-        private void SceneLoaded(string name)
-        {
-            if (name == CustomSceneManager.Instance.Menu)
-            {
-                
-            }
-            else if (name == CustomSceneManager.Instance.Session)
-            {
-                //SessionManager.Instance.Initialize();
-
-            }
-        }
-
         private void InitDataStorage()
         {
-            int currentDataVersion = 14;
             int dataVersion = SimpleStorage.LoadDataVersion();
             if (dataVersion < currentDataVersion)
             {
+                CustomLogger.LogDojoLoop($"A new version of slot data has been detected. Local: {dataVersion}, Remote: {currentDataVersion}");
                 SimpleStorage.ClearAll();
                 SimpleStorage.SetDataVersion(currentDataVersion);
             }
             
-        }
-        
-        private void OnDestroy()
-        {
-            CustomSceneManager.Instance.OnLoadScene -= SceneLoaded;
         }
     }
 

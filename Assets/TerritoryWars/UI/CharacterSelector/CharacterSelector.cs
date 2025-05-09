@@ -145,7 +145,6 @@ namespace TerritoryWars.UI.CharacterSelector
 
         private void InitializeCharacter(Character character)
         {
-            Debug.Log($"characterItem.character.CharacterId: {character.CharacterId} _currentSelectedCharacterId: {_currentSelectedCharacterId}");
             CharacterAnimator.Play(character.IdleSprites, character.IdleAnimationDuration);
             CharacterAnimator.PlaySpecial(character.SelectedSprites, character.SelectedAnimationDuration);
             CharacterShadow.sprite = character.ShadowSprite;

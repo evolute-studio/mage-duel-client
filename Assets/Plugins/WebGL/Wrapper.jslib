@@ -11,6 +11,10 @@ mergeInto(LibraryManager.library, {
         console.log("ControllerLogin called");
         return window.unityConnector.ControllerLogin();
     },
+    controller_logout: function() {
+        console.log("ControllerLogout called");
+        return window.controllerInstance.disconnect();
+    }
     is_controller_logged_in: function() {
         console.log("IsControllerLoggedIn called");
         return window.unityConnector.IsControllerLoggedIn() ? 1 : 0;
@@ -25,5 +29,9 @@ mergeInto(LibraryManager.library, {
         var buffer = _malloc(bufferSize);
         stringToUTF8(connectionData, buffer, bufferSize);
         return buffer;
+    },
+    open_controller_profile: function() {
+        console.log("OpenControllerProfile called");
+        window.controllerInstance.controller.openProfile("achievements");
     }
 }); 
