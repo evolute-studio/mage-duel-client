@@ -11,8 +11,9 @@ namespace TerritoryWars.Tile
 {
     public class CloudsController : MonoBehaviour
     {
-        public float spawnTime = 1.2f;
+        public float spawnTime = 1f;
         private List<Vector3> mountains = new List<Vector3>();
+        private List<Vector3> usedMountains = new List<Vector3>();
         private Coroutine coroutine;
         private bool _spawnClouds = false;
         private float timer = 0f;
@@ -33,15 +34,15 @@ namespace TerritoryWars.Tile
             int randomGameObject = Random.Range(0, mountains.Count);
             Vector3 position = mountains[randomGameObject];
             int randomClouds = Random.Range(0, PrefabsManager.Instance.TileAssetsObject.Clouds.Length);
-
-            GameObject cloud = MonoBehaviour.Instantiate(PrefabsManager.Instance.CloudPrefab, position + new Vector3(0.539f,0.23f,0f)
-                , Quaternion.identity);
+            
+            GameObject cloud = Instantiate(PrefabsManager.Instance.CloudPrefab, position
+                ,Quaternion.identity);
 
             SpriteAnimator cloudSpriteAnimator = cloud.GetComponent<SpriteAnimator>();
             
             cloudSpriteAnimator.OnAnimationEnd += () =>
             {
-                cloud.GetComponent<SpriteRenderer>().DOFade(0f, 0.5f).OnComplete(() =>
+                cloud.GetComponent<SpriteRenderer>().DOFade(0f, Random.Range(0.4f, 0.9f)).OnComplete(() =>
                 {
                     Destroy(cloud);
                 });
