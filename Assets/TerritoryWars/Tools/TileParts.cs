@@ -25,6 +25,7 @@ public class TileParts : MonoBehaviour
     public PolygonCollider2D PolygonCollider2D;
     public FlagsOnWall FlagsOnWalls;
     public SpriteRenderer HangingGrass;
+    public Material HangingGrassMaterial;
 
     private GameObject WallParent;
     public GameObject[] CompletedBorderWalls;
@@ -140,6 +141,7 @@ public class TileParts : MonoBehaviour
         if (HangingGrass.sprite == null && HangingGrass != null)
         {
             HangingGrass.sprite = PrefabsManager.Instance.TileAssetsObject.GetHangingGrass();
+            HangingGrass.material = HangingGrassMaterial;
         }
     }
 
