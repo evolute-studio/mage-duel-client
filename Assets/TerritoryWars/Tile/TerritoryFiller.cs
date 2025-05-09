@@ -41,13 +41,19 @@ namespace TerritoryWars.Tile
         public LineRenderer lineRenderer;
         private bool isArcSpawned = false;
 
+        private int _currentMask = 0;
+
         [ContextMenu("Place Fence")]
         public void PlaceTerritory(bool isContested)
         {
             if (fencePrefab == null || lineRenderer == null || lineRenderer.positionCount < 2)
             {
-                
                 return;
+            }
+
+            if (currentTerritory != null)
+            {
+                _currentMask = currentTerritory.gameObject.layer;
             }
 
             while (transform.childCount > 0)
@@ -82,6 +88,7 @@ namespace TerritoryWars.Tile
             }
             
             currentTerritory = Instantiate(territoryPrefab, transform).GetComponent<Territory>();
+            currentTerritory.gameObject.layer = _currentMask;
             TerritorySpriteRenderer = currentTerritory.GetComponent<SpriteRenderer>();
             currentTerritory.SetLineRenderer(lineRenderer);
             currentTerritory.GenerateMask();

@@ -45,7 +45,6 @@ namespace TerritoryWars.UI
         [SerializeField] private GameObject[] _toggleGameObjects;
         [SerializeField] private GameObject _toggleJokerButton;
         [SerializeField] private GameObject[] _toggleJokerInfoGameObjects;
-        [SerializeField] private CanvasGroup[] _togglersCanvasGroup;
         [SerializeField] private CanvasGroup _deckContainerCanvasGroup;
         [SerializeField] private GameMenuView _gameMenuView;
 
@@ -135,7 +134,7 @@ namespace TerritoryWars.UI
                 return;
             }
             _resultPopUpUI.SetPlayersName(_sessionManager.PlayersData[0].username, _sessionManager.PlayersData[1].username);
-            evolute_duel_Board board = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
+            evolute_duel_Board board = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
             int cityScoreBlue = board.blue_score.Item1;
             int cartScoreBlue = board.blue_score.Item2;
             int cityScoreRed = board.red_score.Item1;
@@ -314,7 +313,7 @@ namespace TerritoryWars.UI
         {
             SaveSnapshotText.gameObject.SetActive(true);
 
-            DojoGameManager.Instance.SessionManager.CreateSnapshot();
+            DojoGameManager.Instance.DojoSessionManager.CreateSnapshot();
 
             SaveSnapshotText.DOFade(1, 0.2f);
             DOVirtual.DelayedCall(3, () =>
@@ -353,9 +352,12 @@ namespace TerritoryWars.UI
             }
         }
 
-        private void SwitchToggle()
+        public void SetFinishGameUI(bool isActive)
         {
-            
+            SetSkipTurnButtonActive(isActive);
+            _deckContainerCanvasGroup.gameObject.SetActive(isActive);
+            SaveSnapshotButton.gameObject.SetActive(isActive);
+            _sessionManager.sessionUI.SessionTimerUI.SetActiveTimer(isActive);
         }
 
         public void SetJokerButtonActive(bool active)

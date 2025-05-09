@@ -1,3 +1,5 @@
+using System;
+using DG.Tweening;
 using UnityEngine;
 
 namespace TerritoryWars.General
@@ -12,14 +14,16 @@ namespace TerritoryWars.General
         [SerializeField] private float minZoom = 2f;
         [SerializeField] private float maxZoom = 4f;
         [SerializeField] private float pinchZoomSpeed = 0.5f;
+        [SerializeField] private float _contestZoom = 2.5f;
 
         private Camera _mainCamera;
         private Camera _camera;
         private bool _isMainCamera = false;
         private Vector3 lastMousePosition;
         private bool isDragging = false;
-        public Vector3 minBounds = new Vector3(-4f, -3f, 0f);
-        public Vector3 maxBounds = new Vector3(4f, 4f, 0f);
+        private Vector3 minBounds = new Vector3(-8f, -8f, 0f);
+        private Vector3 maxBounds = new Vector3(8f, 8f, 0f);
+        private bool _isCameraMoveLocked = false;
 
         // Для мобільних жестів
         private float lastPinchDistance;
@@ -39,8 +43,18 @@ namespace TerritoryWars.General
         // Update is called once per frame
         void Update()
         {
-            HandlePanning();
-            HandleZoom();
+            if (!_isMainCamera)
+            {
+                _camera.orthographicSize = _mainCamera.orthographicSize;
+                _camera.transform.position = _mainCamera.transform.position;
+                return;
+            }
+            
+            if (!_isCameraMoveLocked)
+            {
+                HandlePanning();
+                HandleZoom();
+            }
         }
 
         private void HandlePanning()
@@ -66,10 +80,12 @@ namespace TerritoryWars.General
                     Vector3 worldDelta = _camera.ScreenToWorldPoint(touch.position) - 
                                        _camera.ScreenToWorldPoint(lastMousePosition);
                     Vector3 move = -worldDelta;
+                    float horizontalExtent = _mainCamera.orthographicSize * _mainCamera.aspect;
+                    float verticalExtent = _mainCamera.orthographicSize;
 
                     Vector3 newPosition = transform.position + move;
-                    newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
-                    newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y, maxBounds.y);
+                    newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x + horizontalExtent, maxBounds.x - horizontalExtent);
+                    newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y + verticalExtent, maxBounds.y - verticalExtent);
 
                     transform.position = newPosition;
                     lastMousePosition = touch.position;
@@ -92,10 +108,12 @@ namespace TerritoryWars.General
                 Vector3 worldDelta = _camera.ScreenToWorldPoint(Input.mousePosition) - 
                                    _camera.ScreenToWorldPoint(lastMousePosition);
                 Vector3 move = -worldDelta;
+                float horizontalExtent = _mainCamera.orthographicSize * _mainCamera.aspect;
+                float verticalExtent = _mainCamera.orthographicSize;
 
                 Vector3 newPosition = transform.position + move;
-                newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
-                newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y, maxBounds.y);
+                newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x + horizontalExtent, maxBounds.x - horizontalExtent);
+                newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y + verticalExtent, maxBounds.y - verticalExtent);
 
                 transform.position = newPosition;
                 lastMousePosition = Input.mousePosition;
@@ -148,6 +166,19 @@ namespace TerritoryWars.General
                     _camera.orthographicSize = Mathf.Clamp(newSize, minZoom, maxZoom);
                 }
             }
+        }
+
+        public void SetCameraLock(bool isLocked)
+        {
+            _isCameraMoveLocked = isLocked;
+        }
+        
+        public void SetCameraPosition(Vector3 position, Action callback = null)
+        {
+            _mainCamera.transform.DOMove(position, 0.7f).OnComplete(() =>
+            {
+                callback?.Invoke();
+            });
         }
     }
 }

@@ -63,7 +63,7 @@ namespace TerritoryWars.General
         public void Initialize()
         {
             InitializeBoard();
-            var onChainBoard = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
+            var onChainBoard = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
             char[] edgeTiles = OnChainBoardDataConverter.GetInitialEdgeState(onChainBoard.initial_edge_state);
             CreateBorder(edgeTiles);
 
@@ -441,6 +441,20 @@ namespace TerritoryWars.General
                     List<Side> sides = CheckCityTileSidesToEmpty(x, y);
                     tileGenerator.FencePlacerForCloserToBorderCity(sides);
                 }
+            }
+        }
+
+        public void CloseCityStructure(byte root)
+        {
+            var city = DojoGameManager.Instance.DojoSessionManager.GetCityByPosition(root);
+
+            foreach (var node in city.Value)
+            {
+                Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
+                GameObject tile = GetTileObject(position.x, position.y);
+                if (tile == null || !tile.TryGetComponent(out TileGenerator tileGenerator)) continue;
+                List<Side> sides = CheckCityTileSidesToEmpty(position.x, position.y);
+                tileGenerator.FencePlacerForCloserToBorderCity(sides);
             }
         }
 

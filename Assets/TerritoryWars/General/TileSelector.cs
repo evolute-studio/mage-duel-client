@@ -439,7 +439,7 @@ namespace TerritoryWars.General
                 if (board.PlaceTile(currentTile, selectedPosition.Value.x, selectedPosition.Value.y,
                         SessionManager.Instance.CurrentTurnPlayer.LocalId))
                 {
-                    DojoGameManager.Instance.SessionManager.MakeMove(currentTile, selectedPosition.Value.x, selectedPosition.Value.y, isJokerMode);
+                    DojoGameManager.Instance.DojoSessionManager.MakeMove(currentTile, selectedPosition.Value.x, selectedPosition.Value.y, isJokerMode);
                     LastMove = (currentTile, selectedPosition.Value);
                     isPlacingTile = false;
                     if(isJokerMode) 
@@ -603,7 +603,7 @@ namespace TerritoryWars.General
             tilePreview.ResetPosition();
             ClearHighlights();
 
-            var currentTile = DojoGameManager.Instance.SessionManager.GetTopTile();
+            var currentTile = DojoGameManager.Instance.DojoSessionManager.GetTopTile();
             if (currentTile != null)
             {
                 StartTilePlacement(currentTile);
