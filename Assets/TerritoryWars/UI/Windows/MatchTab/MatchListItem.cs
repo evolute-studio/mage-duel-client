@@ -1,9 +1,10 @@
+using TerritoryWars.Tools;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace TerritoryWars.UI.MatchTab
+namespace TerritoryWars.UI.Windows.MatchTab
 {
     public class MatchListItem : MonoBehaviour
     {
@@ -33,16 +34,18 @@ namespace TerritoryWars.UI.MatchTab
             //_gameIdText.text = GameId;
 
             PlayButton.onClick.RemoveAllListeners();
-
+            
             if (status != "Created")
             {
                 PlayButton.interactable = false;
             }
             else
             {
+                
                 PlayButton.interactable = true;
                 if (onJoin != null)
                 {
+                    
                     PlayButton.onClick.AddListener(onJoin);
                 }
             }

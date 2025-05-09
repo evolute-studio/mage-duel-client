@@ -6,7 +6,6 @@ using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
-using TerritoryWars.UI.MatchTab;
 using UnityEngine;
 using UnityEngine.UI;
 

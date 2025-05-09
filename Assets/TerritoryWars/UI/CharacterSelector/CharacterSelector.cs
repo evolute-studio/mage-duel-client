@@ -27,6 +27,7 @@ namespace TerritoryWars.UI.CharacterSelector
         public CanvasGroup CanvasGroup;
         public CursorOnHover ForegroundCursorOnHover;
         public GameObject Hint;
+        [SerializeField] private List<GameObject> ObjectsToHide;
         
         private int _currentSelectedCharacterId = 1;
         private int _currentCharacterId = 1;
@@ -81,6 +82,16 @@ namespace TerritoryWars.UI.CharacterSelector
                     child.transform.localScale = Vector3.one * 0.75f;
                     child.transform.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutBack);
                 }
+                
+                foreach (var objectToHide in ObjectsToHide)
+                {
+                    if (!objectToHide.TryGetComponent(out CanvasGroup objectCanvasGroup))
+                    {
+                        objectCanvasGroup = objectToHide.AddComponent<CanvasGroup>();
+                    }
+                    objectCanvasGroup.alpha = 1;
+                    objectCanvasGroup.DOFade(0, 0.25f).SetEase(Ease.OutBack);
+                }
             }
             else
             {
@@ -102,6 +113,16 @@ namespace TerritoryWars.UI.CharacterSelector
                     Transform child = CharacterSelectorObject.transform.GetChild(i);
                     child.transform.DOKill();
                     child.transform.DOScale(Vector3.one * 0.75f, 0.25f).SetEase(Ease.InBack);
+                }
+                
+                foreach (var objectToHide in ObjectsToHide)
+                {
+                    if (!objectToHide.TryGetComponent(out CanvasGroup objectCanvasGroup))
+                    {
+                        objectCanvasGroup = objectToHide.AddComponent<CanvasGroup>();
+                    }
+                    objectCanvasGroup.alpha = 0;
+                    objectCanvasGroup.DOFade(1, 0.25f).SetEase(Ease.OutBack);
                 }
             }
         }

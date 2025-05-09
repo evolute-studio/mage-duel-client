@@ -81,7 +81,6 @@ namespace TerritoryWars.Dojo
                     .GetComponent<evolute_duel_Game>();
                 if (game == null)
                 {
-                    CustomLogger.LogError("Game not found");
                     return null;
                 }
                 _gameInProgress = game;
