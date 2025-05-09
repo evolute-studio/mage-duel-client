@@ -95,11 +95,9 @@ namespace TerritoryWars.Tile
                 if (IsPointInPolygon(randomPos, positions))
                 {
                     GameObject tree = Instantiate(prefab, randomPos, Quaternion.identity);
-                    SpriteRenderer treeRenderer = tree.GetComponent<SpriteRenderer>();
                     bool isNorthern = ShouldSpawnNorthernTree(randomY);
-                    treeRenderer.sprite = Random.Range(0, 10) < 3
-                        ? PrefabsManager.Instance.TileAssetsObject.GetRandomBush()
-                        : PrefabsManager.Instance.TileAssetsObject.GetTree(isNorthern);
+                    tree.GetComponent<SpriteRenderer>().sprite =
+                        PrefabsManager.Instance.TileAssetsObject.GetTree(isNorthern);
                     tree.transform.parent = transform;
                     treesPlaced++;
                 }

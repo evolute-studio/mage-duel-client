@@ -33,16 +33,12 @@ namespace TerritoryWars.ScriptablesObjects
         public Sprite[] StoneWallSprites;
 
         public Sprite[] HangingGrass; 
-        public Sprite NorthernGrass;
         
         public Sprite MudCityTextureSprite;
         public Sprite StoneCityTextureSprite;
         
         public Sprite[] ContestedBlueHouses;
         public Sprite[] ContestedRedHouses;
-
-        public Sprite[] Bushes;
-        public Sprite[] Flowers;
         
         [Header("Trees")]
         public Sprite[] NorthernTrees;
@@ -228,28 +224,6 @@ namespace TerritoryWars.ScriptablesObjects
             int randomIndex = Random.Range(0, (isContested ? StoneWallSprites : WoodenWallSprites).Length);
             Sprite randomWall = (isContested ? StoneWallSprites : WoodenWallSprites)[randomIndex];
             return randomWall;
-        }
-        
-        public Sprite GetRandomBush()
-        {
-            if (Bushes != null)
-            {
-                int randomIndex = Random.Range(0, Bushes.Length);
-                Sprite randomBush = Bushes[randomIndex];
-                return randomBush;
-            }
-            return null;
-        }
-        
-        public Sprite GetRandomFlower()
-        {
-            if (Flowers != null)
-            {
-                int randomIndex = Random.Range(0, Flowers.Length);
-                Sprite randomFlower = Flowers[randomIndex];
-                return randomFlower;
-            }
-            return null;
         }
         
         public Sprite GetPinByPlayerId(int playerId)

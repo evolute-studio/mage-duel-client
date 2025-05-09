@@ -724,13 +724,8 @@ namespace TerritoryWars.Dojo
                     }
                     CustomLogger.LogImportant($"Tile: {tile} | TileData: {tileData} | PlayerOwner: {playerOwner}");
                     tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.rotationIndex);
-
-                    if (isContested)
-                    {
-                        tileGenerator.ChangeEnvironmentForContest();
-                        tileGenerator.tileParts.SetActiveWoodenBorderWall(false);
-                        tileGenerator.tileParts.SetActiveWoodenArcs(false);
-                    }
+                    
+                    if(isContested) tileGenerator.ChangeEnvironmentForContest();
                     
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                         Board.StructureType.City, isContested);
