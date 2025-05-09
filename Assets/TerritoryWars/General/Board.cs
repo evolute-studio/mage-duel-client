@@ -66,7 +66,7 @@ namespace TerritoryWars.General
             var onChainBoard = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
             char[] edgeTiles = OnChainBoardDataConverter.GetInitialEdgeState(onChainBoard.initial_edge_state);
             CreateBorder(edgeTiles);
-
+            SessionManager.Instance.CloudsController.SetMountains(GetMountains());
         }
 
         private void InitializeBoard()
@@ -399,19 +399,19 @@ namespace TerritoryWars.General
         {
             if (x < 4 & y < 4) // the numbers indicate the part of the board
             {
-                return 0;
+                return 0; // default mountain
             }
             if (x > 4 & y > 4)
             {
-                return 3;
+                return 3; // snow mountain
             }
             if (x <= 4 & y >= 4)
             {
-                return 1;
+                return 1; // player mountain
             }
             if (x >= 4 & y <= 4)
             {
-                return 2;
+                return 2; // player mountain
             }
 
             return -1;
@@ -487,6 +487,44 @@ namespace TerritoryWars.General
 
             return closerSides;
         }
+
+        public List<GameObject> GetMountains()
+        {
+            List<GameObject> mountains = new List<GameObject>();
+            
+            for (int i = 0; i < 10; i++)
+            {
+                if (tileData[i, 0].id == "FFFF" && !mountains.Contains(tileObjects[i, 1]))
+                {
+                    mountains.Add(tileObjects[i, 0]);
+                }
+            }
+            
+            for (int i = 0; i < 10; i++)
+            {
+                if (tileData[9, i].id == "FFFF" && !mountains.Contains(tileObjects[9, i]))
+                {
+                    mountains.Add(tileObjects[9, i]);
+                }
+            }
+
+            for (int i = 9; i >= 0 ; i--)
+            {
+                if (tileData[i, 9].id == "FFFF" && !mountains.Contains(tileObjects[i, 9]))
+                {
+                    mountains.Add(tileObjects[i, 9]);
+                }
+            }
+            
+            for (int i = 9; i >= 0 ; i--)
+            {
+                if (tileData[0, i].id == "FFFF" && !mountains.Contains(tileObjects[0, i]))
+                {
+                    mountains.Add(tileObjects[0, i]);
+                }
+            }
+            return mountains;
+        }
         
         public List<MineTileInfo> CheckRoadTileSidesToBorder(int x, int y)
         {
@@ -549,6 +587,22 @@ namespace TerritoryWars.General
         public bool IsEdgeTile(int x, int y)
         {
             return x == 0 || x == width - 1 || y == 0 || y == height - 1;
+        }
+        
+        public List<Side> CheckSnowNeighborsForTile(int x, int y)
+        {
+            List<Side> snowNeighbors = new List<Side>();
+            if (x + 1 <= width - 1)
+            {
+               if(tileObjects[x + 1, y] != null) snowNeighbors.Add(Side.Top); 
+            }
+            
+            if(y + 1 <= height - 1)
+            {
+                if(tileObjects[x, y + 1] != null) snowNeighbors.Add(Side.Left);
+            }
+            
+            return snowNeighbors;
         }
 
         public (Vector2Int, Side) GetNeighborPositionAndSideToEdgeTile(int x, int y)

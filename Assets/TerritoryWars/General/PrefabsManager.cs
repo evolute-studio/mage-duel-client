@@ -33,6 +33,7 @@ namespace TerritoryWars.General
         private int _currentPlayerIndex = 0;
         public GameObject SkipBubblePrefab;
         public GameObject StructureHoverPrefab;
+        public GameObject CloudPrefab;
         
         public GameObject GetNextPlayer()
         {

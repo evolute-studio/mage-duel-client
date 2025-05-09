@@ -33,15 +33,22 @@ namespace TerritoryWars.ScriptablesObjects
         public Sprite[] StoneWallSprites;
 
         public Sprite[] HangingGrass; 
+        public Sprite NorthernGrass;
         
         public Sprite MudCityTextureSprite;
         public Sprite StoneCityTextureSprite;
         
         public Sprite[] ContestedBlueHouses;
         public Sprite[] ContestedRedHouses;
+
+        public Sprite[] Bushes;
+        public Sprite[] Flowers;
+
+        [SerializeField] public SpriteArray[] Clouds;
         
         [Header("Trees")]
         public Sprite[] NorthernTrees;
+        public Sprite[] CentralTrees;
         public Sprite[] SouthernTrees;
 
         [Header("Flags")] public FlagsOnWall[] FlagsOnWalls;
@@ -193,11 +200,19 @@ namespace TerritoryWars.ScriptablesObjects
             return false;
         }
         
-        public Sprite GetTree(bool isNorth)
+        public Sprite GetTree(bool isNorth, bool isSouth)
         {
-            int randomIndex = Random.Range(0, (isNorth ? NorthernTrees : SouthernTrees).Length);
-            Sprite randomTree = (isNorth ? NorthernTrees : SouthernTrees)[randomIndex];
-            return randomTree;
+            if (isNorth)
+            {
+                return NorthernTrees[Random.Range(0, NorthernTrees.Length)];
+            }
+
+            if (isSouth)
+            {
+                return SouthernTrees[Random.Range(0, SouthernTrees.Length)];
+            }
+            
+            return CentralTrees[Random.Range(0, CentralTrees.Length)];
         }
         
         public Sprite GetContestedRoadByReference(Sprite roadSprite)
@@ -224,6 +239,28 @@ namespace TerritoryWars.ScriptablesObjects
             int randomIndex = Random.Range(0, (isContested ? StoneWallSprites : WoodenWallSprites).Length);
             Sprite randomWall = (isContested ? StoneWallSprites : WoodenWallSprites)[randomIndex];
             return randomWall;
+        }
+        
+        public Sprite GetRandomBush()
+        {
+            if (Bushes != null)
+            {
+                int randomIndex = Random.Range(0, Bushes.Length);
+                Sprite randomBush = Bushes[randomIndex];
+                return randomBush;
+            }
+            return null;
+        }
+        
+        public Sprite GetRandomFlower()
+        {
+            if (Flowers != null)
+            {
+                int randomIndex = Random.Range(0, Flowers.Length);
+                Sprite randomFlower = Flowers[randomIndex];
+                return randomFlower;
+            }
+            return null;
         }
         
         public Sprite GetPinByPlayerId(int playerId)
@@ -323,6 +360,12 @@ namespace TerritoryWars.ScriptablesObjects
         public class FlagsOnWall
         {
             public Sprite[] Flags;
+        }
+        
+        [Serializable]
+        public class SpriteArray
+        {
+            public Sprite[] Sprites;
         }
         
     }
