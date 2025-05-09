@@ -7738,6 +7738,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   withScrollBar: 1
+  ObjectsToHide:
+  - {fileID: 2024215690}
+  - {fileID: 1020324375}
   windowGO: {fileID: 1793970167}
   backgroundPlaceholderGO: {fileID: 733720844}
   listItemParent: {fileID: 1793970169}
@@ -16186,7 +16189,7 @@ GameObject:
   - component: {fileID: 2024215693}
   - component: {fileID: 2024215692}
   m_Layer: 0
-  m_Name: Buttons
+  m_Name: GeneralButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17616,6 +17619,18 @@ PrefabInstance:
       propertyPath: backgroundPlaceholderGO
       value: 
       objectReference: {fileID: 45849157}
+    - target: {fileID: 2003781416064296505, guid: ecd4eab03d892ab99a56a1c2e7972ebf, type: 3}
+      propertyPath: ObjectsToHide.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2003781416064296505, guid: ecd4eab03d892ab99a56a1c2e7972ebf, type: 3}
+      propertyPath: 'ObjectsToHide.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2024215690}
+    - target: {fileID: 2003781416064296505, guid: ecd4eab03d892ab99a56a1c2e7972ebf, type: 3}
+      propertyPath: 'ObjectsToHide.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1020324375}
     - target: {fileID: 2487132034357024736, guid: ecd4eab03d892ab99a56a1c2e7972ebf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.624508

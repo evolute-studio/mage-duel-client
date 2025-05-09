@@ -7,8 +7,10 @@ namespace TerritoryWars.UI.Windows
 {
     public class Window : MonoBehaviour
     {
-        [Header("Settings", order = 2)] [SerializeField]
-        protected bool withScrollBar = true;
+        [Header("Settings", order = 2)] 
+        [SerializeField] protected bool withScrollBar = true;
+        [SerializeField] protected List<GameObject> ObjectsToHide;
+        
         
         [Header("General References", order = 1)]
         [SerializeField] protected GameObject windowGO;
@@ -76,6 +78,16 @@ namespace TerritoryWars.UI.Windows
 
             canvasGroup.alpha = 0;
             canvasGroup.DOFade(1, 0.25f).SetEase(Ease.OutBack);
+
+            foreach (var objectToHide in ObjectsToHide)
+            {
+                if (!objectToHide.TryGetComponent(out CanvasGroup objectCanvasGroup))
+                {
+                    objectCanvasGroup = objectToHide.AddComponent<CanvasGroup>();
+                }
+                objectCanvasGroup.alpha = 1;
+                objectCanvasGroup.DOFade(0, 0.25f).SetEase(Ease.OutBack);
+            }
         }
 
         protected virtual void PanelActiveFalse()
@@ -90,6 +102,16 @@ namespace TerritoryWars.UI.Windows
                 CursorManager.Instance.SetCursor("default");
                 ClearAllListItems();
             });
+            
+            foreach (var objectToHide in ObjectsToHide)
+            {
+                if (!objectToHide.TryGetComponent(out CanvasGroup objectCanvasGroup))
+                {
+                    objectCanvasGroup = objectToHide.AddComponent<CanvasGroup>();
+                }
+                objectCanvasGroup.alpha = 0;
+                objectCanvasGroup.DOFade(1, 0.25f).SetEase(Ease.OutBack);
+            }
         }
         
     }
