@@ -95,6 +95,7 @@ namespace TerritoryWars.ExternalConnections
             public string toriiUrl;
             public string gameAddress;
             public string playerProfileActionsAddress;
+            public string worldAddress;
         }
         
         

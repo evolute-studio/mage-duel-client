@@ -411,7 +411,6 @@ namespace TerritoryWars.Dojo
             account = burnerManager.Burners.FirstOrDefault(b => b.Address.Hex() == address);
             if (account == null)
             {
-                CustomLogger.LogError("Failed to get burner account");
                 return false;
             }
             return true;

@@ -15,19 +15,18 @@ namespace Dojo
         public ToriiWasmClient wasmClient;
         [SerializeField] public WorldManagerData dojoConfig;
 
-        public async void Initialize(string rpcUrl = null, string toriiUrl = null)
+        public async void Initialize(string rpcUrl = null, string toriiUrl = null, string worldAddress = null)
         {
-            if (rpcUrl != null && toriiUrl != null)
-            {
-                dojoConfig.rpcUrl = rpcUrl;
-                dojoConfig.toriiUrl = toriiUrl;
-            }
+            string rpc = rpcUrl ?? dojoConfig.rpcUrl;
+            string torii = toriiUrl ?? dojoConfig.toriiUrl;
+            FieldElement world = worldAddress != null ? new FieldElement(worldAddress) : dojoConfig.worldAddress;
+            Debug.Log($"[WorldManager] Initializing with rpcUrl: {rpc} and toriiUrl: {torii} and worldAddress: {world.Hex()}");
             
 #if UNITY_WEBGL && !UNITY_EDITOR
-            wasmClient = new ToriiWasmClient(dojoConfig.toriiUrl, dojoConfig.relayWebrtcUrl, dojoConfig.worldAddress);
+            wasmClient = new ToriiWasmClient(torii, dojoConfig.relayWebrtcUrl, world);
             await wasmClient.CreateClient();
 #else
-            toriiClient = new ToriiClient(dojoConfig.toriiUrl, dojoConfig.relayUrl, dojoConfig.worldAddress);
+            toriiClient = new ToriiClient(torii, dojoConfig.relayUrl, world);
 #endif
 
             /*  fetch entities from the world

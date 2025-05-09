@@ -1,4 +1,5 @@
 using DG.Tweening;
+using TerritoryWars.ExternalConnections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.Serialization;
@@ -57,7 +58,7 @@ namespace TerritoryWars.UI.Windows.Leaderboard
         public void CopyAddress()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            JSBridge.CopyValue(Address);
+            JSBridge.CopyValue(_address);
 #else
             GUIUtility.systemCopyBuffer = _address;
 #endif

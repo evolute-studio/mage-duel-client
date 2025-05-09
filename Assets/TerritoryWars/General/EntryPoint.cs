@@ -57,6 +57,7 @@ namespace TerritoryWars.General
         {
             #if !UNITY_EDITOR && UNITY_WEBGL
             WrapperConnectorCalls.ConnectionData connection = WrapperConnectorCalls.GetConnectionData();
+            //CustomLogger.LogImportant($"[Connection] rpcUrl {connection.rpcUrl} toriiUrl {connection.toriiUrl} gameAddress {connection.gameAddress} playerProfileActionsAddress {connection.playerProfileActionsAddress}");
             game_contract.contractAddress = connection.gameAddress;
             player_profile_actions.contractAddress = connection.playerProfileActionsAddress;
             ControllerContracts.EVOLUTE_DUEL_GAME_ADDRESS = connection.gameAddress;
