@@ -7,7 +7,7 @@ namespace TerritoryWars.Tile
     {
         public GameObject prefab;
         public float treeDensity = 0.5f;
-        public Vector2 boundsY = new Vector2(-5, 5);
+        public Vector2 boundsY = new Vector2(0, 9);
 
         private void Start()
         {
@@ -23,6 +23,17 @@ namespace TerritoryWars.Tile
             float random = Random.value;
             
             return random < northernProbability;
+        }
+
+        private bool ShouldSpawnSouthernTree(float y)
+        {
+            float normalizedY = Mathf.InverseLerp(boundsY.x, boundsY.y, y);
+            
+            float southernProbability = 1 - normalizedY;
+            
+            float random = Random.value;
+            
+            return random < southernProbability;
         }
 
         private float CalculatePolygonArea(Vector3[] points)
@@ -97,9 +108,10 @@ namespace TerritoryWars.Tile
                     GameObject tree = Instantiate(prefab, randomPos, Quaternion.identity);
                     SpriteRenderer treeRenderer = tree.GetComponent<SpriteRenderer>();
                     bool isNorthern = ShouldSpawnNorthernTree(randomY);
+                    bool isSouthern = ShouldSpawnSouthernTree(randomY);
                     treeRenderer.sprite = Random.Range(0, 10) < 3
                         ? PrefabsManager.Instance.TileAssetsObject.GetRandomBush()
-                        : PrefabsManager.Instance.TileAssetsObject.GetTree(isNorthern);
+                        : PrefabsManager.Instance.TileAssetsObject.GetTree(isNorthern, isSouthern);
                     tree.transform.parent = transform;
                     treesPlaced++;
                 }

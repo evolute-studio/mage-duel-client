@@ -68,6 +68,7 @@ namespace TerritoryWars.General
         [SerializeField] public GameUI gameUI;
         [SerializeField] public PlayerInfoUI sessionUI;
         [SerializeField] private DeckManager deckManager;
+        public CloudsController CloudsController;
         public JokerManager JokerManager;
         public TileSelector TileSelector;
         public StructureHoverManager StructureHoverManager;

@@ -25,15 +25,10 @@ public class TileParts : MonoBehaviour
     public PolygonCollider2D PolygonCollider2D;
     public FlagsOnWall FlagsOnWalls;
     public SpriteRenderer HangingGrass;
-    public GameObject[] ArcsGameObjects;
 
     private GameObject WallParent;
     public GameObject[] CompletedBorderWalls;
     public List<GameObject> CompletedWalls;
-
-    public SpriteRenderer GrassSpriteRenderer;
-
-    public GameObject[] TransitionGrass;
     
 
     private int DefaultLayerMask = 0; // Default layer
@@ -171,23 +166,6 @@ public class TileParts : MonoBehaviour
                             .GetFlagByReference(SetLocalPlayerData.GetLocalIndex(winner), flag.sprite);
                     }
                 }
-            }
-        }
-    }
-
-    public void SetActiveWoodenBorderWall(bool isActive)
-    {
-        Transform borderFences = transform.Find("BorderFence");
-        borderFences.gameObject.SetActive(isActive);
-    }
-
-    public void SetActiveWoodenArcs(bool isActive)
-    {
-        if (ArcsGameObjects != null)
-        {
-            foreach (var arc in ArcsGameObjects)
-            {
-                arc.SetActive(isActive);
             }
         }
     }
