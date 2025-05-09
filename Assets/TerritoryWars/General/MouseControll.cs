@@ -21,7 +21,7 @@ namespace TerritoryWars.General
         private bool _isMainCamera = false;
         private Vector3 lastMousePosition;
         private bool isDragging = false;
-        private Vector3 minBounds = new Vector3(-8f, -8f, 0f);
+        private Vector3 minBounds = new Vector3(-8f, -2.8f, 0f);
         private Vector3 maxBounds = new Vector3(8f, 8f, 0f);
         private bool _isCameraMoveLocked = false;
 
@@ -84,8 +84,8 @@ namespace TerritoryWars.General
                     float verticalExtent = _mainCamera.orthographicSize;
 
                     Vector3 newPosition = transform.position + move;
-                    newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x + horizontalExtent, maxBounds.x - horizontalExtent);
-                    newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y + verticalExtent, maxBounds.y - verticalExtent);
+                    newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
+                    newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y, maxBounds.y);
 
                     transform.position = newPosition;
                     lastMousePosition = touch.position;
@@ -112,8 +112,8 @@ namespace TerritoryWars.General
                 float verticalExtent = _mainCamera.orthographicSize;
 
                 Vector3 newPosition = transform.position + move;
-                newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x + horizontalExtent, maxBounds.x - horizontalExtent);
-                newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y + verticalExtent, maxBounds.y - verticalExtent);
+                newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
+                newPosition.y = Mathf.Clamp(newPosition.y, minBounds.y, maxBounds.y);
 
                 transform.position = newPosition;
                 lastMousePosition = Input.mousePosition;
