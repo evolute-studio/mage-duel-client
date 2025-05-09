@@ -47,6 +47,7 @@ namespace TerritoryWars.UI
         [SerializeField] private GameObject[] _toggleJokerInfoGameObjects;
         [SerializeField] private CanvasGroup[] _togglersCanvasGroup;
         [SerializeField] private CanvasGroup _deckContainerCanvasGroup;
+        [SerializeField] private GameMenuView _gameMenuView;
 
         [SerializeField] private ResultPopUpUI _resultPopUpUI;
         [FormerlySerializedAs("SessionUI")] [SerializeField] public PlayerInfoUI playerInfoUI;
@@ -55,6 +56,8 @@ namespace TerritoryWars.UI
         [SerializeField] private TextMeshProUGUI SaveSnapshotText;
         
         public static event Action OnJokerButtonClickedEvent;
+        
+        private GameMenuController _gameMenuController;
 
         [Header("Tile Preview")]
         [SerializeField] private TilePreview tilePreview;
@@ -75,6 +78,9 @@ namespace TerritoryWars.UI
         {
             _sessionManager = FindObjectOfType<General.SessionManager>();
             deckManager = FindObjectOfType<DeckManager>();
+
+            _gameMenuController = new GameMenuController();
+            _gameMenuController.Initialize(_gameMenuView);
 
             SetupButtons();
             UpdateUI();
@@ -117,12 +123,6 @@ namespace TerritoryWars.UI
             if (deckButton != null)
             {
                 deckButton.onClick.AddListener(OnDeckButtonClicked);
-            }
-            
-            if (SaveSnapshotButton != null)
-            {
-                SaveSnapshotText.gameObject.SetActive(false);
-                SaveSnapshotButton.onClick.AddListener(OnSaveSnapshotButtonClicked);
             }
         }
         
@@ -190,6 +190,8 @@ namespace TerritoryWars.UI
             _sessionManager.EndTurn();
             UpdateUI();
             SetActiveDeckContainer(false);
+            SetActiveSkipButtonPulse(false);
+            JokerButtonPulse(false);
         }
         
         private void SkipMoveButtonClicked()
@@ -202,15 +204,11 @@ namespace TerritoryWars.UI
 
         public void SetActiveSkipButtonPulse(bool isActive)
         {
+            _skipButtonTween?.Kill();
+            skipTurnButton.transform.localScale = _skipButtonScale;
             if (isActive)
             {
-                skipTurnButton.transform.localScale = _skipButtonScale;
                 _skipButtonTween = skipTurnButton.transform.DOScale(skipTurnButton.transform.localScale.x * 1.1f, 0.8f).SetLoops(-1, LoopType.Yoyo);
-            }
-            else
-            {
-                _skipButtonTween?.Kill();
-                skipTurnButton.transform.localScale = _skipButtonScale;
             }
         }
         
