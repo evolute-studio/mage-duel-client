@@ -34,6 +34,8 @@ namespace TerritoryWars.General
         public GameObject SkipBubblePrefab;
         public GameObject StructureHoverPrefab;
         public GameObject CloudPrefab;
+        public GameObject[] MountainsGO;
+        public GameObject[] SnowMountainsGO;
         
         public GameObject GetNextPlayer()
         {
@@ -49,6 +51,16 @@ namespace TerritoryWars.General
         public GameObject InstantiateObject(GameObject prefab)
         {
             return Instantiate(prefab);
+        }
+
+        public GameObject GetRandomMountainTile()
+        {
+            return MountainsGO[Random.Range(0, MountainsGO.Length)];
+        }
+        
+        public GameObject GetRandomSnowMountainTile()
+        {
+            return SnowMountainsGO[Random.Range(0, SnowMountainsGO.Length)];
         }
     }
 }

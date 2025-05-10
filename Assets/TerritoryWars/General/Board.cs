@@ -155,15 +155,28 @@ namespace TerritoryWars.General
                 // Place mountains at start and end positions
                 PlaceTile(new TileData(fieldTile), startPos.x, startPos.y, -1);
                 // Don't place forests, only mountains at other corners
-                tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = 
-                    tileAssets.GetRandomMountain(IsSnowBoardPart(startPos.x, startPos.y));
-                tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer").localScale = new Vector3(1, 1, 1);
-                tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>()
-                    .sortingOrder = 14;
+                GameObject mountain;
+                if (IsSnowBoardPart(startPos.x, startPos.y) == 3)
+                {
+                    mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
+                        tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer"));
+                }
+                else
+                {
+                    mountain = Instantiate(PrefabsManager.Instance.GetRandomMountainTile(),
+                        tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer"));
+                }
+
+                foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                {
+                    mountainSprite.sortingOrder = 14;
+                }
                 if (swapOrderLayer)
                 {
-                    tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer")
-                        .GetComponent<SpriteRenderer>().sortingOrder = 20;
+                    foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                    {
+                        mountainSprite.sortingOrder = 14; // 20
+                    }
                 }
 
                 tileObjects[startPos.x, startPos.y].GetComponentsInChildren<TileParts>().ToList().ForEach(
@@ -180,15 +193,28 @@ namespace TerritoryWars.General
                 if(GetTileObject(endPos.x, endPos.y) != null)
                     Destroy(GetTileObject(endPos.x, endPos.y));
                 PlaceTile(new TileData(fieldTile), endPos.x, endPos.y, -1);
-                tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite
-                    = tileAssets.GetRandomMountain(IsSnowBoardPart(endPos.x, endPos.y));
-                tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer").localScale = new Vector3(1, 1, 1);
-                tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>()
-                    .sortingOrder = 14;
+                GameObject mountain;
+                if (IsSnowBoardPart(endPos.x, endPos.y) == 3)
+                {
+                    mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
+                        tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer"));
+                }
+                else
+                {
+                    mountain = Instantiate(PrefabsManager.Instance.GetRandomMountainTile(),
+                        tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer"));
+                }
+
+                foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                {
+                    mountainSprite.sortingOrder = 14;
+                }
                 if (swapOrderLayer)
                 {
-                    tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer")
-                        .GetComponent<SpriteRenderer>().sortingOrder = 20;
+                    foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                    {
+                        mountainSprite.sortingOrder = 14; // 20
+                    }
                 }
                 tileObjects[endPos.x, endPos.y].GetComponentsInChildren<TileParts>().ToList().ForEach(
                     renderer => 
@@ -204,15 +230,32 @@ namespace TerritoryWars.General
                 PlaceTile(tile, availablePositions[i].x, availablePositions[i].y, -1);
                 if (tilesToSpawn[i] == fieldTile)
                 {
-                    tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite 
-                        = tileAssets.GetRandomMountain(IsSnowBoardPart(availablePositions[i].x, availablePositions[i].y));
-                    tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer").localScale = new Vector3(1, 1, 1);
                     tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer")
-                        .GetComponent<SpriteRenderer>().sortingOrder = 14; 
+                            .GetComponent<SpriteRenderer>().sprite
+                        = null;
+                    
+                    GameObject mountain;
+                    if (IsSnowBoardPart(availablePositions[i].x, availablePositions[i].y) == 3)
+                    {
+                        mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
+                            tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer"));
+                    }
+                    else
+                    {
+                        mountain = Instantiate(PrefabsManager.Instance.GetRandomMountainTile(),
+                            tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer"));
+                    }
+
+                    foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                    {
+                        mountainSprite.sortingOrder = 14;
+                    }
                     if (swapOrderLayer)
                     {
-                        tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer")
-                            .GetComponent<SpriteRenderer>().sortingOrder = 20;
+                        foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                        {
+                            mountainSprite.sortingOrder = 14; // 20
+                        }
                     }
                     TileParts tileParts = tileObjects[availablePositions[i].x, availablePositions[i].y]
                         .GetComponentInChildren<TileParts>();
