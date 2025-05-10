@@ -274,6 +274,7 @@ namespace TerritoryWars.General
         
         public bool PlaceTile(TileData data, int x, int y, int ownerId)
         {
+            CustomLogger.LogImportant($"Placing tile {data.id} and sides {data.sides[0]}{data.sides[1]}{data.sides[2]}{data.sides[3]} at {x}, {y}");
             // if (!CanPlaceTile(data, x, y))
             // {
             //     CustomLogger.LogWarning($"Can't place tile {data.id} at {x}, {y}");

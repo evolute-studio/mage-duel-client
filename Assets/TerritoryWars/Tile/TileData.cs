@@ -14,7 +14,7 @@ namespace TerritoryWars.Tile
         public Structure CityStructure;
         public Structure RoadStructure;
         public string id;
-        private char[] sides;
+        public char[] sides;
         public int rotationIndex = 0;
         public int OwnerId = -1;
         
@@ -27,7 +27,7 @@ namespace TerritoryWars.Tile
             UpdateId();
         }
 
-        private void UpdateId()
+        public void UpdateId()
         {
             
             char[] rotatedSides = new char[4];
@@ -101,7 +101,9 @@ namespace TerritoryWars.Tile
         public void SetConfig(string config)
         {
             id = config;
-            (_, rotationIndex) = OnChainBoardDataConverter.GetTypeAndRotation(config);
+            byte type;
+            (type, rotationIndex) = OnChainBoardDataConverter.GetTypeAndRotation(config);
+            sides = OnChainBoardDataConverter.TileTypes[type].ToCharArray();
         }
         
         public bool IsCityParallel()
