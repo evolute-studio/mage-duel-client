@@ -281,7 +281,7 @@ namespace TerritoryWars.Tile
 
             if (isContest)
             {
-                if (playerId != 3 && houseRenderers.Count > 0)
+                if (houseRenderers.Count > 0)
                 {
                     if (_tileData.IsCityParallel())
                     {
@@ -334,7 +334,7 @@ namespace TerritoryWars.Tile
             {
                 return;
             }
-            Sprite mergedHouseSprite = TileAssetsObject.GetContestedHouses(count/2, playerId);
+            Sprite mergedHouseSprite = TileAssetsObject.GetContestedHouses(count/2, playerId, mainHouse.sprite);
             mainHouse.sprite = mergedHouseSprite;
             
         }

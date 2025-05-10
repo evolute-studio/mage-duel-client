@@ -146,9 +146,41 @@ namespace TerritoryWars.ScriptablesObjects
             return null;
         }
 
-        public Sprite GetContestedHouses(int count, int playerIndex)
+        public Sprite GetContestedHouses(int count, int playerIndex, Sprite house = null)
         {
-            playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
+            if (playerIndex == 3)
+            {
+                int houseOwnerIndex = 0;
+                if (house != null)
+                {
+                    foreach (var smallHouse in FirstPlayerHouses.SmallHouses)
+                    {
+                        if (smallHouse == house) houseOwnerIndex = 0;
+                    }
+                    
+                    foreach (var largeHouse in FirstPlayerHouses.LargeHouses)
+                    {
+                        if (largeHouse == house) houseOwnerIndex = 0;
+                    }
+                    
+                    foreach (var smallHouse in SecondPlayerHouses.SmallHouses)
+                    {
+                        if (smallHouse == house) houseOwnerIndex = 1;
+                    }
+                    
+                    foreach (var largeHouse in SecondPlayerHouses.LargeHouses)
+                    {
+                        if (largeHouse == house) houseOwnerIndex = 1;
+                    }
+                    
+                    playerIndex = houseOwnerIndex;
+                }
+            }
+            else
+            {
+                playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
+            }
+            
             var contestedHouses = playerIndex == 0 ? FirstPlayerContestedHouses : SecondPlayerContestedHouses;
             int randomIndex;
             switch (count)
@@ -172,6 +204,43 @@ namespace TerritoryWars.ScriptablesObjects
 
         public bool IsContestedHouse(Sprite sprite, int count, int playerIndex)
         {
+            if (playerIndex == 3)
+            {
+                List<Sprite[]> tieHouses = new List<Sprite[]>();
+                switch (count)
+                {
+                    case 1:
+                        tieHouses.Add(FirstPlayerContestedHouses.OneHouse);
+                        tieHouses.Add(SecondPlayerContestedHouses.OneHouse);
+                        break;
+                    case 2:
+                        tieHouses.Add(FirstPlayerContestedHouses.DoubleHouses);
+                        tieHouses.Add(SecondPlayerContestedHouses.DoubleHouses);
+                        break;
+                    case 3:
+                        tieHouses.Add(FirstPlayerContestedHouses.TripleHouses);
+                        tieHouses.Add(SecondPlayerContestedHouses.TripleHouses);
+                        break;
+                    case 4:
+                        tieHouses.Add(FirstPlayerContestedHouses.QuadrupleHouses);
+                        tieHouses.Add(SecondPlayerContestedHouses.QuadrupleHouses);
+                        break;
+                }
+
+                if (tieHouses.Count > 0)
+                {
+                    foreach (var houseArray in tieHouses)
+                    {
+                        foreach (var house in houseArray)
+                        {
+                            if(house == sprite) return true;
+                        }
+                    }
+                }
+                
+                return false;
+            }
+            
             playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
             var contestedHouses = playerIndex == 0 ? FirstPlayerContestedHouses : SecondPlayerContestedHouses;
             Sprite[] houses = null;

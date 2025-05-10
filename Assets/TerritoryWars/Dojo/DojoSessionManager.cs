@@ -738,7 +738,7 @@ namespace TerritoryWars.Dojo
                 }
                 tileGenerator.RecolorHouses(playerOwner, isContested);
                     
-                if(isContested) tileGenerator.ChangeEnvironmentForContest();
+                if(isContested){ tileGenerator.ChangeEnvironmentForContest();}
                     
                 SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                     Board.StructureType.City, isContested); 
