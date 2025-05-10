@@ -51,12 +51,12 @@ public class GameMenuController
         if (_model.IsGameMenuActive)
         {
             _view.GameMenuPanelRectTransform.DOKill();
-            _view.GameMenuPanelRectTransform.DOAnchorPosY(0f, 0.5f);
+            _view.GameMenuPanelRectTransform.DOAnchorPosY(0f, 0.25f);
         }
         else
         {
             _view.GameMenuPanelRectTransform.DOKill();
-            _view.GameMenuPanelRectTransform.DOAnchorPosY(-_view.GameMenuPanelRectTransform.rect.height, 0.5f);
+            _view.GameMenuPanelRectTransform.DOAnchorPosY(-_view.GameMenuPanelRectTransform.rect.height, 0.25f);
         }
     }
 }
