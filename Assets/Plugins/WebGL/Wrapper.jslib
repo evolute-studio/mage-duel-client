@@ -14,7 +14,7 @@ mergeInto(LibraryManager.library, {
     controller_logout: function() {
         console.log("ControllerLogout called");
         return window.controllerInstance.disconnect();
-    }
+    },
     is_controller_logged_in: function() {
         console.log("IsControllerLoggedIn called");
         return window.unityConnector.IsControllerLoggedIn() ? 1 : 0;
