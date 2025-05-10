@@ -157,7 +157,6 @@ namespace TerritoryWars.General
             Board.Initialize();
             if (lastMoveId != null)
             {
-                CustomLogger.LogImportant("SessionManager.Initialize() - lastMoveId != null");
                 evolute_duel_Move lastMove = DojoGameManager.Instance.GetMove(lastMoveId);
                 int playerIndex = lastMove.player_side switch
                 {
@@ -167,7 +166,6 @@ namespace TerritoryWars.General
                 };
                 CurrentTurnPlayer = Players[playerIndex];
                 List<evolute_duel_Move> moves = DojoGameManager.Instance.GetMoves(new List<evolute_duel_Move>{lastMove});
-                CustomLogger.LogImportant("SessionManager.Initialize() - moves.Count: " + moves.Count);
                 int moveNumber = 0;
                 foreach (var move in moves)
                 {
@@ -320,7 +318,7 @@ namespace TerritoryWars.General
 
         private void StartLocalTurn()
         {
-            CustomLogger.LogImportant("StartLocalTurn");
+            CustomLogger.LogDojoLoop("StartLocalTurn");
             if (IsGameWithBotAsPlayer)
             {
                 DojoGameManager.Instance.LocalBotAsPlayer.MakeMove();
@@ -344,7 +342,7 @@ namespace TerritoryWars.General
 
         private void StartRemoteTurn()
         {
-            CustomLogger.LogImportant("StartRemoteTurn");
+            CustomLogger.LogDojoLoop("StartRemoteTurn");
             if (IsGameWithBot || IsGameWithBotAsPlayer)
             {
                 DojoGameManager.Instance.LocalBot.MakeMove();
@@ -461,7 +459,6 @@ namespace TerritoryWars.General
             _nextTile = GetNextTile();
             _nextTile.OwnerId = RemotePlayer.LocalId;
             TileSelector.SetCurrentTile(_nextTile);
-            CustomLogger.LogImportant("UpdateTile. Tile: " + _nextTile.id);
         }
         
         public TileData GetNextTile()
