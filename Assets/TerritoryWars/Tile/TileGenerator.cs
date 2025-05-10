@@ -312,7 +312,6 @@ namespace TerritoryWars.Tile
 
         public void MergeHouses(List<SpriteRenderer> houses, int playerId)
         {
-            CustomLogger.LogImportant("MergeHouses. Houses count: " + houses.Count);
             int count = houses.Count;
             if (count == 0) return;
             

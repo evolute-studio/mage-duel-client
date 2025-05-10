@@ -126,7 +126,6 @@ namespace TerritoryWars.General
         }
         public void SetCurrentTile(TileData tile)
         {
-            CustomLogger.LogImportant($"[SetCurrentTile]");
             currentTile = tile;
             gameUI.UpdateUI();
             tilePreview.UpdatePreview(tile);
@@ -135,7 +134,6 @@ namespace TerritoryWars.General
 
         public void StartTilePlacement(TileData tile)
         {
-            CustomLogger.LogImportant($"[StartTilePlacement]");
             GameUI.Instance.SetEndTurnButtonActive(false);
             tilePreview.ResetPosition();
             tilePreview.UpdatePreview(tile);

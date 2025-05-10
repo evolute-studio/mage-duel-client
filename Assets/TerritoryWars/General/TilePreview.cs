@@ -100,7 +100,6 @@ namespace TerritoryWars.General
 
         public void UpdatePreview(TileData currentTile)
         {
-            CustomLogger.LogImportant($"[UpdatePreview]");
             tileGeneratorForUI.gameObject.SetActive(true);
             if (currentTile != null)
             {

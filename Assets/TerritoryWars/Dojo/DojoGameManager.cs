@@ -507,7 +507,7 @@ namespace TerritoryWars.Dojo
         
         private void OnEventMessage(ModelInstance modelInstance)
         {
-            CustomLogger.LogImportant($"Received event: {modelInstance.Model.Name}");
+            CustomLogger.LogDojoLoop($"Received event: {modelInstance.Model.Name}");
             switch (modelInstance)
             {
                 case evolute_duel_PlayerUsernameChanged playerUsernameChanged:

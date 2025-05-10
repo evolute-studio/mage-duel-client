@@ -21,7 +21,7 @@ namespace TerritoryWars.Tools
         public static Dictionary<LogType, string> LogTypeColors = new Dictionary<LogType, string>
         {
             {LogType.Info, "#808080"},      
-            {LogType.Warning, "#FFA500"},    
+            {LogType.Warning, "#FFA500"},
             {LogType.Execution, "#32CD32"}, 
             {LogType.Error, "#DC143C"},        
             {LogType.Important, "#9441e0"},

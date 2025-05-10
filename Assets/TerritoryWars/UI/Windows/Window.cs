@@ -40,7 +40,6 @@ namespace TerritoryWars.UI.Windows
         
         protected virtual void ClearAllListItems()
         {
-            CustomLogger.LogImportant($"${listItems.Count} list items cleared");
             foreach (var item in listItems)
             {
                 if (item is MonoBehaviour monoBehaviour)

@@ -153,7 +153,6 @@ namespace TerritoryWars.Dojo
             _moveCount++;
             string move_id = eventModel.move_id.Hex();
             LastMoveTimestamp = eventModel.timestamp;
-            CustomLogger.LogImportant($"Moved Timestamp: {eventModel.timestamp}");
             string prev_move_id = eventModel.prev_move_id switch
             {
                 Option<FieldElement>.Some id => id.value.Hex(),
@@ -214,7 +213,6 @@ namespace TerritoryWars.Dojo
             string player = eventModel.player.Hex();
             if(LastMoveTimestamp == eventModel.timestamp) return;
             LastMoveTimestamp = eventModel.timestamp;
-            CustomLogger.LogImportant($"Skipped Timestamp: {eventModel.timestamp}");
             CustomLogger.LogExecution($"[Skipped] | Player: {player}");
             OnSkipMoveReceived?.Invoke(player);
         }
@@ -832,7 +830,6 @@ namespace TerritoryWars.Dojo
                     {
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                     }
-                    CustomLogger.LogImportant($"Tile: {tile} | TileData: {tileData} | PlayerOwner: {playerOwner}");
                     tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.rotationIndex);
 
                     if (isContested)
