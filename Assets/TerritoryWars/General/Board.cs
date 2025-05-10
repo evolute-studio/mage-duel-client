@@ -602,22 +602,6 @@ namespace TerritoryWars.General
         {
             return x == 0 || x == width - 1 || y == 0 || y == height - 1;
         }
-        
-        public List<Side> CheckSnowNeighborsForTile(int x, int y)
-        {
-            List<Side> snowNeighbors = new List<Side>();
-            if (x + 1 <= width - 1)
-            {
-               if(tileObjects[x + 1, y] != null) snowNeighbors.Add(Side.Top); 
-            }
-            
-            if(y + 1 <= height - 1)
-            {
-                if(tileObjects[x, y + 1] != null) snowNeighbors.Add(Side.Left);
-            }
-            
-            return snowNeighbors;
-        }
 
         public (Vector2Int, Side) GetNeighborPositionAndSideToEdgeTile(int x, int y)
         {

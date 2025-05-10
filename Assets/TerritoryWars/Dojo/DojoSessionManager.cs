@@ -719,6 +719,7 @@ namespace TerritoryWars.Dojo
                     continue;
                 }
                 GameObject tile = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
+                TileData tileData = SessionManager.Instance.Board.GetTileData(position.x, position.y);
                 TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
                 int playerOwner;
                 if (city.Key.contested)
@@ -736,9 +737,14 @@ namespace TerritoryWars.Dojo
                 {
                     playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                 }
-                tileGenerator.RecolorHouses(playerOwner, isContested);
-                    
-                if(isContested){ tileGenerator.ChangeEnvironmentForContest();}
+                tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.rotationIndex);
+
+                if (isContested)
+                {
+                    tileGenerator.ChangeEnvironmentForContest();
+                    tileGenerator.tileParts.SetActiveWoodenArcs(false);
+                    tileGenerator.tileParts.SetActiveWoodenBorderWall(false);
+                }
                     
                 SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                     Board.StructureType.City, isContested); 
@@ -828,8 +834,13 @@ namespace TerritoryWars.Dojo
                     }
                     CustomLogger.LogImportant($"Tile: {tile} | TileData: {tileData} | PlayerOwner: {playerOwner}");
                     tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.rotationIndex);
-                    
-                    if(isContested) tileGenerator.ChangeEnvironmentForContest();
+
+                    if (isContested)
+                    {
+                        tileGenerator.ChangeEnvironmentForContest();
+                        tileGenerator.tileParts.SetActiveWoodenBorderWall(false);
+                        tileGenerator.tileParts.SetActiveWoodenArcs(false);
+                    }
                     
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                         Board.StructureType.City, isContested); 

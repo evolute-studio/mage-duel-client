@@ -26,10 +26,15 @@ public class TileParts : MonoBehaviour
     public FlagsOnWall FlagsOnWalls;
     public SpriteRenderer HangingGrass;
     public Material HangingGrassMaterial;
+    public GameObject[] ArcsGameObjects;
 
     private GameObject WallParent;
     public GameObject[] CompletedBorderWalls;
     public List<GameObject> CompletedWalls;
+
+    public SpriteRenderer GrassSpriteRenderer;
+
+    public GameObject[] TransitionGrass;
     
 
     private int DefaultLayerMask = 0; // Default layer
@@ -172,8 +177,26 @@ public class TileParts : MonoBehaviour
         }
     }
 
+    public void SetActiveWoodenBorderWall(bool isActive)
+    {
+        Transform borderFences = transform.Find("BorderFence");
+        borderFences.gameObject.SetActive(isActive);
+    }
+
+    public void SetActiveWoodenArcs(bool isActive)
+    {
+        if (ArcsGameObjects != null)
+        {
+            foreach (var arc in ArcsGameObjects)
+            {
+                arc.SetActive(isActive);
+            }
+        }
+    }
+
     public void PlaceContestedWalls(int rotation)
     {
+        CustomLogger.LogImportant($"{rotation} | {CompletedWalls.Count}");
         WallParent.SetActive(true);
         WallPlacer?.gameObject.SetActive(false);
 
