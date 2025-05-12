@@ -56,8 +56,12 @@ namespace TerritoryWars.UI.Windows.Leaderboard
                 if (i >= players.Count)
                     break;
                 string playerName = CairoFieldsConverter.GetStringFromFieldElement(players[i].username);
+                
                 if (String.IsNullOrEmpty(playerName) || playerName.StartsWith("Bot") || players[i].balance <= 0)
+                {
+                    i = i == 0 ? 0 : i--;
                     continue;
+                }
 
                 LeaderboardListItem leaderboardItem = CreateListItem<LeaderboardListItem>();
                 string name = CairoFieldsConverter.GetStringFromFieldElement(players[i].username);
