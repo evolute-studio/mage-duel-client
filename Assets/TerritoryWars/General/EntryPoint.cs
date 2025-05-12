@@ -47,7 +47,7 @@ namespace TerritoryWars.General
         public DojoGameController DojoGameGUIController;
         public bool UseDojoGUIController = false;
         
-        
+        public WrapperConnectorCalls.ConnectionData connection;
         public Game game_contract;
         public Player_profile_actions player_profile_actions;
         private int currentDataVersion;
@@ -57,17 +57,19 @@ namespace TerritoryWars.General
         public void Start()
         {
             #if !UNITY_EDITOR && UNITY_WEBGL
-            WrapperConnectorCalls.ConnectionData connection = WrapperConnectorCalls.GetConnectionData();
+            connection = WrapperConnectorCalls.GetConnectionData();
             //CustomLogger.LogImportant($"[Connection] rpcUrl {connection.rpcUrl} toriiUrl {connection.toriiUrl} gameAddress {connection.gameAddress} playerProfileActionsAddress {connection.playerProfileActionsAddress}");
             game_contract.contractAddress = connection.gameAddress;
             player_profile_actions.contractAddress = connection.playerProfileActionsAddress;
+            string worldAddress = connection.worldAddress;
             ControllerContracts.EVOLUTE_DUEL_GAME_ADDRESS = connection.gameAddress;
             ControllerContracts.EVOLUTE_DUEL_PLAYER_PROFILE_ACTIONS_ADDRESS = connection.playerProfileActionsAddress;
-            DojoGameManager.Instance.WorldManager.Initialize(connection.rpcUrl, connection.toriiUrl);
+            DojoGameManager.Instance.WorldManager.Initialize(connection.rpcUrl, connection.toriiUrl, worldAddress);
             currentDataVersion = connection.slotDataVersion;
+            #else
+            DojoGameManager.Instance.WorldManager.Initialize();
             #endif
             
-            DojoGameManager.Instance.WorldManager.Initialize();
             CustomLogger.LogDojoLoop("Starting Loading Game");
             CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
             bool isControllerLogged = WrapperConnectorCalls.IsControllerLoggedIn();
@@ -114,7 +116,7 @@ namespace TerritoryWars.General
                 
                 // 1. Setup Account
                 CustomLogger.LogDojoLoop("Setting up account");
-                await SetupAccountAsync();
+                await SetupAccountAsync(connection);
                 
                 // 2. Create Burners
                 CustomLogger.LogDojoLoop("Creating burner accounts");
@@ -155,7 +157,7 @@ namespace TerritoryWars.General
                 
                 // 1. Setup Account
                 CustomLogger.LogDojoLoop("Setting up account");
-                await SetupAccountAsync();
+                await SetupAccountAsync(connection);
                 
                 // 2. Create Burners
                 CustomLogger.LogDojoLoop("Creating burner accounts");
@@ -185,12 +187,12 @@ namespace TerritoryWars.General
             }
         }
 
-        private Task SetupAccountAsync()
+        private Task SetupAccountAsync(WrapperConnectorCalls.ConnectionData connection)
         {
             var tcs = new TaskCompletionSource<bool>();
             
             try {
-                DojoGameManager.SetupMasterAccount(() => tcs.TrySetResult(true));
+                DojoGameManager.SetupMasterAccount(connection, () => tcs.TrySetResult(true));
                 // timeout to avoid hanging
                 StartCoroutine(SetupAccountTimeout(tcs, 30f));
             }
