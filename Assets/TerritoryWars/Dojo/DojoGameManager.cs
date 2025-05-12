@@ -110,11 +110,12 @@ namespace TerritoryWars.Dojo
         }
 
 
-        public void SetupMasterAccount(WrapperConnectorCalls.ConnectionData connection, Action callback)
+        public void SetupMasterAccount(Action callback, WrapperConnectorCalls.ConnectionData connection = default)
         {
             try 
             {
-                provider = new JsonRpcClient(connection.rpcUrl);
+                string rpcUrl =  String.IsNullOrEmpty(connection.rpcUrl) ? dojoConfig.rpcUrl: connection.rpcUrl;
+                provider = new JsonRpcClient(rpcUrl);
                 masterAccount = new Account(provider, new SigningKey(gameManagerData.masterPrivateKey),
                     new FieldElement(gameManagerData.masterAddress), callback);
             }

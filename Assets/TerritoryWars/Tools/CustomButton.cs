@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 namespace TerritoryWars.Tools
 {
     [RequireComponent(typeof(CursorOnHover), typeof(Image))]
-    public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+    public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
     {
         [Header("Custom Button Settings")]
         [SerializeField] public Sprite DefaultSprite;
@@ -26,6 +27,8 @@ namespace TerritoryWars.Tools
         
         private Vector2 _defaultContentPosition;
         private Button _button;
+        
+        private bool _isPressed;
         
         protected void Awake()
         { ;
@@ -55,7 +58,7 @@ namespace TerritoryWars.Tools
             if (HoverOutlineSprite != null && HoverImage != null)
             {
                 HoverImage.DOKill();
-                HoverImage.sprite = HoverOutlineSprite;
+                HoverImage.sprite = _isPressed ? PressedHoverOutlineSprite : HoverOutlineSprite;
                 HoverImage.gameObject.SetActive(true);
                 HoverImage.DOFade(1, HoverTransitionTime);
             }
@@ -73,29 +76,36 @@ namespace TerritoryWars.Tools
                 });
             }
         }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (_button != null && _button.interactable == false && PressedSprite != null && Image != null)
+            {
+                return;
+            }
+            _isPressed = true;
+            HoverImage.sprite = PressedHoverOutlineSprite;
+            if(ButtonContent) ButtonContent.anchoredPosition = new Vector2(_defaultContentPosition.x, _defaultContentPosition.y + PressedContentOffsetY);
+            Image.sprite = PressedSprite;
+        }
         
-        public void OnPointerClick(PointerEventData eventData)
+        public void OnPointerUp(PointerEventData eventData)
         {
             if (_button != null && _button.interactable == false)
             {
                 return;
             }
-            if (PressedSprite != null && Image != null)
+            Image.DOKill();
+            Sequence seq = DOTween.Sequence();
+            seq.AppendInterval(PressedDuration);
+            seq.AppendCallback(() =>
             {
-                HoverImage.sprite = PressedHoverOutlineSprite;
-                if(ButtonContent) ButtonContent.anchoredPosition = new Vector2(_defaultContentPosition.x, _defaultContentPosition.y + PressedContentOffsetY);
-                Image.DOKill();
-                Sequence seq = DOTween.Sequence();
-                Image.sprite = PressedSprite;
-                seq.AppendInterval(PressedDuration);
-                seq.AppendCallback(() =>
-                {
-                    Image.sprite = DefaultSprite;
-                    HoverImage.sprite = HoverOutlineSprite;
-                    if(ButtonContent) ButtonContent.anchoredPosition = _defaultContentPosition;
-                });
-                seq.Play();
-            }
+                Image.sprite = DefaultSprite;
+                HoverImage.sprite = HoverOutlineSprite;
+                if(ButtonContent) ButtonContent.anchoredPosition = _defaultContentPosition;
+                _isPressed = false;
+            });
+            seq.Play();
         }
     }
 }
