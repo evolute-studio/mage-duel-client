@@ -157,7 +157,7 @@ namespace TerritoryWars.General
                 
                 // 1. Setup Account
                 CustomLogger.LogDojoLoop("Setting up account");
-                await SetupAccountAsync(connection);
+                await SetupAccountAsync();
                 
                 // 2. Create Burners
                 CustomLogger.LogDojoLoop("Creating burner accounts");
@@ -187,12 +187,12 @@ namespace TerritoryWars.General
             }
         }
 
-        private Task SetupAccountAsync(WrapperConnectorCalls.ConnectionData connection)
+        private Task SetupAccountAsync(WrapperConnectorCalls.ConnectionData connection = default)
         {
             var tcs = new TaskCompletionSource<bool>();
             
             try {
-                DojoGameManager.SetupMasterAccount(connection, () => tcs.TrySetResult(true));
+                DojoGameManager.SetupMasterAccount(() => tcs.TrySetResult(true), connection);
                 // timeout to avoid hanging
                 StartCoroutine(SetupAccountTimeout(tcs, 30f));
             }

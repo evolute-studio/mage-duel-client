@@ -642,7 +642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cb53232f67c4c74a3019b9862a69724, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  contractAddress: 0x039344460b0d9917c58185b47ce77848a6b9d5f0b26639f9faad2cdcb9451239
+  contractAddress: 0x00d9e263844859eb46fa5293392996d5582853ae03d2333f095565f4e831f422
 --- !u!114 &209425368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -656,7 +656,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   worldManager: {fileID: 209425369}
-  limit: 100
   OnSynchronized:
     m_PersistentCalls:
       m_Calls: []
@@ -667,6 +666,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnEventMessage:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTokenBalanceUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTokenUpdated:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &209425369
@@ -710,7 +715,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05e6e0e5e92900cb385659b57ed36e8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  contractAddress: 0x0693f1a1bba2704e2694b2402dbc5de4e4dcaf03aabbf4d2bad3e47c6a3de4dd
+  contractAddress: 0x048d6f53219765f4187d532b4a96d15581342570448f03cb38cfb170c31e9595
 --- !u!114 &209425372
 MonoBehaviour:
   m_ObjectHideFlags: 0

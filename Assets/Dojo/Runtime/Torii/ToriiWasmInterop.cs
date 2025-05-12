@@ -1,3 +1,4 @@
+#if UNITY_WEBGL && !UNITY_EDITOR
 using UnityEngine;
 using System;
 using System.Runtime.InteropServices;
@@ -15,6 +16,13 @@ using Newtonsoft.Json.Linq;
 namespace Dojo.Torii
 {
     [Serializable]
+    public struct WasmEntity
+    {
+        public string hashed_keys;
+        public Dictionary<string, Dictionary<string, WasmValue>> models;
+    }
+
+    [Serializable]
     public struct WasmValue
     {
         public string type;
@@ -30,11 +38,39 @@ namespace Dojo.Torii
         public WasmValue value;
     }
 
+    [Serializable]
+    public struct WasmToken
+    {
+        public string contract_address;
+        public string token_id;
+        public string name;
+        public string symbol;
+        public int decimals;
+        public string metadata;
+    }
+
+    [Serializable]
+    public struct WasmTokenBalance
+    {
+        public string balance;
+        public string account_address;
+        public string contract_address;
+        public string token_id;
+    }
+
     public class ToriiWasmInterop : MonoBehaviour
     {
         // Creates a new client and returns the pointer to it
         [DllImport("__Internal")]
         public static extern void CreateClient(CString toriiUrl, CString relayUrl, CString worldAddress, Action<IntPtr> cb);
+
+        // Returns an array of all tokens
+        [DllImport("__Internal")]
+        public static extern void GetTokens(IntPtr clientPtr, CString contractAddresses, CString tokenIds, int limit, CString cursor, Action<string> cb);
+
+        // Returns an array of all token balances
+        [DllImport("__Internal")]
+        public static extern void GetTokenBalances(IntPtr clientPtr, CString contractAddresses, CString accountAddresses, CString tokenIds, int limit, CString cursor, Action<string> cb);
 
         // Returns a dictionary of all of the entities
         [DllImport("__Internal")]
@@ -49,17 +85,23 @@ namespace Dojo.Torii
 
         // Calls the callback at [callbackObjectName].[callbackMethodName] on entity updated
         [DllImport("__Internal")]
-        public static extern void OnEntityUpdated(IntPtr clientPtr, CString clauses, Action<string, string> cb, Action<IntPtr> subCb);
+        public static extern void OnEntityUpdated(IntPtr clientPtr, CString clause, Action<string> cb, Action<IntPtr> subCb);
 
         [DllImport("__Internal")]
-        public static extern void UpdateEntitySubscription(IntPtr clientPtr, IntPtr subPtr, CString clauses);
+        public static extern void UpdateEntitySubscription(IntPtr clientPtr, IntPtr subPtr, CString clause);
 
         // Calls the callback at [callbackObjectName].[callbackMethodName] on event mnessage updated
         [DllImport("__Internal")]
-        public static extern void OnEventMessageUpdated(IntPtr clientPtr, CString clauses, bool historical, Action<string, string> cb, Action<IntPtr> subCb);
+        public static extern void OnEventMessageUpdated(IntPtr clientPtr, CString clause, Action<string> cb, Action<IntPtr> subCb);
 
         [DllImport("__Internal")]
-        public static extern void UpdateEventMessageSubscription(IntPtr clientPtr, IntPtr subPtr, CString clauses, bool historical);
+        public static extern void UpdateEventMessageSubscription(IntPtr clientPtr, IntPtr subPtr, CString clause);
+
+        [DllImport("__Internal")]
+        public static extern void OnTokenUpdated(IntPtr clientPtr, CString contractAddresses, CString tokenIds, Action<string> cb, Action<IntPtr> subCb);
+
+        [DllImport("__Internal")]
+        public static extern void OnTokenBalanceUpdated(IntPtr clientPtr, CString contractAddresses, CString accountAddresses, CString tokenIds, Action<string> cb, Action<IntPtr> subCb);
 
         // Add models to sync
         [DllImport("__Internal")]
@@ -81,3 +123,4 @@ namespace Dojo.Torii
         public static extern void PublishMessage(IntPtr clientPtr, CString typedData, CString signature, Action<string> cb);
     }
 }
+#endif // UNITY_WEBGL
