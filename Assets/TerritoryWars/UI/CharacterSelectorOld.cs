@@ -36,7 +36,7 @@ namespace TerritoryWars.UI
 
         public void Initialize()
         {
-            if (MenuUIController.Instance._namePanelController.EvoluteBalance == 0)
+            if (MenuUIController.Instance.NamePanelController.EvoluteBalance == 0)
             {
                 PlayerCharactersManager.ClearAvailableCharacters();
             }
@@ -178,7 +178,7 @@ namespace TerritoryWars.UI
             }
             else
             {
-                int evoluteBalance = MenuUIController.Instance._namePanelController.EvoluteBalance;
+                int evoluteBalance = MenuUIController.Instance.NamePanelController.EvoluteBalance;
                 if (evoluteBalance >= character.Locker.cost)
                 {
                     character.Locker.Unlock();

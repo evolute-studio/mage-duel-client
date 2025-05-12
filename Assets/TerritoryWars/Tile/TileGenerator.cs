@@ -293,7 +293,7 @@ namespace TerritoryWars.Tile
                         MergeHouses(houseRenderers, playerId);
                     }
                     
-                }
+                }   
             }
             else
             {

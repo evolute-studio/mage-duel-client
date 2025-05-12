@@ -13,8 +13,8 @@ namespace TerritoryWars.Tools
         public Button CancelButton;
         public TextMeshProUGUI loadingText;
         public static string waitAnotherPlayerText = "Waiting for another player to join";
-        public static string connectingText = "Connecting to Evolute Kinghdom";
-        public static string launchGameText = "Connecting to Evolute Kinghdom";
+        public static string connectingText = "Connecting to Evolute Kingdom";
+        public static string launchGameText = "Connecting to Evolute Kingdom";
         public static string returnToLobbyText = "Returning to the menu";
         public static string boardInitializationText = "Initializing the board";
 

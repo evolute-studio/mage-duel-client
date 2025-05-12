@@ -110,11 +110,12 @@ namespace TerritoryWars.Dojo
         }
 
 
-        public void SetupMasterAccount(Action callback)
+        public void SetupMasterAccount(Action callback, WrapperConnectorCalls.ConnectionData connection = default)
         {
             try 
             {
-                provider = new JsonRpcClient(dojoConfig.rpcUrl);
+                string rpcUrl =  String.IsNullOrEmpty(connection.rpcUrl) ? dojoConfig.rpcUrl: connection.rpcUrl;
+                provider = new JsonRpcClient(rpcUrl);
                 masterAccount = new Account(provider, new SigningKey(gameManagerData.masterPrivateKey),
                     new FieldElement(gameManagerData.masterAddress), callback);
             }
@@ -525,7 +526,7 @@ namespace TerritoryWars.Dojo
         private void PlayerUsernameChanged(evolute_duel_PlayerUsernameChanged eventMessage)
         {
             if(LocalAccount == null || LocalAccount.Address.Hex() != eventMessage.player_id.Hex()) return;
-            MenuUIController.Instance._namePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username));
+            MenuUIController.Instance.NamePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username));
         }
         
         private void GameCreateFailed(evolute_duel_GameCreateFailed eventMessage)
