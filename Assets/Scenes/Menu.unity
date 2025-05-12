@@ -2041,6 +2041,8 @@ MonoBehaviour:
   ApplyButton: {fileID: 1525631046}
   ButtonText: {fileID: 1525631044}
   LockerButtonIcon: {fileID: 1525631045}
+  LockerIcon: {fileID: -4880709253181496687, guid: dd8c5fdeaa651249eb3950541569476b, type: 3}
+  EquipedIcon: {fileID: 736751076816789743, guid: 98bcf0dcd2684b2a9b69d6ef20a99e11, type: 3}
   IsOwned: 0
   IsEquipped: 0
 --- !u!1 &285151295
@@ -5913,7 +5915,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 603.9, y: 244.40002}
+  m_AnchoredPosition: {x: 603.9, y: 313.7}
   m_SizeDelta: {x: 436, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &654377204 stripped
@@ -10870,7 +10872,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -514, y: -23.172}
+  m_AnchoredPosition: {x: -476.5, y: -23.172}
   m_SizeDelta: {x: 0, y: 110.34483}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &1416486403
@@ -11538,7 +11540,7 @@ MonoBehaviour:
     - {fileID: -7244589549716353255, guid: 7bef83afa789f6c4e93798de8ad5ddbb, type: 3}
     ShadowSprite: {fileID: 5253506086352480488, guid: 071ceeb884033476e8acb72437c391f4, type: 3}
     CharacterShadowPosition: {x: -32.6, y: -104}
-    HintPositionY: 540
+    HintPositionY: 600
   - CharacterId: 1
     CharacterIcon: {fileID: 6120914730915384989, guid: e79b1819e79109bbfb160056aa7c1213, type: 3}
     CharacterName: Mira
@@ -11578,7 +11580,7 @@ MonoBehaviour:
     - {fileID: -5684482156367956648, guid: 6b64ad2389a12b143aa3a48f2e1312b3, type: 3}
     ShadowSprite: {fileID: 5253506086352480488, guid: 071ceeb884033476e8acb72437c391f4, type: 3}
     CharacterShadowPosition: {x: -53.5, y: -86.11}
-    HintPositionY: 519.4
+    HintPositionY: 600
   - CharacterId: 2
     CharacterIcon: {fileID: 811960651493979081, guid: e79b1819e79109bbfb160056aa7c1213, type: 3}
     CharacterName: Bandi
@@ -11613,7 +11615,7 @@ MonoBehaviour:
     - {fileID: -1275791352653629626, guid: 18b419f3b5bc20342b521f10a024e474, type: 3}
     ShadowSprite: {fileID: -1768981574596086536, guid: 071ceeb884033476e8acb72437c391f4, type: 3}
     CharacterShadowPosition: {x: -47.2, y: -98.3}
-    HintPositionY: 473.5
+    HintPositionY: 600
   - CharacterId: 3
     CharacterIcon: {fileID: 2245513856936013222, guid: e79b1819e79109bbfb160056aa7c1213, type: 3}
     CharacterName: Lithor
@@ -11651,7 +11653,7 @@ MonoBehaviour:
     - {fileID: 1092502232, guid: 9f54c6834d456a5468eede9cfcc14811, type: 3}
     ShadowSprite: {fileID: -1768981574596086536, guid: 071ceeb884033476e8acb72437c391f4, type: 3}
     CharacterShadowPosition: {x: -48.1, y: -153.83}
-    HintPositionY: 584.3
+    HintPositionY: 655.69
   CharacterItems:
   - {fileID: 5440909327554412721}
   - {fileID: 1919071106}
@@ -13077,7 +13079,7 @@ PrefabInstance:
     - target: {fileID: 4666975300993036208, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -75479096, guid: 13d0720239aaa247e9abc7de2d618541, type: 3}
+      objectReference: {fileID: 736751076816789743, guid: 98bcf0dcd2684b2a9b69d6ef20a99e11, type: 3}
     - target: {fileID: 4820468141743288626, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -13169,6 +13171,10 @@ PrefabInstance:
     - target: {fileID: 4820468141743288626, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5106672095785710323, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
+      propertyPath: m_Interactable
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5106672095785710323, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -13268,7 +13274,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7330603052455128508, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7330603052455128508, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -13277,6 +13283,10 @@ PrefabInstance:
     - target: {fileID: 7330603052455128508, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -48.015
+      objectReference: {fileID: 0}
+    - target: {fileID: 7555534412213885630, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8816006413446261605, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_text
@@ -13312,11 +13322,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1525631045 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6165875055700600957, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
+--- !u!114 &1525631045 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4666975300993036208, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
   m_PrefabInstance: {fileID: 1525631042}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1525631046 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5106672095785710323, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
