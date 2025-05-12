@@ -526,7 +526,7 @@ namespace TerritoryWars.Dojo
         private void PlayerUsernameChanged(evolute_duel_PlayerUsernameChanged eventMessage)
         {
             if(LocalAccount == null || LocalAccount.Address.Hex() != eventMessage.player_id.Hex()) return;
-            MenuUIController.Instance._namePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username));
+            MenuUIController.Instance.NamePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username));
         }
         
         private void GameCreateFailed(evolute_duel_GameCreateFailed eventMessage)

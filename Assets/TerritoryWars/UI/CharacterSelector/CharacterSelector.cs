@@ -32,7 +32,7 @@ namespace TerritoryWars.UI.CharacterSelector
         private int _currentSelectedCharacterId = 1;
         private int _currentCharacterId = 1;
         private List<int> _unlockedCharacters = new List<int>();
-        private int _playerBalance => MenuUIController.Instance._namePanelController.EvoluteBalance;
+        private int _playerBalance => MenuUIController.Instance.NamePanelController.EvoluteBalance;
 
         // public void Start()
         // {

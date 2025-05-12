@@ -111,9 +111,9 @@ public class SnapshotTabController : MonoBehaviour
         
         public async void SetActivePanel(bool isActive)
         {
-            if (isActive && MenuUIController.Instance._namePanelController.IsDefaultName())
+            if (isActive && MenuUIController.Instance.NamePanelController.IsDefaultName())
             {
-                MenuUIController.Instance._changeNamePanelUIController.SetNamePanelActive(true);
+                MenuUIController.Instance.ChangeNamePanelUIController.SetNamePanelActive(true);
                 return;
             }
             

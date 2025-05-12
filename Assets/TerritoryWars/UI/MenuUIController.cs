@@ -26,10 +26,9 @@ namespace TerritoryWars.UI
             }
         }
         
-        public NamePanelController _namePanelController;
-        public ChangeNamePanelUIController _changeNamePanelUIController;
+        public NamePanelController NamePanelController;
+        public ChangeNamePanelUIController ChangeNamePanelUIController;
         public CharacterSelector.CharacterSelector CharacterSelector;
-        [FormerlySerializedAs("_characterSelector")] public CharacterSelectorOld characterSelectorOld;
 
         public void Start()
         {
@@ -45,9 +44,11 @@ namespace TerritoryWars.UI
         public void Initialize()
         {
             DojoGameManager.Instance.CustomSynchronizationMaster.DestroyBoardsAndAllDependencies();
-            _namePanelController.Initialize();
+            NamePanelController.Initialize();
             CharacterSelector.Initialize();
-            _namePanelController.OnNameChanged.AddListener(OnNameChanged);
+            NamePanelController.OnNameChanged.AddListener(OnNameChanged);
+            
+            ChangeNamePanelUIController.SetNamePanelActive(NamePanelController.IsDefaultName());
         }
 
         public async void NewAccount()
@@ -93,9 +94,9 @@ namespace TerritoryWars.UI
 
         public void OnDestroy()
         {
-            if (_namePanelController != null)
+            if (NamePanelController != null)
             {
-                _namePanelController.OnNameChanged.RemoveListener(OnNameChanged);
+                NamePanelController.OnNameChanged.RemoveListener(OnNameChanged);
             }
         }
     }
