@@ -12,7 +12,7 @@ namespace Dojo
     {
         public SynchronizationMaster synchronizationMaster;
 #if UNITY_WEBGL && !UNITY_EDITOR
-        public ToriiWasmClient toriiClient;
+        public ToriiWasmClient wasmClient;
 #else
         public ToriiClient toriiClient;
 #endif
@@ -26,8 +26,8 @@ namespace Dojo
             Debug.Log($"[WorldManager] Initializing with rpcUrl: {rpc} and toriiUrl: {torii} and worldAddress: {world.Hex()}");
             
 #if UNITY_WEBGL && !UNITY_EDITOR
-            toriiClient = new ToriiWasmClient(torii, dojoConfig.relayWebrtcUrl, world);
-            await toriiClient.CreateClient();
+            wasmClient = new ToriiWasmClient(torii, dojoConfig.relayWebrtcUrl, world);
+            await wasmClient.CreateClient();
 #else
             toriiClient = new ToriiClient(torii, dojoConfig.relayUrl, world);
 #endif
@@ -123,7 +123,7 @@ namespace Dojo
         public async Task<byte[]> Publish(TypedData typedData, FieldElement[] signature)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            return await toriiClient.PublishMessage(typedData, signature);
+            return await wasmClient.PublishMessage(typedData, signature);
 #else
             return await Task.Run(() => toriiClient.PublishMessage(typedData, signature).ToArray());
 #endif

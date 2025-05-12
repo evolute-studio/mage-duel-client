@@ -116,8 +116,13 @@ namespace TerritoryWars.Dojo
             {
                 string rpcUrl =  String.IsNullOrEmpty(connection.rpcUrl) ? dojoConfig.rpcUrl: connection.rpcUrl;
                 provider = new JsonRpcClient(rpcUrl);
+                string masterAddress = gameManagerData.masterAddress;
+                Debug.Log($"[Master Address]: {masterAddress}");
+                FieldElement masterAddressField = new FieldElement(masterAddress);
+                Debug.Log($"[Master Address as FieldElement Inner]: {masterAddressField.Inner}");
+                Debug.Log($"[Master Address as FieldElement Hex]: {masterAddressField.Hex()}");
                 masterAccount = new Account(provider, new SigningKey(gameManagerData.masterPrivateKey),
-                    new FieldElement(gameManagerData.masterAddress), callback);
+                    masterAddressField, callback);
             }
             catch (Exception e)
             {
