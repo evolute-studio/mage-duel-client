@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TerritoryWars.Dojo;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
+using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using Random = UnityEngine.Random;
 
@@ -17,7 +19,7 @@ namespace TerritoryWars.General
         
         private bool isJokerActive = false;
         
-        private Dictionary<(int, int), string[]> _cachedCombinations = new Dictionary<(int, int), string[]>();
+        private Dictionary<(int, int, int), string[]> _cachedCombinations = new Dictionary<(int, int, int), string[]>();
         private Dictionary<(int, int), int> _currentCombinationIndex = new Dictionary<(int, int), int>();
         
         public bool IsJokerActive => isJokerActive;
@@ -52,13 +54,14 @@ namespace TerritoryWars.General
         
         public TileData GetGenerateJokerTile(int x, int y)
         {
-            if (!_cachedCombinations.ContainsKey((x, y)))
+            int moveNumber = DojoGameManager.Instance.DojoSessionManager.MoveCount;
+            if (!_cachedCombinations.ContainsKey((x, y, moveNumber)))
             {
-                _cachedCombinations[(x, y)] = GenerateAllCombinations(x, y);
+                _cachedCombinations[(x, y, moveNumber)] = GenerateAllCombinations(x, y);
                 _currentCombinationIndex[(x, y)] = 0;
             }
             
-            string[] possibleCombinations = _cachedCombinations[(x, y)];
+            string[] possibleCombinations = _cachedCombinations[(x, y, moveNumber)];
             
             if (!_currentCombinationIndex.ContainsKey((x, y)))
             {
@@ -71,6 +74,7 @@ namespace TerritoryWars.General
             _currentCombinationIndex[(x, y)] = (currentIndex + 1) % possibleCombinations.Length;
             
             TileData jokerTile = new TileData(tileConfig);
+            CustomLogger.LogImportant("Joker tile generated: " + jokerTile.id);
             return jokerTile;
         }
 
@@ -87,7 +91,12 @@ namespace TerritoryWars.General
         public string[] GenerateAllCombinations(int x, int y)
         {
             Dictionary<Side, LandscapeType> neighborSides = GetNeighborSides(x, y);
-            
+            string log = "Position: " + x + ", " + y + "\n";
+            foreach (var side in neighborSides)
+            {
+                log += $"{side.Key}: {side.Value}, ";
+            }
+            CustomLogger.LogImportant(log);
             char[] template = new char[4];
             bool[] fixedSides = new bool[4];
             bool[] universalSides = new bool[4];

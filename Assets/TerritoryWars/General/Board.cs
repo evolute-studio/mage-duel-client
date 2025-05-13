@@ -1061,5 +1061,22 @@ namespace TerritoryWars.General
             public Vector2Int TileBoardPosition;
             public Side Direction;
         }
+
+        // public void OnGUI()
+        // {
+        //     for (int x = 0; x < width; x++)
+        //     {
+        //         for (int y = 0; y < height; y++)
+        //         {
+        //             if (tileObjects[x, y] != null && tileData[x, y] != null)
+        //             {
+        //                 Vector3 screenPos = Camera.main.WorldToScreenPoint(tileObjects[x, y].transform.position);
+        //                 screenPos.y = Screen.height - screenPos.y; // Конвертуємо Y координату для GUI
+        //                 
+        //                 GUI.Label(new Rect(screenPos.x - 20, screenPos.y - 10, 100, 20), tileData[x, y].id);
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
