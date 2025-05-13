@@ -88,7 +88,8 @@ namespace TerritoryWars.UI
 
         public void ControllerLogout()
         {
-            WrapperConnectorCalls.ControllerLogout();
+            if(ApplicationState.IsController)
+                WrapperConnectorCalls.ControllerLogout();
             JSBridge.ReloadPage();
         }
 
