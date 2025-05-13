@@ -83,12 +83,18 @@ namespace TerritoryWars.UI
 
         public void OpenControllerProfile()
         {
-            WrapperConnectorCalls.ControllerProfile();
+            if(ApplicationState.IsController)
+                WrapperConnectorCalls.ControllerProfile();
+            else
+            {
+                ChangeNamePanelUIController.SetNamePanelActive(true);
+            }
         }
 
         public void ControllerLogout()
         {
-            WrapperConnectorCalls.ControllerLogout();
+            if(ApplicationState.IsController)
+                WrapperConnectorCalls.ControllerLogout();
             JSBridge.ReloadPage();
         }
 

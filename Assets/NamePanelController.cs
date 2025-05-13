@@ -22,6 +22,7 @@ public class NamePanelController : MonoBehaviour
     public TextMeshProUGUI PlayerNameText;
     public TextMeshProUGUI EvoluteCountText;
     public Button ChangeNameButton;
+    public Image ControllerIcon;
     
     private bool _isInitialized = false;
     
@@ -49,6 +50,7 @@ public class NamePanelController : MonoBehaviour
         string name = CairoFieldsConverter.GetStringFromFieldElement(profile.username);
         SetName(name);
         SetEvoluteBalance(profile.balance);
+        ControllerIcon.gameObject.SetActive(ApplicationState.IsController);
     }
 
     private void CreateModelForNewPlayer()
@@ -68,11 +70,6 @@ public class NamePanelController : MonoBehaviour
             CairoFieldsConverter.GetFieldElementFromString(username));
         SetName(username);
         SetEvoluteBalance(0);
-    }
-
-    public void CallChangeNamePanel()
-    {
-        ChangeNamePanel.SetActive(true);
     }
 
     public bool IsDefaultName()
