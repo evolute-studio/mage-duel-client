@@ -215,7 +215,7 @@ namespace TerritoryWars.Tile
                     if (_tileData.OwnerId == -1) playerId = -1;
                     GameObject houseObject = Instantiate(PrefabsManager.Instance.GetRandomNotContestedHouseGameObject(1
                         , playerId), house.Parent.transform);
-                    currentGoTileRotator.MirrorRotationObjects.Add(house.Parent.transform);
+                    currentGoTileRotator.SimpleRotationObjects.Add(house.Parent.transform);
                     house.SetData(houseObject);
                 }
                 
@@ -227,7 +227,15 @@ namespace TerritoryWars.Tile
                 
                 for(int i = 0; i < _tileData.HouseSprites.Count; i++){
                     if (i >= houseRenderers.Count) break;
-                    houseRenderers[i].sprite = _tileData.HouseSprites[i];
+                    // houseRenderers[i].sprite = _tileData.HouseSprites[i];
+                    houseRenderers[i].transform.parent.gameObject.SetActive(false);
+                    Transform newHouseParent = houseRenderers[i].transform.parent.parent;
+                    TileParts.HouseGameObject house = new TileParts.HouseGameObject(newHouseParent.gameObject); 
+                    GameObject houseObject = PrefabsManager.Instance.GetNonContestedHousePrefabByReference(_tileData.HouseSprites[i]);
+                    GameObject houseGO = Instantiate(houseObject, houseRenderers[i].transform.parent.parent);
+                    houseGO.transform.position = houseRenderers[i].transform.parent.position;
+                    house.SetData(houseGO);
+                    tileParts.Houses.Add(house);
                 }
             }
             
@@ -287,35 +295,37 @@ namespace TerritoryWars.Tile
             }
 
             houseRenderers.Clear();
-            foreach (var house in tileParts.Houses)
-            {
-                houseRenderers.Add(house.HouseSpriteRenderer);
-            }
+            List<TileParts.HouseGameObject> activeHouses = tileParts.Houses.Where(x => x.Parent.gameObject.activeSelf).ToList();
 
             if (isContest)
             {
-                if (houseRenderers.Count > 0)
+                if (activeHouses.Count > 0)
                 {
                     if (_tileData.IsCityParallel())
                     {
-                        MergeHouses(tileParts.Houses.GetRange(0,2), playerId);
-                        MergeHouses(tileParts.Houses.GetRange(2,2), playerId);
+                        MergeHouses(activeHouses.GetRange(0,2), playerId);
+                        MergeHouses(activeHouses.GetRange(2,2), playerId);
                     }
                     else
                     {
-                        MergeHouses(tileParts.Houses,playerId);
+                        MergeHouses(activeHouses, playerId);
                     }
                     
                 }   
             }
             else
             {
-                if (houseRenderers.Count == 0) return;
-                var tilePartsHouse = tileParts.Houses;
+                if (activeHouses.Count == 0) return;
                 
-                foreach (var house in houseRenderers)
+                foreach (var house in activeHouses)
                 {
-                    house.sprite = TileAssetsObject.GetNotContestedHouseByReference(house.sprite, playerId);
+                    GameObject housePrefab = PrefabsManager.Instance.GetRandomNotContestedHouseGameObject(1, playerId);
+                    Transform prevHouse = house.HouseSpriteRenderer.transform.parent;
+                    prevHouse.gameObject.SetActive(false);
+                    GameObject houseGO = Instantiate(housePrefab, house.Parent.transform);
+                    houseGO.transform.position = prevHouse.position;
+                    house.SetData(houseGO);
+                    
                 }
             }
             
@@ -328,6 +338,7 @@ namespace TerritoryWars.Tile
 
         public void MergeHouses(List<TileParts.HouseGameObject> houses, int playerId)
         {
+            
             int count = houses.Count;
             if (count == 0) return;
 

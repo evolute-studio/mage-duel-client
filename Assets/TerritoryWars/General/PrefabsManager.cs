@@ -79,7 +79,7 @@ namespace TerritoryWars.General
             if (playerIndex == -1 || playerIndex == 3)
             {
                 randomHouseIndex = Random.Range(0, NeutralPlayerNonContestedHouses.SmallHouses.Length);
-                return NeutralPlayerNonContestedHouses.SmallHouses[randomHouseIndex];
+                return NeutralPlayerNonContestedHouses.SmallHouses[randomHouseIndex].HouseGO;
             }        
             
             playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
@@ -90,14 +90,42 @@ namespace TerritoryWars.General
             {
                 case 1:
                     randomHouseIndex = Random.Range(0, notContestedHouses.SmallHouses.Length);
-                    return notContestedHouses.SmallHouses[randomHouseIndex];
+                    return notContestedHouses.SmallHouses[randomHouseIndex].HouseGO;
                 case 2:
                     randomHouseIndex = Random.Range(0, notContestedHouses.MediumHouses.Length);
-                    return notContestedHouses.MediumHouses[randomHouseIndex];
+                    return notContestedHouses.MediumHouses[randomHouseIndex].HouseGO;
                 default:
                     return null;
                     
             }
+        }
+
+        public GameObject GetNonContestedHousePrefabByReference(Sprite sprite)
+        {
+            foreach (var housePrefab in FirstPlayerNonContestedHouses.SmallHouses)
+            {
+                if (housePrefab.HouseSprite == sprite)
+                {
+                    return housePrefab.HouseGO;
+                }
+            }
+
+            foreach (var housePrefab in SecondPlayerNonContestedHouses.SmallHouses)
+            {
+                if (housePrefab.HouseSprite == sprite)
+                {
+                    return housePrefab.HouseGO;
+                }
+            }
+
+            return null;
+        }
+
+        [Serializable]
+        public class HousePrefab
+        {
+            public GameObject HouseGO;
+            public Sprite HouseSprite;
         }
 
         public GameObject GetContestedHouse(int count, int playerIndex, Sprite house = null)
@@ -169,8 +197,8 @@ namespace TerritoryWars.General
         [Serializable]
         public class NonContestedHousesGameObject
         {
-            public GameObject[] SmallHouses;
-            public GameObject[] MediumHouses;
+            public HousePrefab[] SmallHouses;
+            public HousePrefab[] MediumHouses;
         }
     }
 }
