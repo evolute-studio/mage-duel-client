@@ -44,6 +44,7 @@ namespace TerritoryWars.Tile
         public List<LineRenderer> AllCityLineRenderers = new List<LineRenderer>();
         
         public List<SpriteRenderer> houseRenderers;
+        private List<TileParts.HouseGameObject> _housesParent = new List<TileParts.HouseGameObject>();
         public List<RoadPin> Pins = new List<RoadPin>();
         
 
@@ -177,8 +178,9 @@ namespace TerritoryWars.Tile
             TileRotator currentGoTileRotator = CurrentTileGO.GetComponent<TileRotator>();
             AllCityRenderers = new List<SpriteRenderer>();
             AllCityLineRenderers = new List<LineRenderer>();
+            houseRenderers = new List<SpriteRenderer>();
+            _housesParent = tileParts.Houses;
             
-            houseRenderers = tileParts.HouseRenderers;
             List<SpriteRenderer> arcRenderers = tileParts.ArcRenderers;
             TerritoryFiller territoryFiller = tileParts.TileTerritoryFiller;
             WallPlacer = tileParts.WallPlacer;
@@ -195,16 +197,12 @@ namespace TerritoryWars.Tile
                 AllCityRenderers.AddRange(pillarsRenderers);
             }
 
-            if (houseRenderers != null)
+            if (_housesParent != null)
             { 
-                
-                AllCityRenderers.AddRange(houseRenderers);
-                
-                foreach (var house in houseRenderers)
+                foreach (var house in _housesParent)
                 {
                     int playerId = 0;
                     SessionManager sessionManager = SessionManager.Instance;
-                    currentGoTileRotator.MirrorRotationObjects.Add(house.transform);
                     if (sessionManager == null || sessionManager.CurrentTurnPlayer == null)
                     {
                         playerId = Random.Range(0, 2);
@@ -215,9 +213,18 @@ namespace TerritoryWars.Tile
                     }
 
                     if (_tileData.OwnerId == -1) playerId = -1;
-                    int cityCount = TileConfig.Count(c => c == 'C');
-                    house.sprite = TileAssetsObject.GetNotContestedHouse(1, playerId);
+                    GameObject houseObject = Instantiate(PrefabsManager.Instance.GetRandomNotContestedHouseGameObject(1
+                        , playerId), house.Parent.transform);
+                    currentGoTileRotator.MirrorRotationObjects.Add(house.Parent.transform);
+                    house.SetData(houseObject);
                 }
+                
+                foreach (var house in tileParts.Houses)
+                {
+                    houseRenderers.Add(house.HouseSpriteRenderer);
+                }
+                AllCityRenderers.AddRange(houseRenderers);
+                
                 for(int i = 0; i < _tileData.HouseSprites.Count; i++){
                     if (i >= houseRenderers.Count) break;
                     houseRenderers[i].sprite = _tileData.HouseSprites[i];
@@ -233,6 +240,7 @@ namespace TerritoryWars.Tile
             {
                 currentGoTileRotator.LineRenderers.Add(area.lineRenderer);
             }
+            
             currentGoTileRotator.RotateTile((_rotation + 3) % 4);
             Transform[] pins = tileParts.PinsPositions;
             
@@ -277,7 +285,12 @@ namespace TerritoryWars.Tile
                 tileParts.PlaceContestedWalls(rotation);
                 tileParts.PlaceFlags(rotation, playerId);
             }
-            houseRenderers = CurrentTileGO.GetComponent<TileParts>().HouseRenderers;
+
+            houseRenderers.Clear();
+            foreach (var house in tileParts.Houses)
+            {
+                houseRenderers.Add(house.HouseSpriteRenderer);
+            }
 
             if (isContest)
             {
@@ -285,18 +298,21 @@ namespace TerritoryWars.Tile
                 {
                     if (_tileData.IsCityParallel())
                     {
-                        MergeHouses(houseRenderers.GetRange(0, 2), playerId);
-                        MergeHouses(houseRenderers.GetRange(2, 2), playerId);
+                        MergeHouses(tileParts.Houses.GetRange(0,2), playerId);
+                        MergeHouses(tileParts.Houses.GetRange(2,2), playerId);
                     }
                     else
                     {
-                        MergeHouses(houseRenderers, playerId);
+                        MergeHouses(tileParts.Houses,playerId);
                     }
                     
                 }   
             }
             else
             {
+                if (houseRenderers.Count == 0) return;
+                var tilePartsHouse = tileParts.Houses;
+                
                 foreach (var house in houseRenderers)
                 {
                     house.sprite = TileAssetsObject.GetNotContestedHouseByReference(house.sprite, playerId);
@@ -310,32 +326,35 @@ namespace TerritoryWars.Tile
             }
         }
 
-        public void MergeHouses(List<SpriteRenderer> houses, int playerId)
+        public void MergeHouses(List<TileParts.HouseGameObject> houses, int playerId)
         {
             int count = houses.Count;
             if (count == 0) return;
-            
+
             Vector2 mergedPosition = Vector2.zero;
             foreach (var house in houses)
             {
-                mergedPosition += (Vector2)house.transform.position;
+                mergedPosition += (Vector2)house.Parent.transform.position;
             }
             mergedPosition /= count;
             foreach (var house in houses)
             {
-                house.transform.position = mergedPosition;
-                house.gameObject.SetActive(false);
+                house.Parent.transform.position = mergedPosition;
+                house.Parent.gameObject.SetActive(false);
             }
-            SpriteRenderer mainHouse = houses[0];
-            mainHouse.gameObject.SetActive(true);
+            TileParts.HouseGameObject mainHouse = houses[0];
+            mainHouse.Parent.gameObject.SetActive(true);
 
-            if (TileAssetsObject.IsContestedHouse(mainHouse.sprite, count / 2, playerId))
+            if (TileAssetsObject.IsContestedHouse(mainHouse.HouseSpriteRenderer.sprite, count / 2, playerId))
             {
                 return;
             }
-            Sprite mergedHouseSprite = TileAssetsObject.GetContestedHouses(count/2, playerId, mainHouse.sprite);
-            mainHouse.sprite = mergedHouseSprite;
             
+            Destroy(mainHouse.HouseSpriteRenderer.transform.parent.gameObject);
+            GameObject mergedHousePrefab = PrefabsManager.Instance.GetContestedHouse(count/2, playerId);
+            GameObject houseGO = Instantiate(mergedHousePrefab, mainHouse.Parent.transform);
+            houseGO.transform.position = mergedPosition;
+            mainHouse.SetData(houseGO);
         }
 
         public void ChangeEnvironmentForContest()
@@ -345,7 +364,7 @@ namespace TerritoryWars.Tile
 
         public void FencePlacerForCloserToBorderCity(List<Side> closerSides)
         {
-            if (closerSides == null || tileParts.HouseRenderers == null) return;
+            if (closerSides == null || tileParts.Houses == null) return;
             List<Side> closerCitySide = new List<Side>();
             foreach (var side in closerSides)
             {

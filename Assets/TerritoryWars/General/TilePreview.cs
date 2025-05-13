@@ -121,8 +121,14 @@ namespace TerritoryWars.General
                     
 
                     HouseSprites.Clear();
-                    SpriteRenderer[] houseRenderers = tileGenerator.CurrentTileGO.GetComponent<TileParts>().HouseRenderers.ToArray();
-                    for (int i = 0; i < houseRenderers.Length; i++)
+                    List<SpriteRenderer> houseRenderers = new List<SpriteRenderer>();
+                    
+                    foreach (var house in tileParts.Houses)
+                    {
+                        houseRenderers.Add(house.HouseSpriteRenderer);
+                    }
+                    
+                    for (int i = 0; i < houseRenderers.Count; i++)
                     {
                         houseRenderers[i].sortingLayerName = "Preview";
                         if (currentTile.HouseSprites.Count > i && currentTile.HouseSprites[i] != null)
@@ -269,7 +275,11 @@ namespace TerritoryWars.General
                 }
 
                 HouseSprites.Clear();
-                SpriteRenderer[] houseRenderers = tileGenerator.CurrentTileGO.GetComponent<TileParts>().HouseRenderers.ToArray();
+                List<SpriteRenderer> houseRenderers = new List<SpriteRenderer>();
+                foreach (var house in tileParts.Houses)
+                {
+                    houseRenderers.Add(house.HouseSpriteRenderer);
+                }
                 foreach (SpriteRenderer houseRenderer in houseRenderers)
                 {
                     houseRenderer.sortingLayerName = "Default";

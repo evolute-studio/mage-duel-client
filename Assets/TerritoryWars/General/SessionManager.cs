@@ -264,20 +264,20 @@ namespace TerritoryWars.General
             Players[hostIndex].transform.position = leftCharacterPath[0];
             Players[guestPlayerIndex].transform.position = rightCharacterPath[0];
             Players[hostIndex].transform
-                .DOPath(leftCharacterPath, 2.5f, PathType.CatmullRom)
+                .DOPath(leftCharacterPath, 2f, PathType.CatmullRom)
                 .SetEase(Ease.OutQuad);
 
             Players[guestPlayerIndex].transform
-                .DOPath(rightCharacterPath, 2.5f, PathType.CatmullRom)
+                .DOPath(rightCharacterPath, 2f, PathType.CatmullRom)
                 .SetEase(Ease.OutQuad);
             
             Camera camera = Camera.main;
             float startOrthographicSize = 7f;
-            float endOrthographicSize = 6f;
+            float endOrthographicSize = 4.5f;
             camera.orthographicSize = startOrthographicSize;
             Sequence sequence = DOTween.Sequence();
             sequence.AppendInterval(0.5f);
-            sequence.Append(DOTween.To(() => camera.orthographicSize, x => camera.orthographicSize = x, endOrthographicSize, 2.5f));
+            sequence.Append(DOTween.To(() => camera.orthographicSize, x => camera.orthographicSize = x, endOrthographicSize, 3.5f));
             sequence.Play();
             
 
