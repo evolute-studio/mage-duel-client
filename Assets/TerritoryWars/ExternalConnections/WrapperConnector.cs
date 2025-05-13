@@ -34,6 +34,13 @@ namespace TerritoryWars.ExternalConnections
             CustomLogger.LogDojoLoop("Controller logged in");
             EntryPoint.Instance.InitializeControllerGameAsync();
         }
+
+        public void OnGuestLogin(string data)
+        {
+            CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
+            CustomLogger.LogDojoLoop("Guest logged in");
+            EntryPoint.Instance.InitializeGuestGameAsync();
+        }
         
         public void OnControllerNotLoggedIn()
         {
