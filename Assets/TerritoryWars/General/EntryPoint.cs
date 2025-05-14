@@ -50,25 +50,32 @@ namespace TerritoryWars.General
         public WrapperConnectorCalls.ConnectionData connection;
         public Game game_contract;
         public Player_profile_actions player_profile_actions;
-        private int currentDataVersion;
         
         private float startConenctionTime;
+        public WorldManagerData dojoConfig;
 
         public void Start()
         {
             #if !UNITY_EDITOR && UNITY_WEBGL
             connection = WrapperConnectorCalls.GetConnectionData();
             //CustomLogger.LogImportant($"[Connection] rpcUrl {connection.rpcUrl} toriiUrl {connection.toriiUrl} gameAddress {connection.gameAddress} playerProfileActionsAddress {connection.playerProfileActionsAddress}");
+            ControllerContracts.EVOLUTE_DUEL_GAME_ADDRESS = connection.gameAddress;
+            ControllerContracts.EVOLUTE_DUEL_PLAYER_PROFILE_ACTIONS_ADDRESS = connection.playerProfileActionsAddress;
+            #else
+            connection.SetData(dojoConfig);
+            #endif
             game_contract.contractAddress = connection.gameAddress;
             player_profile_actions.contractAddress = connection.playerProfileActionsAddress;
             string worldAddress = connection.worldAddress;
-            ControllerContracts.EVOLUTE_DUEL_GAME_ADDRESS = connection.gameAddress;
-            ControllerContracts.EVOLUTE_DUEL_PLAYER_PROFILE_ACTIONS_ADDRESS = connection.playerProfileActionsAddress;
             DojoGameManager.Instance.WorldManager.Initialize(connection.rpcUrl, connection.toriiUrl, worldAddress);
-            currentDataVersion = connection.slotDataVersion;
-            #else
-            DojoGameManager.Instance.WorldManager.Initialize();
-            #endif
+            
+            CustomLogger.LogDojoLoop($"[Connection data] " +
+                                     $"rpcUrl {connection.rpcUrl} " +
+                                     $"toriiUrl {connection.toriiUrl} " +
+                                     $"gameAddress {connection.gameAddress} " +
+                                     $"playerProfileActionsAddress {connection.playerProfileActionsAddress}" +
+                                     $"worldAddress {connection.worldAddress}" +
+                                     $"slotDataVersion {connection.slotDataVersion}");
             
             CustomLogger.LogDojoLoop("Starting Loading Game");
             CustomSceneManager.Instance.LoadingScreen.SetActive(true, null, LoadingScreen.launchGameText);
@@ -157,7 +164,7 @@ namespace TerritoryWars.General
                 
                 // 1. Setup Account
                 CustomLogger.LogDojoLoop("Setting up account");
-                await SetupAccountAsync();
+                await SetupAccountAsync(connection);
                 
                 // 2. Create Burners
                 CustomLogger.LogDojoLoop("Creating burner accounts");
@@ -227,11 +234,11 @@ namespace TerritoryWars.General
         private void InitDataStorage()
         {
             int dataVersion = SimpleStorage.LoadDataVersion();
-            if (dataVersion < currentDataVersion)
+            if (dataVersion < connection.slotDataVersion)
             {
-                CustomLogger.LogDojoLoop($"A new version of slot data has been detected. Local: {dataVersion}, Remote: {currentDataVersion}");
+                CustomLogger.LogDojoLoop($"A new version of slot data has been detected. Local: {dataVersion}, Remote: {connection.slotDataVersion}");
                 SimpleStorage.ClearAll();
-                SimpleStorage.SetDataVersion(currentDataVersion);
+                SimpleStorage.SetDataVersion(connection.slotDataVersion);
             }
             
         }
