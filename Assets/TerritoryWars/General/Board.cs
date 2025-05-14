@@ -156,7 +156,7 @@ namespace TerritoryWars.General
                 PlaceTile(new TileData(fieldTile), startPos.x, startPos.y, -1);
                 // Don't place forests, only mountains at other corners
                 GameObject mountain;
-                if (IsSnowBoardPart(startPos.x, startPos.y) == 3)
+                if (IsSnowBoardPart(startPos.x, startPos.y))
                 {
                     mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
                         tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer"));
@@ -194,7 +194,7 @@ namespace TerritoryWars.General
                     Destroy(GetTileObject(endPos.x, endPos.y));
                 PlaceTile(new TileData(fieldTile), endPos.x, endPos.y, -1);
                 GameObject mountain;
-                if (IsSnowBoardPart(endPos.x, endPos.y) == 3)
+                if (IsSnowBoardPart(endPos.x, endPos.y))
                 {
                     mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
                         tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer"));
@@ -235,7 +235,7 @@ namespace TerritoryWars.General
                         = null;
                     
                     GameObject mountain;
-                    if (IsSnowBoardPart(availablePositions[i].x, availablePositions[i].y) == 3)
+                    if (IsSnowBoardPart(availablePositions[i].x, availablePositions[i].y))
                     {
                         mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
                             tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer"));
@@ -439,26 +439,14 @@ namespace TerritoryWars.General
             }
         }
 
-        public int IsSnowBoardPart(int x, int y)
+        public bool IsSnowBoardPart(int x, int y)
         {
-            if (x < 4 & y < 4) // the numbers indicate the part of the board
-            {
-                return 0; // default mountain
-            }
             if (x > 4 & y > 4)
             {
-                return 3; // snow mountain
-            }
-            if (x <= 4 & y >= 4)
-            {
-                return 1; // player mountain
-            }
-            if (x >= 4 & y <= 4)
-            {
-                return 2; // player mountain
+                return true; // snow mountain
             }
 
-            return -1;
+            return false;
         }
 
         public Vector2Int GetEdgeNeighbors(int x, int y, Side side)
