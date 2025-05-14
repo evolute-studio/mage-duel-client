@@ -7,7 +7,9 @@ using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.ScriptablesObjects;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
+using TerritoryWars.UI;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 namespace TerritoryWars.General
 {
@@ -342,6 +344,34 @@ namespace TerritoryWars.General
 
             return true;
         }
+        
+        public void FloatingTextAnimation(Vector2Int position)
+        {
+            GameObject gameObject = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
+            TileData tileData = SessionManager.Instance.Board.GetTileData(position.x, position.y);
+            TileParts tileParts = gameObject.GetComponentInChildren<TileParts>();
+            TileGenerator tileGenerator = gameObject.GetComponent<TileGenerator>();
+            int playerId = SessionManager.Instance.CurrentTurnPlayer.LocalId;
+            string side = playerId == 0 ? "blue" : "red";
+            Vector3 motion = new Vector3(0, 0.3f, 0);
+                    
+            foreach (var house in tileParts.Houses)
+            {
+                float duration = 2f + UnityEngine.Random.Range(0f, 0.5f);
+                Vector3 textPosition = house.HouseSpriteRenderer.transform.position;
+                FloatingTextManager.Instance.Show("+1", textPosition, motion, duration, "house_icon_" + side);
+            }
+            foreach (var pin in tileGenerator.Pins)
+            {
+                if(pin == null) continue;
+                float duration = 2f + UnityEngine.Random.Range(0f, 0.5f);
+                Vector3 textPosition = pin.transform.position;
+                int cityCount = tileData.id.Count(c => c == 'R');
+                string messageText = cityCount == 2 ? "+2" : "+1";
+                FloatingTextManager.Instance.Show(messageText, textPosition, motion, duration, "road_icon_" + side);
+                if(cityCount == 2) break;
+            }
+        }
 
         public bool RevertTile(int x, int y)
         {
@@ -374,6 +404,12 @@ namespace TerritoryWars.General
             }
         }
 
+        public void ConnectEdgeStructureAnimation(int x, int y, bool isCityContest = false, bool isRoadContest = false)
+        {
+            if(isCityContest || isRoadContest || SessionManager.Instance.IsSessionStarting) return;
+            FloatingTextAnimation(new Vector2Int(x, y));
+        }
+
         private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false, bool isRoadContest = false)
         {
             GameObject[] neighborsGO = new GameObject[4];
@@ -399,6 +435,7 @@ namespace TerritoryWars.General
             {
                 if(IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
+                    ConnectEdgeStructureAnimation(tilePositions[i][0], tilePositions[i][1], isCityContest, isRoadContest);
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
                     {
@@ -438,7 +475,7 @@ namespace TerritoryWars.General
                 }
             }
         }
-
+        
         public bool IsSnowBoardPart(int x, int y)
         {
             if (x > 4 & y > 4)

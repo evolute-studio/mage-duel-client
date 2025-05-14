@@ -302,37 +302,11 @@ namespace TerritoryWars.General
                 .OnComplete(() =>
                 {
                     callback?.Invoke();
-                    FloatingTextAnimation();
+                    SessionManager.Instance.Board.FloatingTextAnimation(_currentBoardPosition);
                 });
         }
 
-        private void FloatingTextAnimation()
-        {
-            GameObject gameObject = SessionManager.Instance.Board.GetTileObject(_currentBoardPosition.x, _currentBoardPosition.y);
-            TileData tileData = SessionManager.Instance.Board.GetTileData(_currentBoardPosition.x, _currentBoardPosition.y);
-            TileParts tileParts = gameObject.GetComponentInChildren<TileParts>();
-            TileGenerator tileGenerator = gameObject.GetComponent<TileGenerator>();
-            int playerId = SessionManager.Instance.CurrentTurnPlayer.LocalId;
-            string side = playerId == 0 ? "blue" : "red";
-            Vector3 motion = new Vector3(0, 0.3f, 0);
-                    
-            foreach (var house in tileParts.Houses)
-            {
-                float duration = 2f + Random.Range(0f, 0.5f);
-                Vector3 position = house.HouseSpriteRenderer.transform.position;
-                FloatingTextManager.Instance.Show("+1", position, motion, duration, "house_icon_" + side);
-            }
-            foreach (var pin in tileGenerator.Pins)
-            {
-                if(pin == null) continue;
-                float duration = 2f + Random.Range(0f, 0.5f);
-                Vector3 position = pin.transform.position;
-                int cityCount = tileData.id.Count(c => c == 'R');
-                string messageText = cityCount == 2 ? "+2" : "+1";
-                FloatingTextManager.Instance.Show(messageText, position, motion, duration, "road_icon_" + side);
-                if(cityCount == 2) break;
-            }
-        }
+        
 
         public void ResetPosition()
         {

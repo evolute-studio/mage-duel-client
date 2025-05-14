@@ -30,7 +30,6 @@ namespace TerritoryWars.Dojo
         private int _snapshotTurn = 0;
         private FieldElement _lastMoveId;
         private ContestProcessor _contestProcessor = new ContestProcessor();
-
         public evolute_duel_Move LastMove
         {
             get

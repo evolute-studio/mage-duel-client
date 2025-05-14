@@ -86,7 +86,7 @@ namespace TerritoryWars.General
         public bool IsLocalPlayerTurn => CurrentTurnPlayer == LocalPlayer;
         public bool IsLocalPlayerHost => LocalPlayer.LocalId == 0;
         
-        
+        public bool IsSessionStarting { get; private set; } = true;
         
        
 
@@ -285,6 +285,7 @@ namespace TerritoryWars.General
 
         public void StartGame()
         {
+            IsSessionStarting = false;
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
             int turnsCount = DojoGameManager.Instance.DojoSessionManager.GetTurnCount();
             ulong timeGone = (ulong)turnsCount * (ulong)DojoSessionManager.TurnDuration;
