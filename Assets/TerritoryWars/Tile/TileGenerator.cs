@@ -299,12 +299,16 @@ namespace TerritoryWars.Tile
                 {
                     if (_tileData.IsCityParallel())
                     {
-                        MergeHouses(tileParts.Houses.GetRange(0,2), playerId);
-                        MergeHouses(tileParts.Houses.GetRange(2,2), playerId);
+                        ReplaceHouses(tileParts.Houses.GetRange(0,2), playerId);
+                        ReplaceHouses(tileParts.Houses.GetRange(2,2), playerId);
+                    }
+                    else if (tileParts.Houses.Count == 8)
+                    {
+                        MergeHouses(tileParts.Houses, playerId);
                     }
                     else
                     {
-                        MergeHouses(tileParts.Houses, playerId);
+                        ReplaceHouses(tileParts.Houses, playerId);
                     }
                     
                 }   
@@ -362,6 +366,18 @@ namespace TerritoryWars.Tile
             GameObject houseGO = Instantiate(mergedHousePrefab, mainHouse.Parent.transform);
             houseGO.transform.position = mergedPosition;
             mainHouse.SetData(houseGO);
+        }
+
+        public void ReplaceHouses(List<TileParts.HouseGameObject> houses, int playerId)
+        {
+            foreach (var house in houses)
+            {
+                GameObject newHousePrefab = PrefabsManager.Instance.GetNonContestedHousePrefabByReference(house.HouseSpriteRenderer.sprite, playerId);
+                house.HouseSpriteRenderer.transform.parent.gameObject.SetActive(false);
+                GameObject houseGO = Instantiate(newHousePrefab, house.Parent.transform);
+                houseGO.transform.localPosition = Vector3.zero;
+                house.SetData(houseGO);
+            }
         }
 
         public void ChangeEnvironmentForContest()

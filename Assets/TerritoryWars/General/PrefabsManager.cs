@@ -100,13 +100,14 @@ namespace TerritoryWars.General
             }
         }
 
-        public GameObject GetNonContestedHousePrefabByReference(Sprite sprite)
+        public GameObject GetNonContestedHousePrefabByReference(Sprite sprite, int playerId = -1)
         {
             foreach (var housePrefab in FirstPlayerNonContestedHouses.SmallHouses)
             {
                 if (housePrefab.HouseSprite == sprite)
                 {
-                    return housePrefab.HouseGO;
+                    int index = Array.IndexOf(FirstPlayerNonContestedHouses.SmallHouses, housePrefab);
+                    return playerId == 0 || playerId == -1 ? housePrefab.HouseGO : SecondPlayerNonContestedHouses.SmallHouses[index].HouseGO;
                 }
             }
 
@@ -114,7 +115,8 @@ namespace TerritoryWars.General
             {
                 if (housePrefab.HouseSprite == sprite)
                 {
-                    return housePrefab.HouseGO;
+                    int index = Array.IndexOf(SecondPlayerNonContestedHouses.SmallHouses, housePrefab);
+                    return playerId == 1 || playerId == -1 ? housePrefab.HouseGO : FirstPlayerNonContestedHouses.SmallHouses[index].HouseGO;
                 }
             }
 
