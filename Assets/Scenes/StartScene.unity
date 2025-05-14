@@ -930,7 +930,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7330603052455128508, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 292.66
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7330603052455128508, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2866,6 +2866,7 @@ GameObject:
   - component: {fileID: 1226731876}
   - component: {fileID: 1226731875}
   - component: {fileID: 1226731878}
+  - component: {fileID: 1226731879}
   m_Layer: 5
   m_Name: CancelButton
   m_TagString: Untagged
@@ -2886,6 +2887,7 @@ RectTransform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1223735958}
+  - {fileID: 1407714565}
   m_Father: {fileID: 1261583745}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -2912,7 +2914,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 2
+  m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -2994,6 +2996,29 @@ MonoBehaviour:
   onExit:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1226731879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226731873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ec9f9bcefff43089821ca0e43fe13c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DefaultSprite: {fileID: 5783594883459643935, guid: 8c6eb9a8c7c6cbe2ab6c10d3211194d0, type: 3}
+  HoverOutlineSprite: {fileID: 401053787, guid: 8c6eb9a8c7c6cbe2ab6c10d3211194d0, type: 3}
+  PressedSprite: {fileID: 5783594883459643935, guid: 8c6eb9a8c7c6cbe2ab6c10d3211194d0, type: 3}
+  PressedHoverOutlineSprite: {fileID: 401053787, guid: 8c6eb9a8c7c6cbe2ab6c10d3211194d0, type: 3}
+  DisabledSprite: {fileID: 0}
+  ButtonContent: {fileID: 0}
+  HoverTransitionTime: 0.12
+  PressedDuration: 0.5
+  PressedContentOffsetY: -7.5
+  Image: {fileID: 1226731876}
+  HoverImage: {fileID: 1407714566}
 --- !u!1 &1261583744
 GameObject:
   m_ObjectHideFlags: 0
@@ -3086,6 +3111,81 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1407714564
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1407714565}
+  - component: {fileID: 1407714567}
+  - component: {fileID: 1407714566}
+  m_Layer: 5
+  m_Name: HoveredImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1407714565
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407714564}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1226731874}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 106, y: 36}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1407714566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407714564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 401053787, guid: 8c6eb9a8c7c6cbe2ab6c10d3211194d0, type: 3}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1407714567
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407714564}
+  m_CullTransparentMesh: 1
 --- !u!1 &1495848415
 GameObject:
   m_ObjectHideFlags: 0
