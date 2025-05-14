@@ -16,6 +16,7 @@ namespace TerritoryWars.UI.Menu
         [SerializeField] private Sprite DarkenBackgroundSprite;
         
         [SerializeField] private float TransitionTime = 0.5f;
+        [SerializeField] private float AlphaStart = 0.5f;
         [SerializeField] private float AlphaTarget = 0.5f;
         
         [SerializeField] private Transform WindsParent;
@@ -60,7 +61,7 @@ namespace TerritoryWars.UI.Menu
             }
             else
             {
-                DarkenImage.DOFade(0, TransitionTime);
+                DarkenImage.DOFade(AlphaStart, TransitionTime);
             }
         }
     }
