@@ -445,13 +445,13 @@ namespace TerritoryWars.General
                         SessionManager.Instance.JokerManager.CompleteJokerPlacement();
                     }
                     isJokerMode = false;
-                    selectedPosition = null;
                     jokerPosition = null;
                     ClearHighlights();
                     OnTilePlaced.Invoke();
                     gameUI.SetEndTurnButtonActive(false);
                     gameUI.SetRotateButtonActive(false);
                     gameUI.SetSkipTurnButtonActive(true);
+                    selectedPosition = null;
                 }
             }
             catch (System.Exception e)

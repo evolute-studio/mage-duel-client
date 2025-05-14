@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using TerritoryWars.Tile;
 using UnityEngine;
 using DG.Tweening;
+using TerritoryWars.Dojo;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using Random = UnityEngine.Random;
 
 namespace TerritoryWars.General
 {
@@ -31,6 +33,7 @@ namespace TerritoryWars.General
         [SerializeField] private Ease moveEase = Ease.OutQuint;
 
         private Vector3 _initialPosition;
+        private Vector2Int _currentBoardPosition;
         private Tween currentTween;
         private Camera _mainCamera;
 
@@ -187,6 +190,7 @@ namespace TerritoryWars.General
         public void SetPosition(int x, int y)
         {
             currentTween?.Kill();
+            _currentBoardPosition = new Vector2Int(x, y);
 
             Vector3 targetPosition = Board.GetTilePosition(x, y);
             targetPosition.y += tilePreviewSetHeight;
@@ -298,7 +302,36 @@ namespace TerritoryWars.General
                 .OnComplete(() =>
                 {
                     callback?.Invoke();
+                    FloatingTextAnimation();
                 });
+        }
+
+        private void FloatingTextAnimation()
+        {
+            GameObject gameObject = SessionManager.Instance.Board.GetTileObject(_currentBoardPosition.x, _currentBoardPosition.y);
+            TileData tileData = SessionManager.Instance.Board.GetTileData(_currentBoardPosition.x, _currentBoardPosition.y);
+            TileParts tileParts = gameObject.GetComponentInChildren<TileParts>();
+            TileGenerator tileGenerator = gameObject.GetComponent<TileGenerator>();
+            int playerId = SessionManager.Instance.CurrentTurnPlayer.LocalId;
+            string side = playerId == 0 ? "blue" : "red";
+            Vector3 motion = new Vector3(0, 0.3f, 0);
+                    
+            foreach (var house in tileParts.Houses)
+            {
+                float duration = 2f + Random.Range(0f, 0.5f);
+                Vector3 position = house.HouseSpriteRenderer.transform.position;
+                FloatingTextManager.Instance.Show("+1", position, motion, duration, "house_icon_" + side);
+            }
+            foreach (var pin in tileGenerator.Pins)
+            {
+                if(pin == null) continue;
+                float duration = 2f + Random.Range(0f, 0.5f);
+                Vector3 position = pin.transform.position;
+                int cityCount = tileData.id.Count(c => c == 'R');
+                string messageText = cityCount == 2 ? "+2" : "+1";
+                FloatingTextManager.Instance.Show(messageText, position, motion, duration, "road_icon_" + side);
+                if(cityCount == 2) break;
+            }
         }
 
         public void ResetPosition()

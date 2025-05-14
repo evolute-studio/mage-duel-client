@@ -1,6 +1,7 @@
 using DG.Tweening;
 using NUnit.Framework.Constraints;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using UnityEngine;
 
 public class GameMenuController
@@ -36,7 +37,7 @@ public class GameMenuController
 
     private void OnPlaybookButtonClicked()
     {
-        
+        JSBridge.OpenURL("https://evolute.notion.site/playbook");
     }
 
     private void OnExitButtonClicked()

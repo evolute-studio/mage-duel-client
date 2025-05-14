@@ -13,6 +13,10 @@ namespace TerritoryWars.UI
     
     
             private List<FloatingText> floatingTexts = new List<FloatingText>();
+            public List<FloatingTextIcon> icons = new List<FloatingTextIcon>();
+            
+            public AnimationCurve animationCurve;
+            public AnimationCurve positionCurve;
 
             private void Awake()
             {
@@ -22,21 +26,23 @@ namespace TerritoryWars.UI
             {
                 foreach (FloatingText txt in floatingTexts)
                 {
-                    txt.UpdateFloatingText();
+                    txt.UpdateFloatingText(animationCurve, positionCurve);
                 }
             }
     
-            public void Show(string msg, int fontSize, Color color, Vector3 position, Vector3 motion, float duration)
+            public void Show(string msg, Vector3 position, Vector3 motion, float duration, string iconName = null)
             {
                 FloatingText floatingText = GetFloatingText();
                 floatingText.messageText.text = msg;
-                floatingText.messageText.fontSize = fontSize;
-                floatingText.messageText.color = color;
+                //floatingText.messageText.fontSize = fontSize;
+                //floatingText.messageText.color = color;
+                floatingText.iconImage.sprite = icons.Find(i => i.iconName == iconName)?.icon;
 
                 floatingText.go.transform.position = position;
                 floatingText.go.transform.localScale = Vector3.one;
                 floatingText.motion = motion;
                 floatingText.duration = duration;
+                floatingText.startPos = position;
         
                 floatingText.Show();
             }
@@ -54,7 +60,7 @@ namespace TerritoryWars.UI
                     txt.go = Instantiate(textPrefab);
                     txt.go.transform.SetParent(textContainer.transform);
                     txt.messageText = txt.go.GetComponentInChildren<TextMeshProUGUI>();
-                    txt.icon = txt.go.GetComponentInChildren<Image>();
+                    txt.iconImage = txt.go.GetComponentInChildren<Image>();
             
                     floatingTexts.Add(txt);
                 }

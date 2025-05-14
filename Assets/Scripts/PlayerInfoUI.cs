@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using TerritoryWars;
 using TerritoryWars.General;
 using TerritoryWars.Tile;
@@ -68,21 +69,55 @@ public class PlayerInfoUI : MonoBehaviour
     public void SetCityScores(int localPlayerCityScore, int remotePlayerCityScore)
     {
         int[] playersCityScores = SetLocalPlayerData.GetLocalPlayerInt(localPlayerCityScore, remotePlayerCityScore);
-        cityScoreTextPlayers[0].text = (playersCityScores[0] / 2).ToString();
-        cityScoreTextPlayers[1].text = (playersCityScores[1] / 2).ToString();
+        if(cityScoreTextPlayers[0].text != playersCityScores[0].ToString())
+        {
+            ValueChangedAnimation(cityScoreTextPlayers[0]);
+        }
+        if(cityScoreTextPlayers[1].text != playersCityScores[1].ToString())
+        {
+            ValueChangedAnimation(cityScoreTextPlayers[1]);
+        }
+        cityScoreTextPlayers[0].text = playersCityScores[0].ToString();
+        cityScoreTextPlayers[1].text = playersCityScores[1].ToString();
     }
     
     
     public void SetRoadScores(int localPlayerTileScore, int remotePlayerTileScore)
     {
         int[] playersRoadScores = SetLocalPlayerData.GetLocalPlayerInt(localPlayerTileScore, remotePlayerTileScore);
+        if(tileScoreTextPlayers[0].text != playersRoadScores[0].ToString())
+        {
+            ValueChangedAnimation(tileScoreTextPlayers[0]);
+        }
+        if(tileScoreTextPlayers[1].text != playersRoadScores[1].ToString())
+        {
+            ValueChangedAnimation(tileScoreTextPlayers[1]);
+        }
         tileScoreTextPlayers[0].text = playersRoadScores[0].ToString();
         tileScoreTextPlayers[1].text = playersRoadScores[1].ToString();
+    }
+
+    private void ValueChangedAnimation(TextMeshProUGUI text)
+    {
+        Sequence seq = DOTween.Sequence();
+        seq.Append(text.transform.parent.DOScale(1.25f, 0.2f));
+        seq.Join(text.DOColor(Color.green, 0.2f));
+        seq.Append(text.transform.parent.DOScale(1f, 0.5f));
+        seq.Join(text.DOColor(Color.white, 0.5f));
+        seq.Play().SetLoops(2);
     }
 
     public void SetPlayerScores(int localPlayerScore, int remotePlayerScore)
     {
         int[] playersScores = SetLocalPlayerData.GetLocalPlayerInt(localPlayerScore, remotePlayerScore);
+        if(LocalPlayerScoreText.text != playersScores[0].ToString())
+        {
+            ValueChangedAnimation(LocalPlayerScoreText);
+        }
+        if(RemotePlayerScoreText.text != playersScores[1].ToString())
+        {
+            ValueChangedAnimation(RemotePlayerScoreText);
+        }
         LocalPlayerScoreText.text = playersScores[0].ToString();
         RemotePlayerScoreText.text = playersScores[1].ToString();
     }

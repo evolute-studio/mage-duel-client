@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,10 +11,13 @@ namespace TerritoryWars.UI
         public GameObject go;
         public Vector3 startPosition;
         public TextMeshProUGUI messageText;
-        public Image icon;
+        public Image iconImage;
         public Vector3 motion;
+        public Vector3 startPos;
         public float duration;
         public float lastShown;
+        
+        private Vector3 endPosition => startPos + motion;
 
         public void Show()
         {
@@ -28,15 +32,25 @@ namespace TerritoryWars.UI
             go.SetActive(active);
         }
 
-        public void UpdateFloatingText()
+        public void UpdateFloatingText(AnimationCurve opacityCurve, AnimationCurve positionCurve)
         {
             if (!active) return;
         
             if(Time.time - lastShown > duration) 
                 Hide();
-            messageText.color = new Color(messageText.color.r, messageText.color.g, messageText.color.b, 1 - ((Time.time - lastShown) / duration));
-            go.transform.position += motion * Time.deltaTime;
+            float t = (Time.time - lastShown) / duration;
+            messageText.color = new Color(messageText.color.r, messageText.color.g, messageText.color.b, opacityCurve.Evaluate(t));
+            iconImage.color = new Color(iconImage.color.r, iconImage.color.g, iconImage.color.b, opacityCurve.Evaluate(t));
+            
+            go.transform.position = Vector3.Lerp(startPos, endPosition, positionCurve.Evaluate(t));
         
         }
+    }
+    
+    [Serializable]
+    public class FloatingTextIcon
+    {
+        public string iconName;
+        public Sprite icon;
     }
 }
