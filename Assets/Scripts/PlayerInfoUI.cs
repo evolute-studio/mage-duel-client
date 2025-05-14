@@ -83,6 +83,8 @@ public class PlayerInfoUI : MonoBehaviour
     public void SetPlayerScores(int localPlayerScore, int remotePlayerScore)
     {
         int[] playersScores = SetLocalPlayerData.GetLocalPlayerInt(localPlayerScore, remotePlayerScore);
+        LocalPlayerScoreText.text = playersScores[0].ToString();
+        RemotePlayerScoreText.text = playersScores[1].ToString();
     }
     
     public void SetNames(string localPlayerName, string remotePlayerName)
