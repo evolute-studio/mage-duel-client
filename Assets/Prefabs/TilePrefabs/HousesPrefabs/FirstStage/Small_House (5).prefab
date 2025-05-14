@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 23186320208953364}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.045, y: 0.536, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -76,16 +76,16 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 0}
+  m_SortingOrder: 15
+  m_Sprite: {fileID: -953972856, guid: ae8710ffe641b0946910ae77f55e0c04, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.48, y: 0.48}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &3861007571286593748
@@ -100,7 +100,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa2fb40dcb0933642a019f27c5faaf41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sprites: []
+  sprites:
+  - {fileID: -953972856, guid: ae8710ffe641b0946910ae77f55e0c04, type: 3}
+  - {fileID: -1287226513, guid: ae8710ffe641b0946910ae77f55e0c04, type: 3}
+  - {fileID: -1204532226, guid: ae8710ffe641b0946910ae77f55e0c04, type: 3}
+  - {fileID: 299927037, guid: ae8710ffe641b0946910ae77f55e0c04, type: 3}
+  - {fileID: 306514431, guid: ae8710ffe641b0946910ae77f55e0c04, type: 3}
+  - {fileID: 794081569, guid: ae8710ffe641b0946910ae77f55e0c04, type: 3}
+  - {fileID: -442425609, guid: ae8710ffe641b0946910ae77f55e0c04, type: 3}
+  - {fileID: 1897075342, guid: ae8710ffe641b0946910ae77f55e0c04, type: 3}
+  - {fileID: 268702306, guid: ae8710ffe641b0946910ae77f55e0c04, type: 3}
+  - {fileID: 1640301703, guid: ae8710ffe641b0946910ae77f55e0c04, type: 3}
   duration: 1
   loop: 1
   delay: 0
@@ -153,7 +163,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7315801431587418828}
   - component: {fileID: 8388320427149900345}
-  - component: {fileID: 7542962039629736521}
   m_Layer: 0
   m_Name: House
   m_TagString: Untagged
@@ -219,7 +228,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 14
   m_Sprite: {fileID: 3281690614800120212, guid: 1fbee86e021e3a66692de67262c1fdc9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -230,26 +239,4 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
---- !u!114 &7542962039629736521
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2701887723682196347}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa2fb40dcb0933642a019f27c5faaf41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sprites: []
-  duration: 1
-  loop: 1
-  delay: 0
-  randomizeStart: 0
-  randomSpriteStart: 0
-  maxRandomDelay: 0.5
-  waitBetweenLoops: 0
-  playOnAwake: 1
-  _spriteRenderer: {fileID: 0}
+  m_SpriteSortPoint: 1

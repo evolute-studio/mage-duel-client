@@ -5,11 +5,12 @@ using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Serialization;
 
 public class TileParts : MonoBehaviour
 {
-    public List<SpriteRenderer> HouseRenderers { get; private set; } = new List<SpriteRenderer>();
+    public List<HouseGameObject> Houses { get; private set; } = new List<HouseGameObject>();
     public List<SpriteRenderer> DecorationsRenderers { get; private set; } = new List<SpriteRenderer>();
     public List<SpriteRenderer> ArcRenderers = new List<SpriteRenderer>();
     public TerritoryFiller TileTerritoryFiller;
@@ -108,11 +109,10 @@ public class TileParts : MonoBehaviour
         {
             for (int i = 0; i < houses.childCount; i++)
             {
-                SpriteRenderer house = houses.GetChild(i).GetComponent<SpriteRenderer>();
-                if (house != null)
-                {
-                    HouseRenderers.Add(house);
-                }
+                GameObject house = houses.GetChild(i).gameObject;
+                HouseGameObject houseGameObject = new HouseGameObject(house);
+                Houses.Add(houseGameObject);
+                house.GetComponent<SpriteRenderer>().enabled = false;
             }
         }
         
@@ -139,6 +139,22 @@ public class TileParts : MonoBehaviour
                 Areas.Add(forestArea);
             }
         }
+    }
+
+    public void ClearAllHouses()
+    {
+        for(int i = 0; i < Houses.Count; i++)
+        {
+            Destroy(Houses[i].Parent);
+        }
+    }
+
+    public void AddHouse(GameObject house)
+    {
+        if (house == null) return;
+        HouseGameObject houseGameObject = new HouseGameObject(house);
+            
+        Houses.Add(houseGameObject);
     }
 
     public void SpawnTileObjects(bool isBoarderTile = false)
@@ -236,32 +252,18 @@ public class TileParts : MonoBehaviour
             }
         }
     }
-
-    public void ChangeEnvironmentForContest()
-    {
-        if (ContestedEnviroment != null)
-        {
-            ContestedEnviroment.SetActive(true);
-            if (HouseRenderers.Count == 4)
-            {
-                foreach (var house in HouseRenderers)
-                {
-                    house.gameObject.SetActive(false);
-                }
-            }
-        }
-    }
+    
 
     public void CityOutline(bool isOutline, bool isGray = false)
     {
         int mask = isOutline ? OutlineLayerMask : DefaultLayerMask;
         mask = isGray ? GrayOutlineLayerMask : mask;
         
-        if (HouseRenderers != null)
+        if (Houses != null)
         {
-            foreach (var house in HouseRenderers)
+            foreach (var house in Houses)
             {
-                if (house != null) house.gameObject.layer = mask;
+                if (house != null) house.HouseSpriteRenderer.gameObject.layer = mask;
             }
         }
 
@@ -387,5 +389,27 @@ public class TileParts : MonoBehaviour
         public Side Side;
         public GameObject Fence;
         public WallPlacer WallPlacer;
+    }
+
+    [Serializable]
+    public class HouseGameObject
+    {
+        public SpriteRenderer HouseSpriteRenderer { get; private set; }
+        public SpriteRenderer FlagSpriteRenderer { get; private set; }
+        public SpriteAnimator FlagAnimator{ get; private set; }
+
+        public GameObject Parent;
+
+        public HouseGameObject(GameObject house)
+        {
+            Parent = house;
+        }
+
+        public void SetData(GameObject house)
+        {
+            HouseSpriteRenderer = house.transform.Find("House").GetComponent<SpriteRenderer>();
+            FlagSpriteRenderer = house.transform.Find("Flag").GetComponent<SpriteRenderer>();
+            FlagAnimator = house.transform.Find("Flag").GetComponent<SpriteAnimator>();
+        }
     }
 }
