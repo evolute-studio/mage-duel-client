@@ -17,6 +17,7 @@ namespace TerritoryWars.UI
         public float duration;
         public float lastShown;
         
+        
         private Vector3 endPosition => startPos + motion;
 
         public void Show()
@@ -32,7 +33,7 @@ namespace TerritoryWars.UI
             go.SetActive(active);
         }
 
-        public void UpdateFloatingText(AnimationCurve opacityCurve, AnimationCurve positionCurve)
+        public void UpdateFloatingText(AnimationCurve opacityCurve, AnimationCurve positionCurve, float baseCameraSize)
         {
             if (!active) return;
         
@@ -43,6 +44,9 @@ namespace TerritoryWars.UI
             iconImage.color = new Color(iconImage.color.r, iconImage.color.g, iconImage.color.b, opacityCurve.Evaluate(t));
             
             go.transform.position = Vector3.Lerp(startPos, endPosition, positionCurve.Evaluate(t));
+            float currentCameraSize = Camera.main.orthographicSize;
+            float scale = baseCameraSize / currentCameraSize; 
+            go.transform.localScale = Vector3.one * scale;
         
         }
     }

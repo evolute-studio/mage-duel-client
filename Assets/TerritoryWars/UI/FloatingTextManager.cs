@@ -17,6 +17,7 @@ namespace TerritoryWars.UI
             
             public AnimationCurve animationCurve;
             public AnimationCurve positionCurve;
+            public float BaseCameraOrthographicSize = 5f;
 
             private void Awake()
             {
@@ -26,7 +27,7 @@ namespace TerritoryWars.UI
             {
                 foreach (FloatingText txt in floatingTexts)
                 {
-                    txt.UpdateFloatingText(animationCurve, positionCurve);
+                    txt.UpdateFloatingText(animationCurve, positionCurve, BaseCameraOrthographicSize);
                 }
             }
     

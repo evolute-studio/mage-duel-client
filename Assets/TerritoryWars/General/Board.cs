@@ -352,6 +352,7 @@ namespace TerritoryWars.General
             TileParts tileParts = gameObject.GetComponentInChildren<TileParts>();
             TileGenerator tileGenerator = gameObject.GetComponent<TileGenerator>();
             int playerId = SessionManager.Instance.CurrentTurnPlayer.SideId;
+            playerId = SetLocalPlayerData.GetLocalIndex(playerId);
             string side = playerId == 0 ? "blue" : "red";
             Vector3 motion = new Vector3(0, 0.3f, 0);
                     
