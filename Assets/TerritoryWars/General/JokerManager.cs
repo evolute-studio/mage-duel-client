@@ -13,8 +13,8 @@ namespace TerritoryWars.General
     public class JokerManager
     {
         private SessionManager _sessionManager;
-        private Character[] Players => _sessionManager.Players;
-        private Character CurrentTurnPlayer => _sessionManager.CurrentTurnPlayer;
+        private Player[] Players => _sessionManager.Players;
+        private Player CurrentTurnPlayer => _sessionManager.CurrentTurnPlayer;
         private Board Board => _sessionManager.Board;
         
         private bool isJokerActive = false;
@@ -30,17 +30,17 @@ namespace TerritoryWars.General
         }
         public void Initialize(evolute_duel_Board board)
         {
-            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
+            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.SideId);
             SetJokersCount(0, board.player1.Item3);
             SetJokersCount(1, board.player2.Item3);
         }
         
          public void ActivateJoker()
         {
-            if (Players[CurrentTurnPlayer.LocalId].JokerCount > 0)
+            if (Players[CurrentTurnPlayer.SideId].JokerCount > 0)
             {
                 isJokerActive = true;
-                Players[CurrentTurnPlayer.LocalId].JokerCount--;
+                Players[CurrentTurnPlayer.SideId].JokerCount--;
                 _sessionManager.TileSelector.StartJokerPlacement();
             }
         }
@@ -48,7 +48,7 @@ namespace TerritoryWars.General
         public void DeactivateJoker()
         {
             isJokerActive = false;
-            Players[CurrentTurnPlayer.LocalId].JokerCount++;
+            Players[CurrentTurnPlayer.SideId].JokerCount++;
             GameUI.Instance.UpdateUI();
         }
         
@@ -204,7 +204,7 @@ namespace TerritoryWars.General
         
         public bool CanUseJoker()
         {
-            int characterId = CurrentTurnPlayer == null ? 0 : CurrentTurnPlayer.LocalId;
+            int characterId = CurrentTurnPlayer == null ? 0 : CurrentTurnPlayer.SideId;
             return !isJokerActive && Players[characterId].JokerCount > 0;
         }
 
@@ -218,7 +218,7 @@ namespace TerritoryWars.General
         public void SetJokersCount(int playerId, int count)
         {
             GameUI.Instance.playerInfoUI.SetJokersCount(playerId, count);
-            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
+            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.SideId);
         }
     }
 }

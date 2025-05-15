@@ -351,7 +351,7 @@ namespace TerritoryWars.General
             TileData tileData = SessionManager.Instance.Board.GetTileData(position.x, position.y);
             TileParts tileParts = gameObject.GetComponentInChildren<TileParts>();
             TileGenerator tileGenerator = gameObject.GetComponent<TileGenerator>();
-            int playerId = SessionManager.Instance.CurrentTurnPlayer.LocalId;
+            int playerId = SessionManager.Instance.CurrentTurnPlayer.SideId;
             string side = playerId == 0 ? "blue" : "red";
             Vector3 motion = new Vector3(0, 0.3f, 0);
                     
@@ -371,6 +371,13 @@ namespace TerritoryWars.General
                 FloatingTextManager.Instance.Show(messageText, textPosition, motion, duration, "road_icon_" + side);
                 if(cityCount == 2) break;
             }
+        }
+
+        public void ScoreClientPrediction(int playerIndex, TileData data)
+        {
+            if(!SessionManager.Instance.IsLocalPlayerTurn) return;
+            SessionManager.Instance.gameUI.playerInfoUI.AddClientCityScore(playerIndex, data.id.Count(c => c == 'C') * 2);
+            SessionManager.Instance.gameUI.playerInfoUI.AddClientRoadScore(playerIndex, data.id.Count(r => r == 'R'));
         }
 
         public bool RevertTile(int x, int y)
@@ -404,10 +411,11 @@ namespace TerritoryWars.General
             }
         }
 
-        public void ConnectEdgeStructureAnimation(int x, int y, bool isCityContest = false, bool isRoadContest = false)
+        public void ConnectEdgeStructureAnimation(int ownerId, TileData tileData, int x, int y, bool isCityContest = false, bool isRoadContest = false)
         {
             if(isCityContest || isRoadContest || SessionManager.Instance.IsSessionStarting) return;
             FloatingTextAnimation(new Vector2Int(x, y));
+            ScoreClientPrediction(ownerId, tileData);
         }
 
         private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false, bool isRoadContest = false)
@@ -435,7 +443,7 @@ namespace TerritoryWars.General
             {
                 if(IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
-                    ConnectEdgeStructureAnimation(tilePositions[i][0], tilePositions[i][1], isCityContest, isRoadContest);
+                    ConnectEdgeStructureAnimation(owner, neighborsData[i], tilePositions[i][0], tilePositions[i][1], isCityContest, isRoadContest);
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
                     {

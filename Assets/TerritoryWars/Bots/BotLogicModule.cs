@@ -24,16 +24,16 @@ namespace TerritoryWars.Bots
             }
         }
 
-        private int _localId
+        private int SessionSideId
         {
             get
             {
                 if (SessionManager.Instance == null) return -1;
-                return _player.LocalId;
+                return _player.SideId;
             }
         }
         
-        private Character _player 
+        private Player _player 
         {
             get
             {
@@ -264,8 +264,8 @@ namespace TerritoryWars.Bots
             int redPoints = structure.GetRedPoints();
             int openEdges = structure.GetOpenEdges();
 
-            int myPoints = _localId == 0 ? bluePoints : redPoints;
-            int enemyPoints = _localId == 0 ? redPoints : bluePoints;
+            int myPoints = SessionSideId == 0 ? bluePoints : redPoints;
+            int enemyPoints = SessionSideId == 0 ? redPoints : bluePoints;
 
             int deltaPoints = myPoints - enemyPoints;
             float result = deltaPoints * POINTS_WEIGHT;

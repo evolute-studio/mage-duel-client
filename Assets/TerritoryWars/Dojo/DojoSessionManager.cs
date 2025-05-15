@@ -227,13 +227,14 @@ namespace TerritoryWars.Dojo
             string board_id = eventModel.board_id.Hex();
             if (LocalPlayerBoard.id.Hex() != board_id) return;
             CustomLogger.LogExecution($"[BoardUpdated] | BoardId: {board_id}");
-            int cityScoreBlue = eventModel.blue_score.Item1;
-            int cartScoreBlue = eventModel.blue_score.Item2;
-            int cityScoreRed = eventModel.red_score.Item1;
-            int cartScoreRed = eventModel.red_score.Item2;
-            GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
-            GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
-            GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
+            int cityScoreFirst = eventModel.blue_score.Item1;
+            int cartScoreFirst = eventModel.blue_score.Item2;
+            int cityScoreSecond = eventModel.red_score.Item1;
+            int cartScoreSecond = eventModel.red_score.Item2;
+            float tilePlacementDuration = 0.8f;
+            GameUI.Instance.playerInfoUI.SetCityScores(cityScoreFirst, cityScoreSecond, delay: tilePlacementDuration);
+            GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreFirst, cartScoreSecond, delay: tilePlacementDuration);
+            GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreFirst + cartScoreFirst, cityScoreSecond + cartScoreSecond, delay: tilePlacementDuration);
             var tileData = eventModel.top_tile switch
             {
                 Option<byte>.Some topTile => new TileData(OnChainBoardDataConverter.GetTopTile(topTile)),

@@ -425,7 +425,7 @@ namespace TerritoryWars.General
 
             gameUI.SetRotateButtonActive(false);
 
-            tilePreview.PlaceTile(CompleteTilePlacement);
+            tilePreview.PlaceTile(SessionManager.Instance.CurrentTurnPlayer.SideId, currentTile, CompleteTilePlacement);
         }
 
         public void CompleteTilePlacement()
@@ -435,7 +435,7 @@ namespace TerritoryWars.General
                 if (!selectedPosition.HasValue) return;
                 
                 if (board.PlaceTile(currentTile, selectedPosition.Value.x, selectedPosition.Value.y,
-                        SessionManager.Instance.CurrentTurnPlayer.LocalId))
+                        SessionManager.Instance.CurrentTurnPlayer.SideId))
                 {
                     DojoGameManager.Instance.DojoSessionManager.MakeMove(currentTile, selectedPosition.Value.x, selectedPosition.Value.y, isJokerMode);
                     LastMove = (currentTile, selectedPosition.Value);

@@ -75,16 +75,16 @@ namespace TerritoryWars.General
 
         public Vector3[] SpawnPoints;
 
-        public Character[] Players;
+        public Player[] Players;
         public PlayerData[] PlayersData;
-        public Character CurrentTurnPlayer { get; private set; }
-        public Character LocalPlayer { get; private set; }
-        public Character RemotePlayer { get; private set; }
+        public Player CurrentTurnPlayer { get; private set; }
+        public Player LocalPlayer { get; private set; }
+        public Player RemotePlayer { get; private set; }
 
         public bool IsGameWithBot => DojoGameManager.Instance.DojoSessionManager.IsGameWithBot;
         public bool IsGameWithBotAsPlayer => DojoGameManager.Instance.DojoSessionManager.IsGameWithBotAsPlayer;
         public bool IsLocalPlayerTurn => CurrentTurnPlayer == LocalPlayer;
-        public bool IsLocalPlayerHost => LocalPlayer.LocalId == 0;
+        public bool IsLocalPlayerHost => LocalPlayer.SideId == 0;
         
         public bool IsSessionStarting { get; private set; } = true;
         
@@ -111,9 +111,9 @@ namespace TerritoryWars.General
             int cartScoreBlue = board.blue_score.Item2;
             int cityScoreRed = board.red_score.Item1;
             int cartScoreRed = board.red_score.Item2;
-            GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
-            GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
-            GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
+            GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed, false);
+            GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed, false);
+            GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed, false);
             GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(ClientLocalPlayerSkip);
             GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.AddListener(ClientRemotePlayerSkip);
             JokerManager.Initialize(board);
@@ -209,7 +209,7 @@ namespace TerritoryWars.General
                 DojoGameManager.Instance.LocalBotAsPlayer.SessionStarted();
             }
             
-            Players = new Character[2];
+            Players = new Player[2];
             PlayersData = new PlayerData[2];
 
             
@@ -240,8 +240,8 @@ namespace TerritoryWars.General
             GameObject hostObject = Instantiate(hostPrefab, Vector3.zero, Quaternion.identity);
             GameObject guestObject = Instantiate(guestPrefab, Vector3.zero, Quaternion.identity);
             
-            Players[0] = hostObject.GetComponent<Character>();
-            Players[1] = guestObject.GetComponent<Character>();
+            Players[0] = hostObject.GetComponent<Player>();
+            Players[1] = guestObject.GetComponent<Player>();
             
             Players[0].Initialize(board.player1.Item1, board.player1.Item2, board.player1.Item3);
             Players[1].Initialize(board.player2.Item1, board.player2.Item2, board.player2.Item3);
@@ -336,7 +336,7 @@ namespace TerritoryWars.General
             gameUI.SetSkipTurnButtonActive(true);
 
             TileData currentTile = GetNextTile();
-            currentTile.OwnerId = LocalPlayer.LocalId;
+            currentTile.OwnerId = LocalPlayer.SideId;
             TileSelector.StartTilePlacement(currentTile);
             gameUI.SetActiveDeckContainer(true);
         }
@@ -439,13 +439,13 @@ namespace TerritoryWars.General
         private IEnumerator HandleOpponentMoveCoroutine(string playerAddress, TileData tile, Vector2Int position, int rotation)
         {
             tile.Rotate(rotation);
-            tile.OwnerId = RemotePlayer.LocalId;
+            tile.OwnerId = RemotePlayer.SideId;
             TileSelector.SetCurrentTile(tile);
             TileSelector.tilePreview.SetPosition(position.x + 1, position.y + 1);
             yield return new WaitForSeconds(0.3f);
-            TileSelector.tilePreview.PlaceTile(() =>
+            TileSelector.tilePreview.PlaceTile(RemotePlayer.SideId,tile, () =>
             {
-                Board.PlaceTile(tile, position.x + 1, position.y + 1, GetPlayerByAddress(playerAddress).LocalId);
+                Board.PlaceTile(tile, position.x + 1, position.y + 1, GetPlayerByAddress(playerAddress).SideId);
             });
             yield return new WaitForSeconds(0.5f);
             CurrentTurnPlayer.EndTurn();
@@ -458,7 +458,7 @@ namespace TerritoryWars.General
         public void UpdateTile()
         {
             _nextTile = GetNextTile();
-            _nextTile.OwnerId = RemotePlayer.LocalId;
+            _nextTile.OwnerId = RemotePlayer.SideId;
             TileSelector.SetCurrentTile(_nextTile);
         }
         
@@ -499,14 +499,14 @@ namespace TerritoryWars.General
             Invoke(nameof(StartTurn), delay);
         }
         
-        public Character GetPlayerByAddress(string address)
+        public Player GetPlayerByAddress(string address)
         {
             return Players.FirstOrDefault(player => player.Address.Hex() == address);
         }
     
         public int GetLocalIdByAddress(FieldElement address)
         {
-            return Players.FirstOrDefault(player => player.Address.Hex() == address.Hex())?.LocalId ?? -1;
+            return Players.FirstOrDefault(player => player.Address.Hex() == address.Hex())?.SideId ?? -1;
         }
 
         private void OnDestroy()
