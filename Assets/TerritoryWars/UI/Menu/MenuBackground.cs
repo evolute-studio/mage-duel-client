@@ -22,9 +22,14 @@ namespace TerritoryWars.UI.Menu
         [SerializeField] private Transform WindsParent;
         private List<SpriteAnimator> _winds = new List<SpriteAnimator>();
         private int _windIndex = 0;
+        private RectTransform _rectTransform;
+
+
+        private float _targetRatio = 1.777777778f;
 
         private void Awake()
         {
+            _rectTransform = GetComponent<RectTransform>();
             for(int i = 0; i < WindsParent.childCount; i++)
             {
                 var wind = WindsParent.GetChild(i).GetComponent<SpriteAnimator>();
@@ -34,6 +39,13 @@ namespace TerritoryWars.UI.Menu
                 }
             }
             InvokeRepeating(nameof(StartWinds), 0, 3f);
+        }
+
+        public void Update()
+        {
+            float ratio = Screen.width / (float)Screen.height;
+            float scale = ratio > _targetRatio ? ratio / _targetRatio : 1;
+            _rectTransform.localScale = new Vector3(scale, scale, 1);
         }
 
         private void StartWinds()
