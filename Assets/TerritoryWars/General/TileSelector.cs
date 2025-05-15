@@ -131,7 +131,11 @@ namespace TerritoryWars.General
             tilePreview.UpdatePreview(tile);
             currentTile.HouseSprites.AddRange(tilePreview.HouseSprites);
         }
-
+        public bool IsExistValidPlacement(TileData tile)
+        {
+            return board.GetValidPlacements(tile).Count > 0;
+        }
+        
         public void StartTilePlacement(TileData tile)
         {
             GameUI.Instance.SetEndTurnButtonActive(false);
@@ -143,18 +147,6 @@ namespace TerritoryWars.General
             selectedPosition = null;
 
             _currentValidPlacements = board.GetValidPlacements(currentTile);
-            if (_currentValidPlacements.Count == 0)
-            {
-                if (SessionManager.Instance.CurrentTurnPlayer.JokerCount > 0)
-                {
-                    gameUI.JokerButtonPulse(true);
-                }
-                
-                gameUI.SetActiveSkipButtonPulse(true);
-                // EndTilePlacement();
-                return;
-            }
-            
 
             ShowPossiblePlacements(_currentValidPlacements);
             gameUI.SetEndTurnButtonActive(false);

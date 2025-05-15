@@ -72,7 +72,7 @@ namespace TerritoryWars.UI
         
         [SerializeField] private ArrowAnimations arrowAnimations;
         private bool _isJokerActive = false;
-
+        
         public void Initialize()
         {
             _sessionManager = FindObjectOfType<General.SessionManager>();
@@ -190,14 +190,12 @@ namespace TerritoryWars.UI
             UpdateUI();
             SetActiveDeckContainer(false);
             SetActiveSkipButtonPulse(false);
-            JokerButtonPulse(false);
         }
         
         private void SkipMoveButtonClicked()
         {
             _sessionManager.ClientLocalPlayerSkip();
             SetActiveSkipButtonPulse(false);
-            JokerButtonPulse(false);
             UpdateUI();
         }
 
@@ -269,7 +267,6 @@ namespace TerritoryWars.UI
         {
             if(SessionManager.Instance.CurrentTurnPlayer.JokerCount <= 0 || _isJokerActive || !SessionManager.Instance.IsLocalPlayerTurn) return;
             _isJokerActive = true;
-            JokerButtonPulse(false);
             
             SetJokerMode(true);
             OnJokerButtonClickedEvent?.Invoke();
