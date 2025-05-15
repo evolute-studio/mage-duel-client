@@ -22813,6 +22813,81 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1745866723
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1745866724}
+  - component: {fileID: 1745866726}
+  - component: {fileID: 1745866725}
+  m_Layer: 5
+  m_Name: HoveredImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1745866724
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745866723}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1821238660}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 58, y: 24}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1745866725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745866723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 401053787, guid: 8c6eb9a8c7c6cbe2ab6c10d3211194d0, type: 3}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1745866726
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745866723}
+  m_CullTransparentMesh: 1
 --- !u!1 &1756048722
 GameObject:
   m_ObjectHideFlags: 0
@@ -23828,6 +23903,7 @@ GameObject:
   - component: {fileID: 1821238662}
   - component: {fileID: 1821238661}
   - component: {fileID: 1821238664}
+  - component: {fileID: 1821238665}
   m_Layer: 5
   m_Name: SkipMoveButton
   m_TagString: Untagged
@@ -23848,6 +23924,7 @@ RectTransform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 568291491}
+  - {fileID: 1745866724}
   m_Father: {fileID: 1783385970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -23956,6 +24033,29 @@ MonoBehaviour:
   onExit:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1821238665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1821238659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ec9f9bcefff43089821ca0e43fe13c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DefaultSprite: {fileID: 5783594883459643935, guid: 8c6eb9a8c7c6cbe2ab6c10d3211194d0, type: 3}
+  HoverOutlineSprite: {fileID: 401053787, guid: 8c6eb9a8c7c6cbe2ab6c10d3211194d0, type: 3}
+  PressedSprite: {fileID: 5783594883459643935, guid: 8c6eb9a8c7c6cbe2ab6c10d3211194d0, type: 3}
+  PressedHoverOutlineSprite: {fileID: 401053787, guid: 8c6eb9a8c7c6cbe2ab6c10d3211194d0, type: 3}
+  DisabledSprite: {fileID: 0}
+  ButtonContent: {fileID: 0}
+  HoverTransitionTime: 0.12
+  PressedDuration: 0.5
+  PressedContentOffsetY: 0
+  Image: {fileID: 1821238662}
+  HoverImage: {fileID: 1745866725}
 --- !u!1 &1830808358
 GameObject:
   m_ObjectHideFlags: 0
