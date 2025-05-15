@@ -102,6 +102,7 @@ namespace TerritoryWars.General
 
         public GameObject GetNonContestedHousePrefabByReference(Sprite sprite, int playerId = -1)
         {
+            playerId = SetLocalPlayerData.GetLocalIndex(playerId);
             foreach (var housePrefab in FirstPlayerNonContestedHouses.SmallHouses)
             {
                 if (housePrefab.HouseSprite == sprite)

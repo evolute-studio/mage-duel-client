@@ -358,14 +358,14 @@ namespace TerritoryWars.General
                     
             foreach (var house in tileParts.Houses)
             {
-                float duration = 2f + UnityEngine.Random.Range(0f, 0.5f);
+                float duration = 2f + UnityEngine.Random.Range(0f, 1f);
                 Vector3 textPosition = house.HouseSpriteRenderer.transform.position;
                 FloatingTextManager.Instance.Show("+1", textPosition, motion, duration, "house_icon_" + side);
             }
             foreach (var pin in tileGenerator.Pins)
             {
                 if(pin == null) continue;
-                float duration = 2f + UnityEngine.Random.Range(0f, 0.5f);
+                float duration = 2f + UnityEngine.Random.Range(0f, 1f);
                 Vector3 textPosition = pin.transform.position;
                 int cityCount = tileData.id.Count(c => c == 'R');
                 string messageText = cityCount == 2 ? "+2" : "+1";
