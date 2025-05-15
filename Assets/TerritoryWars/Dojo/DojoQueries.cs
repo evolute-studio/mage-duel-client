@@ -17,6 +17,17 @@ namespace TerritoryWars.Dojo
         public static OrderBy[] order_by = null;
         public static ulong entity_updated_after = 0;
         
+        // events
+        public static Query GetQueryTrophyCreation()
+        {
+            string[] entity_models = new[] { GetModelName<evolute_duel_TrophyCreation>() };
+            
+            Query query = new Query(limit, offset, null, dont_include_hashed_keys, 
+                order_by, entity_models, entity_updated_after);
+            return query;
+        }
+        
+        
         /// <summary>
         /// Gets a query to fetch a single player by their address
         /// </summary>

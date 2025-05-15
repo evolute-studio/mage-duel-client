@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Dojo;
 using TerritoryWars.Tools;
 using UnityEngine;
+using ATask = System.Threading.Tasks.Task;
 
 public class ContestProcessor
 {
@@ -12,7 +13,7 @@ public class ContestProcessor
     private bool _isProcessing = false;
     public bool IsGameFinished = false;
 
-    public async Task CheckFinishGame()
+    public async ATask CheckFinishGame()
     {
         if(_isProcessing) return;
         
@@ -65,7 +66,7 @@ public class ContestProcessor
         await CheckFinishGame();
     }
     
-    private async Task CoroutineAsync(Action action, float delay = 0f)
+    private async ATask CoroutineAsync(Action action, float delay = 0f)
     {
         var tcs = new TaskCompletionSource<bool>();
         Coroutines.StartRoutine(WaitForCoroutine(tcs, action, delay));

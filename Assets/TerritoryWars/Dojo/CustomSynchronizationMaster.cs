@@ -17,6 +17,13 @@ namespace TerritoryWars.Dojo
         public WorldManager WorldManager;
 
         #region Sync Methods
+        
+        public async Task<int> SyncTrophyCreation()
+        {
+            int count = await SyncConstruction(DojoQueries.GetQueryTrophyCreation(), nameof(SyncTrophyCreation));
+            CustomLogger.LogDojoLoop($"Synced {count} game created");
+            return count;
+        }
 
         // -------- Sync Methods --------
         public async Task<int> SyncPlayer(FieldElement address)

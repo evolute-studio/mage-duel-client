@@ -9,6 +9,7 @@ using UnityEngine;
 // fix to use Records in Unity ref. https://stackoverflow.com/a/73100830
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Dojo.Torii;
 using TerritoryWars.Bots;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
@@ -175,6 +176,11 @@ namespace TerritoryWars.Dojo
             await CustomSynchronizationMaster.SyncGeneralModels();
             await CustomSynchronizationMaster.SyncPlayer(LocalAccount.Address);
             await CustomSynchronizationMaster.SyncPlayerInProgressGame(LocalAccount.Address);
+            
+            CustomLogger.LogImportant("Try to sync TrophyCreation events");
+            count = await WorldManager.synchronizationMaster.SynchronizeEventEntities(DojoQueries.GetQueryTrophyCreation());
+            CustomLogger.LogImportant($"Synced {count} TrophyCreation events");
+            
             // if player has an in progress game, sync the board with dependencies
             // TODO: remove logic duplication. It's already in SessionManager.Start
             bool hasGame = await CheckGameInProgress();
@@ -187,6 +193,12 @@ namespace TerritoryWars.Dojo
             {
                 //LoadMenu();
             }
+        }
+
+        public async Task SyncEvents()
+        {
+            Query query = DojoQueries.GetQueryTrophyCreation();
+            WorldManager.toriiClient.EventMessages(query, true);
         }
 
         public async Task SyncEverythingForGame()

@@ -158,35 +158,37 @@ namespace TerritoryWars.General
         {
             InitDataStorage();
             
+            CustomLogger.LogDojoLoop("Starting OnChain mode initialization");
+                
+            // 1. Setup Account
+            CustomLogger.LogDojoLoop("Setting up account");
+            await SetupAccountAsync(connection);
+                
+            // 2. Create Burners
+            CustomLogger.LogDojoLoop("Creating burner accounts");
+            await DojoGameManager.CreateBurners();
+
+            CustomLogger.LogDojoLoop("Creating local player");
+            await DojoGameManager.CreateLocalPlayer();
+            //
+            // await CoroutineAsync(() => { }, 2f);
+            //
+            CustomLogger.LogDojoLoop("Creating bot");
+            await DojoGameManager.CreateBot();
+                
+            // 3. Sync Initial Models
+            CustomLogger.LogDojoLoop("Syncing initial models");
+            await DojoGameManager.SyncInitialModels();
+                
+            // 4. Load Game
+            CustomLogger.LogDojoLoop("Checking previous game");
+            DojoGameManager.LoadGame();
+                
+            CustomLogger.LogDojoLoop("Initialization completed successfully");
+            
             try
             {
-                CustomLogger.LogDojoLoop("Starting OnChain mode initialization");
                 
-                // 1. Setup Account
-                CustomLogger.LogDojoLoop("Setting up account");
-                await SetupAccountAsync(connection);
-                
-                // 2. Create Burners
-                CustomLogger.LogDojoLoop("Creating burner accounts");
-                await DojoGameManager.CreateBurners();
-
-                CustomLogger.LogDojoLoop("Creating local player");
-                await DojoGameManager.CreateLocalPlayer();
-                //
-                // await CoroutineAsync(() => { }, 2f);
-                //
-                CustomLogger.LogDojoLoop("Creating bot");
-                await DojoGameManager.CreateBot();
-                
-                // 3. Sync Initial Models
-                CustomLogger.LogDojoLoop("Syncing initial models");
-                await DojoGameManager.SyncInitialModels();
-                
-                // 4. Load Game
-                CustomLogger.LogDojoLoop("Checking previous game");
-                DojoGameManager.LoadGame();
-                
-                CustomLogger.LogDojoLoop("Initialization completed successfully");
             }
             catch (Exception e)
             {

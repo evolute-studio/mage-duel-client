@@ -65,6 +65,24 @@ namespace Dojo
             return entities.Count;
         }
 
+        public async Task<int> SynchronizeEventEntities(Query query)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            var events = await worldManager.wasmClient.EventMessages(query);
+#else
+            var events = await Task.Run(() => worldManager.toriiClient.EventMessages(query));
+#endif
+            
+            var entityGameObjects = new List<GameObject>();
+            foreach (var entity in events)
+            {
+                entityGameObjects.Add(SpawnEntity(entity.HashedKeys, entity.Models.Values.ToArray()));
+            }
+            
+            OnSynchronized?.Invoke(entityGameObjects);
+            return events.Count;
+        }
+
         // Spawn an Entity game object from a dojo.Entity
         private GameObject SpawnEntity(FieldElement hashedKeys, Model[] entityModels)
         {

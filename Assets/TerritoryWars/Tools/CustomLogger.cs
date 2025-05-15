@@ -39,7 +39,7 @@ namespace TerritoryWars.Tools
             {LogType.Important, true},
             {LogType.DojoLoop, true},
             {LogType.Analytics, true},
-            {LogType.Filtering, false},
+            {LogType.Filtering, true},
             
         };
         
