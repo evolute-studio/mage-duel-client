@@ -305,7 +305,6 @@ namespace TerritoryWars.General
             }
             
             gameUI.SetActiveSkipButtonPulse(false);
-            gameUI.JokerButtonPulse(false);
             
             if (CurrentTurnPlayer == LocalPlayer)
             {
@@ -337,7 +336,23 @@ namespace TerritoryWars.General
 
             TileData currentTile = GetNextTile();
             currentTile.OwnerId = LocalPlayer.SideId;
-            TileSelector.StartTilePlacement(currentTile);
+            
+            if (TileSelector.IsExistValidPlacement(currentTile))
+            {
+                TileSelector.StartTilePlacement(currentTile);
+            }
+            else
+            {
+                if (CurrentTurnPlayer.JokerCount > 0)
+                {
+                    gameUI.OnJokerButtonClicked();
+                }
+                else
+                {
+                    gameUI.SetActiveSkipButtonPulse(true);
+                }
+            }
+            
             gameUI.SetActiveDeckContainer(true);
         }
 
