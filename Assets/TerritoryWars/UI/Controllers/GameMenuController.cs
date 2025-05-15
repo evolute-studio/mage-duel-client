@@ -4,14 +4,13 @@ using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using UnityEngine;
 
-public class GameMenuController
+public class GameMenuController : MonoBehaviour
 {
-    private GameMenuView _view;
+    [SerializeField] private GameMenuView _view;
     private GameMenuModel _model;
 
-    public void Initialize(GameMenuView view)
+    public void Awake()
     {
-        _view = view;
         _model = new GameMenuModel();
         _view.Initialize();
         SetupButtons();
