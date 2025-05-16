@@ -47,6 +47,8 @@ namespace TerritoryWars.UI
         [SerializeField] private GameObject[] _toggleJokerInfoGameObjects;
         [SerializeField] private CanvasGroup _deckContainerCanvasGroup;
         [SerializeField] private GameMenuView _gameMenuView;
+        
+        public float disabledDeckAlpha = 0.5f;
 
         [SerializeField] private ResultPopUpUI _resultPopUpUI;
         [FormerlySerializedAs("SessionUI")] [SerializeField] public PlayerInfoUI playerInfoUI;
@@ -212,7 +214,7 @@ namespace TerritoryWars.UI
                 // _togglersCanvasGroup[0].DOFade(1, 0.5f);
                 // _togglersCanvasGroup[1].alpha = 0.5f;
                 // _togglersCanvasGroup[1].DOFade(1, 0.5f);
-                _deckContainerCanvasGroup.alpha = 0.33f;
+                //_deckContainerCanvasGroup.alpha = disabledDeckAlpha;
                 _deckContainerCanvasGroup.DOFade(1, 0.5f);
                 jokerButton.interactable = true;
                 deckButton.interactable = true;
@@ -224,8 +226,8 @@ namespace TerritoryWars.UI
                 // _togglersCanvasGroup[0].DOFade(0.5f, 0.5f);
                 // _togglersCanvasGroup[1].alpha = 1f;
                 // _togglersCanvasGroup[1].DOFade(0.5f, 0.5f);
-                _deckContainerCanvasGroup.alpha = 1;
-                _deckContainerCanvasGroup.DOFade(0.33f, 0.5f);
+                //_deckContainerCanvasGroup.alpha = 1;
+                _deckContainerCanvasGroup.DOFade(disabledDeckAlpha, 0.5f);
                 jokerButton.interactable = false;
                 deckButton.interactable = false;
             }

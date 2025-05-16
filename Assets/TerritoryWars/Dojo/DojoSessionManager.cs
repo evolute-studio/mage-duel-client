@@ -22,7 +22,7 @@ namespace TerritoryWars.Dojo
         public bool IsGameWithBot { get; private set; }
         public bool IsGameWithBotAsPlayer { get; private set; }
 
-        public static float TurnDuration = 60f;
+        public static float TurnDuration = 45f;
         private GeneralAccount _localPlayerAccount => _dojoGameManager.LocalAccount;
         private evolute_duel_Board _localPlayerBoard;
         public int MoveCount => _dojoGameManager.WorldManager.Entities<evolute_duel_Move>().Length;
