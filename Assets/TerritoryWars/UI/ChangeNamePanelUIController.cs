@@ -1,5 +1,6 @@
 using System;
 using TerritoryWars;
+using TerritoryWars.Contracts;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.ModelsDataConverters;
@@ -25,7 +26,7 @@ public class ChangeNamePanelUIController : MonoBehaviour
 
     private void Initialization()
     {
-        MenuUIController.Instance._namePanelController.OnNameChanged.AddListener(NameChanged);
+        MenuUIController.Instance.NamePanelController.OnNameChanged.AddListener(NameChanged);
         _confirmButton.onClick.AddListener(GetNameFromInputField);
         _cancelButton.onClick.AddListener(OnCancelButtonClick);
     }
@@ -33,7 +34,7 @@ public class ChangeNamePanelUIController : MonoBehaviour
     public void SetNamePanelActive(bool active)
     {
         if(active) SetNamePanelControlActive(true);
-        NameInputField.text = MenuUIController.Instance._namePanelController.PlayerNameText.text;
+        NameInputField.text = "";
         NamePanel.SetActive(active);
     }
     
@@ -57,8 +58,9 @@ public class ChangeNamePanelUIController : MonoBehaviour
         {
             //SetNamePanelActive(false);
             DojoConnector.ChangeUsername(
-                DojoGameManager.Instance.LocalBurnerAccount,
+                DojoGameManager.Instance.LocalAccount,
                 CairoFieldsConverter.GetFieldElementFromString(_name));
+            //ControllerContracts.change_username(CairoFieldsConverter.GetFieldElementFromString(_name));
             SetNamePanelControlActive(false);
             evolute_duel_Player profile = DojoGameManager.Instance.GetLocalPlayerData();
             if (profile == null)
@@ -68,7 +70,7 @@ public class ChangeNamePanelUIController : MonoBehaviour
             }
             
             //MenuUIController.Instance._namePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(profile.username));
-            MenuUIController.Instance._namePanelController.SetEvoluteBalance(profile.balance);
+            MenuUIController.Instance.NamePanelController.SetEvoluteBalance(profile.balance);
         }
         else
         {
@@ -78,12 +80,21 @@ public class ChangeNamePanelUIController : MonoBehaviour
     
     private bool IsNameValid()
     {
-        if(_name.Length < 3 || _name.Length > 31)
+        TextMeshProUGUI placeholder = NameInputField.placeholder.GetComponent<TextMeshProUGUI>();
+        if(_name.Length < 3 || _name.Length > 20)
         {
+            placeholder.text = "3-20 characters";
+            NameInputField.text = string.Empty;
             return false;
         }
         if (!System.Text.RegularExpressions.Regex.IsMatch(_name, @"^[a-zA-Z0-9]+$"))
         {
+            placeholder.text = "Only latin letters and numbers";
+            NameInputField.text = string.Empty;
+            return false;
+        }
+        if (_name.StartsWith("Guest")){
+            NameInputField.text = string.Empty;
             return false;
         }
         return true;

@@ -15,25 +15,25 @@ namespace TerritoryWars.Bots
     {
         public override Bot Bot { get; set; }
 
-        private DojoSessionManager _sessionManager
+        private DojoSessionManager DojoSessionManager
         {
             get
             {
                 if (SessionManager.Instance == null) return null;
-                return DojoGameManager.Instance.SessionManager;
+                return DojoGameManager.Instance.DojoSessionManager;
             }
         }
 
-        private int _localId
+        private int SessionSideId
         {
             get
             {
                 if (SessionManager.Instance == null) return -1;
-                return _player.LocalId;
+                return _player.SideId;
             }
         }
         
-        private Character _player 
+        private Player _player 
         {
             get
             {
@@ -222,7 +222,7 @@ namespace TerritoryWars.Bots
                 if (sideType == 'C')
                 {
                     var citySet =
-                        _sessionManager.GetNearSetByPositionAndSide<evolute_duel_CityNode>(
+                        DojoSessionManager.GetNearSetByPositionAndSide<evolute_duel_CityNode>(
                             new Vector2Int(validPlacement.x, validPlacement.y), (Side)i);
                     if (citySet.Key == null || processedCities.Contains(citySet.Key)) continue;
                     cityValue += EvaluateStructure(citySet);
@@ -231,7 +231,7 @@ namespace TerritoryWars.Bots
                 if (sideType == 'R')
                 {
                     var roadSet =
-                        _sessionManager.GetNearSetByPositionAndSide<evolute_duel_RoadNode>(
+                        DojoSessionManager.GetNearSetByPositionAndSide<evolute_duel_RoadNode>(
                             new Vector2Int(validPlacement.x, validPlacement.y), (Side)i);
                     if (roadSet.Key == null || processedRoads.Contains(roadSet.Key)) continue;
                     roadValue += EvaluateStructure(roadSet);
@@ -264,8 +264,8 @@ namespace TerritoryWars.Bots
             int redPoints = structure.GetRedPoints();
             int openEdges = structure.GetOpenEdges();
 
-            int myPoints = _localId == 0 ? bluePoints : redPoints;
-            int enemyPoints = _localId == 0 ? redPoints : bluePoints;
+            int myPoints = SessionSideId == 0 ? bluePoints : redPoints;
+            int enemyPoints = SessionSideId == 0 ? redPoints : bluePoints;
 
             int deltaPoints = myPoints - enemyPoints;
             float result = deltaPoints * POINTS_WEIGHT;

@@ -45,8 +45,8 @@ namespace TerritoryWars.UI
         [SerializeField] private GameObject[] _toggleGameObjects;
         [SerializeField] private GameObject _toggleJokerButton;
         [SerializeField] private GameObject[] _toggleJokerInfoGameObjects;
-        [SerializeField] private CanvasGroup[] _togglersCanvasGroup;
         [SerializeField] private CanvasGroup _deckContainerCanvasGroup;
+        [SerializeField] private GameMenuView _gameMenuView;
 
         [SerializeField] private ResultPopUpUI _resultPopUpUI;
         [FormerlySerializedAs("SessionUI")] [SerializeField] public PlayerInfoUI playerInfoUI;
@@ -70,7 +70,7 @@ namespace TerritoryWars.UI
         
         [SerializeField] private ArrowAnimations arrowAnimations;
         private bool _isJokerActive = false;
-
+        
         public void Initialize()
         {
             _sessionManager = FindObjectOfType<General.SessionManager>();
@@ -118,12 +118,6 @@ namespace TerritoryWars.UI
             {
                 deckButton.onClick.AddListener(OnDeckButtonClicked);
             }
-            
-            if (SaveSnapshotButton != null)
-            {
-                SaveSnapshotText.gameObject.SetActive(false);
-                SaveSnapshotButton.onClick.AddListener(OnSaveSnapshotButtonClicked);
-            }
         }
         
         public void ShowResultPopUp()
@@ -135,7 +129,7 @@ namespace TerritoryWars.UI
                 return;
             }
             _resultPopUpUI.SetPlayersName(_sessionManager.PlayersData[0].username, _sessionManager.PlayersData[1].username);
-            evolute_duel_Board board = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
+            evolute_duel_Board board = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
             int cityScoreBlue = board.blue_score.Item1;
             int cartScoreBlue = board.blue_score.Item2;
             int cityScoreRed = board.red_score.Item1;
@@ -150,7 +144,7 @@ namespace TerritoryWars.UI
             _resultPopUpUI.SetPlayerHeroAnimator(playerInfoUI.charactersObject.GetAnimatorController(PlayerCharactersManager.GetCurrentCharacterId()),
                 playerInfoUI.charactersObject.GetAnimatorController(PlayerCharactersManager.GetOpponentCurrentCharacterId()));
                 
-            bool isLocalPlayerBlue = SessionManager.Instance.LocalPlayer.LocalId == 0;
+            bool isLocalPlayerBlue = SessionManager.Instance.LocalPlayer.SideId == 0;
             string wonText;
             if (score1 > score2 && isLocalPlayerBlue || score1 < score2 && !isLocalPlayerBlue)
                 wonText = "You won!";
@@ -190,27 +184,23 @@ namespace TerritoryWars.UI
             _sessionManager.EndTurn();
             UpdateUI();
             SetActiveDeckContainer(false);
+            SetActiveSkipButtonPulse(false);
         }
         
         private void SkipMoveButtonClicked()
         {
             _sessionManager.ClientLocalPlayerSkip();
             SetActiveSkipButtonPulse(false);
-            JokerButtonPulse(false);
             UpdateUI();
         }
 
         public void SetActiveSkipButtonPulse(bool isActive)
         {
+            _skipButtonTween?.Kill();
+            skipTurnButton.transform.localScale = _skipButtonScale;
             if (isActive)
             {
-                skipTurnButton.transform.localScale = _skipButtonScale;
                 _skipButtonTween = skipTurnButton.transform.DOScale(skipTurnButton.transform.localScale.x * 1.1f, 0.8f).SetLoops(-1, LoopType.Yoyo);
-            }
-            else
-            {
-                _skipButtonTween?.Kill();
-                skipTurnButton.transform.localScale = _skipButtonScale;
             }
         }
         
@@ -272,7 +262,6 @@ namespace TerritoryWars.UI
         {
             if(SessionManager.Instance.CurrentTurnPlayer.JokerCount <= 0 || _isJokerActive || !SessionManager.Instance.IsLocalPlayerTurn) return;
             _isJokerActive = true;
-            JokerButtonPulse(false);
             
             SetJokerMode(true);
             OnJokerButtonClickedEvent?.Invoke();
@@ -316,7 +305,7 @@ namespace TerritoryWars.UI
         {
             SaveSnapshotText.gameObject.SetActive(true);
 
-            DojoGameManager.Instance.SessionManager.CreateSnapshot();
+            DojoGameManager.Instance.DojoSessionManager.CreateSnapshot();
 
             SaveSnapshotText.DOFade(1, 0.2f);
             DOVirtual.DelayedCall(3, () =>
@@ -355,9 +344,12 @@ namespace TerritoryWars.UI
             }
         }
 
-        private void SwitchToggle()
+        public void SetFinishGameUI(bool isActive)
         {
-            
+            SetSkipTurnButtonActive(isActive);
+            _deckContainerCanvasGroup.gameObject.SetActive(isActive);
+            SaveSnapshotButton.gameObject.SetActive(isActive);
+            _sessionManager.sessionUI.SessionTimerUI.SetActiveTimer(isActive);
         }
 
         public void SetJokerButtonActive(bool active)

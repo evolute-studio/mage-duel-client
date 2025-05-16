@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using TerritoryWars.General;
+using TerritoryWars.ModelsDataConverters;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -12,9 +14,11 @@ namespace TerritoryWars.Tile
         public Structure CityStructure;
         public Structure RoadStructure;
         public string id;
-        private char[] sides;
+        public char[] sides;
         public int rotationIndex = 0;
         public int OwnerId = -1;
+        
+        public List<Sprite> HouseSprites = new List<Sprite>();
         
 
         public TileData(string tileCode)
@@ -23,7 +27,7 @@ namespace TerritoryWars.Tile
             UpdateId();
         }
 
-        private void UpdateId()
+        public void UpdateId()
         {
             
             char[] rotatedSides = new char[4];
@@ -70,17 +74,10 @@ namespace TerritoryWars.Tile
             OwnerId = playerId;
             
         }
-        
-        public void RecolorCityStructures()
-        {
-            if (CityStructure == null) return;
-            GameObject city = SessionManager.Instance.Board.GetTileObject(CityStructure.Position.x, CityStructure.Position.y);
-            city.GetComponent<TileGenerator>().RecolorHouses(CityStructure.OwnerId);
-        }
 
         public string GetConfig()
         {
-            return id + ":" + rotationIndex;
+            return id;
         }
         
         public List<Side> GetRoadSides()
@@ -103,12 +100,18 @@ namespace TerritoryWars.Tile
 
         public void SetConfig(string config)
         {
-            string[] parts = config.Split(':');
-            if (parts.Length == 2)
-            {
-                id = parts[0];
-                rotationIndex = int.Parse(parts[1]);
-            }
+            id = config;
+            byte type;
+            (type, rotationIndex) = OnChainBoardDataConverter.GetTypeAndRotation(config);
+            sides = OnChainBoardDataConverter.TileTypes[type].ToCharArray();
+        }
+        
+        public bool IsCityParallel()
+        {
+            int cityCount = id.Count(c => c == 'C');
+            if (cityCount != 2) return false;
+            if ( (id[0] == 'C' && id[2] == 'C') || (id[1] == 'C' && id[3] == 'C')) return true;
+            return false;
         }
 
         public static string GetRotatedConfig(string config, int times = 1)

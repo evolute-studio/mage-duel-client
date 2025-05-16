@@ -1,5 +1,6 @@
 using System;
 using Dojo.Starknet;
+using TerritoryWars.General;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -10,7 +11,7 @@ namespace TerritoryWars.Dojo
         public Game gameSystem;
         [FormerlySerializedAs("gameManagerDojo")] public DojoGameManager dojoGameManager;
         
-        private Account localPlayer => dojoGameManager.LocalBurnerAccount;
+        private GeneralAccount localPlayer => dojoGameManager.LocalAccount;
 
         private string logMessages = "";
         private Vector2 scrollPosition;

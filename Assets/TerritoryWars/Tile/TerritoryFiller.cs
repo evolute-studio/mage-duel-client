@@ -41,13 +41,19 @@ namespace TerritoryWars.Tile
         public LineRenderer lineRenderer;
         private bool isArcSpawned = false;
 
+        private int _currentMask = 0;
+
         [ContextMenu("Place Fence")]
         public void PlaceTerritory(bool isContested)
         {
             if (fencePrefab == null || lineRenderer == null || lineRenderer.positionCount < 2)
             {
-                
                 return;
+            }
+
+            if (currentTerritory != null)
+            {
+                _currentMask = currentTerritory.gameObject.layer;
             }
 
             while (transform.childCount > 0)
@@ -82,6 +88,7 @@ namespace TerritoryWars.Tile
             }
             
             currentTerritory = Instantiate(territoryPrefab, transform).GetComponent<Territory>();
+            currentTerritory.gameObject.layer = _currentMask;
             TerritorySpriteRenderer = currentTerritory.GetComponent<SpriteRenderer>();
             currentTerritory.SetLineRenderer(lineRenderer);
             currentTerritory.GenerateMask();
@@ -121,43 +128,6 @@ namespace TerritoryWars.Tile
             polygonCollider.gameObject.tag = "City";
 
            
-        }
-
-        private IEnumerator PlaceFenceSegmentRoutine(Vector3 start, Vector3 end)
-        {
-            Vector2 direction = (end - start).normalized;
-
-            if (float.IsNaN(direction.x) || float.IsNaN(direction.y))
-            {
-                Debug.LogError($"Invalid direction: {direction}, start: {start}, end: {end}");
-                yield break;
-            }
-            
-            int spriteIndex = GetIsometricDirectionIndex(direction);
-            float distance = Vector2.Distance(start, end);
-
-            int fenceCount = Mathf.FloorToInt(distance / fenceWidth);
-            if (fenceCount < 1) fenceCount = 1;
-
-            float actualSpacing = distance / fenceCount;
-
-            for (int i = 0; i < fenceCount; i++)
-            {
-                float t = (i + 0.5f) / fenceCount;
-                Vector3 localPosition = Vector3.Lerp(start, end, t);
-
-                GameObject fence = Instantiate(fencePrefab, transform);
-                fence.transform.localPosition = new Vector3(localPosition.x, localPosition.y, 0);
-                fence.transform.position += transform.position;
-
-                var spriteRenderer = fence.GetComponent<SpriteRenderer>();
-                if (spriteRenderer != null)
-                {
-                    spriteRenderer.sprite = GetFenceSprite(spriteIndex);
-                }
-
-                yield return new WaitForSeconds(spawnDelay);
-            }
         }
 
         private int GetIsometricDirectionIndex(Vector2 direction)

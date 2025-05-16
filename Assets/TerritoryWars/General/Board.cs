@@ -7,7 +7,9 @@ using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.ScriptablesObjects;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
+using TerritoryWars.UI;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 namespace TerritoryWars.General
 {
@@ -50,7 +52,7 @@ namespace TerritoryWars.General
         [SerializeField] private int width = 10;
         [SerializeField] private int height = 10;
         [SerializeField] private GameObject tilePrefab;
-        [SerializeField] private static float tileSpacing = 0.63f;
+        [SerializeField] private static float tileSpacing = 0.965f;
 
         private GameObject[,] tileObjects;
         private TileData[,] tileData;
@@ -63,15 +65,10 @@ namespace TerritoryWars.General
         public void Initialize()
         {
             InitializeBoard();
-            var onChainBoard = DojoGameManager.Instance.SessionManager.LocalPlayerBoard;
+            var onChainBoard = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
             char[] edgeTiles = OnChainBoardDataConverter.GetInitialEdgeState(onChainBoard.initial_edge_state);
             CreateBorder(edgeTiles);
-
-        }
-
-        public void OnDestroy()
-        {
-            
+            SessionManager.Instance.CloudsController.SetMountains(GetMountains());
         }
 
         private void InitializeBoard()
@@ -160,11 +157,28 @@ namespace TerritoryWars.General
                 // Place mountains at start and end positions
                 PlaceTile(new TileData(fieldTile), startPos.x, startPos.y, -1);
                 // Don't place forests, only mountains at other corners
-                tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = tileAssets.GetRandomMountain();
+                GameObject mountain;
+                if (IsSnowBoardPart(startPos.x, startPos.y))
+                {
+                    mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
+                        tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer"));
+                }
+                else
+                {
+                    mountain = Instantiate(PrefabsManager.Instance.GetRandomMountainTile(),
+                        tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer"));
+                }
+
+                foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                {
+                    mountainSprite.sortingOrder = 14;
+                }
                 if (swapOrderLayer)
                 {
-                    tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer")
-                        .GetComponent<SpriteRenderer>().sortingOrder = 20;
+                    foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                    {
+                        mountainSprite.sortingOrder = 14; // 20
+                    }
                 }
 
                 tileObjects[startPos.x, startPos.y].GetComponentsInChildren<TileParts>().ToList().ForEach(
@@ -172,6 +186,8 @@ namespace TerritoryWars.General
                     {
                         renderer.Enviroment.SetActive(false);
                     });
+                
+                tileObjects[startPos.x, startPos.y].GetComponentInChildren<TileParts>().HideForestAreas();
             }
 
             if (endPos != new Vector2Int(9, 0) && endPos != new Vector2Int(0, 9))
@@ -179,17 +195,35 @@ namespace TerritoryWars.General
                 if(GetTileObject(endPos.x, endPos.y) != null)
                     Destroy(GetTileObject(endPos.x, endPos.y));
                 PlaceTile(new TileData(fieldTile), endPos.x, endPos.y, -1);
-                tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = tileAssets.GetRandomMountain();
+                GameObject mountain;
+                if (IsSnowBoardPart(endPos.x, endPos.y))
+                {
+                    mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
+                        tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer"));
+                }
+                else
+                {
+                    mountain = Instantiate(PrefabsManager.Instance.GetRandomMountainTile(),
+                        tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer"));
+                }
+
+                foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                {
+                    mountainSprite.sortingOrder = 14;
+                }
                 if (swapOrderLayer)
                 {
-                    tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer")
-                        .GetComponent<SpriteRenderer>().sortingOrder = 20;
+                    foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                    {
+                        mountainSprite.sortingOrder = 14; // 20
+                    }
                 }
                 tileObjects[endPos.x, endPos.y].GetComponentsInChildren<TileParts>().ToList().ForEach(
-                    renderer =>
+                    renderer => 
                     {
                         renderer.Enviroment.SetActive(false);
                     });
+                tileObjects[endPos.x, endPos.y].GetComponentInChildren<TileParts>().HideForestAreas();
             }
 
             for (int i = 0; i < availablePositions.Count; i++)
@@ -198,12 +232,41 @@ namespace TerritoryWars.General
                 PlaceTile(tile, availablePositions[i].x, availablePositions[i].y, -1);
                 if (tilesToSpawn[i] == fieldTile)
                 {
-                    tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer").GetComponent<SpriteRenderer>().sprite = tileAssets.GetRandomMountain();
+                    tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer")
+                            .GetComponent<SpriteRenderer>().sprite
+                        = null;
+                    
+                    GameObject mountain;
+                    if (IsSnowBoardPart(availablePositions[i].x, availablePositions[i].y))
+                    {
+                        mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
+                            tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer"));
+                    }
+                    else
+                    {
+                        mountain = Instantiate(PrefabsManager.Instance.GetRandomMountainTile(),
+                            tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer"));
+                    }
+
+                    foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                    {
+                        mountainSprite.sortingOrder = 14;
+                    }
                     if (swapOrderLayer)
                     {
-                        tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer")
-                            .GetComponent<SpriteRenderer>().sortingOrder = 20;
+                        foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+                        {
+                            mountainSprite.sortingOrder = 14; // 20
+                        }
                     }
+                    TileParts tileParts = tileObjects[availablePositions[i].x, availablePositions[i].y]
+                        .GetComponentInChildren<TileParts>();
+                    foreach (var area in tileParts.Areas)
+                    {
+                        if (area == null) continue;
+                        Destroy(area.gameObject);
+                    }
+                    tileParts.Areas.Clear();
                 }
                 else if (tilesToSpawn[i] == roadTile)
                 {
@@ -256,6 +319,7 @@ namespace TerritoryWars.General
         
         public bool PlaceTile(TileData data, int x, int y, int ownerId)
         {
+            CustomLogger.LogImportant($"Placing tile {data.id} and sides {data.sides[0]}{data.sides[1]}{data.sides[2]}{data.sides[3]} at {x}, {y}");
             // if (!CanPlaceTile(data, x, y))
             // {
             //     CustomLogger.LogWarning($"Can't place tile {data.id} at {x}, {y}");
@@ -279,6 +343,42 @@ namespace TerritoryWars.General
             }
 
             return true;
+        }
+        
+        public void FloatingTextAnimation(Vector2Int position)
+        {
+            GameObject gameObject = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
+            TileData tileData = SessionManager.Instance.Board.GetTileData(position.x, position.y);
+            TileParts tileParts = gameObject.GetComponentInChildren<TileParts>();
+            TileGenerator tileGenerator = gameObject.GetComponent<TileGenerator>();
+            int playerId = SessionManager.Instance.CurrentTurnPlayer.SideId;
+            playerId = SetLocalPlayerData.GetLocalIndex(playerId);
+            string side = playerId == 0 ? "blue" : "red";
+            Vector3 motion = new Vector3(0, 0.3f, 0);
+                    
+            foreach (var house in tileParts.Houses)
+            {
+                float duration = 2f + UnityEngine.Random.Range(0f, 1f);
+                Vector3 textPosition = house.HouseSpriteRenderer.transform.position;
+                FloatingTextManager.Instance.Show("+1", textPosition, motion, duration, "house_icon_" + side);
+            }
+            foreach (var pin in tileGenerator.Pins)
+            {
+                if(pin == null) continue;
+                float duration = 2f + UnityEngine.Random.Range(0f, 1f);
+                Vector3 textPosition = pin.transform.position;
+                int cityCount = tileData.id.Count(c => c == 'R');
+                string messageText = cityCount == 2 ? "+2" : "+1";
+                FloatingTextManager.Instance.Show(messageText, textPosition, motion, duration, "road_icon_" + side);
+                if(cityCount == 2) break;
+            }
+        }
+
+        public void ScoreClientPrediction(int playerIndex, TileData data)
+        {
+            if(!SessionManager.Instance.IsLocalPlayerTurn) return;
+            SessionManager.Instance.gameUI.playerInfoUI.AddClientCityScore(playerIndex, data.id.Count(c => c == 'C') * 2);
+            SessionManager.Instance.gameUI.playerInfoUI.AddClientRoadScore(playerIndex, data.id.Count(r => r == 'R'));
         }
 
         public bool RevertTile(int x, int y)
@@ -312,6 +412,13 @@ namespace TerritoryWars.General
             }
         }
 
+        public void ConnectEdgeStructureAnimation(int ownerId, TileData tileData, int x, int y, bool isCityContest = false, bool isRoadContest = false)
+        {
+            if(isCityContest || isRoadContest || SessionManager.Instance.IsSessionStarting) return;
+            FloatingTextAnimation(new Vector2Int(x, y));
+            ScoreClientPrediction(ownerId, tileData);
+        }
+
         private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false, bool isRoadContest = false)
         {
             GameObject[] neighborsGO = new GameObject[4];
@@ -337,23 +444,12 @@ namespace TerritoryWars.General
             {
                 if(IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
-                    if (neighborsGO[i].GetComponentInChildren<MineTile>() && isRoadContest)
-                    {
-                        MineTile mineTile = neighborsGO[i].GetComponentInChildren<MineTile>();
-                        
-                        mineTile.MineRoad.sprite = 
-                            PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(mineTile.MineRoad
-                                .sprite);
-                    }
-
+                    ConnectEdgeStructureAnimation(owner, neighborsData[i], tilePositions[i][0], tilePositions[i][1], isCityContest, isRoadContest);
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
                     {
-                        foreach (var renderer in tileGenerator.houseRenderers)
-                        {
-                            //renderer.sprite = tileAssets.GetHouseByReference(renderer.sprite, owner);
-                            tileGenerator.RecolorHouses(owner, isCityContest);
-                        }
+                        (_, byte rotation) = OnChainBoardDataConverter.GetTypeAndRotation(neighborsData[i].id);
+                        tileGenerator.RecolorHouses(owner, isCityContest, rotation);
                     }
 
                     if (type == StructureType.All || type == StructureType.Road)
@@ -388,6 +484,16 @@ namespace TerritoryWars.General
                 }
             }
         }
+        
+        public bool IsSnowBoardPart(int x, int y)
+        {
+            if (x > 4 & y > 4)
+            {
+                return true; // snow mountain
+            }
+
+            return false;
+        }
 
         public Vector2Int GetEdgeNeighbors(int x, int y, Side side)
         {
@@ -413,6 +519,20 @@ namespace TerritoryWars.General
                     List<Side> sides = CheckCityTileSidesToEmpty(x, y);
                     tileGenerator.FencePlacerForCloserToBorderCity(sides);
                 }
+            }
+        }
+
+        public void CloseCityStructure(byte root)
+        {
+            var city = DojoGameManager.Instance.DojoSessionManager.GetCityByPosition(root);
+
+            foreach (var node in city.Value)
+            {
+                Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
+                GameObject tile = GetTileObject(position.x, position.y);
+                if (tile == null || !tile.TryGetComponent(out TileGenerator tileGenerator)) continue;
+                List<Side> sides = CheckCityTileSidesToEmpty(position.x, position.y);
+                tileGenerator.FencePlacerForCloserToBorderCity(sides);
             }
         }
 
@@ -458,6 +578,44 @@ namespace TerritoryWars.General
             if (GetTileData(x, y + 1) == null) { closerSides.Add(Side.Left); }
 
             return closerSides;
+        }
+
+        public List<GameObject> GetMountains()
+        {
+            List<GameObject> mountains = new List<GameObject>();
+            
+            for (int i = 0; i < 10; i++)
+            {
+                if (tileData[i, 0].id == "FFFF" && !mountains.Contains(tileObjects[i, 1]))
+                {
+                    mountains.Add(tileObjects[i, 0]);
+                }
+            }
+            
+            for (int i = 0; i < 10; i++)
+            {
+                if (tileData[9, i].id == "FFFF" && !mountains.Contains(tileObjects[9, i]))
+                {
+                    mountains.Add(tileObjects[9, i]);
+                }
+            }
+
+            for (int i = 9; i >= 0 ; i--)
+            {
+                if (tileData[i, 9].id == "FFFF" && !mountains.Contains(tileObjects[i, 9]))
+                {
+                    mountains.Add(tileObjects[i, 9]);
+                }
+            }
+            
+            for (int i = 9; i >= 0 ; i--)
+            {
+                if (tileData[0, i].id == "FFFF" && !mountains.Contains(tileObjects[0, i]))
+                {
+                    mountains.Add(tileObjects[0, i]);
+                }
+            }
+            return mountains;
         }
         
         public List<MineTileInfo> CheckRoadTileSidesToBorder(int x, int y)
@@ -937,5 +1095,22 @@ namespace TerritoryWars.General
             public Vector2Int TileBoardPosition;
             public Side Direction;
         }
+
+        // public void OnGUI()
+        // {
+        //     for (int x = 0; x < width; x++)
+        //     {
+        //         for (int y = 0; y < height; y++)
+        //         {
+        //             if (tileObjects[x, y] != null && tileData[x, y] != null)
+        //             {
+        //                 Vector3 screenPos = Camera.main.WorldToScreenPoint(tileObjects[x, y].transform.position);
+        //                 screenPos.y = Screen.height - screenPos.y; // Конвертуємо Y координату для GUI
+        //                 
+        //                 GUI.Label(new Rect(screenPos.x - 20, screenPos.y - 10, 100, 20), tileData[x, y].id);
+        //             }
+        //         }
+        //     }
+        // }
     }
 }

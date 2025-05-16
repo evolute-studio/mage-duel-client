@@ -69,7 +69,7 @@ namespace TerritoryWars.UI.Popups
                 SecondOptionText = "Cancel game",
                 SecondOptionAction = () =>
                 {
-                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount);
                     CustomSceneManager.Instance.LoadLobby();
                 }
             };
@@ -88,7 +88,7 @@ namespace TerritoryWars.UI.Popups
                 SecondOptionText = "Cancel game",
                 SecondOptionAction = () =>
                 {
-                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount);
                     CustomSceneManager.Instance.LoadLobby();
                 }
             };
@@ -107,7 +107,7 @@ namespace TerritoryWars.UI.Popups
                 SecondOptionText = "Cancel game",
                 SecondOptionAction = () =>
                 {
-                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+                    DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount);
                     CustomSceneManager.Instance.LoadLobby();
                 }
             };

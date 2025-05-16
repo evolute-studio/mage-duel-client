@@ -21,7 +21,7 @@ namespace TerritoryWars.UI
 
         private void CancelGame()
         {
-            DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount);
+            DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount);
             CustomSceneManager.Instance.LoadLobby();
         }
         

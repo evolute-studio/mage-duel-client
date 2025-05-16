@@ -14,8 +14,13 @@ namespace Dojo
         public string rpcUrl = "http://localhost:8080";
         public string relayUrl = "/ip4/127.0.0.1/tcp/9090";
         public string relayWebrtcUrl;
+        [Header("Contracts")]
+        public string gameAddress = "0x0";
+        public string playerProfileActionsAddress = "0x0";
         [Header("World")]
         public FieldElement worldAddress;
         public Query query = new Query();
+        public int SlotDataVersion = 18;
+        
     }
 }

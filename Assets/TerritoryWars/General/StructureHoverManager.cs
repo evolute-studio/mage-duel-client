@@ -3,6 +3,7 @@ using System.Numerics;
 using TerritoryWars.Dojo;
 using TerritoryWars.Models;
 using TerritoryWars.ModelsDataConverters;
+using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using UnityEngine;
@@ -14,6 +15,7 @@ namespace TerritoryWars.General
 {
     public class StructureHoverManager : MonoBehaviour
     {
+        public bool IsGameFinished = false;
         public Transform Canvas;
         public RawImage FillImage;
         public RawImage OutlineImage;
@@ -38,8 +40,11 @@ namespace TerritoryWars.General
         
         public void Update()
         {
-            HandleTileHover();
-            UpdateInfoPanel();
+            if (!IsGameFinished)
+            {
+                HandleTileHover();
+                UpdateInfoPanel();
+            }
         }
         
         private void HandleTileHover()
@@ -126,7 +131,7 @@ namespace TerritoryWars.General
                 (tilePosition, _) = board.GetNeighborPositionAndSideToEdgeTile(tilePosition.x, tilePosition.y);
             }
             if(tilePosition == new Vector2Int(-1, -1)) return;
-            var cityDict = DojoGameManager.Instance.SessionManager.GetCityByPosition(tilePosition);
+            var cityDict = DojoGameManager.Instance.DojoSessionManager.GetCityByPosition(tilePosition);
             if (cityDict.Key == null) return;
             _structureRoot = cityDict.Key;
             foreach (var city in cityDict.Value)
@@ -164,7 +169,7 @@ namespace TerritoryWars.General
             
             byte rootPosition = OnChainBoardDataConverter.GetRootByPositionAndSide(tilePosition, hoveredSide);
             
-            var roadDict = DojoGameManager.Instance.SessionManager.GetRoadByPosition(rootPosition);
+            var roadDict = DojoGameManager.Instance.DojoSessionManager.GetRoadByPosition(rootPosition);
             if (roadDict.Key == null) return;
             _structureRoot = roadDict.Key;
             foreach (var road in roadDict.Value)
@@ -217,6 +222,82 @@ namespace TerritoryWars.General
             }
             isHovered = true;
             CursorManager.Instance.SetCursor("pointer");
+        }
+
+        public HashSet<KeyValuePair<TileParts, Side>> GetRoadTilePartsForHighlight(Transform tileParent, TileParts tileParts, byte rootPosition = 0)
+        {
+            Board board = SessionManager.Instance.Board;
+            HashSet<KeyValuePair<TileParts, Side>> roadTileParts = new HashSet<KeyValuePair<TileParts, Side>>();
+            HashSet<KeyValuePair<Vector2Int, Side>> hoveredTiles = new HashSet<KeyValuePair<Vector2Int, Side>>();
+            
+            var roadDict = DojoGameManager.Instance.DojoSessionManager.GetRoadByPosition(rootPosition);
+            if (roadDict.Key == null) return new HashSet<KeyValuePair<TileParts, Side>>();
+            foreach (var road in roadDict.Value)
+            {
+                (Vector2Int structurePosition, Side side) = OnChainBoardDataConverter.GetPositionAndSide(road.position);
+                KeyValuePair<Vector2Int, Side> keyValuePair = new KeyValuePair<Vector2Int, Side>(structurePosition, side);
+                if (hoveredTiles.Contains(keyValuePair)) continue;
+                
+                hoveredTiles.Add(keyValuePair);
+                Vector2Int edgeTile = board.GetEdgeNeighbors(structurePosition.x, structurePosition.y, side);
+                if(edgeTile == new Vector2Int(-1, -1)) continue;
+                KeyValuePair<Vector2Int, Side> edgeKeyValuePair = new KeyValuePair<Vector2Int, Side>(edgeTile, board.GetOppositeSide(side));
+                if (hoveredTiles.Contains(edgeKeyValuePair)) continue;
+                hoveredTiles.Add(edgeKeyValuePair);
+            }
+
+            foreach (var hoveredTile in hoveredTiles)
+            {
+                GameObject tile = board.GetTileObject(hoveredTile.Key.x, hoveredTile.Key.y);
+                if (tile != null)
+                {
+                    KeyValuePair<TileParts, Side> tilePart = new KeyValuePair<TileParts, Side>(tile.GetComponentInChildren<TileParts>(), hoveredTile.Value);
+                    roadTileParts.Add(tilePart);
+                }
+            }
+            
+            return roadTileParts;
+        }
+
+        public List<TileParts> GetCityTilePartsForHighlight(Transform tileParent)
+        {
+            Board board = SessionManager.Instance.Board;
+            List<TileParts> cityTileParts = new List<TileParts>();
+            HashSet<KeyValuePair<Vector2Int, Side>> hoveredTiles = new HashSet<KeyValuePair<Vector2Int, Side>>();
+            
+            Vector2Int position = board.GetPositionByObject(tileParent.gameObject);
+            if (board.IsEdgeTile(position.x, position.y))
+            {
+                (position, _) = board.GetNeighborPositionAndSideToEdgeTile(position.x, position.y);
+            }
+            
+            if(position == new Vector2Int(-1, -1)) return new List<TileParts>();
+            var cityDict = DojoGameManager.Instance.DojoSessionManager.GetCityByPosition(position);
+            if (cityDict.Key == null) return new List<TileParts>();
+            foreach (var city in cityDict.Value)
+            {
+                (Vector2Int structurePosition, Side side) = OnChainBoardDataConverter.GetPositionAndSide(city.position);
+                KeyValuePair<Vector2Int, Side> keyValuePair = new KeyValuePair<Vector2Int, Side>(structurePosition, side);
+                if (hoveredTiles.Contains(keyValuePair)) continue;
+                
+                hoveredTiles.Add(keyValuePair);
+                Vector2Int edgeTile = board.GetEdgeNeighbors(structurePosition.x, structurePosition.y, side);
+                if(edgeTile == new Vector2Int(-1, -1)) continue;
+                KeyValuePair<Vector2Int, Side> edgeKeyValuePair = new KeyValuePair<Vector2Int, Side>(edgeTile, side);
+                if (hoveredTiles.Contains(edgeKeyValuePair)) continue;
+                hoveredTiles.Add(edgeKeyValuePair);
+            }
+
+            foreach (var hoveredTile in hoveredTiles)
+            {
+                GameObject tile = board.GetTileObject(hoveredTile.Key.x, hoveredTile.Key.y);
+                if (tile != null)
+                {
+                    cityTileParts.Add(tile.GetComponentInChildren<TileParts>());
+                }
+            }
+            
+            return cityTileParts;
         }
 
         private void HoverExit()

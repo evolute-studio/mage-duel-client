@@ -11,13 +11,13 @@ namespace TerritoryWars.General
         {
             get
             {
-                bool isLocalBurnerAccountExist = DojoGameManager.Instance.LocalBurnerAccount != null;
+                bool isLocalBurnerAccountExist = DojoGameManager.Instance.LocalAccount != null;
                 if (!isLocalBurnerAccountExist)
                     return 0;
-                bool isPlayerDataExist = DojoGameManager.Instance.GetPlayerData(DojoGameManager.Instance.LocalBurnerAccount.Address.Hex()) != null;
+                bool isPlayerDataExist = DojoGameManager.Instance.GetPlayerData(DojoGameManager.Instance.LocalAccount.Address.Hex()) != null;
                 if (!isPlayerDataExist)
                     return 0;
-                return DojoGameManager.Instance.GetPlayerData(DojoGameManager.Instance.LocalBurnerAccount.Address.Hex())
+                return DojoGameManager.Instance.GetPlayerData(DojoGameManager.Instance.LocalAccount.Address.Hex())
                     .active_skin;
             }
         }

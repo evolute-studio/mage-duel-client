@@ -24,7 +24,11 @@ namespace TerritoryWars.Editor
                 tileRotator.RotateClockwise();
                 EditorUtility.SetDirty(target);
             }
-            
+            // if (GUILayout.Button("Rotate LineRenderer"))
+            // {
+            //     tileRotator.RotateLineRenderer();
+            //     EditorUtility.SetDirty(target);
+            // }
             EditorGUILayout.EndVertical();
         }
     }

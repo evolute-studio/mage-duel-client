@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TerritoryWars.Dojo;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
+using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using Random = UnityEngine.Random;
 
@@ -11,13 +13,13 @@ namespace TerritoryWars.General
     public class JokerManager
     {
         private SessionManager _sessionManager;
-        private Character[] Players => _sessionManager.Players;
-        private Character CurrentTurnPlayer => _sessionManager.CurrentTurnPlayer;
+        private Player[] Players => _sessionManager.Players;
+        private Player CurrentTurnPlayer => _sessionManager.CurrentTurnPlayer;
         private Board Board => _sessionManager.Board;
         
         private bool isJokerActive = false;
         
-        private Dictionary<(int, int), string[]> _cachedCombinations = new Dictionary<(int, int), string[]>();
+        private Dictionary<(int, int, int), string[]> _cachedCombinations = new Dictionary<(int, int, int), string[]>();
         private Dictionary<(int, int), int> _currentCombinationIndex = new Dictionary<(int, int), int>();
         
         public bool IsJokerActive => isJokerActive;
@@ -28,17 +30,17 @@ namespace TerritoryWars.General
         }
         public void Initialize(evolute_duel_Board board)
         {
-            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
+            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.SideId);
             SetJokersCount(0, board.player1.Item3);
             SetJokersCount(1, board.player2.Item3);
         }
         
          public void ActivateJoker()
         {
-            if (Players[CurrentTurnPlayer.LocalId].JokerCount > 0)
+            if (Players[CurrentTurnPlayer.SideId].JokerCount > 0)
             {
                 isJokerActive = true;
-                Players[CurrentTurnPlayer.LocalId].JokerCount--;
+                Players[CurrentTurnPlayer.SideId].JokerCount--;
                 _sessionManager.TileSelector.StartJokerPlacement();
             }
         }
@@ -46,19 +48,20 @@ namespace TerritoryWars.General
         public void DeactivateJoker()
         {
             isJokerActive = false;
-            Players[CurrentTurnPlayer.LocalId].JokerCount++;
+            Players[CurrentTurnPlayer.SideId].JokerCount++;
             GameUI.Instance.UpdateUI();
         }
         
         public TileData GetGenerateJokerTile(int x, int y)
         {
-            if (!_cachedCombinations.ContainsKey((x, y)))
+            int moveNumber = DojoGameManager.Instance.DojoSessionManager.MoveCount;
+            if (!_cachedCombinations.ContainsKey((x, y, moveNumber)))
             {
-                _cachedCombinations[(x, y)] = GenerateAllCombinations(x, y);
+                _cachedCombinations[(x, y, moveNumber)] = GenerateAllCombinations(x, y);
                 _currentCombinationIndex[(x, y)] = 0;
             }
             
-            string[] possibleCombinations = _cachedCombinations[(x, y)];
+            string[] possibleCombinations = _cachedCombinations[(x, y, moveNumber)];
             
             if (!_currentCombinationIndex.ContainsKey((x, y)))
             {
@@ -71,6 +74,7 @@ namespace TerritoryWars.General
             _currentCombinationIndex[(x, y)] = (currentIndex + 1) % possibleCombinations.Length;
             
             TileData jokerTile = new TileData(tileConfig);
+            CustomLogger.LogImportant("Joker tile generated: " + jokerTile.id);
             return jokerTile;
         }
 
@@ -87,7 +91,12 @@ namespace TerritoryWars.General
         public string[] GenerateAllCombinations(int x, int y)
         {
             Dictionary<Side, LandscapeType> neighborSides = GetNeighborSides(x, y);
-            
+            string log = "Position: " + x + ", " + y + "\n";
+            foreach (var side in neighborSides)
+            {
+                log += $"{side.Key}: {side.Value}, ";
+            }
+            CustomLogger.LogImportant(log);
             char[] template = new char[4];
             bool[] fixedSides = new bool[4];
             bool[] universalSides = new bool[4];
@@ -195,7 +204,7 @@ namespace TerritoryWars.General
         
         public bool CanUseJoker()
         {
-            int characterId = CurrentTurnPlayer == null ? 0 : CurrentTurnPlayer.LocalId;
+            int characterId = CurrentTurnPlayer == null ? 0 : CurrentTurnPlayer.SideId;
             return !isJokerActive && Players[characterId].JokerCount > 0;
         }
 
@@ -209,7 +218,7 @@ namespace TerritoryWars.General
         public void SetJokersCount(int playerId, int count)
         {
             GameUI.Instance.playerInfoUI.SetJokersCount(playerId, count);
-            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.LocalId);
+            GameUI.Instance.playerInfoUI.ShowPlayerJokerCount(_sessionManager.LocalPlayer.SideId);
         }
     }
 }

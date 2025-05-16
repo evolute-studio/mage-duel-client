@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TerritoryWars;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
+using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
 using UnityEngine;
@@ -21,6 +22,7 @@ public class NamePanelController : MonoBehaviour
     public TextMeshProUGUI PlayerNameText;
     public TextMeshProUGUI EvoluteCountText;
     public Button ChangeNameButton;
+    public Image ControllerIcon;
     
     private bool _isInitialized = false;
     
@@ -42,35 +44,38 @@ public class NamePanelController : MonoBehaviour
         evolute_duel_Player profile = DojoGameManager.Instance.GetLocalPlayerData();
         if(profile == null)
         {
-            CustomLogger.LogWarning("Player profile is null");
-            
-            string defaultName = DojoGameManager.Instance.LocalBurnerAccount.Address.Hex().Substring(0, 10);
-            DojoConnector.ChangeUsername(
-                DojoGameManager.Instance.LocalBurnerAccount,
-                CairoFieldsConverter.GetFieldElementFromString(defaultName));
-            SetName(defaultName);
-            SetEvoluteBalance(0);
+            CreateModelForNewPlayer();
             return;
+        }
+        string name = CairoFieldsConverter.GetStringFromFieldElement(profile.username);
+        SetName(name);
+        SetEvoluteBalance(profile.balance);
+        ControllerIcon.gameObject.SetActive(ApplicationState.IsController);
+    }
+
+    private void CreateModelForNewPlayer()
+    {
+        CustomLogger.LogWarning("Player profile is null");
+        string username;
+        if (ApplicationState.IsController)
+        {
+            username = WrapperConnector.instance.username;
         }
         else
         {
-            string name = CairoFieldsConverter.GetStringFromFieldElement(profile.username);
-            SetName(name);
-            SetEvoluteBalance(profile.balance);
-            //DojoGameManager.Instance.WorldManager.synchronizationMaster.OnSynchronized.RemoveListener(Initialize);
+            username = "Guest" + DojoGameManager.Instance.LocalAccount.Address.Hex().Substring(0, 9);
         }
-        
-    }
-
-    public void CallChangeNamePanel()
-    {
-        ChangeNamePanel.SetActive(true);
+        DojoConnector.ChangeUsername(
+            DojoGameManager.Instance.LocalAccount,
+            CairoFieldsConverter.GetFieldElementFromString(username));
+        SetName(username);
+        SetEvoluteBalance(0);
     }
 
     public bool IsDefaultName()
     {
         // default name starts with "0x"
-        return PlayerNameText.text.StartsWith("0x");
+        return PlayerNameText.text.StartsWith("Guest");
     }
     
     public void SetName(string name)
@@ -82,6 +87,7 @@ public class NamePanelController : MonoBehaviour
     public void SetEvoluteBalance(int value)
     {
         EvoluteBalance = value;
-        EvoluteCountText.text = " x " + value.ToString();
+        EvoluteCountText.text = value.ToString();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(EvoluteCountText.rectTransform);
     }
 }

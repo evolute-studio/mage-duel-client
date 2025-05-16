@@ -129,8 +129,13 @@ namespace TerritoryWars.General
             currentTile = tile;
             gameUI.UpdateUI();
             tilePreview.UpdatePreview(tile);
+            currentTile.HouseSprites.AddRange(tilePreview.HouseSprites);
         }
-
+        public bool IsExistValidPlacement(TileData tile)
+        {
+            return board.GetValidPlacements(tile).Count > 0;
+        }
+        
         public void StartTilePlacement(TileData tile)
         {
             GameUI.Instance.SetEndTurnButtonActive(false);
@@ -142,18 +147,6 @@ namespace TerritoryWars.General
             selectedPosition = null;
 
             _currentValidPlacements = board.GetValidPlacements(currentTile);
-            if (_currentValidPlacements.Count == 0)
-            {
-                if (SessionManager.Instance.CurrentTurnPlayer.JokerCount > 0)
-                {
-                    gameUI.JokerButtonPulse(true);
-                }
-                
-                gameUI.SetActiveSkipButtonPulse(true);
-                // EndTilePlacement();
-                return;
-            }
-            
 
             ShowPossiblePlacements(_currentValidPlacements);
             gameUI.SetEndTurnButtonActive(false);
@@ -424,24 +417,7 @@ namespace TerritoryWars.General
 
             gameUI.SetRotateButtonActive(false);
 
-            tilePreview.PlaceTile(CompleteTilePlacement);
-        }
-
-        public void PlaceTile(TileData tileData, ValidPlacement validPlacement, int playerId)
-        {
-            // first check if it is possible to place the tile
-            bool isPossible = board.CanPlaceTile(tileData, validPlacement.x, validPlacement.y);
-            if (!isPossible)
-            {
-                CustomLogger.LogWarning($"TileSelector: PlaceTile: Can't place tile. Config: {tileData.id} " +
-                                        $"Position: {validPlacement.x} {validPlacement.y}");
-                return;
-            }
-
-            tilePreview.PlaceTile( () =>
-            {
-                board.PlaceTile(currentTile, validPlacement.x, validPlacement.y, playerId);
-            });
+            tilePreview.PlaceTile(SessionManager.Instance.CurrentTurnPlayer.SideId, currentTile, CompleteTilePlacement);
         }
 
         public void CompleteTilePlacement()
@@ -449,11 +425,11 @@ namespace TerritoryWars.General
             try
             {
                 if (!selectedPosition.HasValue) return;
-
+                
                 if (board.PlaceTile(currentTile, selectedPosition.Value.x, selectedPosition.Value.y,
-                        SessionManager.Instance.CurrentTurnPlayer.LocalId))
+                        SessionManager.Instance.CurrentTurnPlayer.SideId))
                 {
-                    DojoGameManager.Instance.SessionManager.MakeMove(currentTile, selectedPosition.Value.x, selectedPosition.Value.y, isJokerMode);
+                    DojoGameManager.Instance.DojoSessionManager.MakeMove(currentTile, selectedPosition.Value.x, selectedPosition.Value.y, isJokerMode);
                     LastMove = (currentTile, selectedPosition.Value);
                     isPlacingTile = false;
                     if(isJokerMode) 
@@ -461,13 +437,13 @@ namespace TerritoryWars.General
                         SessionManager.Instance.JokerManager.CompleteJokerPlacement();
                     }
                     isJokerMode = false;
-                    selectedPosition = null;
                     jokerPosition = null;
                     ClearHighlights();
                     OnTilePlaced.Invoke();
                     gameUI.SetEndTurnButtonActive(false);
                     gameUI.SetRotateButtonActive(false);
                     gameUI.SetSkipTurnButtonActive(true);
+                    selectedPosition = null;
                 }
             }
             catch (System.Exception e)
@@ -588,7 +564,7 @@ namespace TerritoryWars.General
         {
             try
             {
-                currentTile = tile;
+                currentTile.SetConfig(tile.id);
                 selectedPosition = new Vector2Int(x, y);
                 isPlacingTile = true;
 
@@ -617,7 +593,7 @@ namespace TerritoryWars.General
             tilePreview.ResetPosition();
             ClearHighlights();
 
-            var currentTile = DojoGameManager.Instance.SessionManager.GetTopTile();
+            var currentTile = DojoGameManager.Instance.DojoSessionManager.GetTopTile();
             if (currentTile != null)
             {
                 StartTilePlacement(currentTile);

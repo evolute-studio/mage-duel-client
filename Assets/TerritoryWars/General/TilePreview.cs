@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 using TerritoryWars.Tile;
 using UnityEngine;
 using DG.Tweening;
+using TerritoryWars.Dojo;
+using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using Random = UnityEngine.Random;
 
 namespace TerritoryWars.General
 {
     public class TilePreview : MonoBehaviour
     {
         [SerializeField] private TileGenerator tileGenerator;
-        [SerializeField] private TileView previewTileView;
         [SerializeField] private float tilePreviewSetHeight = 0.5f;
         public PolygonCollider2D PreviewPolygonCollider2D;
         public TileJokerAnimator _tileJokerAnimator;
@@ -30,11 +32,13 @@ namespace TerritoryWars.General
 
         [SerializeField] private Ease moveEase = Ease.OutQuint;
 
+        private TileData currentTile;
         private Vector3 _initialPosition;
+        private Vector2Int _currentBoardPosition;
         private Tween currentTween;
         private Camera _mainCamera;
 
-        private List<Sprite> _houseSprites = new List<Sprite>();
+        public List<Sprite> HouseSprites = new List<Sprite>();
 
         private void Awake()
         {
@@ -62,10 +66,6 @@ namespace TerritoryWars.General
 
             
             transform.position = _initialPosition;
-            if (previewTileView != null)
-            {
-                previewTileView.transform.position = _initialPosition;
-            }
         }
 
         public void Start()
@@ -78,13 +78,13 @@ namespace TerritoryWars.General
 
         private void SetupSortingLayers()
         {
-            SpriteRenderer[] spriteRenderers = previewTileView.GetComponentsInChildren<SpriteRenderer>();
+            SpriteRenderer[] spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
             foreach (SpriteRenderer spriteRenderer in spriteRenderers)
             {
                 spriteRenderer.sortingLayerName = "Preview";
             }
 
-            LineRenderer[] lineRenderers = previewTileView.GetComponentsInChildren<LineRenderer>();
+            LineRenderer[] lineRenderers = GetComponentsInChildren<LineRenderer>();
             foreach (LineRenderer lineRenderer in lineRenderers)
             {
                 lineRenderer.sortingLayerName = "Preview";
@@ -105,14 +105,15 @@ namespace TerritoryWars.General
         public void UpdatePreview(TileData currentTile)
         {
             tileGeneratorForUI.gameObject.SetActive(true);
-            if (previewTileView != null && currentTile != null)
+            if (currentTile != null)
             {
-                previewTileView.gameObject.SetActive(true);
+                gameObject.SetActive(true);
                 tileGenerator.Generate(currentTile);
                 tileGeneratorForUI.Generate(currentTile);
                 if (tileGenerator.CurrentTileGO != null)
                 {
                     TileParts tileParts = tileGenerator.CurrentTileGO.GetComponent<TileParts>();
+                    tileParts.HideForestAreas();
                     
                     if (tileParts.TileTerritoryFiller != null)
                     {
@@ -123,13 +124,27 @@ namespace TerritoryWars.General
                     }
                     
 
-                    _houseSprites.Clear();
-                    SpriteRenderer[] houseRenderers = tileGenerator.CurrentTileGO.GetComponent<TileParts>().HouseRenderers.ToArray();
+                    HouseSprites.Clear();
+                    List<SpriteRenderer> houseRenderers = new List<SpriteRenderer>();
+                    
+                    foreach (var house in tileParts.Houses)
+                    {
+                        houseRenderers.Add(house.HouseSpriteRenderer);
+                    }
+                    
+                    for (int i = 0; i < houseRenderers.Count; i++)
+                    {
+                        houseRenderers[i].sortingLayerName = "Preview";
+                        if (currentTile.HouseSprites.Count > i && currentTile.HouseSprites[i] != null)
+                            houseRenderers[i].sprite = currentTile.HouseSprites[i];
+                        HouseSprites.Add(houseRenderers[i].sprite);
+                    }
                     foreach (SpriteRenderer houseRenderer in houseRenderers)
                     {
                         houseRenderer.sortingLayerName = "Preview";
-                        _houseSprites.Add(houseRenderer.sprite);
+                        HouseSprites.Add(houseRenderer.sprite);
                     }
+                    
                 }
 
                 if (tileGeneratorForUI.CurrentTileGO != null)
@@ -146,21 +161,19 @@ namespace TerritoryWars.General
                     SetLayerRecursively(tileGeneratorForUI.CurrentTileGO.transform);
                     
                 }
-
-                previewTileView.UpdateView(currentTile);
             }
-            else if (previewTileView != null)
+            else
             {
-                previewTileView.gameObject.SetActive(false);
+                gameObject.SetActive(false);
             }
 
-            SpriteRenderer[] spriteRenderers = previewTileView.GetComponentsInChildren<SpriteRenderer>();
+            SpriteRenderer[] spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
             foreach (SpriteRenderer spriteRenderer in spriteRenderers)
             {
                 spriteRenderer.sortingLayerName = "Preview";
             }
 
-            LineRenderer[] lineRenderers = previewTileView.GetComponentsInChildren<LineRenderer>();
+            LineRenderer[] lineRenderers = GetComponentsInChildren<LineRenderer>();
             foreach (LineRenderer lineRenderer in lineRenderers)
             {
                 lineRenderer.sortingLayerName = "Preview";
@@ -172,43 +185,46 @@ namespace TerritoryWars.General
             SessionManager.Instance.TileSelector.SetCurrentTile(new TileData("FFFF"));
             tileGenerator.Generate(new TileData("FFFF"));
             tileGeneratorForUI.Generate(new TileData("FFFF"));
+            tileGenerator.tileParts.HideForestAreas();
         }
 
         public void SetPosition(int x, int y)
         {
             currentTween?.Kill();
+            _currentBoardPosition = new Vector2Int(x, y);
 
             Vector3 targetPosition = Board.GetTilePosition(x, y);
             targetPosition.y += tilePreviewSetHeight;
 
-            currentTween = previewTileView.transform
+            currentTween = transform
                 .DOMove(targetPosition, moveDuration)
                 .SetEase(moveEase);
             //previewTileView.transform.DOScale(1, 0.5f).SetEase(Ease.OutQuint);
         }
         
-        public void PlaceTile(Action callback = null)
+        public void PlaceTile(int playerIndex, TileData tileData, Action callback = null)
         {
-            StartCoroutine(PlaceTileCoroutine(callback));
+            currentTile = tileData;
+            StartCoroutine(PlaceTileCoroutine(playerIndex, callback));
         }
         
 
-        private IEnumerator PlaceTileCoroutine(Action callback = null)
+        private IEnumerator PlaceTileCoroutine(int playerIndex, Action callback = null)
         {
             if (!gameObject.activeSelf) yield break;
             // shake animation Y
-            previewTileView.transform.DOShakePosition(0.5f, 0.1f, 18, 45, false, true);
+            transform.DOShakePosition(0.5f, 0.1f, 18, 45, false, true);
 
             yield return new WaitForSeconds(0.5f);
             
             SpriteRenderer[] grounds =
-                previewTileView.transform.Find("Ground").GetComponentsInChildren<SpriteRenderer>();
+                transform.Find("Ground").GetComponentsInChildren<SpriteRenderer>();
 
             foreach (SpriteRenderer ground in grounds)
             {
                 ground.sortingLayerName = "Default";
             }
-            previewTileView.transform.Find("Grass").GetComponent<SpriteRenderer>().sortingLayerName = "Default";
+            transform.Find("Grass").GetComponent<SpriteRenderer>().sortingLayerName = "Default";
             
             if (tileGenerator.CurrentTileGO != null)
             {
@@ -231,6 +247,7 @@ namespace TerritoryWars.General
 
                     foreach (var segment in segments)
                     {
+                        if (segment == null) continue;
                         segment.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
                     }
                 }
@@ -256,34 +273,43 @@ namespace TerritoryWars.General
                 groundRenderers.Add(tileGenerator.CurrentTileGO.transform.Find("Grass").GetComponent<SpriteRenderer>());
                 groundRenderers.AddRange(tileGenerator.CurrentTileGO.transform.Find("Ground")
                     .GetComponentsInChildren<SpriteRenderer>());
+                groundRenderers.Add(tileGenerator.tileParts.HangingGrass);
 
                 foreach (var renderers in groundRenderers)
                 {
                     renderers.sortingLayerName = "Default";
                 }
 
-                _houseSprites.Clear();
-                SpriteRenderer[] houseRenderers = tileGenerator.CurrentTileGO.GetComponent<TileParts>().HouseRenderers.ToArray();
+                HouseSprites.Clear();
+                List<SpriteRenderer> houseRenderers = new List<SpriteRenderer>();
+                foreach (var house in tileParts.Houses)
+                {
+                    houseRenderers.Add(house.HouseSpriteRenderer);
+                }
                 foreach (SpriteRenderer houseRenderer in houseRenderers)
                 {
                     houseRenderer.sortingLayerName = "Default";
-                    _houseSprites.Add(houseRenderer.sprite);
+                    HouseSprites.Add(houseRenderer.sprite);
                 }
             }
             
             currentTween?.Kill();
-            Vector3 currentPosition = previewTileView.transform.position;
+            Vector3 currentPosition = transform.position;
             Vector3 targetPosition = currentPosition;
             targetPosition.y -= tilePreviewSetHeight;
             SessionManager.Instance.CurrentTurnPlayer.EndTurn();
-            currentTween = previewTileView.transform
+            currentTween = transform
                 .DOMove(targetPosition, moveDuration)
                 .SetEase(moveEase)
                 .OnComplete(() =>
                 {
                     callback?.Invoke();
+                    SessionManager.Instance.Board.FloatingTextAnimation(_currentBoardPosition);
+                    SessionManager.Instance.Board.ScoreClientPrediction(playerIndex, currentTile);
                 });
         }
+
+        
 
         public void ResetPosition()
         {

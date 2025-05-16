@@ -57,13 +57,13 @@ namespace TerritoryWars.Dojo
         public JsonRpcClient provider;
         public Account masterAccount;
         
-        public Account LocalBurnerAccount { get; private set; }
+        public GeneralAccount LocalAccount { get; private set; }
         public Bot LocalBot { get; private set; }
         public Bot LocalBotAsPlayer { get; private set; }
 
         public bool IsLocalPlayer;
         
-        public DojoSessionManager SessionManager;
+        public DojoSessionManager DojoSessionManager;
         
         public UnityEvent OnLocalPlayerSet = new UnityEvent();
 
@@ -77,11 +77,10 @@ namespace TerritoryWars.Dojo
                 if(_gameInProgress != null) return _gameInProgress;
                 evolute_duel_Game game = WorldManager.Entities<evolute_duel_Game>()
                     .FirstOrDefault(g =>
-                        g.GetComponent<evolute_duel_Game>().player.Hex() == LocalBurnerAccount.Address.Hex())?
+                        g.GetComponent<evolute_duel_Game>().player.Hex() == LocalAccount.Address.Hex())?
                     .GetComponent<evolute_duel_Game>();
                 if (game == null)
                 {
-                    CustomLogger.LogError("Game not found");
                     return null;
                 }
                 _gameInProgress = game;
@@ -97,12 +96,11 @@ namespace TerritoryWars.Dojo
                 if(_boardInProgress != null) return _boardInProgress;
                 evolute_duel_Board board = WorldManager.Entities<evolute_duel_Board>()
                     .FirstOrDefault(b =>
-                        b.GetComponent<evolute_duel_Board>()?.player1.Item1?.Hex() == LocalBurnerAccount.Address.Hex() ||
-                        b.GetComponent<evolute_duel_Board>()?.player2.Item1?.Hex() == LocalBurnerAccount.Address.Hex())?
+                        b.GetComponent<evolute_duel_Board>()?.player1.Item1?.Hex() == LocalAccount.Address.Hex() ||
+                        b.GetComponent<evolute_duel_Board>()?.player2.Item1?.Hex() == LocalAccount.Address.Hex())?
                     .GetComponent<evolute_duel_Board>();
                 if (board == null)
                 {
-                    CustomLogger.LogError("Board not found");
                     return null;
                 }
                 _boardInProgress = board;
@@ -112,11 +110,12 @@ namespace TerritoryWars.Dojo
         }
 
 
-        public void SetupMasterAccount(Action callback)
+        public void SetupMasterAccount(Action callback, WrapperConnectorCalls.ConnectionData connection = default)
         {
             try 
             {
-                provider = new JsonRpcClient(dojoConfig.rpcUrl);
+                string rpcUrl =  String.IsNullOrEmpty(connection.rpcUrl) ? dojoConfig.rpcUrl: connection.rpcUrl;
+                provider = new JsonRpcClient(rpcUrl);
                 masterAccount = new Account(provider, new SigningKey(gameManagerData.masterPrivateKey),
                     new FieldElement(gameManagerData.masterAddress), callback);
             }
@@ -136,10 +135,21 @@ namespace TerritoryWars.Dojo
             WorldManager.synchronizationMaster.OnSynchronized.AddListener(OnSynchronized);
             WorldManager.synchronizationMaster.OnEntitySpawned.AddListener(SpawnEntity);
             WorldManager.synchronizationMaster.OnModelUpdated.AddListener(IncomingModelsFilter.FilterModels);
-            
-            await TryCreateLocalAccount(3, false);
-            IncomingModelsFilter.SetLocalPlayerId(LocalBurnerAccount.Address.Hex());
-            
+        }
+
+        public void SetLocalControllerAccount(FieldElement address)
+        {
+            LocalAccount = new GeneralAccount(address);
+            SimpleStorage.SetPlayerAddress(LocalAccount.Address.Hex());
+            IncomingModelsFilter.SetLocalPlayerId(LocalAccount.Address.Hex());
+        }
+        
+        public async Task CreateLocalPlayer()
+        {
+            Account account = await TryCreateAccount(3, false);
+            LocalAccount = new GeneralAccount(account);
+            SimpleStorage.SetPlayerAddress(LocalAccount.Address.Hex());
+            IncomingModelsFilter.SetLocalPlayerId(LocalAccount.Address.Hex());
         }
 
         public async Task CreateBot()
@@ -154,7 +164,7 @@ namespace TerritoryWars.Dojo
         public Bot CreateBotAsPlayer()
         {
             var localBotAsPlayer = new Bot();
-            localBotAsPlayer.Initialize(LocalBurnerAccount);
+            localBotAsPlayer.Initialize(LocalAccount);
             return localBotAsPlayer;
             //DojoConnector.BecameBot(LocalBurnerAccount);
         }
@@ -163,8 +173,8 @@ namespace TerritoryWars.Dojo
         {
             int count = 0;
             await CustomSynchronizationMaster.SyncGeneralModels();
-            await CustomSynchronizationMaster.SyncPlayer(LocalBurnerAccount.Address);
-            await CustomSynchronizationMaster.SyncPlayerInProgressGame(LocalBurnerAccount.Address);
+            await CustomSynchronizationMaster.SyncPlayer(LocalAccount.Address);
+            await CustomSynchronizationMaster.SyncPlayerInProgressGame(LocalAccount.Address);
             // if player has an in progress game, sync the board with dependencies
             // TODO: remove logic duplication. It's already in SessionManager.Start
             bool hasGame = await CheckGameInProgress();
@@ -182,7 +192,7 @@ namespace TerritoryWars.Dojo
         public async Task SyncEverythingForGame()
         {
             CustomLogger.LogDojoLoop("SyncEverythingForGame");
-            await CustomSynchronizationMaster.SyncPlayerInProgressGame(LocalBurnerAccount.Address);
+            await CustomSynchronizationMaster.SyncPlayerInProgressGame(LocalAccount.Address);
             evolute_duel_Game game = GameInProgress;
             FieldElement boardId = game.board_id switch
             {
@@ -252,12 +262,12 @@ namespace TerritoryWars.Dojo
 
         private void RestoreGame()
         {
-            SessionManager?.OnDestroy();
-            SessionManager = new DojoSessionManager(this);
+            DojoSessionManager?.OnDestroy();
+            DojoSessionManager = new DojoSessionManager(this);
             CustomSceneManager.Instance.LoadSession(
                 startAction: () =>
                     CustomSceneManager.Instance.LoadingScreen.SetActive(true, 
-                        () => DojoConnector.CancelGame(DojoGameManager.Instance.LocalBurnerAccount), 
+                        () => DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount), 
                         LoadingScreen.connectingText),
                 finishAction: () =>
                     CustomSceneManager.Instance.LoadingScreen.SetActive(false));
@@ -318,58 +328,66 @@ namespace TerritoryWars.Dojo
         
         public async Task SyncLocalPlayerSnapshots()
         {
-            int count = await CustomSynchronizationMaster.SyncPlayerSnapshots(LocalBurnerAccount.Address);
+            int count = await CustomSynchronizationMaster.SyncPlayerSnapshots(LocalAccount.Address);
         }
         
         #region Account Creation 
-        private async Task TryCreateLocalAccount(int attempts, bool createNew)
+        private async Task<Account> TryCreateAccount(int attempts, bool createNew)
         {
             try
             {
                 for (int i = 0; i < attempts; i++)
                 {
                     CustomLogger.LogInfo($"Creating burner account. Attempt: {i}");
-                    if (await CreateLocalAccount(createNew))
+                    Account account = await CreateAccount(createNew);
+                    if (account == null)
                     {
-                        CustomLogger.LogInfo($"Burner account created. Attempt: {i}. Address: {LocalBurnerAccount.Address.Hex()}");
+                        CustomLogger.LogInfo($"Burner account created. Attempt: {i}. Address: {LocalAccount.Address.Hex()}");
                         OnLocalPlayerSet?.Invoke();
                         break;
                     }
+
+                    return account;
                 }
             }
             catch (Exception e)
             {
                 CustomLogger.LogError($"Failed to create burner account. {e}");
             }
+            CustomLogger.LogError("Failed to create burner account");
+            return null;
         }
         
         
-        public async Task<bool> CreateLocalAccount(bool createNew)
+        public async Task<Account> CreateAccount(bool createNew)
         {
             try
             {
                 if (createNew)
                 {
-                    LocalBurnerAccount = await burnerManager.DeployBurner();
+                    return await burnerManager.DeployBurner();
                 }
                 else
                 {
                     string storedAccountAddress = SimpleStorage.LoadPlayerAddress();
                     bool isBurnersEmpty = burnerManager.Burners.Count == 0;
                     Account storedAccount = burnerManager.Burners.FirstOrDefault(b => b.Address.Hex() == storedAccountAddress);
-                    LocalBurnerAccount = storedAccount;
                     if (storedAccount == null || isBurnersEmpty)
                     {
                         CustomLogger.LogWarning("Burner account not found. Creating new account.");
-                        LocalBurnerAccount = await burnerManager.DeployBurner();
+                        return await burnerManager.DeployBurner();
+                    }
+                    else
+                    {
+                        return storedAccount;
                     }
                 }
-                SimpleStorage.SetPlayerAddress(LocalBurnerAccount.Address.Hex());
-                return true;
+                SimpleStorage.SetPlayerAddress(LocalAccount.Address.Hex());
+                return null;
             }
             catch (Exception e)
             {
-                return false;
+                return null;
             }
         }
         
@@ -392,7 +410,6 @@ namespace TerritoryWars.Dojo
             account = burnerManager.Burners.FirstOrDefault(b => b.Address.Hex() == address);
             if (account == null)
             {
-                CustomLogger.LogError("Failed to get burner account");
                 return false;
             }
             return true;
@@ -414,9 +431,9 @@ namespace TerritoryWars.Dojo
             await DojoConnector.ChangeUsername(LocalBot.Account,
                new FieldElement(LocalBot.AccountModule.GetDefaultUsername(), true));
             CustomLogger.LogDojoLoop("Bot username changed");
-            await DojoConnector.CreateGame(LocalBurnerAccount);
+            await DojoConnector.CreateGame(LocalAccount);
             CustomLogger.LogDojoLoop("Game created");
-            DojoConnector.JoinGame(LocalBot.Account, LocalBurnerAccount.Address);
+            DojoConnector.JoinGame(LocalBot.Account, LocalAccount.Address);
             CustomLogger.LogDojoLoop("Bot joined game");
         }
         
@@ -462,8 +479,9 @@ namespace TerritoryWars.Dojo
                 return null;
             }
             Bot bot = new Bot();
-            bot.Initialize(account);
-            DojoConnector.BecameBot(account);
+            GeneralAccount botAccount = new GeneralAccount(account);
+            bot.Initialize(botAccount);
+            DojoConnector.BecameBot(botAccount);
             return bot;
         }
         
@@ -490,7 +508,7 @@ namespace TerritoryWars.Dojo
         
         private void OnEventMessage(ModelInstance modelInstance)
         {
-            CustomLogger.LogImportant($"Received event: {modelInstance.Model.Name}");
+            CustomLogger.LogDojoLoop($"Received event: {modelInstance.Model.Name}");
             switch (modelInstance)
             {
                 case evolute_duel_PlayerUsernameChanged playerUsernameChanged:
@@ -507,16 +525,17 @@ namespace TerritoryWars.Dojo
         
         private void PlayerUsernameChanged(evolute_duel_PlayerUsernameChanged eventMessage)
         {
-            if(LocalBurnerAccount == null || LocalBurnerAccount.Address.Hex() != eventMessage.player_id.Hex()) return;
-            MenuUIController.Instance._namePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username));
+            if(LocalAccount == null || LocalAccount.Address.Hex() != eventMessage.player_id.Hex()) return;
+            if(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username).StartsWith("Guest")) return;
+            MenuUIController.Instance.NamePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username));
         }
         
         private void GameCreateFailed(evolute_duel_GameCreateFailed eventMessage)
         {
             string hostPlayer = eventMessage.host_player.Hex();
-            if (LocalBurnerAccount.Address.Hex() != hostPlayer) return;
-            DojoConnector.CancelGame(LocalBurnerAccount);
-            InvokeWithDelay(() => DojoConnector.CreateGame(LocalBurnerAccount), 1f);
+            if (LocalAccount.Address.Hex() != hostPlayer) return;
+            DojoConnector.CancelGame(LocalAccount);
+            InvokeWithDelay(() => DojoConnector.CreateGame(LocalAccount), 1f);
         }
         
 
@@ -529,20 +548,20 @@ namespace TerritoryWars.Dojo
                 return;
             }
             CustomLogger.LogInfo($"Check start session. " +
-                                 $"\nLocalPlayerIsHost: {gameStarted.host_player.Hex() == LocalBurnerAccount.Address.Hex()}" +
-                                 $"\nLocalPlayerIsGuest: {gameStarted.guest_player.Hex() == LocalBurnerAccount.Address.Hex()}" +
+                                 $"\nLocalPlayerIsHost: {gameStarted.host_player.Hex() == LocalAccount.Address.Hex()}" +
+                                 $"\nLocalPlayerIsGuest: {gameStarted.guest_player.Hex() == LocalAccount.Address.Hex()}" +
                                  $"\nEventHostPlayerAddress: {gameStarted.host_player.Hex()}" +
                                  $"\nEventGuestPlayerAddress: {gameStarted.guest_player.Hex()}" +
-                                 $"\nLocalPlayerAddress: {LocalBurnerAccount.Address.Hex()}");
-            if (gameStarted.host_player.Hex() == LocalBurnerAccount.Address.Hex() ||
-                gameStarted.guest_player.Hex() == LocalBurnerAccount.Address.Hex())
+                                 $"\nLocalPlayerAddress: {LocalAccount.Address.Hex()}");
+            if (gameStarted.host_player.Hex() == LocalAccount.Address.Hex() ||
+                gameStarted.guest_player.Hex() == LocalAccount.Address.Hex())
             {
                 CustomLogger.LogInfo("Start session");
                 // Start session
                 ApplicationState.SetState(ApplicationStates.Initializing);
                 await SyncEverythingForGame();
-                SessionManager?.OnDestroy();
-                SessionManager = new DojoSessionManager(this);
+                DojoSessionManager?.OnDestroy();
+                DojoSessionManager = new DojoSessionManager(this);
                 CustomSceneManager.Instance.LoadSession();
             }
         }
@@ -626,7 +645,7 @@ namespace TerritoryWars.Dojo
         
         public evolute_duel_Player GetLocalPlayerData()
         {
-            evolute_duel_Player player = GetPlayerData(LocalBurnerAccount.Address.Hex());
+            evolute_duel_Player player = GetPlayerData(LocalAccount.Address.Hex());
             if (player == null)
             {
                 CustomLogger.LogWarning("Local player not found. Waiting for player model");

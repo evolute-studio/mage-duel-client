@@ -50,7 +50,6 @@ namespace TerritoryWars.UI
         {
             ShowSkipText(false);
             RotateHourglass();
-            CustomLogger.LogImportant("Start turn timer. Timestamp: " + timestamp + " _startTurnTime: " + _startTurnTime);
             
             // checking for the future
             ulong currentTimestamp = (ulong) (System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
@@ -154,6 +153,11 @@ namespace TerritoryWars.UI
                 $"<color=#{(index < visibleDots ? "FFFFFFFF" : "FFFFFF00")}>.</color>"));
             
             TurnText.text = baseText + dots;
+        }
+
+        public void SetActiveTimer(bool active)
+        {
+            gameObject.SetActive(active);
         }
 
     }

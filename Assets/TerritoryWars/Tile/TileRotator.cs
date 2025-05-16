@@ -37,6 +37,15 @@ namespace TerritoryWars.Tile
         {
             ApplyRotation();
         }
+        
+        [ContextMenu("Rotate LineRenderer")]
+        public void RotateLineRenderer()
+        {
+            foreach (var lineRenderer in LineRenderers)
+            {
+                LineRotation(lineRenderer);
+            }
+        }
 
         public void RotateCounterClockwise()
         {
@@ -80,16 +89,13 @@ namespace TerritoryWars.Tile
             {
                 _tileParts.RoadRenderers = RotateRoadArray(_tileParts.RoadRenderers);
             }
-
-            // foreach (var spriteLayerSwapElement in SpriteLayerSwapElements) - this logic now disabled!
-            // {
-            //     spriteLayerSwapElement.Rotate();
-            // }
+            
             OnRotation?.Invoke();
         }
 
         public void SimpleRotation(Transform obj, int times = 1)
         {
+            if (obj == null) return;
             for (int i = 0; i < times; i++)
             {
                 Vector3 originalPos = obj.localPosition;
@@ -117,6 +123,7 @@ namespace TerritoryWars.Tile
 
         public void MirrorRotation(Transform obj, int times = 1)
         {
+            if (obj == null) return;
             for (int i = 0; i < times; i++)
             {
                 Vector3 originalPos = obj.localPosition;
@@ -131,6 +138,7 @@ namespace TerritoryWars.Tile
 
         public static void GetMirrorRotationStatic(Transform obj, int times = 1)
         {
+            if (obj == null) return;
             for (int i = 0; i < times; i++)
             {
                 Vector3 originalPos = obj.localPosition;
@@ -194,7 +202,7 @@ namespace TerritoryWars.Tile
                 foreach (var spriteSwapElement in SpriteSwapElements)
                 {
                     spriteSwapElement.Rotate(times);
-                    CustomLogger.LogInfo($"Sprite swap element: {times} | Houses : {_tileParts.HouseRenderers.Count} | Roads: {_tileParts.RoadRenderers.Length}");
+                    CustomLogger.LogInfo($"Sprite swap element: {times} | Houses : {_tileParts.Houses.Count} | Roads: {_tileParts.RoadRenderers.Length}");
                     if (spriteSwapElement.PinObjects != null && spriteSwapElement.PinObjects.Length > 0)
                     {
                         var pinsParent = spriteSwapElement.PinObjects[spriteSwapElement.CurrentIndex];
@@ -209,9 +217,10 @@ namespace TerritoryWars.Tile
                 }
             }
             
+            _tileParts ??= GetComponent<TileParts>();
             if (_tileParts.RoadRenderers != null)
             {
-                CustomLogger.LogInfo($"Road renderers : {times} | Houses : {_tileParts.HouseRenderers.Count} | Roads: {_tileParts.RoadRenderers.Length}");
+                CustomLogger.LogInfo($"Road renderers : {times} | Houses : {_tileParts.Houses.Count} | Roads: {_tileParts.RoadRenderers.Length}");
                 _tileParts.RoadRenderers = RotateRoadArray(_tileParts.RoadRenderers, times);
             }
 
@@ -234,11 +243,6 @@ namespace TerritoryWars.Tile
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                RotateClockwise();
-            }
-
             if (autoRotate && Time.time >= nextRotateTime)
             {
                 RotateClockwise();

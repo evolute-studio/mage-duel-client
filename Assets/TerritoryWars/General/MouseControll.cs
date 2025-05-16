@@ -1,3 +1,5 @@
+using System;
+using DG.Tweening;
 using UnityEngine;
 
 namespace TerritoryWars.General
@@ -12,14 +14,20 @@ namespace TerritoryWars.General
         [SerializeField] private float minZoom = 2f;
         [SerializeField] private float maxZoom = 4f;
         [SerializeField] private float pinchZoomSpeed = 0.5f;
+        [SerializeField] private float _contestZoom = 2.5f;
 
         private Camera _mainCamera;
         private Camera _camera;
         private bool _isMainCamera = false;
         private Vector3 lastMousePosition;
         private bool isDragging = false;
-        private Vector3 minBounds = new Vector3(-4f, -3f, 0f);
-        private Vector3 maxBounds = new Vector3(4f, 4f, 0f);
+        private Vector3 minBounds = new Vector3(-8f, -2.8f, 0f);
+        private Vector3 maxBounds = new Vector3(8f, 8f, 0f);
+        private bool _isCameraMoveLocked = false;
+        
+        private float _pinchEndTime = 0f;
+        private const float PINCH_END_THRESHOLD = 0.2f;
+        private bool wasPinching = false;
 
         // Для мобільних жестів
         private float lastPinchDistance;
@@ -39,13 +47,46 @@ namespace TerritoryWars.General
         // Update is called once per frame
         void Update()
         {
-            HandlePanning();
-            HandleZoom();
+            if (!_isMainCamera)
+            {
+                _camera.orthographicSize = _mainCamera.orthographicSize;
+                _camera.transform.position = _mainCamera.transform.position;
+                return;
+            }
+            
+            if (!_isCameraMoveLocked)
+            {
+                HandlePanning();
+                HandleZoom();
+            }
         }
 
         private void HandlePanning()
         {
-            if (Input.touchCount == 1) // Один палець для переміщення
+            if (wasPinching && Time.time - _pinchEndTime < PINCH_END_THRESHOLD)
+            {
+                // If the finger has started to move after a recent zuma, allow you to move
+                if (Input.touchCount == 1)
+                {
+                    Touch touch = Input.GetTouch(0);
+                    if (touch.phase == TouchPhase.Moved)
+                    {
+                        wasPinching = false; // We throw away the box to allow moving
+                    }
+                }
+                else if (Input.touchCount == 0)
+                {
+                    wasPinching = false;
+                }
+        
+                // If still in the period after zoom, do not process moving
+                if (wasPinching)
+                {
+                    return;
+                }
+            }
+            
+            if (Input.touchCount == 1) // One finger to move
             {
                 Touch touch = Input.GetTouch(0);
                 
@@ -66,6 +107,8 @@ namespace TerritoryWars.General
                     Vector3 worldDelta = _camera.ScreenToWorldPoint(touch.position) - 
                                        _camera.ScreenToWorldPoint(lastMousePosition);
                     Vector3 move = -worldDelta;
+                    float horizontalExtent = _mainCamera.orthographicSize * _mainCamera.aspect;
+                    float verticalExtent = _mainCamera.orthographicSize;
 
                     Vector3 newPosition = transform.position + move;
                     newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
@@ -92,6 +135,8 @@ namespace TerritoryWars.General
                 Vector3 worldDelta = _camera.ScreenToWorldPoint(Input.mousePosition) - 
                                    _camera.ScreenToWorldPoint(lastMousePosition);
                 Vector3 move = -worldDelta;
+                float horizontalExtent = _mainCamera.orthographicSize * _mainCamera.aspect;
+                float verticalExtent = _mainCamera.orthographicSize;
 
                 Vector3 newPosition = transform.position + move;
                 newPosition.x = Mathf.Clamp(newPosition.x, minBounds.x, maxBounds.x);
@@ -121,10 +166,12 @@ namespace TerritoryWars.General
                 {
                     lastPinchDistance = Vector2.Distance(touch0.position, touch1.position);
                     isPinching = true;
+                    wasPinching = true;
                 }
                 else if (touch0.phase == TouchPhase.Ended || touch1.phase == TouchPhase.Ended)
                 {
                     isPinching = false;
+                    _pinchEndTime = Time.time;
                 }
 
                 if (isPinching)
@@ -148,6 +195,19 @@ namespace TerritoryWars.General
                     _camera.orthographicSize = Mathf.Clamp(newSize, minZoom, maxZoom);
                 }
             }
+        }
+
+        public void SetCameraLock(bool isLocked)
+        {
+            _isCameraMoveLocked = isLocked;
+        }
+        
+        public void SetCameraPosition(Vector3 position, Action callback = null)
+        {
+            _mainCamera.transform.DOMove(position, 0.7f).OnComplete(() =>
+            {
+                callback?.Invoke();
+            });
         }
     }
 }

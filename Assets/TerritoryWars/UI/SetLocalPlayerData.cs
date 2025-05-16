@@ -40,7 +40,17 @@ namespace TerritoryWars.UI
                 return index; 
             }
             
-            return _isLocalPlayerHost ? index : index == 0 ? 1 : 0;
+            return _isLocalPlayerHost ? index : GetOppositeIndex(index);
+        }
+        
+        public static int GetOppositeIndex(int index)
+        {
+            if (index < 0 || index > 1)
+            {
+                return index; 
+            }
+            
+            return index == 0 ? 1 : 0;
         }
     }
 }

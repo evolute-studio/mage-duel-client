@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using TerritoryWars.UI.Popups;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TerritoryWars.UI
 {
@@ -24,15 +26,13 @@ namespace TerritoryWars.UI
             }
         }
         
-        public NamePanelController _namePanelController;
-        public ChangeNamePanelUIController _changeNamePanelUIController;
-        public CharacterSelector _characterSelector;
+        public NamePanelController NamePanelController;
+        public ChangeNamePanelUIController ChangeNamePanelUIController;
+        public CharacterSelector.CharacterSelector CharacterSelector;
 
         public void Start()
         {
-            
             Initialize();
-            //DojoGameManager.Instance.SessionManager = null;
         }
 
         private void Initialize(List<GameObject> list)
@@ -44,15 +44,16 @@ namespace TerritoryWars.UI
         public void Initialize()
         {
             DojoGameManager.Instance.CustomSynchronizationMaster.DestroyBoardsAndAllDependencies();
-            _namePanelController.Initialize();
-            _characterSelector.Initialize();
+            NamePanelController.Initialize();
+            CharacterSelector.Initialize();
+            NamePanelController.OnNameChanged.AddListener(OnNameChanged);
             
-            _namePanelController.OnNameChanged.AddListener(OnNameChanged);
+            ChangeNamePanelUIController.SetNamePanelActive(NamePanelController.IsDefaultName());
         }
 
         public async void NewAccount()
         {
-            await DojoGameManager.Instance.CreateLocalAccount(true);
+            await DojoGameManager.Instance.CreateAccount(true);
             Initialize();
         }
 
@@ -80,11 +81,28 @@ namespace TerritoryWars.UI
             }
         }
 
+        public void OpenControllerProfile()
+        {
+            if(ApplicationState.IsController)
+                WrapperConnectorCalls.ControllerProfile();
+            else
+            {
+                ChangeNamePanelUIController.SetNamePanelActive(true);
+            }
+        }
+
+        public void ControllerLogout()
+        {
+            if(ApplicationState.IsController)
+                WrapperConnectorCalls.ControllerLogout();
+            JSBridge.ReloadPage();
+        }
+
         public void OnDestroy()
         {
-            if (_namePanelController != null)
+            if (NamePanelController != null)
             {
-                _namePanelController.OnNameChanged.RemoveListener(OnNameChanged);
+                NamePanelController.OnNameChanged.RemoveListener(OnNameChanged);
             }
         }
     }
