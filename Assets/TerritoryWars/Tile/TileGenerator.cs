@@ -213,7 +213,7 @@ namespace TerritoryWars.Tile
 
                     if (_tileData.OwnerId == -1) playerId = -1;
                     GameObject prefab = _tileData.HouseSprites.Count > i 
-                        ? PrefabsManager.Instance.GetNonContestedHousePrefabByReference(_tileData.HouseSprites[i])
+                        ? PrefabsManager.Instance.GetNonContestedHousePrefabByReference(_tileData.HouseSprites[i], playerId)
                         : PrefabsManager.Instance.GetRandomNotContestedHouseGameObject(1, playerId);
                     GameObject houseObject = Instantiate(prefab, house.Parent.transform);
                     currentGoTileRotator.SimpleRotationObjects.Add(house.Parent.transform);
