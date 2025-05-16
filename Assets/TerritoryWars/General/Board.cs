@@ -444,6 +444,7 @@ namespace TerritoryWars.General
             {
                 if(IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
+                    neighborsData[i].OwnerId = owner;
                     ConnectEdgeStructureAnimation(owner, neighborsData[i], tilePositions[i][0], tilePositions[i][1], isCityContest, isRoadContest);
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
