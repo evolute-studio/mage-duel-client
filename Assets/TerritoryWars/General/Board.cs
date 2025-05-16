@@ -1097,41 +1097,41 @@ namespace TerritoryWars.General
             public Side Direction;
         }
 
-        public void OnGUI()
-        {
-            // Create semi-transparent dark background style
-            GUIStyle darkStyle = new GUIStyle(GUI.skin.label);
-            darkStyle.normal.background = new Texture2D(1, 1);
-            darkStyle.normal.background.SetPixel(0, 0, new Color(0, 0, 0, 0.5f));
-            darkStyle.normal.background.Apply();
-            darkStyle.normal.textColor = Color.white;
-
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    if (tileObjects[x, y] != null && tileData[x, y] != null)
-                    {
-                        Vector3 screenPos = Camera.main.WorldToScreenPoint(tileObjects[x, y].transform.position);
-                        screenPos.y = Screen.height - screenPos.y; // Конвертуємо Y координату для GUI
-                        
-                        // Background rect that covers all labels
-                        GUI.Box(new Rect(screenPos.x - 20, screenPos.y - 50, 100, 60), "", darkStyle);
-
-                        GUI.Label(new Rect(screenPos.x - 20, screenPos.y - 10, 100, 20), tileData[x, y].id);
-                        GUI.Label(new Rect(screenPos.x - 20, screenPos.y - 30, 100, 20), tileData[x, y].OwnerId.ToString());
-                        string houseRenderers = "";
-                        foreach (var data in tileData[x, y].HouseSprites)
-                        {
-                            if (data == null) continue;
-                            // split _
-                            string[] split = data.name.Split('_');
-                            houseRenderers += split.Last() + ",";
-                        }
-                        GUI.Label(new Rect(screenPos.x - 20, screenPos.y - 50, 100, 20), houseRenderers);
-                    }
-                }
-            }
-        }
+        // public void OnGUI()
+        // {
+        //     // Create semi-transparent dark background style
+        //     GUIStyle darkStyle = new GUIStyle(GUI.skin.label);
+        //     darkStyle.normal.background = new Texture2D(1, 1);
+        //     darkStyle.normal.background.SetPixel(0, 0, new Color(0, 0, 0, 0.5f));
+        //     darkStyle.normal.background.Apply();
+        //     darkStyle.normal.textColor = Color.white;
+        //
+        //     for (int x = 0; x < width; x++)
+        //     {
+        //         for (int y = 0; y < height; y++)
+        //         {
+        //             if (tileObjects[x, y] != null && tileData[x, y] != null)
+        //             {
+        //                 Vector3 screenPos = Camera.main.WorldToScreenPoint(tileObjects[x, y].transform.position);
+        //                 screenPos.y = Screen.height - screenPos.y; // Конвертуємо Y координату для GUI
+        //                 
+        //                 // Background rect that covers all labels
+        //                 GUI.Box(new Rect(screenPos.x - 20, screenPos.y - 50, 100, 60), "", darkStyle);
+        //
+        //                 GUI.Label(new Rect(screenPos.x - 20, screenPos.y - 10, 100, 20), tileData[x, y].id);
+        //                 GUI.Label(new Rect(screenPos.x - 20, screenPos.y - 30, 100, 20), tileData[x, y].OwnerId.ToString());
+        //                 string houseRenderers = "";
+        //                 foreach (var data in tileData[x, y].HouseSprites)
+        //                 {
+        //                     if (data == null) continue;
+        //                     // split _
+        //                     string[] split = data.name.Split('_');
+        //                     houseRenderers += split.Last() + ",";
+        //                 }
+        //                 GUI.Label(new Rect(screenPos.x - 20, screenPos.y - 50, 100, 20), houseRenderers);
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
