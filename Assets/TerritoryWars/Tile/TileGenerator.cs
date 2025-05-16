@@ -288,7 +288,7 @@ namespace TerritoryWars.Tile
             if (isContest)
             {
                 tileParts.PlaceContestedWalls(rotation);
-                tileParts.PlaceFlags(rotation, playerId);
+                tileParts.PlaceFlags(rotation, playerId == 3 ? _tileData.OwnerId : playerId);
             }
             
             //List<TileParts.HouseGameObject> activeHouses = tileParts.Houses.Where(x => x.Parent.gameObject.activeSelf).ToList();
@@ -370,6 +370,10 @@ namespace TerritoryWars.Tile
 
         public void ReplaceHouses(List<TileParts.HouseGameObject> houses, int playerId)
         {
+            if (playerId == 3)
+            {
+                return;
+            }
             foreach (var house in houses)
             {
                 GameObject newHousePrefab = PrefabsManager.Instance.GetNonContestedHousePrefabByReference(house.HouseSpriteRenderer.sprite, playerId);
