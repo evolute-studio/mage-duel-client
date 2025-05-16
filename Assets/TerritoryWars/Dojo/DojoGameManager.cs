@@ -116,13 +116,8 @@ namespace TerritoryWars.Dojo
             {
                 string rpcUrl =  String.IsNullOrEmpty(connection.rpcUrl) ? dojoConfig.rpcUrl: connection.rpcUrl;
                 provider = new JsonRpcClient(rpcUrl);
-                string masterAddress = gameManagerData.masterAddress;
-                Debug.Log($"[Master Address]: {masterAddress}");
-                FieldElement masterAddressField = new FieldElement(masterAddress);
-                Debug.Log($"[Master Address as FieldElement Inner]: {masterAddressField.Inner}");
-                Debug.Log($"[Master Address as FieldElement Hex]: {masterAddressField.Hex()}");
                 masterAccount = new Account(provider, new SigningKey(gameManagerData.masterPrivateKey),
-                    masterAddressField, callback);
+                    new FieldElement(gameManagerData.masterAddress), callback);
             }
             catch (Exception e)
             {
@@ -531,7 +526,8 @@ namespace TerritoryWars.Dojo
         private void PlayerUsernameChanged(evolute_duel_PlayerUsernameChanged eventMessage)
         {
             if(LocalAccount == null || LocalAccount.Address.Hex() != eventMessage.player_id.Hex()) return;
-            MenuUIController.Instance._namePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username));
+            if(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username).StartsWith("Guest")) return;
+            MenuUIController.Instance.NamePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(eventMessage.new_username));
         }
         
         private void GameCreateFailed(evolute_duel_GameCreateFailed eventMessage)

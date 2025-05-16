@@ -32,7 +32,7 @@ namespace TerritoryWars.UI.CharacterSelector
         private int _currentSelectedCharacterId = 1;
         private int _currentCharacterId = 1;
         private List<int> _unlockedCharacters = new List<int>();
-        private int _playerBalance => MenuUIController.Instance._namePanelController.EvoluteBalance;
+        private int _playerBalance => MenuUIController.Instance.NamePanelController.EvoluteBalance;
 
         // public void Start()
         // {
@@ -60,6 +60,11 @@ namespace TerritoryWars.UI.CharacterSelector
         
         public void SetActive(bool active)
         {
+            InitializeCharacter(Characters.First(x => x.CharacterId == _currentSelectedCharacterId));
+            while(_currentSelectedCharacterId != Characters[2].CharacterId)
+            {
+                ShiftCharacters(true);
+            }
             if (active)
             {
                 CharacterSelectorObject.SetActive(true);
@@ -95,7 +100,7 @@ namespace TerritoryWars.UI.CharacterSelector
             }
             else
             {
-                InitializeCharacters();
+                InitializeCharacter(Characters.First(x => x.CharacterId == _currentSelectedCharacterId));
                 CanvasGroup.alpha = 1;
                 CanvasGroup.interactable = false;
                 CanvasGroup.blocksRaycasts = false;
@@ -210,6 +215,7 @@ namespace TerritoryWars.UI.CharacterSelector
             _currentSelectedCharacterId = currentCharacter.CharacterId;
             InitializeCharacters();
             DojoConnector.ChangeSkin(DojoGameManager.Instance.LocalAccount, currentCharacter.CharacterId);
+            SetActive(false);
             
         }
     }

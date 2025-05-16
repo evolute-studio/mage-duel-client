@@ -1,7 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Dojo;
 using TerritoryWars.General;
+using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
 using UnityEngine;
 
@@ -123,6 +125,16 @@ namespace TerritoryWars.ExternalConnections
             public string playerProfileActionsAddress;
             public string worldAddress;
             public int slotDataVersion;
+            
+            public void SetData(WorldManagerData data)
+            {
+                rpcUrl = data.rpcUrl;
+                toriiUrl = data.toriiUrl;
+                gameAddress = data.gameAddress;
+                playerProfileActionsAddress = data.playerProfileActionsAddress;
+                worldAddress = data.worldAddress.Hex();
+                slotDataVersion = data.SlotDataVersion;
+            }
         }
         
         

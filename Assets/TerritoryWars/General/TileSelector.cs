@@ -131,7 +131,11 @@ namespace TerritoryWars.General
             tilePreview.UpdatePreview(tile);
             currentTile.HouseSprites.AddRange(tilePreview.HouseSprites);
         }
-
+        public bool IsExistValidPlacement(TileData tile)
+        {
+            return board.GetValidPlacements(tile).Count > 0;
+        }
+        
         public void StartTilePlacement(TileData tile)
         {
             GameUI.Instance.SetEndTurnButtonActive(false);
@@ -143,18 +147,6 @@ namespace TerritoryWars.General
             selectedPosition = null;
 
             _currentValidPlacements = board.GetValidPlacements(currentTile);
-            if (_currentValidPlacements.Count == 0)
-            {
-                if (SessionManager.Instance.CurrentTurnPlayer.JokerCount > 0)
-                {
-                    gameUI.JokerButtonPulse(true);
-                }
-                
-                gameUI.SetActiveSkipButtonPulse(true);
-                // EndTilePlacement();
-                return;
-            }
-            
 
             ShowPossiblePlacements(_currentValidPlacements);
             gameUI.SetEndTurnButtonActive(false);
@@ -425,7 +417,7 @@ namespace TerritoryWars.General
 
             gameUI.SetRotateButtonActive(false);
 
-            tilePreview.PlaceTile(CompleteTilePlacement);
+            tilePreview.PlaceTile(SessionManager.Instance.CurrentTurnPlayer.SideId, currentTile, CompleteTilePlacement);
         }
 
         public void CompleteTilePlacement()
@@ -435,7 +427,7 @@ namespace TerritoryWars.General
                 if (!selectedPosition.HasValue) return;
                 
                 if (board.PlaceTile(currentTile, selectedPosition.Value.x, selectedPosition.Value.y,
-                        SessionManager.Instance.CurrentTurnPlayer.LocalId))
+                        SessionManager.Instance.CurrentTurnPlayer.SideId))
                 {
                     DojoGameManager.Instance.DojoSessionManager.MakeMove(currentTile, selectedPosition.Value.x, selectedPosition.Value.y, isJokerMode);
                     LastMove = (currentTile, selectedPosition.Value);
@@ -445,13 +437,13 @@ namespace TerritoryWars.General
                         SessionManager.Instance.JokerManager.CompleteJokerPlacement();
                     }
                     isJokerMode = false;
-                    selectedPosition = null;
                     jokerPosition = null;
                     ClearHighlights();
                     OnTilePlaced.Invoke();
                     gameUI.SetEndTurnButtonActive(false);
                     gameUI.SetRotateButtonActive(false);
                     gameUI.SetSkipTurnButtonActive(true);
+                    selectedPosition = null;
                 }
             }
             catch (System.Exception e)

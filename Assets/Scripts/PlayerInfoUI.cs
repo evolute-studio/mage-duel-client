@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using TerritoryWars;
 using TerritoryWars.General;
 using TerritoryWars.Tile;
@@ -17,7 +18,7 @@ public class PlayerInfoUI : MonoBehaviour
     public Color JokerNotAvailableColor;
     public Color JokerAvailableColor;
     public List<TextMeshProUGUI> cityScoreTextPlayers;
-    public List<TextMeshProUGUI> tileScoreTextPlayers;
+    [FormerlySerializedAs("tileScoreTextPlayers")] public List<TextMeshProUGUI> roadScoreTextPlayers;
     public List<TextMeshProUGUI> timeTextPlayers;
     [SerializeField] private Board _board;
     public CharactersObject charactersObject;
@@ -42,7 +43,7 @@ public class PlayerInfoUI : MonoBehaviour
         for (int i = 0; i < players.Count; i++)
         {
             cityScoreTextPlayers[i].text = players[i].cityScore.ToString();
-            tileScoreTextPlayers[i].text = players[i].tileScore.ToString();
+            roadScoreTextPlayers[i].text = players[i].roadScore.ToString();
             timeTextPlayers[i].text = players[i].time.ToString();
         }
 
@@ -65,27 +66,117 @@ public class PlayerInfoUI : MonoBehaviour
     }
     
 
-    public void SetCityScores(int localPlayerCityScore, int remotePlayerCityScore)
+    public void SetCityScores(int firstPlayerCityScore, int secondPlayerCityScore, bool withAnimation = true, float delay = 0)
     {
-        int[] playersCityScores = SetLocalPlayerData.GetLocalPlayerInt(localPlayerCityScore, remotePlayerCityScore);
-        cityScoreTextPlayers[0].text = (playersCityScores[0] / 2).ToString();
-        cityScoreTextPlayers[1].text = (playersCityScores[1] / 2).ToString();
-    }
-    
-    
-    public void SetRoadScores(int localPlayerTileScore, int remotePlayerTileScore)
-    {
-        int[] playersRoadScores = SetLocalPlayerData.GetLocalPlayerInt(localPlayerTileScore, remotePlayerTileScore);
-        tileScoreTextPlayers[0].text = playersRoadScores[0].ToString();
-        tileScoreTextPlayers[1].text = playersRoadScores[1].ToString();
+        int[] playersCityScores = SetLocalPlayerData.GetLocalPlayerInt(firstPlayerCityScore, secondPlayerCityScore);
+        if(cityScoreTextPlayers[0].text != playersCityScores[0].ToString() && withAnimation)
+        {
+            ValueChangedAnimation(cityScoreTextPlayers[0], players[0].cityScore < playersCityScores[0], delay);
+        }
+        if(cityScoreTextPlayers[1].text != playersCityScores[1].ToString() && withAnimation)
+        {
+            ValueChangedAnimation(cityScoreTextPlayers[1], players[1].cityScore < playersCityScores[1], delay);
+        }
+        cityScoreTextPlayers[0].text = playersCityScores[0].ToString();
+        cityScoreTextPlayers[1].text = playersCityScores[1].ToString();
+        players[0].cityScore = playersCityScores[0];
+        players[1].cityScore = playersCityScores[1];
     }
 
-    public void SetPlayerScores(int localPlayerScore, int remotePlayerScore)
+    public void AddClientCityScore(int serverSideId, int playerCityScore)
+    {
+        if(playerCityScore == 0) return;
+        int localSideId = SetLocalPlayerData.GetLocalIndex(serverSideId);
+        ValueChangedAnimation(cityScoreTextPlayers[localSideId], true, 0);
+        players[localSideId].cityScore += playerCityScore;
+        cityScoreTextPlayers[localSideId].text = players[localSideId].cityScore.ToString();
+        SetPlayerScoresWithoutSwap(players[0].generalScore, players[1].generalScore);
+    }
+    
+    
+    public void SetRoadScores(int localPlayerTileScore, int remotePlayerTileScore, bool withAnimation = true, float delay = 0)
+    {
+        int[] playersRoadScores = SetLocalPlayerData.GetLocalPlayerInt(localPlayerTileScore, remotePlayerTileScore);
+        if(roadScoreTextPlayers[0].text != playersRoadScores[0].ToString() && withAnimation)
+        {
+            ValueChangedAnimation(roadScoreTextPlayers[0], players[0].roadScore < playersRoadScores[0], delay);
+        }
+        if(roadScoreTextPlayers[1].text != playersRoadScores[1].ToString() && withAnimation)
+        {
+            ValueChangedAnimation(roadScoreTextPlayers[1], players[1].roadScore < playersRoadScores[1], delay);
+        }
+        roadScoreTextPlayers[0].text = playersRoadScores[0].ToString();
+        roadScoreTextPlayers[1].text = playersRoadScores[1].ToString();
+        players[0].roadScore = playersRoadScores[0];
+        players[1].roadScore = playersRoadScores[1];
+    }
+    
+    public void AddClientRoadScore(int playerIndex, int playerRoadScore)
+    {
+        if(playerRoadScore == 0) return;
+        playerIndex = SetLocalPlayerData.GetLocalIndex(playerIndex);
+        ValueChangedAnimation(roadScoreTextPlayers[playerIndex], true, 0);
+        players[playerIndex].roadScore += playerRoadScore;
+        roadScoreTextPlayers[playerIndex].text = players[playerIndex].roadScore.ToString();
+        SetPlayerScoresWithoutSwap(players[0].generalScore, players[1].generalScore);
+    }
+
+    private void ValueChangedAnimation(TextMeshProUGUI text, bool isNewValueBigger, float delay)
+    {
+        text.transform.parent.DOKill();
+        text.DOKill();
+        Color color = isNewValueBigger ? Color.green : Color.red;
+        Sequence seq = DOTween.Sequence();
+        seq.AppendInterval(delay);
+        seq.Append(text.transform.parent.DOScale(1.2f, 0.2f).SetEase(Ease.OutBack));
+        seq.Join(text.DOColor(color, 0.2f).SetEase(Ease.OutBack));
+        seq.Append(text.transform.parent.DOScale(1f, 0.3f).SetEase(Ease.InOutSine));
+        
+        seq.Append(text.transform.parent.DOScale(1.1f, 0.3f).SetEase(Ease.InOutSine));
+        seq.Append(text.transform.parent.DOScale(1f, 0.3f).SetEase(Ease.InOutSine));
+        seq.Append(text.transform.parent.DOScale(1.05f, 0.3f).SetEase(Ease.InOutSine));
+        
+        seq.Append(text.transform.parent.DOScale(1f, 0.5f).SetEase(Ease.OutExpo));
+        seq.Join(text.DOColor(Color.white, 1f).SetEase(Ease.OutExpo));
+        seq.Play();
+    }
+    public void SetPlayerScores(int localPlayerScore, int remotePlayerScore, bool withAnimation = true, float delay = 0)
     {
         int[] playersScores = SetLocalPlayerData.GetLocalPlayerInt(localPlayerScore, remotePlayerScore);
-        LocalPlayerScoreText.text = playersScores[0].ToString();
-        RemotePlayerScoreText.text = playersScores[1].ToString();
+        SetPlayerScoresWithoutSwap(playersScores[0], playersScores[1], withAnimation, delay);
     }
+    public void SetPlayerScoresWithoutSwap(int localPlayerScore, int remotePlayerScore, bool withAnimation = true, float delay = 0)
+    {
+        if(LocalPlayerScoreText.text != localPlayerScore.ToString() && withAnimation)
+        {
+            int value = int.Parse(LocalPlayerScoreText.text);
+            ValueChangedAnimation(LocalPlayerScoreText, value <= localPlayerScore, delay);
+        }
+        if(RemotePlayerScoreText.text != remotePlayerScore.ToString() && withAnimation)
+        {
+            int value = int.Parse(RemotePlayerScoreText.text);
+            ValueChangedAnimation(RemotePlayerScoreText, value <= remotePlayerScore, delay);
+        }
+        LocalPlayerScoreText.text = localPlayerScore.ToString();
+        RemotePlayerScoreText.text = remotePlayerScore.ToString();
+    }
+
+    // public void GeneralScoreClientPrediction(int playerIndex)
+    // {
+    //     int localPlayerScore = players[0].cityScore + players[0].roadScore;
+    //     int remotePlayerScore = players[1].cityScore + players[1].roadScore;
+    //     int[] playersScores = SetLocalPlayerData.GetLocalPlayerInt(localPlayerScore, remotePlayerScore);
+    //     if(LocalPlayerScoreText.text != playersScores[0].ToString())
+    //     {
+    //         ValueChangedAnimation(LocalPlayerScoreText);
+    //     }
+    //     if(RemotePlayerScoreText.text != playersScores[1].ToString())
+    //     {
+    //         ValueChangedAnimation(RemotePlayerScoreText);
+    //     }
+    //     LocalPlayerScoreText.text = playersScores[0].ToString();
+    //     RemotePlayerScoreText.text = playersScores[1].ToString();
+    // }
     
     public void SetNames(string localPlayerName, string remotePlayerName)
     {
@@ -134,8 +225,9 @@ public class PlayerInfoUI : MonoBehaviour
     {
         public Image playerImage;
         public int jokerCount = 3;
+        public int generalScore => cityScore + roadScore;
         public int cityScore = 0;
-        public int tileScore = 0;
+        public int roadScore = 0;
         public float time = 600f;
         public List<Image> jokersImage;
         public TextMeshProUGUI jokerCountText;

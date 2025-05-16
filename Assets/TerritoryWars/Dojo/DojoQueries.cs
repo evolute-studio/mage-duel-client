@@ -65,9 +65,9 @@ namespace TerritoryWars.Dojo
             
             var notBotClause = new MemberClause(
                 GetModelName<evolute_duel_Player>(),
-                "is_bot",
-                dojo.ComparisonOperator.Eq,
-                new MemberValue( new Primitive{ Bool = false })
+                "role",
+                dojo.ComparisonOperator.Neq,
+                new MemberValue( new Primitive{ U8 = 2} )
             );
             
             // username not contatin 0x part

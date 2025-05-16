@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using TerritoryWars.Tile;
 using UnityEngine;
 using DG.Tweening;
+using TerritoryWars.Dojo;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using Random = UnityEngine.Random;
 
 namespace TerritoryWars.General
 {
@@ -30,7 +32,9 @@ namespace TerritoryWars.General
 
         [SerializeField] private Ease moveEase = Ease.OutQuint;
 
+        private TileData currentTile;
         private Vector3 _initialPosition;
+        private Vector2Int _currentBoardPosition;
         private Tween currentTween;
         private Camera _mainCamera;
 
@@ -121,8 +125,14 @@ namespace TerritoryWars.General
                     
 
                     HouseSprites.Clear();
-                    SpriteRenderer[] houseRenderers = tileGenerator.CurrentTileGO.GetComponent<TileParts>().HouseRenderers.ToArray();
-                    for (int i = 0; i < houseRenderers.Length; i++)
+                    List<SpriteRenderer> houseRenderers = new List<SpriteRenderer>();
+                    
+                    foreach (var house in tileParts.Houses)
+                    {
+                        houseRenderers.Add(house.HouseSpriteRenderer);
+                    }
+                    
+                    for (int i = 0; i < houseRenderers.Count; i++)
                     {
                         houseRenderers[i].sortingLayerName = "Preview";
                         if (currentTile.HouseSprites.Count > i && currentTile.HouseSprites[i] != null)
@@ -181,6 +191,7 @@ namespace TerritoryWars.General
         public void SetPosition(int x, int y)
         {
             currentTween?.Kill();
+            _currentBoardPosition = new Vector2Int(x, y);
 
             Vector3 targetPosition = Board.GetTilePosition(x, y);
             targetPosition.y += tilePreviewSetHeight;
@@ -191,13 +202,14 @@ namespace TerritoryWars.General
             //previewTileView.transform.DOScale(1, 0.5f).SetEase(Ease.OutQuint);
         }
         
-        public void PlaceTile(Action callback = null)
+        public void PlaceTile(int playerIndex, TileData tileData, Action callback = null)
         {
-            StartCoroutine(PlaceTileCoroutine(callback));
+            currentTile = tileData;
+            StartCoroutine(PlaceTileCoroutine(playerIndex, callback));
         }
         
 
-        private IEnumerator PlaceTileCoroutine(Action callback = null)
+        private IEnumerator PlaceTileCoroutine(int playerIndex, Action callback = null)
         {
             if (!gameObject.activeSelf) yield break;
             // shake animation Y
@@ -269,7 +281,11 @@ namespace TerritoryWars.General
                 }
 
                 HouseSprites.Clear();
-                SpriteRenderer[] houseRenderers = tileGenerator.CurrentTileGO.GetComponent<TileParts>().HouseRenderers.ToArray();
+                List<SpriteRenderer> houseRenderers = new List<SpriteRenderer>();
+                foreach (var house in tileParts.Houses)
+                {
+                    houseRenderers.Add(house.HouseSpriteRenderer);
+                }
                 foreach (SpriteRenderer houseRenderer in houseRenderers)
                 {
                     houseRenderer.sortingLayerName = "Default";
@@ -288,8 +304,12 @@ namespace TerritoryWars.General
                 .OnComplete(() =>
                 {
                     callback?.Invoke();
+                    SessionManager.Instance.Board.FloatingTextAnimation(_currentBoardPosition);
+                    SessionManager.Instance.Board.ScoreClientPrediction(playerIndex, currentTile);
                 });
         }
+
+        
 
         public void ResetPosition()
         {

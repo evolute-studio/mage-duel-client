@@ -7,7 +7,9 @@ using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.ScriptablesObjects;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
+using TerritoryWars.UI;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 namespace TerritoryWars.General
 {
@@ -156,7 +158,7 @@ namespace TerritoryWars.General
                 PlaceTile(new TileData(fieldTile), startPos.x, startPos.y, -1);
                 // Don't place forests, only mountains at other corners
                 GameObject mountain;
-                if (IsSnowBoardPart(startPos.x, startPos.y) == 3)
+                if (IsSnowBoardPart(startPos.x, startPos.y))
                 {
                     mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
                         tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer"));
@@ -194,7 +196,7 @@ namespace TerritoryWars.General
                     Destroy(GetTileObject(endPos.x, endPos.y));
                 PlaceTile(new TileData(fieldTile), endPos.x, endPos.y, -1);
                 GameObject mountain;
-                if (IsSnowBoardPart(endPos.x, endPos.y) == 3)
+                if (IsSnowBoardPart(endPos.x, endPos.y))
                 {
                     mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
                         tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer"));
@@ -235,7 +237,7 @@ namespace TerritoryWars.General
                         = null;
                     
                     GameObject mountain;
-                    if (IsSnowBoardPart(availablePositions[i].x, availablePositions[i].y) == 3)
+                    if (IsSnowBoardPart(availablePositions[i].x, availablePositions[i].y))
                     {
                         mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
                             tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer"));
@@ -342,6 +344,42 @@ namespace TerritoryWars.General
 
             return true;
         }
+        
+        public void FloatingTextAnimation(Vector2Int position)
+        {
+            GameObject gameObject = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
+            TileData tileData = SessionManager.Instance.Board.GetTileData(position.x, position.y);
+            TileParts tileParts = gameObject.GetComponentInChildren<TileParts>();
+            TileGenerator tileGenerator = gameObject.GetComponent<TileGenerator>();
+            int playerId = SessionManager.Instance.CurrentTurnPlayer.SideId;
+            playerId = SetLocalPlayerData.GetLocalIndex(playerId);
+            string side = playerId == 0 ? "blue" : "red";
+            Vector3 motion = new Vector3(0, 0.3f, 0);
+                    
+            foreach (var house in tileParts.Houses)
+            {
+                float duration = 2f + UnityEngine.Random.Range(0f, 1f);
+                Vector3 textPosition = house.HouseSpriteRenderer.transform.position;
+                FloatingTextManager.Instance.Show("+1", textPosition, motion, duration, "house_icon_" + side);
+            }
+            foreach (var pin in tileGenerator.Pins)
+            {
+                if(pin == null) continue;
+                float duration = 2f + UnityEngine.Random.Range(0f, 1f);
+                Vector3 textPosition = pin.transform.position;
+                int cityCount = tileData.id.Count(c => c == 'R');
+                string messageText = cityCount == 2 ? "+2" : "+1";
+                FloatingTextManager.Instance.Show(messageText, textPosition, motion, duration, "road_icon_" + side);
+                if(cityCount == 2) break;
+            }
+        }
+
+        public void ScoreClientPrediction(int playerIndex, TileData data)
+        {
+            if(!SessionManager.Instance.IsLocalPlayerTurn) return;
+            SessionManager.Instance.gameUI.playerInfoUI.AddClientCityScore(playerIndex, data.id.Count(c => c == 'C') * 2);
+            SessionManager.Instance.gameUI.playerInfoUI.AddClientRoadScore(playerIndex, data.id.Count(r => r == 'R'));
+        }
 
         public bool RevertTile(int x, int y)
         {
@@ -374,6 +412,13 @@ namespace TerritoryWars.General
             }
         }
 
+        public void ConnectEdgeStructureAnimation(int ownerId, TileData tileData, int x, int y, bool isCityContest = false, bool isRoadContest = false)
+        {
+            if(isCityContest || isRoadContest || SessionManager.Instance.IsSessionStarting) return;
+            FloatingTextAnimation(new Vector2Int(x, y));
+            ScoreClientPrediction(ownerId, tileData);
+        }
+
         private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false, bool isRoadContest = false)
         {
             GameObject[] neighborsGO = new GameObject[4];
@@ -399,6 +444,7 @@ namespace TerritoryWars.General
             {
                 if(IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
+                    ConnectEdgeStructureAnimation(owner, neighborsData[i], tilePositions[i][0], tilePositions[i][1], isCityContest, isRoadContest);
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
                     {
@@ -438,27 +484,15 @@ namespace TerritoryWars.General
                 }
             }
         }
-
-        public int IsSnowBoardPart(int x, int y)
+        
+        public bool IsSnowBoardPart(int x, int y)
         {
-            if (x < 4 & y < 4) // the numbers indicate the part of the board
-            {
-                return 0; // default mountain
-            }
             if (x > 4 & y > 4)
             {
-                return 3; // snow mountain
-            }
-            if (x <= 4 & y >= 4)
-            {
-                return 1; // player mountain
-            }
-            if (x >= 4 & y <= 4)
-            {
-                return 2; // player mountain
+                return true; // snow mountain
             }
 
-            return -1;
+            return false;
         }
 
         public Vector2Int GetEdgeNeighbors(int x, int y, Side side)
@@ -1061,5 +1095,22 @@ namespace TerritoryWars.General
             public Vector2Int TileBoardPosition;
             public Side Direction;
         }
+
+        // public void OnGUI()
+        // {
+        //     for (int x = 0; x < width; x++)
+        //     {
+        //         for (int y = 0; y < height; y++)
+        //         {
+        //             if (tileObjects[x, y] != null && tileData[x, y] != null)
+        //             {
+        //                 Vector3 screenPos = Camera.main.WorldToScreenPoint(tileObjects[x, y].transform.position);
+        //                 screenPos.y = Screen.height - screenPos.y; // Конвертуємо Y координату для GUI
+        //                 
+        //                 GUI.Label(new Rect(screenPos.x - 20, screenPos.y - 10, 100, 20), tileData[x, y].id);
+        //             }
+        //         }
+        //     }
+        // }
     }
 }

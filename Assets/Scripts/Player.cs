@@ -5,13 +5,14 @@ using TerritoryWars.Tools;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Character : MonoBehaviour
+public class Player : MonoBehaviour
 {
     private Animator _animator;
     private CharacterAnimator _characterAnimator;
     public FieldElement Address;
-    public int LocalId;
+    //public int SessionSideId;
     public PlayerSide Side;
+    public int SideId => Side.Unwrap();
     public int JokerCount;
     public SpriteRenderer GFX;
     
@@ -19,12 +20,6 @@ public class Character : MonoBehaviour
     {
         Address = address;
         Side = side;
-        LocalId = side switch
-        {
-            PlayerSide.Blue => 0,
-            PlayerSide.Red => 1,
-            _ => 0
-        };
         JokerCount = jokerCount;
         _animator = GetComponent<Animator>();
         _characterAnimator = new CharacterAnimator(_animator);

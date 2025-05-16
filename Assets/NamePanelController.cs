@@ -22,6 +22,7 @@ public class NamePanelController : MonoBehaviour
     public TextMeshProUGUI PlayerNameText;
     public TextMeshProUGUI EvoluteCountText;
     public Button ChangeNameButton;
+    public Image ControllerIcon;
     
     private bool _isInitialized = false;
     
@@ -49,6 +50,7 @@ public class NamePanelController : MonoBehaviour
         string name = CairoFieldsConverter.GetStringFromFieldElement(profile.username);
         SetName(name);
         SetEvoluteBalance(profile.balance);
+        ControllerIcon.gameObject.SetActive(ApplicationState.IsController);
     }
 
     private void CreateModelForNewPlayer()
@@ -61,7 +63,7 @@ public class NamePanelController : MonoBehaviour
         }
         else
         {
-            username = DojoGameManager.Instance.LocalAccount.Address.Hex().Substring(0, 9);
+            username = "Guest" + DojoGameManager.Instance.LocalAccount.Address.Hex().Substring(0, 9);
         }
         DojoConnector.ChangeUsername(
             DojoGameManager.Instance.LocalAccount,
@@ -70,15 +72,10 @@ public class NamePanelController : MonoBehaviour
         SetEvoluteBalance(0);
     }
 
-    public void CallChangeNamePanel()
-    {
-        ChangeNamePanel.SetActive(true);
-    }
-
     public bool IsDefaultName()
     {
         // default name starts with "0x"
-        return PlayerNameText.text.StartsWith("0x");
+        return PlayerNameText.text.StartsWith("Guest");
     }
     
     public void SetName(string name)

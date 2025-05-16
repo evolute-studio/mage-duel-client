@@ -25,12 +25,11 @@ namespace TerritoryWars.Dojo
         public static float TurnDuration = 60f;
         private GeneralAccount _localPlayerAccount => _dojoGameManager.LocalAccount;
         private evolute_duel_Board _localPlayerBoard;
-        private int _moveCount = 0;
+        public int MoveCount => _dojoGameManager.WorldManager.Entities<evolute_duel_Move>().Length;
 
         private int _snapshotTurn = 0;
         private FieldElement _lastMoveId;
         private ContestProcessor _contestProcessor = new ContestProcessor();
-
         public evolute_duel_Move LastMove
         {
             get
@@ -149,8 +148,6 @@ namespace TerritoryWars.Dojo
             string player = eventModel.player.Hex();
             if (player != SessionManager.Instance.LocalPlayer.Address.Hex() &&
                 player != SessionManager.Instance.RemotePlayer.Address.Hex()) return;
-
-            _moveCount++;
             string move_id = eventModel.move_id.Hex();
             LastMoveTimestamp = eventModel.timestamp;
             string prev_move_id = eventModel.prev_move_id switch
@@ -230,13 +227,14 @@ namespace TerritoryWars.Dojo
             string board_id = eventModel.board_id.Hex();
             if (LocalPlayerBoard.id.Hex() != board_id) return;
             CustomLogger.LogExecution($"[BoardUpdated] | BoardId: {board_id}");
-            int cityScoreBlue = eventModel.blue_score.Item1;
-            int cartScoreBlue = eventModel.blue_score.Item2;
-            int cityScoreRed = eventModel.red_score.Item1;
-            int cartScoreRed = eventModel.red_score.Item2;
-            GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed);
-            GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed);
-            GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed);
+            int cityScoreFirst = eventModel.blue_score.Item1;
+            int cartScoreFirst = eventModel.blue_score.Item2;
+            int cityScoreSecond = eventModel.red_score.Item1;
+            int cartScoreSecond = eventModel.red_score.Item2;
+            float tilePlacementDuration = 0.8f;
+            GameUI.Instance.playerInfoUI.SetCityScores(cityScoreFirst, cityScoreSecond, delay: tilePlacementDuration);
+            GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreFirst, cartScoreSecond, delay: tilePlacementDuration);
+            GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreFirst + cartScoreFirst, cityScoreSecond + cartScoreSecond, delay: tilePlacementDuration);
             var tileData = eventModel.top_tile switch
             {
                 Option<byte>.Some topTile => new TileData(OnChainBoardDataConverter.GetTopTile(topTile)),
@@ -966,8 +964,7 @@ namespace TerritoryWars.Dojo
 
         public void CreateSnapshot()
         {
-            GameObject[] movesGO = _dojoGameManager.WorldManager.Entities<evolute_duel_Move>();
-            DojoConnector.CreateSnapshot(_localPlayerAccount, LocalPlayerBoard.id, (byte)movesGO.Length);
+            DojoConnector.CreateSnapshot(_localPlayerAccount, LocalPlayerBoard.id, (byte)MoveCount);
         }
 
         public void SkipMove()

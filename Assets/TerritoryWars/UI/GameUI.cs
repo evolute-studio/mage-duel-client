@@ -55,8 +55,6 @@ namespace TerritoryWars.UI
         [SerializeField] private TextMeshProUGUI SaveSnapshotText;
         
         public static event Action OnJokerButtonClickedEvent;
-        
-        private GameMenuController _gameMenuController;
 
         [Header("Tile Preview")]
         [SerializeField] private TilePreview tilePreview;
@@ -72,14 +70,11 @@ namespace TerritoryWars.UI
         
         [SerializeField] private ArrowAnimations arrowAnimations;
         private bool _isJokerActive = false;
-
+        
         public void Initialize()
         {
             _sessionManager = FindObjectOfType<General.SessionManager>();
             deckManager = FindObjectOfType<DeckManager>();
-
-            _gameMenuController = new GameMenuController();
-            _gameMenuController.Initialize(_gameMenuView);
 
             SetupButtons();
             UpdateUI();
@@ -149,7 +144,7 @@ namespace TerritoryWars.UI
             _resultPopUpUI.SetPlayerHeroAnimator(playerInfoUI.charactersObject.GetAnimatorController(PlayerCharactersManager.GetCurrentCharacterId()),
                 playerInfoUI.charactersObject.GetAnimatorController(PlayerCharactersManager.GetOpponentCurrentCharacterId()));
                 
-            bool isLocalPlayerBlue = SessionManager.Instance.LocalPlayer.LocalId == 0;
+            bool isLocalPlayerBlue = SessionManager.Instance.LocalPlayer.SideId == 0;
             string wonText;
             if (score1 > score2 && isLocalPlayerBlue || score1 < score2 && !isLocalPlayerBlue)
                 wonText = "You won!";
@@ -190,14 +185,12 @@ namespace TerritoryWars.UI
             UpdateUI();
             SetActiveDeckContainer(false);
             SetActiveSkipButtonPulse(false);
-            JokerButtonPulse(false);
         }
         
         private void SkipMoveButtonClicked()
         {
             _sessionManager.ClientLocalPlayerSkip();
             SetActiveSkipButtonPulse(false);
-            JokerButtonPulse(false);
             UpdateUI();
         }
 
@@ -269,7 +262,6 @@ namespace TerritoryWars.UI
         {
             if(SessionManager.Instance.CurrentTurnPlayer.JokerCount <= 0 || _isJokerActive || !SessionManager.Instance.IsLocalPlayerTurn) return;
             _isJokerActive = true;
-            JokerButtonPulse(false);
             
             SetJokerMode(true);
             OnJokerButtonClickedEvent?.Invoke();

@@ -26,8 +26,8 @@ public class evolute_duel_Player : ModelInstance {
         [ModelField("active_skin")]
         public byte active_skin;
         
-        [ModelField("is_bot")]
-        public bool is_bot;
+        [ModelField("role")]
+        public byte role; // 0 = guest, 1 = controller, 2 = bot,
 
     // Start is called before the first frame update
     void Start() {

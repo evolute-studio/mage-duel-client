@@ -20,7 +20,6 @@ namespace TerritoryWars.ScriptablesObjects
         public ContestedHouses SecondPlayerContestedHouses;
         
         
-        public Sprite[] ForestMountains;
         public Sprite[] SnowMountains;
         public Sprite[] ForestMountainsWithoutClouds;
         public GameObject ForestPrefab;
@@ -33,13 +32,9 @@ namespace TerritoryWars.ScriptablesObjects
         public Sprite[] StoneWallSprites;
 
         public Sprite[] HangingGrass; 
-        public Sprite NorthernGrass;
         
         public Sprite MudCityTextureSprite;
         public Sprite StoneCityTextureSprite;
-        
-        public Sprite[] ContestedBlueHouses;
-        public Sprite[] ContestedRedHouses;
 
         public Sprite[] Bushes;
         public Sprite[] Flowers;
@@ -344,12 +339,6 @@ namespace TerritoryWars.ScriptablesObjects
             return isContested ? StoneCityTextureSprite : MudCityTextureSprite;
         }
         
-        public Sprite[] GetRandomContestedHouse(int playerIndex)
-        {
-            int randomIndex = Random.Range(0, (playerIndex == 0 ? ContestedBlueHouses : ContestedRedHouses).Length);
-            Sprite randomContestedHouse = (playerIndex == 0 ? ContestedBlueHouses : ContestedRedHouses)[randomIndex];
-            return new Sprite[] {randomContestedHouse};
-        }
         
         public Sprite GetHangingGrass()
         {

@@ -202,7 +202,7 @@ namespace TerritoryWars.Tile
                 foreach (var spriteSwapElement in SpriteSwapElements)
                 {
                     spriteSwapElement.Rotate(times);
-                    CustomLogger.LogInfo($"Sprite swap element: {times} | Houses : {_tileParts.HouseRenderers.Count} | Roads: {_tileParts.RoadRenderers.Length}");
+                    CustomLogger.LogInfo($"Sprite swap element: {times} | Houses : {_tileParts.Houses.Count} | Roads: {_tileParts.RoadRenderers.Length}");
                     if (spriteSwapElement.PinObjects != null && spriteSwapElement.PinObjects.Length > 0)
                     {
                         var pinsParent = spriteSwapElement.PinObjects[spriteSwapElement.CurrentIndex];
@@ -220,7 +220,7 @@ namespace TerritoryWars.Tile
             _tileParts ??= GetComponent<TileParts>();
             if (_tileParts.RoadRenderers != null)
             {
-                CustomLogger.LogInfo($"Road renderers : {times} | Houses : {_tileParts.HouseRenderers.Count} | Roads: {_tileParts.RoadRenderers.Length}");
+                CustomLogger.LogInfo($"Road renderers : {times} | Houses : {_tileParts.Houses.Count} | Roads: {_tileParts.RoadRenderers.Length}");
                 _tileParts.RoadRenderers = RotateRoadArray(_tileParts.RoadRenderers, times);
             }
 
