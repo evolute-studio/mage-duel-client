@@ -52,6 +52,7 @@ namespace TerritoryWars.Tools
 
         public void Play()
         {
+            if(!gameObject.activeSelf) return;
             Stop();
             if (sprites == null || sprites.Length == 0 || (_spriteRenderer == null && _image == null))
             {

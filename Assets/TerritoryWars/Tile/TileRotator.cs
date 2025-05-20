@@ -243,11 +243,6 @@ namespace TerritoryWars.Tile
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                RotateClockwise();
-            }
-
             if (autoRotate && Time.time >= nextRotateTime)
             {
                 RotateClockwise();

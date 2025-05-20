@@ -24,6 +24,10 @@ namespace TerritoryWars.General
         private Vector3 minBounds = new Vector3(-8f, -2.8f, 0f);
         private Vector3 maxBounds = new Vector3(8f, 8f, 0f);
         private bool _isCameraMoveLocked = false;
+        
+        private float _pinchEndTime = 0f;
+        private const float PINCH_END_THRESHOLD = 0.2f;
+        private bool wasPinching = false;
 
         // Для мобільних жестів
         private float lastPinchDistance;
@@ -59,7 +63,30 @@ namespace TerritoryWars.General
 
         private void HandlePanning()
         {
-            if (Input.touchCount == 1) // Один палець для переміщення
+            if (wasPinching && Time.time - _pinchEndTime < PINCH_END_THRESHOLD)
+            {
+                // If the finger has started to move after a recent zuma, allow you to move
+                if (Input.touchCount == 1)
+                {
+                    Touch touch = Input.GetTouch(0);
+                    if (touch.phase == TouchPhase.Moved)
+                    {
+                        wasPinching = false; // We throw away the box to allow moving
+                    }
+                }
+                else if (Input.touchCount == 0)
+                {
+                    wasPinching = false;
+                }
+        
+                // If still in the period after zoom, do not process moving
+                if (wasPinching)
+                {
+                    return;
+                }
+            }
+            
+            if (Input.touchCount == 1) // One finger to move
             {
                 Touch touch = Input.GetTouch(0);
                 
@@ -139,10 +166,12 @@ namespace TerritoryWars.General
                 {
                     lastPinchDistance = Vector2.Distance(touch0.position, touch1.position);
                     isPinching = true;
+                    wasPinching = true;
                 }
                 else if (touch0.phase == TouchPhase.Ended || touch1.phase == TouchPhase.Ended)
                 {
                     isPinching = false;
+                    _pinchEndTime = Time.time;
                 }
 
                 if (isPinching)

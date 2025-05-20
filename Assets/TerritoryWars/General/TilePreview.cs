@@ -135,8 +135,6 @@ namespace TerritoryWars.General
                     for (int i = 0; i < houseRenderers.Count; i++)
                     {
                         houseRenderers[i].sortingLayerName = "Preview";
-                        if (currentTile.HouseSprites.Count > i && currentTile.HouseSprites[i] != null)
-                            houseRenderers[i].sprite = currentTile.HouseSprites[i];
                         HouseSprites.Add(houseRenderers[i].sprite);
                     }
                     foreach (SpriteRenderer houseRenderer in houseRenderers)
