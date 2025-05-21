@@ -62,7 +62,7 @@ namespace TerritoryWars.Dojo
             return query;
         }
 
-        public static Query GetQueryTopPlayersForLeaderboard(uint count)
+        public static Query GetQueryTopPlayersForLeaderboard(uint count, uint playersBalance)
         {
             string[] entity_models = new[] { GetModelName<evolute_duel_Player>() };
             
@@ -73,12 +73,11 @@ namespace TerritoryWars.Dojo
                 new MemberValue( new Primitive{ U8 = 2} )
             );
             
-            // username not contatin 0x part
-            var notContain0xClause = new MemberClause(
+            var balanceClause = new MemberClause(
                 GetModelName<evolute_duel_Player>(),
-                "username",
-                dojo.ComparisonOperator.NotIn,
-                new MemberValue("0x")
+                "balance",
+                dojo.ComparisonOperator.Gte,
+                new MemberValue( new Primitive{ U8 = (byte)playersBalance} )
             );
             
             OrderBy[] order_by = new[]
@@ -88,7 +87,12 @@ namespace TerritoryWars.Dojo
                     member: "balance",
                     direction: dojo.OrderDirection.Desc)
             };
-            Query query = new Query(count, offset, notBotClause, dont_include_hashed_keys, 
+            
+            var compositeClause = new CompositeClause(
+                dojo.LogicalOperator.And,
+                new[] { (Clause)notBotClause, balanceClause }
+            );
+            Query query = new Query(count, offset, compositeClause, dont_include_hashed_keys, 
                                     order_by, entity_models, entity_updated_after);
             return query;
         }
