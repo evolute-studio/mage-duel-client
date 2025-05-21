@@ -15276,7 +15276,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1731191455535948361, guid: bdbe09d647d637f40aa82422ac603c20, type: 3}
       propertyPath: m_ScrollSensitivity
-      value: 0.75
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 1731191455535948361, guid: bdbe09d647d637f40aa82422ac603c20, type: 3}
       propertyPath: m_VerticalScrollbar
@@ -15599,6 +15599,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 34308446730687405, guid: bdbe09d647d637f40aa82422ac603c20, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1793970168}
+    - targetCorrespondingSourceObject: {fileID: 9159506782267116232, guid: bdbe09d647d637f40aa82422ac603c20, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2129706285}
   m_SourcePrefab: {fileID: 100100000, guid: bdbe09d647d637f40aa82422ac603c20, type: 3}
 --- !u!224 &1793970165 stripped
 RectTransform:
@@ -17297,6 +17300,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2110622090}
   m_CullTransparentMesh: 1
+--- !u!1 &2129706284 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9159506782267116232, guid: bdbe09d647d637f40aa82422ac603c20, type: 3}
+  m_PrefabInstance: {fileID: 1793970164}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2129706285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2129706284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08dfb51eb22ca674595e2ae63b308878, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2146934662
 GameObject:
   m_ObjectHideFlags: 0
