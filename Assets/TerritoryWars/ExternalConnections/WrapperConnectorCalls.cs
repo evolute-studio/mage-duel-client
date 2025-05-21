@@ -22,12 +22,12 @@ namespace TerritoryWars.ExternalConnections
         
         [DllImport("__Internal")]
         private static extern void controller_logout();
+
+        [DllImport("__Internal")]
+        private static extern void get_controller_username();
         
         [DllImport("__Internal")]
         private static extern void open_controller_profile();
-
-        [DllImport("__Internal")]
-        private static extern string get_controller_username();
 
         [DllImport("__Internal")]
         private static extern void execute_controller(string transaction);
@@ -79,16 +79,17 @@ namespace TerritoryWars.ExternalConnections
 #endif
         }
 
-        public static string GetUsername()
+        public static void GetControllerUsername()
         {
-            if(!ApplicationState.IsController) return null;
+            if (!ApplicationState.IsController) return;
+            
 #if UNITY_WEBGL && !UNITY_EDITOR
             CustomLogger.LogDojoLoop("GetUsername");
-            string username = get_controller_username();
-            return username;
+            get_controller_username();
+            return;
 #else
             CustomLogger.LogDojoLoop("GetUsername called in non-WebGL build");
-            return null;
+            return;
 #endif
         }
 

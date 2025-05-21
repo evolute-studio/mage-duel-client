@@ -48,6 +48,7 @@ public class NamePanelController : MonoBehaviour
             return;
         }
         string name = CairoFieldsConverter.GetStringFromFieldElement(profile.username);
+        CheckNickname(name);
         SetName(name);
         SetEvoluteBalance(profile.balance);
         ControllerIcon.gameObject.SetActive(ApplicationState.IsController);
@@ -77,7 +78,16 @@ public class NamePanelController : MonoBehaviour
         // default name starts with "0x"
         return PlayerNameText.text.StartsWith("Guest");
     }
-    
+
+    public void CheckNickname(string name)
+    {
+        if (String.IsNullOrEmpty(name))
+        {
+            CustomLogger.LogError("Name is null or empty");
+            WrapperConnectorCalls.GetControllerUsername();
+        }
+    }
+
     public void SetName(string name)
     {
         PlayerNameText.text = name;
