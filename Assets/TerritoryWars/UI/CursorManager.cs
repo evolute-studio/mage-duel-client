@@ -23,6 +23,7 @@ public class CursorManager : MonoBehaviour
     // Corresponding hotspots
     public Vector2 defaultHotspot;
     public Vector2 pointerHotspot;
+    private Vector2 hotspot;
 
     void Awake()
     {
@@ -44,10 +45,12 @@ public class CursorManager : MonoBehaviour
         {
             _canvas = GetComponent<Canvas>();
         }
+        hotspot = defaultHotspot;
     }
 
     public void Update()
     {
+        Cursor.visible = false;
         Vector2 mousePosition = Input.mousePosition;
         
         // Конвертуємо позицію миші в локальні координати Canvas
@@ -58,7 +61,7 @@ public class CursorManager : MonoBehaviour
             out Vector2 localPoint
         );
         
-        _cursorRectTransform.anchoredPosition = localPoint;
+        _cursorRectTransform.anchoredPosition = localPoint + hotspot;
     }
 
     public void SetCursor(string cursorType)
@@ -67,9 +70,11 @@ public class CursorManager : MonoBehaviour
         {
             case "pointer":
                 _cursorImage.sprite = pointerCursor;
+                hotspot = pointerHotspot;
                 break;
             default:
                 _cursorImage.sprite = defaultCursor;
+                hotspot = defaultHotspot;
                 break;
         }
     }
