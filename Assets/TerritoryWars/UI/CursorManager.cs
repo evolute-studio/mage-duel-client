@@ -2,16 +2,18 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class CursorManager : MonoBehaviour
 {
     public static CursorManager Instance;
-    private Camera MainCamera;
     [SerializeField]private GameObject _cursorObject;
-    [SerializeField]private SpriteRenderer _cursorSpriteRenderer;
+    [SerializeField]private Image _cursorImage;
+    [SerializeField]private RectTransform _cursorRectTransform;
+    [SerializeField]private Canvas _canvas;
+    [SerializeField]private RectTransform _canvasRectTransform;
     
     // Different cursor types you might want
     public Sprite defaultCursor;
@@ -29,51 +31,34 @@ public class CursorManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
             Destroy(gameObject);
         }
-        
-        UpdateMainCamera();
         Cursor.visible = false;
         SetCursor("default");
-    }
-
-    private void OnDestroy()
-    {
-        if (Instance == this)
+        
+        // Отримуємо посилання на Canvas, якщо воно не встановлено
+        if (_canvas == null)
         {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-        }
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        UpdateMainCamera();
-    }
-
-    private void UpdateMainCamera()
-    {
-        MainCamera = Camera.main;
-        if (MainCamera == null)
-        {
-            Debug.LogWarning("Main camera not found! Cursor position might be incorrect.");
+            _canvas = GetComponent<Canvas>();
         }
     }
 
     public void Update()
     {
-        if (MainCamera != null)
-        {
-            Vector2 cursorPos = MainCamera.ScreenToWorldPoint(Input.mousePosition);
-            float spriteHeight = _cursorSpriteRenderer.bounds.size.y;
-            float spriteWidth = _cursorSpriteRenderer.bounds.size.x;
-            cursorPos.y -= spriteHeight / 2;
-            cursorPos.x += spriteWidth / 2;
-            _cursorObject.transform.position = cursorPos;
-        }
+        Vector2 mousePosition = Input.mousePosition;
+        
+        // Конвертуємо позицію миші в локальні координати Canvas
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _canvasRectTransform,
+            mousePosition,
+            _canvas.worldCamera,
+            out Vector2 localPoint
+        );
+        
+        _cursorRectTransform.anchoredPosition = localPoint;
     }
 
     public void SetCursor(string cursorType)
@@ -81,10 +66,10 @@ public class CursorManager : MonoBehaviour
         switch(cursorType.ToLower())
         {
             case "pointer":
-                _cursorSpriteRenderer.sprite = pointerCursor;
+                _cursorImage.sprite = pointerCursor;
                 break;
             default:
-                _cursorSpriteRenderer.sprite = defaultCursor;
+                _cursorImage.sprite = defaultCursor;
                 break;
         }
     }
