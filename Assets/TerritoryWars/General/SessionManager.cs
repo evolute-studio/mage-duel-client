@@ -87,7 +87,8 @@ namespace TerritoryWars.General
         public bool IsLocalPlayerHost => LocalPlayer.SideId == 0;
         
         public bool IsSessionStarting { get; private set; } = true;
-        
+
+        public bool isPlayerMakeMove = false;
        
 
         public void Start()
@@ -318,6 +319,7 @@ namespace TerritoryWars.General
 
         private void StartLocalTurn()
         {
+            isPlayerMakeMove = false;
             CustomLogger.LogDojoLoop("StartLocalTurn");
             if (IsGameWithBotAsPlayer)
             {
