@@ -181,6 +181,18 @@ namespace TerritoryWars.ModelsDataConverters
             return new Vector2Int(x + 1, y + 1);
         }
         
+        public static Vector2Int GetPositionFromIndex(int index)
+        {
+            int x = index / 8;
+            int y = index % 8;
+            return new Vector2Int(x + 1, y + 1);
+        }
+        
+        public static byte ConvertServerToClientRotation(byte rotation)
+        {
+            return (byte)((rotation + 3) % 4);
+        }
+        
         public static byte GetRootByPosition(Vector2Int position)
         {
             int x = position.x - 1;

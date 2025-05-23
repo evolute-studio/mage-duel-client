@@ -26,6 +26,17 @@ namespace TerritoryWars.Tile
             sides = tileCode.ToCharArray();
             UpdateId();
         }
+        
+        public static bool IsEqual(TileData tile1, TileData tile2)
+        {
+            (var clientType, var clientRotation) = OnChainBoardDataConverter.GetTypeAndRotation(tile1.id);
+            (var serverType, var serverRotation) = OnChainBoardDataConverter.GetTypeAndRotation(tile2.id);
+            bool isTypeEqual = clientType == serverType;
+            bool isRotationEqual = serverRotation == clientRotation;
+            bool isOwnerEqual = tile1.OwnerId == tile2.OwnerId;
+            
+            return isTypeEqual && isRotationEqual && isOwnerEqual;
+        }
 
         public void UpdateId()
         {
