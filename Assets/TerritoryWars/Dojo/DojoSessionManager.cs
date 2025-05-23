@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;
-using DG.Tweening;
 using Dojo;
 using Dojo.Starknet;
 using TerritoryWars.ExternalConnections;
@@ -248,61 +247,7 @@ namespace TerritoryWars.Dojo
             SessionManager.Instance.SetTilesInDeck(availableTiles + 1);
             SessionManager.Instance.JokerManager.SetJokersCount(0, hostPlayerJokers);
             SessionManager.Instance.JokerManager.SetJokersCount(1, guestPlayerJokers);
-            Sequence seq = DOTween.Sequence();
-            seq.AppendInterval(tilePlacementDuration + 0.1f);
-            seq.AppendCallback(() =>
-            {
-                BoardReconciliation(eventModel.state);
-            });
-            seq.Play();
-            
         }
-
-        private void BoardReconciliation((byte, byte, byte)[] state) // type, rotation, player side
-        {
-            Board board = SessionManager.Instance.Board;
-            for (int i = 0; i < state.Length; i++)
-            {
-                Vector2Int position = OnChainBoardDataConverter.GetPositionFromIndex(i);
-                board.PlacedTiles.TryGetValue(position, out var clientTile);
-
-                if (IsServerTileEmpty(state[i]) && clientTile != null)
-                {
-                    CustomLogger.LogDojoLoop($"[BoardReconciliation] Position: {position} | Client tile exists but server tile is empty");
-                    board.RevertTile(position.x, position.y);
-                }
-                else if (IsServerTileEmpty(state[i]) && clientTile == null)
-                {
-                    continue;
-                }
-                
-                TileData serverTile = new TileData(OnChainBoardDataConverter.TileTypes[state[i].Item1]);
-                serverTile.Rotate(OnChainBoardDataConverter.ConvertServerToClientRotation(state[i].Item2));
-                serverTile.OwnerId = state[i].Item3;
-
-                if (clientTile != null && !IsServerTileEmpty(state[i]))
-                {
-                    if (!TileData.IsEqual(clientTile, serverTile))
-                    {
-                        CustomLogger.LogDojoLoop($"[BoardReconciliation] Position: {position} | Both tiles exist but are different");
-                        board.RevertTile(position.x, position.y);
-                        board.PlaceTile(serverTile, position.x, position.y, serverTile.OwnerId);
-                    }
-                }
-                else if (clientTile == null && !IsServerTileEmpty(state[i]))
-                {
-                    CustomLogger.LogDojoLoop($"[BoardReconciliation] Position: {position} | Client tile is empty but server tile exists");
-                    board.PlaceTile(serverTile, position.x, position.y, serverTile.OwnerId);
-                }
-            }
-        }
-        
-        private bool IsServerTileEmpty((byte, byte, byte) tile)
-        {
-            return tile.Item1 == 24;
-        }
-        
-        
 
         private void GameFinished(FieldElement board_id, FieldElement hostPlayer)
         {

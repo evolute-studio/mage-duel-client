@@ -388,7 +388,7 @@ namespace TerritoryWars.General
             tileData[x, y] = null;
             PlacedTiles.Remove(new Vector2Int(x, y));
 
-            if(tileObjects[x,y] == null && tileData[x,y] == null && !PlacedTiles.ContainsKey(new Vector2Int(x, y)))
+            if(tileObjects[x,y] == null && tileData[x,y] == null && PlacedTiles.ContainsKey(new Vector2Int(x, y)))
             {
                 return true;
             }
