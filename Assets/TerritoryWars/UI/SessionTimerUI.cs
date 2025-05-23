@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Linq;
 using DG.Tweening;
 using TerritoryWars.Dojo;
@@ -15,6 +16,7 @@ namespace TerritoryWars.UI
         public TextMeshProUGUI TurnText;
         public string LocalPlayerTurnText = "Your turn now";
         public string OpponentPlayerTurnText = $"Waiting for opponent's turn";
+        public string PassingTurnText = $"Passing the turn";
         
         [Header("Hourglass")]
         public SpriteAnimator SpriteAnimator;
@@ -24,6 +26,7 @@ namespace TerritoryWars.UI
         public float RotationAnimationDuration = 0.5f;
         
         [Header("Timer")]
+        public float PassingTurnDuration = 3f;
         public TextMeshProUGUI TimerText;
         public TextMeshProUGUI SkipText;
 
@@ -32,18 +35,63 @@ namespace TerritoryWars.UI
         private float _currentTurnTime => GetTurnTime();
         
         [Header("Events")]
+        public UnityEvent OnClientLocalPlayerTurnEnd;
+        public UnityEvent OnClientOpponentPlayerTurnEnd;
         public UnityEvent OnLocalPlayerTurnEnd;
         public UnityEvent OnOpponentPlayerTurnEnd;
+        
+        private Coroutine _clientTimerCoroutine;
+        private Coroutine _passingTimerCoroutine;
         
         private bool _isLocalPlayerTurn = true;
         private bool _isTimerActive = false;
         
         
 
-        public void Update()
+        public IEnumerator UpdateClientTimer()
         {
-            UpdateTimer();
-            UpdateTurnText();
+            if (!_isTimerActive) yield break;
+            while (_currentTurnTime > 0)
+            {
+                TimerText.text = $"{Mathf.FloorToInt(_currentTurnTime / 60):00}:{Mathf.FloorToInt(_currentTurnTime % 60):00}";
+
+                if (_currentTurnTime + PassingTurnDuration <= TurnDuration  / 3f)
+                {
+                    TimerText.color = new Color(0.866f, 0.08f, 0.236f);
+                }
+                UpdateTurnText(_isLocalPlayerTurn ? LocalPlayerTurnText : OpponentPlayerTurnText);
+                yield return null;
+            }
+            TimerText.text = "";
+            TimerText.color = Color.white;
+            
+            if(_passingTimerCoroutine != null)
+            {
+                StopCoroutine(_passingTimerCoroutine);
+                _passingTimerCoroutine = null;
+            }
+            _passingTimerCoroutine = StartCoroutine(UpdatePassingTurnTimer());
+            EndClientTimer();
+        }
+        
+        public IEnumerator UpdatePassingTurnTimer()
+        {
+            if (_clientTimerCoroutine != null)
+            {
+                StopCoroutine(_clientTimerCoroutine);
+                _clientTimerCoroutine = null;
+            }
+            float time = PassingTurnDuration;
+            float timer = 0;
+            
+            while (timer < time)
+            {
+                timer += Time.deltaTime;
+                UpdateTurnText(PassingTurnText);
+                yield return null;
+            }
+            
+            EndPassingTimer();
         }
 
         public void StartTurnTimer(ulong timestamp, bool isLocal)
@@ -60,38 +108,45 @@ namespace TerritoryWars.UI
             _startTurnTime = timestamp;
             _isTimerActive = true;
             TimerText.color = Color.white;
-        }
-        
-        private void UpdateTimer()
-        {
-            if (!_isTimerActive) return;
             
-            TimerText.text = $"{Mathf.FloorToInt(_currentTurnTime / 60):00}:{Mathf.FloorToInt(_currentTurnTime % 60):00}";
-
-            if (_currentTurnTime <= TurnDuration / 3f)
+            if (_clientTimerCoroutine != null)
             {
-                TimerText.color = new Color(0.866f, 0.08f, 0.236f);
+                StopCoroutine(_clientTimerCoroutine);
+                _clientTimerCoroutine = null;
             }
-            
-            if (_currentTurnTime <= 0)
+            if (_passingTimerCoroutine != null)
             {
-                TimerText.text = "00:00";
-                EndTimer();
+                StopCoroutine(_passingTimerCoroutine);
+                _passingTimerCoroutine = null;
             }
+            _clientTimerCoroutine = StartCoroutine(UpdateClientTimer());
         }
         
         private float GetTurnTime()
         {
             ulong unixTimestamp = (ulong) (System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
-            float turnTime = TurnDuration - (unixTimestamp - _startTurnTime);
-            if (turnTime < 0.1f)
-            {
-                turnTime = 0;
-            }
-            return turnTime < 0 ? 0 : turnTime;
+            float turnTime = TurnDuration - (unixTimestamp - _startTurnTime) - PassingTurnDuration;
+            return turnTime <= 0 ? 0 : turnTime;
         }
         
-        private void EndTimer()
+
+        private void EndClientTimer()
+        {
+            _isTimerActive = false;
+            CustomLogger.LogInfo("End client timer");
+            if (_isLocalPlayerTurn)
+            {
+                CustomLogger.LogInfo("Local player client turn end");
+                OnClientLocalPlayerTurnEnd?.Invoke();
+            }
+            else
+            {
+                CustomLogger.LogInfo("Opponent player client turn end");
+                OnClientOpponentPlayerTurnEnd?.Invoke();
+            }
+        }
+
+        private void EndPassingTimer()
         {
             _isTimerActive = false;
             CustomLogger.LogInfo("End timer");
@@ -107,7 +162,6 @@ namespace TerritoryWars.UI
                 OnOpponentPlayerTurnEnd?.Invoke();
                 ShowSkipText(true);
             }
-            
         }
 
         public void ShowSkipText(bool isActive)
@@ -145,9 +199,8 @@ namespace TerritoryWars.UI
                 });
         }
         
-        private void UpdateTurnText()
+        private void UpdateTurnText(string baseText)
         {
-            string baseText = _isLocalPlayerTurn ? LocalPlayerTurnText : OpponentPlayerTurnText;
             int visibleDots = 3 - ((int)(_currentTurnTime % 3));
             string dots = string.Join("", new string[3].Select((_, index) => 
                 $"<color=#{(index < visibleDots ? "FFFFFFFF" : "FFFFFF00")}>.</color>"));
