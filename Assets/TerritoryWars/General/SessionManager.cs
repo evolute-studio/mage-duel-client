@@ -429,6 +429,7 @@ namespace TerritoryWars.General
             CustomLogger.LogImportant($"[ClientLocalPlayerSkip] {LocalPlayer.Address.Hex()}");
             DojoGameManager.Instance.DojoSessionManager.LocalSkipped(LocalPlayer.Address.Hex());
             DojoGameManager.Instance.DojoSessionManager.SkipMove();
+            TileSelector.tilePreview.ResetPosition();
         }
         
         public void ClientRemotePlayerSkip()
