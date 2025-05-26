@@ -63,27 +63,23 @@ namespace TerritoryWars.General
 
         private void HandlePanning()
         {
-            if (wasPinching && Time.time - _pinchEndTime < PINCH_END_THRESHOLD)
+            if (wasPinching)
             {
-                // If the finger has started to move after a recent zuma, allow you to move
                 if (Input.touchCount == 1)
                 {
                     Touch touch = Input.GetTouch(0);
-                    if (touch.phase == TouchPhase.Moved)
+                    if (touch.phase == TouchPhase.Began)
                     {
-                        wasPinching = false; // We throw away the box to allow moving
+                        // Скидаємо lastMousePosition при початку нового дотику після масштабування
+                        lastMousePosition = touch.position;
+                        wasPinching = false;
                     }
                 }
                 else if (Input.touchCount == 0)
                 {
                     wasPinching = false;
                 }
-        
-                // If still in the period after zoom, do not process moving
-                if (wasPinching)
-                {
-                    return;
-                }
+                return;
             }
             
             if (Input.touchCount == 1) // One finger to move
