@@ -75,7 +75,6 @@ namespace TerritoryWars.General
             
             TileData jokerTile = new TileData(tileConfig);
             jokerTile.OwnerId = SetLocalPlayerData.GetLocalIndex(_sessionManager.LocalPlayer.SideId);
-            CustomLogger.LogImportant("Joker tile generated: " + jokerTile.id);
             return jokerTile;
         }
 
@@ -92,12 +91,6 @@ namespace TerritoryWars.General
         public string[] GenerateAllCombinations(int x, int y)
         {
             Dictionary<Side, LandscapeType> neighborSides = GetNeighborSides(x, y);
-            string log = "Position: " + x + ", " + y + "\n";
-            foreach (var side in neighborSides)
-            {
-                log += $"{side.Key}: {side.Value}, ";
-            }
-            CustomLogger.LogImportant(log);
             char[] template = new char[4];
             bool[] fixedSides = new bool[4];
             bool[] universalSides = new bool[4];

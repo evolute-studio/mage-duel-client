@@ -335,12 +335,10 @@ namespace TerritoryWars.General
             gameUI.SetEndTurnButtonActive(false);
             gameUI.SetRotateButtonActive(false);
             gameUI.SetSkipTurnButtonActive(true);
-            CustomLogger.LogImportant($"NextTile: [GetNextTile()]: {GetNextTile()} | [_nextTile]: {_nextTile}");
 
             TileData currentTile = GetNextTile();
             currentTile.OwnerId = LocalPlayer.SideId;
             TileSelector.SetCurrentTile(_nextTile);
-            CustomLogger.LogImportant($"OwnerId: []: {currentTile.OwnerId} | [LocalPlayer.SideId]: {LocalPlayer.SideId}");
             if (TileSelector.IsExistValidPlacement(currentTile))
             {
                 TileSelector.StartTilePlacement(currentTile);
@@ -406,7 +404,6 @@ namespace TerritoryWars.General
         
         private void SkipMove(string playerAddress)
         {
-            CustomLogger.LogImportant($"[SkipMove] {playerAddress} IsLocalPlayer: {LocalPlayer.Address.Hex() == playerAddress } IsLocalPlayerTurn: {IsLocalPlayerTurn}");
             if (CurrentTurnPlayer.Address.Hex() != playerAddress) return;
             CustomLogger.LogDojoLoop("Skip for current player");
             foreach (var player in Players)
@@ -426,7 +423,7 @@ namespace TerritoryWars.General
 
         public void ClientLocalPlayerSkip()
         {
-            CustomLogger.LogImportant($"[ClientLocalPlayerSkip] {LocalPlayer.Address.Hex()}");
+            CustomLogger.LogDojoLoop($"[ClientLocalPlayerSkip] {LocalPlayer.Address.Hex()}");
             DojoGameManager.Instance.DojoSessionManager.LocalSkipped(LocalPlayer.Address.Hex());
             DojoGameManager.Instance.DojoSessionManager.SkipMove();
             TileSelector.tilePreview.ResetPosition();
@@ -434,7 +431,7 @@ namespace TerritoryWars.General
         
         public void ClientRemotePlayerSkip()
         {
-            CustomLogger.LogImportant($"[ClientRemotePlayerSkip] {RemotePlayer.Address.Hex()}");
+            CustomLogger.LogDojoLoop($"[ClientRemotePlayerSkip] {RemotePlayer.Address.Hex()}");
             DojoGameManager.Instance.DojoSessionManager.LocalSkipped(RemotePlayer.Address.Hex());
         }
 

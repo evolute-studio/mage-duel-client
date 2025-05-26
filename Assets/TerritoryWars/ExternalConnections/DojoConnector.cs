@@ -160,7 +160,6 @@ namespace TerritoryWars.ExternalConnections
             }
             else
             {
-                Debug.Log(ControllerContracts.make_move(joker_tile, rotation, col, row));
                 await TryExecuteAction(
                     account.Account,
                     () => GameContract.make_move(account.Account, joker_tile, rotation, col, row),
