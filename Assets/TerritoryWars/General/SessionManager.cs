@@ -417,7 +417,7 @@ namespace TerritoryWars.General
                     break;
                 }
             }
-            GameUI.Instance.SetJokerMode(false);
+            GameUI.Instance.SetJokerMode(false);    
             TileSelector.EndTilePlacement();
             CurrentTurnPlayer.EndTurn();
             CompleteEndTurn(playerAddress, 5f);
