@@ -11,7 +11,7 @@ namespace TerritoryWars.Carts
 {
     public class CartsSystem : MonoBehaviour
     {
-        public Board board;
+        public BoardManager board;
 
         public static float CartsSpeed = 0.1f;
         public GameObject PlayerCartPrefab;

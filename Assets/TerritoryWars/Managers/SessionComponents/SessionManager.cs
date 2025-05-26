@@ -19,6 +19,7 @@ namespace TerritoryWars.Managers.SessionComponents
             var playersManager = new PlayersManager();
             var gameLoopManager = new GameLoopManager();
 
+            _context.SessionManager = this;
             _context.PlayersManager = playersManager;
             _context.GameLoopManager = gameLoopManager;
 

@@ -12,6 +12,16 @@ using BigInteger = System.Numerics.BigInteger;
 public abstract record GameState() : Enum {
     public record InProgress() : GameState;
     public record Finished() : GameState;
+    
+    public int Unwrap()
+    {
+        return this switch
+        {
+            InProgress => 0,
+            Finished => 1,
+            _ => throw new Exception("Unexpected case in Unwrap")
+        };
+    }
 }
 
 // Type definition for `evolute_duel::packing::PlayerSide` enum

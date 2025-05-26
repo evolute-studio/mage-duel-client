@@ -20,7 +20,7 @@ public class PlayerInfoUI : MonoBehaviour
     public List<TextMeshProUGUI> cityScoreTextPlayers;
     [FormerlySerializedAs("tileScoreTextPlayers")] public List<TextMeshProUGUI> roadScoreTextPlayers;
     public List<TextMeshProUGUI> timeTextPlayers;
-    [SerializeField] private Board _board;
+    [SerializeField] private BoardManager _board;
     public CharactersObject charactersObject;
     public TextMeshProUGUI LocalPlayerName;
     public TextMeshProUGUI RemotePlayerName;

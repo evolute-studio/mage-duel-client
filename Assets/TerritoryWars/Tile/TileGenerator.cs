@@ -406,7 +406,7 @@ namespace TerritoryWars.Tile
             
         }
 
-        public void MinePlaceForCloserToBorderRoad(List<Board.MineTileInfo> closerSides)
+        public void MinePlaceForCloserToBorderRoad(List<BoardManager.MineTileInfo> closerSides)
         {
             if (closerSides == null || !_tileData.IsRoad()) return;
 

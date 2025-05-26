@@ -18,7 +18,7 @@ public class evolute_duel_BoardUpdated : ModelInstance {
         public byte[] available_tiles_in_deck;
 
         [ModelField("top_tile")]
-        public Option<byte> top_tile;
+        public Option<byte> top_tile; 
 
         [ModelField("state")]
         public (byte, byte, byte)[] state;

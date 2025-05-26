@@ -13,9 +13,9 @@ namespace TerritoryWars.Bots
     {
         public override Bot Bot { get; set; }
         
-        private Board _board;
+        private BoardManager _board;
 
-        public Board Board
+        public BoardManager Board
         {
             get
             {

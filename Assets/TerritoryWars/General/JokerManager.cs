@@ -15,7 +15,7 @@ namespace TerritoryWars.General
         private SessionManager _sessionManager;
         private Player[] Players => _sessionManager.Players;
         private Player CurrentTurnPlayer => _sessionManager.CurrentTurnPlayer;
-        private Board Board => _sessionManager.Board;
+        private BoardManager Board => _sessionManager.Board;
         
         private bool isJokerActive = false;
         

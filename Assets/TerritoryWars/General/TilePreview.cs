@@ -191,7 +191,7 @@ namespace TerritoryWars.General
             currentTween?.Kill();
             _currentBoardPosition = new Vector2Int(x, y);
 
-            Vector3 targetPosition = Board.GetTilePosition(x, y);
+            Vector3 targetPosition = BoardManager.GetTilePosition(x, y);
             targetPosition.y += tilePreviewSetHeight;
 
             currentTween = transform

@@ -743,7 +743,7 @@ namespace TerritoryWars.Dojo
                 }
                     
                 SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                    Board.StructureType.City, isContested); 
+                    BoardManager.StructureType.City, isContested); 
             }
         }
 
@@ -791,7 +791,7 @@ namespace TerritoryWars.Dojo
                         
                     }
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                        Board.StructureType.Road, false, isContest);
+                        BoardManager.StructureType.Road, false, isContest);
                 }
         }
 
@@ -838,7 +838,7 @@ namespace TerritoryWars.Dojo
                     }
                     
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                        Board.StructureType.City, isContested); 
+                        BoardManager.StructureType.City, isContested); 
                 }
             }
             
@@ -883,7 +883,7 @@ namespace TerritoryWars.Dojo
                         
                     }
                     SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                        Board.StructureType.Road, false, isContest);
+                        BoardManager.StructureType.Road, false, isContest);
                 }
             }
         }

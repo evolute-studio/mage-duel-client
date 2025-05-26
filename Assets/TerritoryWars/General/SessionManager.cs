@@ -64,7 +64,7 @@ namespace TerritoryWars.General
         }
 
 
-        public Board Board;
+        public BoardManager Board;
         [SerializeField] public GameUI gameUI;
         [SerializeField] public PlayerInfoUI sessionUI;
         [SerializeField] private DeckManager deckManager;

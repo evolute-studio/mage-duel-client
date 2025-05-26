@@ -89,6 +89,26 @@ namespace Dojo
                 .Where(g => g.GetComponent<T>() != null)
                 .ToArray();
         }
+        
+        public T[] EntityModels<T>() where T : ModelInstance
+        {
+            return transform.Cast<Transform>()
+                .Select(t => t.gameObject)
+                .Select(g => g.GetComponent<T>())
+                .Where(c => c != null)
+                .ToArray();
+        }
+        
+        public T EntityModel<T>(string fieldName = null, object value = null) where T : ModelInstance
+        {
+            // c => c != null && c.GetType().GetField(fieldName)?.GetValue(c).Equals(value) == true);
+            return transform.Cast<Transform>()
+                .Select(t => t.gameObject)
+                .Select(g => g.GetComponent<T>())
+                .FirstOrDefault(c => c != null && 
+                    (fieldName == null || 
+                     c.GetType().GetField(fieldName)?.GetValue(c).Equals(value) == true));
+        }
 
         // Add a new entity game object as a child of the WorldManager game object.
         public GameObject AddEntity(string key)

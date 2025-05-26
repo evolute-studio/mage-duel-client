@@ -13,7 +13,7 @@ public class StructureChecker
     public List<List<Structure>> CompletedStructures = new List<List<Structure>>();
     
 
-    public StructureChecker(Board board)
+    public StructureChecker(BoardManager board)
     {
         
     }
@@ -169,7 +169,7 @@ public class StructureChecker
         Vector3 result = Vector3.zero;
         foreach (var structure in structures)
         {
-            result += Board.GetTilePosition(structure.Position.x, structure.Position.y);
+            result += BoardManager.GetTilePosition(structure.Position.x, structure.Position.y);
         }
         result /= structures.Count;
         return result;

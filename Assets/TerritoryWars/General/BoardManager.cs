@@ -45,7 +45,7 @@ namespace TerritoryWars.General
         }
     }
 
-    public class Board : MonoBehaviour
+    public class BoardManager : MonoBehaviour
     {
         public TileAssetsObject tileAssets => PrefabsManager.Instance.TileAssetsObject;
 
