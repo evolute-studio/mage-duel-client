@@ -44,7 +44,7 @@ public class CursorManager : MonoBehaviour
         {
             _canvas = GetComponent<Canvas>();
         }
-        // Cursor.visible = false;
+        Cursor.visible = false;
         _currentCursorSize = _baseCursorSize;
         _hotspot = defaultHotspot;
         SetCursor("default");
@@ -52,7 +52,7 @@ public class CursorManager : MonoBehaviour
         
     }
 
-    public void Update()
+    public void LateUpdate()
     {
         Vector2 mousePosition = Input.mousePosition;
         
