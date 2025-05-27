@@ -30,6 +30,5 @@ public class SessionUIView : MonoBehaviour
     [SerializeField] private TileJokerAnimator tilePreviewUITileJokerAnimator;
     
     private SessionManagerOld _sessionManagerOld;
-    private DeckManager deckManager;
     
 }

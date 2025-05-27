@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace TerritoryWars.General
@@ -73,8 +75,12 @@ namespace TerritoryWars.General
             
             _currentCombinationIndex[(x, y)] = (currentIndex + 1) % possibleCombinations.Length;
             
-            TileData jokerTile = new TileData(tileConfig);
-            jokerTile.OwnerId = SetLocalPlayerData.GetLocalIndex(_sessionManagerOld.LocalPlayer.PlayerSide);
+            (byte type, byte rotation) = OnChainBoardDataConverter.GetTypeAndRotation(tileConfig);
+            TileModel tileModel = new TileModel(
+                GameConfiguration.GetTileType(type), 
+                rotation, Vector2Int.zero, 
+                SetLocalPlayerData.GetLocalIndex(_sessionManagerOld.LocalPlayer.PlayerSide));
+            TileData jokerTile = new TileData(tileModel);
             return jokerTile;
         }
 
@@ -83,7 +89,7 @@ namespace TerritoryWars.General
             JokerManager jokerManager = new JokerManager(SessionManagerOld.Instance);
             string[] possibleCombinations = jokerManager.GenerateAllCombinations(x, y);
             string tileConfig = possibleCombinations[Random.Range(0, possibleCombinations.Length)];
-            TileData jokerTile = new TileData(tileConfig);
+            TileData jokerTile = new TileData(tileConfig, new Vector2Int(x, y), jokerManager.CurrentTurnPlayer.PlayerSide);
             return jokerTile;
             
         }

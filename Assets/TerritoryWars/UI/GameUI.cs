@@ -63,7 +63,6 @@ namespace TerritoryWars.UI
         [SerializeField] private TileJokerAnimator tilePreviewUITileJokerAnimator;
 
         private SessionManagerOld _sessionManagerOld;
-        private DeckManager deckManager;
         
         private TweenerCore<Vector3,Vector3,VectorOptions> _skipButtonTween;
         private TweenerCore<Vector3,Vector3,VectorOptions> _jokerButtonTween;
@@ -76,7 +75,6 @@ namespace TerritoryWars.UI
         public void Initialize()
         {
             _sessionManagerOld = FindObjectOfType<General.SessionManagerOld>();
-            deckManager = FindObjectOfType<DeckManager>();
 
             SetupButtons();
             UpdateUI();

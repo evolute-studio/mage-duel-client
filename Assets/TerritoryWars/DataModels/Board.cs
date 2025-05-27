@@ -14,7 +14,7 @@ namespace TerritoryWars.DataModels
         public char[] InitialEdgeState;
         public string[] AvailableTilesInDeck;
         public string TopTile;
-        public Dictionary<Vector2Int, Tile> Tiles; // key: (x, y) position, value: Tile struct
+        public Dictionary<Vector2Int, TileModel> Tiles; // key: (x, y) position, value: Tile struct
         public SessionPlayer Player1;
         public SessionPlayer Player2;
         public string LastMoveId; // Maybe better store Move struct
@@ -30,13 +30,13 @@ namespace TerritoryWars.DataModels
             AvailableTilesInDeck = board.available_tiles_in_deck.ToList()
                 .Select(x => GameConfiguration.GetTileType(x)).ToArray();
             TopTile = GameConfiguration.GetTileType(board.top_tile.Unwrap());
-            Tiles = new Dictionary<Vector2Int, Tile>();
+            Tiles = new Dictionary<Vector2Int, TileModel>();
             AddEdgeTiles(Tiles, board.initial_edge_state);
             for(int i = 0; i < board.state.Length; i++)
             {
                 var tile = board.state[i];
                 var position = GameConfiguration.GetClientPosition(i);
-                Tiles[position] = new Tile()
+                Tiles[position] = new TileModel()
                 {
                     Type = GameConfiguration.GetTileType(tile.Item1),
                     Position = position,
@@ -73,7 +73,7 @@ namespace TerritoryWars.DataModels
         }
         
         
-        public static void AddEdgeTiles(Dictionary<Vector2Int,Tile> dict, byte[] edgeState)
+        public static void AddEdgeTiles(Dictionary<Vector2Int,TileModel> dict, byte[] edgeState)
         {
             FillCorners(dict);
             
@@ -113,7 +113,7 @@ namespace TerritoryWars.DataModels
                 
                 if (!dict.ContainsKey(position))
                 {
-                    dict.Add(position, new Tile()
+                    dict.Add(position, new TileModel()
                     {
                         Type = $"{edgeType}FFF", // Default empty tile with edge type
                         Position = position,
@@ -126,7 +126,7 @@ namespace TerritoryWars.DataModels
             }
         }
 
-        public static void FillCorners(Dictionary<Vector2Int,Tile> dict)
+        public static void FillCorners(Dictionary<Vector2Int,TileModel> dict)
         {
             Vector2Int[] emptyTilePositions = new Vector2Int[4]
             {
@@ -139,7 +139,7 @@ namespace TerritoryWars.DataModels
             {
                 if (!dict.ContainsKey(position))
                 {
-                    dict.Add(position, new Tile()
+                    dict.Add(position, new TileModel()
                     {
                         Type = "FFFF", // Default empty tile
                         Position = position,

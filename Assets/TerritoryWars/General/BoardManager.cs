@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.ScriptablesObjects;
@@ -49,8 +50,9 @@ namespace TerritoryWars.General
     {
         public TileAssetsObject tileAssets => PrefabsManager.Instance.TileAssetsObject;
 
-        [SerializeField] private int width = 10;
-        [SerializeField] private int height = 10;
+        [SerializeField] private CloudsController CloudsController;
+        [SerializeField] private int width => GameConfiguration.ClientBoardSize.x;
+        [SerializeField] private int height => GameConfiguration.ClientBoardSize.y;
         [SerializeField] private GameObject tilePrefab;
         [SerializeField] private static float tileSpacing = 0.965f;
 
@@ -67,281 +69,133 @@ namespace TerritoryWars.General
             InitializeBoard();
             var onChainBoard = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
             char[] edgeTiles = OnChainBoardDataConverter.GetInitialEdgeState(onChainBoard.initial_edge_state);
-            CreateBorder(edgeTiles);
-            SessionManagerOld.Instance.CloudsController.SetMountains(GetMountains());
         }
-
+        
         private void InitializeBoard()
         {
             tileObjects = new GameObject[width, height];
             tileData = new TileData[width, height];
         }
         
-        private void CreateBorder(char[] border)
+        public void Initialize(Board board)
         {
-            GenerateBorderSide(new Vector2Int(0, 0), new Vector2Int(9, 0), 0, border[0..8],true);
-            GenerateBorderSide(new Vector2Int(9, 0), new Vector2Int(9, 9), 3, border[8..16]);
-            GenerateBorderSide(new Vector2Int(9, 9), new Vector2Int(0, 9), 2, border[16..24]);
-            GenerateBorderSide(new Vector2Int(0, 9), new Vector2Int(0, 0), 1, border[24..32], true);
-        }
-        
-        public void GenerateBorderSide(Vector2Int startPos, Vector2Int endPos, int rotationTimes, char[] border, bool swapOrderLayer = false)
-        {
-            string roadTile = "FFFR";
-            string cityTile = "FFFC";
-            string fieldTile = "FFFF";
-            // eg Start (9, 9) end (9, 0)
-
-            roadTile = TileData.GetRotatedConfig(roadTile, rotationTimes);
-            cityTile = TileData.GetRotatedConfig(cityTile, rotationTimes);
-
-            string[] tilesToSpawn = new string[8];
-            for (int i = 0; i < tilesToSpawn.Length; i++)
+            InitializeBoard();
+            foreach (var tile in board.Tiles.Values)
             {
-                tilesToSpawn[i] = border[i] switch {
-                    'R' => roadTile,
-                    'C' => cityTile,
-                    'F' => fieldTile,
-                    _ => fieldTile
-                };
-            }
-
-            List<Vector2Int> availablePositions = new List<Vector2Int>();
-            if (endPos.y != startPos.y)
-            {
-                for (int i = startPos.y + 1; i < endPos.y; i++)
-                {
-                    availablePositions.Add(new Vector2Int(startPos.x, i));
-                }
-                for (int i = startPos.y - 1; i > endPos.y; i--)
-                {
-                    availablePositions.Add(new Vector2Int(startPos.x, i));
-                }
-                
-            }
-            else
-            {
-                for (int i = startPos.x + 1; i < endPos.x; i++)
-                {
-                    availablePositions.Add(new Vector2Int(i, startPos.y));
-                }
-                for (int i = startPos.x - 1; i > endPos.x; i--)
-                {
-                    availablePositions.Add(new Vector2Int(i, startPos.y));
-                }
-                
-            }
-
-            // Place forests only at (0,9) and (9,0), mountains at other corners
-            if (startPos.x == 0 && startPos.y == 9)
-            {
-                PlaceTile(new TileData(fieldTile), 0, 9, -1);
-                GameObject forest = Instantiate(tileAssets.ForestPrefab, transform.position, Quaternion.identity, tileObjects[0, 9].transform);
-                forest.transform.localPosition = Vector3.zero;
-                GameObject spawnedTile = tileObjects[0, 9];
-                Destroy(spawnedTile);
-            }
-            else if (startPos.x == 9 && startPos.y == 0)
-            {
-                PlaceTile(new TileData(fieldTile), 9, 0, -1);
-                GameObject forest = Instantiate(tileAssets.ForestPrefab, transform.position, Quaternion.identity, tileObjects[9, 0].transform);
-                forest.transform.localPosition = Vector3.zero;
-                forest.transform.localScale = new Vector3(-1, 1, 1);
-                GameObject spawnedTile = tileObjects[9, 0];
-                Destroy(spawnedTile);
-            }
-            else
-            {
-                if(GetTileObject(startPos.x, startPos.y) != null)
-                    Destroy(GetTileObject(startPos.x, startPos.y));
-                // Place mountains at start and end positions
-                PlaceTile(new TileData(fieldTile), startPos.x, startPos.y, -1);
-                // Don't place forests, only mountains at other corners
-                GameObject mountain;
-                if (IsSnowBoardPart(startPos.x, startPos.y))
-                {
-                    mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
-                        tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer"));
-                }
-                else
-                {
-                    mountain = Instantiate(PrefabsManager.Instance.GetRandomMountainTile(),
-                        tileObjects[startPos.x, startPos.y].transform.Find("RoadRenderer"));
-                }
-
-                foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
-                {
-                    mountainSprite.sortingOrder = 14;
-                }
-                if (swapOrderLayer)
-                {
-                    foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
-                    {
-                        mountainSprite.sortingOrder = 14; // 20
-                    }
-                }
-
-                tileObjects[startPos.x, startPos.y].GetComponentsInChildren<TileParts>().ToList().ForEach(
-                    renderer =>
-                    {
-                        renderer.Enviroment.SetActive(false);
-                    });
-                
-                tileObjects[startPos.x, startPos.y].GetComponentInChildren<TileParts>().HideForestAreas();
-            }
-
-            if (endPos != new Vector2Int(9, 0) && endPos != new Vector2Int(0, 9))
-            {
-                if(GetTileObject(endPos.x, endPos.y) != null)
-                    Destroy(GetTileObject(endPos.x, endPos.y));
-                PlaceTile(new TileData(fieldTile), endPos.x, endPos.y, -1);
-                GameObject mountain;
-                if (IsSnowBoardPart(endPos.x, endPos.y))
-                {
-                    mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
-                        tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer"));
-                }
-                else
-                {
-                    mountain = Instantiate(PrefabsManager.Instance.GetRandomMountainTile(),
-                        tileObjects[endPos.x, endPos.y].transform.Find("RoadRenderer"));
-                }
-
-                foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
-                {
-                    mountainSprite.sortingOrder = 14;
-                }
-                if (swapOrderLayer)
-                {
-                    foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
-                    {
-                        mountainSprite.sortingOrder = 14; // 20
-                    }
-                }
-                tileObjects[endPos.x, endPos.y].GetComponentsInChildren<TileParts>().ToList().ForEach(
-                    renderer => 
-                    {
-                        renderer.Enviroment.SetActive(false);
-                    });
-                tileObjects[endPos.x, endPos.y].GetComponentInChildren<TileParts>().HideForestAreas();
-            }
-
-            for (int i = 0; i < availablePositions.Count; i++)
-            {
-                TileData tile = new TileData(tilesToSpawn[i]);
-                PlaceTile(tile, availablePositions[i].x, availablePositions[i].y, -1);
-                if (tilesToSpawn[i] == fieldTile)
-                {
-                    tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer")
-                            .GetComponent<SpriteRenderer>().sprite
-                        = null;
-                    
-                    GameObject mountain;
-                    if (IsSnowBoardPart(availablePositions[i].x, availablePositions[i].y))
-                    {
-                        mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
-                            tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer"));
-                    }
-                    else
-                    {
-                        mountain = Instantiate(PrefabsManager.Instance.GetRandomMountainTile(),
-                            tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("RoadRenderer"));
-                    }
-
-                    foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
-                    {
-                        mountainSprite.sortingOrder = 14;
-                    }
-                    if (swapOrderLayer)
-                    {
-                        foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
-                        {
-                            mountainSprite.sortingOrder = 14; // 20
-                        }
-                    }
-                    TileParts tileParts = tileObjects[availablePositions[i].x, availablePositions[i].y]
-                        .GetComponentInChildren<TileParts>();
-                    foreach (var area in tileParts.Areas)
-                    {
-                        if (area == null) continue;
-                        Destroy(area.gameObject);
-                    }
-                    tileParts.Areas.Clear();
-                }
-                else if (tilesToSpawn[i] == roadTile)
-                {
-                    tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("BorderArc").gameObject.SetActive(true);
-                    Transform borderArc = tileObjects[availablePositions[i].x, availablePositions[i].y].transform.Find("BorderArc");
-                    TileRotator.GetMirrorRotationStatic(borderArc, rotationTimes);
-                    var pins = tileObjects[availablePositions[i].x, availablePositions[i].y]
-                        .GetComponent<TileGenerator>().Pins;
-                    tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileParts>().ToList().ForEach(renderer =>
-                    {
-                        renderer.Mill.SetActive(false);
-                        renderer.Forest[rotationTimes].SetActive(true);
-                        if (swapOrderLayer)
-                        {
-                            renderer.Forest[rotationTimes].GetComponentsInChildren<SpriteRenderer>().ToList().ForEach(sr =>
-                            {
-                                if(sr.gameObject.name == "RoadRenderer") return;
-                                sr.sortingOrder = 20;
-                            });
-                        }
-                    });
-                    foreach (var pin in pins)
-                    {
-                        if (pin == null) continue;
-                        pin.Initialize(-1, 1);
-                    }
-                }
-                else if (tilesToSpawn[i] == cityTile)
-                {
-                    tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileParts>().ToList().ForEach(renderer =>
-                    {
-                        renderer.Forest[rotationTimes].SetActive(true);
-                        if (swapOrderLayer)
-                        {
-                            renderer.Forest[rotationTimes].GetComponentsInChildren<SpriteRenderer>().ToList().ForEach(sr =>
-                            {
-                                sr.sortingOrder = 20;
-                            });
-                        }
-                    });
-                }
-                
-                tileObjects[availablePositions[i].x, availablePositions[i].y].GetComponentsInChildren<TileParts>().ToList().ForEach(
-                    renderer =>
-                    {
-                        renderer.Enviroment.SetActive(false);
-                    });
+                if (IsEdgeTile(tile.Position.x, tile.Position.y)) PlaceEdgeTile(tile);
+                else PlaceTile(tile);
             }
         }
         
-        public bool PlaceTile(TileData data, int x, int y, int ownerId)
+        public void PlaceEdgeTile(TileModel tileModel)
         {
-            // if (!CanPlaceTile(data, x, y))
-            // {
-            //     CustomLogger.LogWarning($"Can't place tile {data.id} at {x}, {y}");
-            //     return false;
-            // }
-
-            tileData[x, y] = data;
-            data.OwnerId = ownerId;
-            GameObject tile = Instantiate(tilePrefab, GetTilePosition(x, y), Quaternion.identity, transform);
-            tile.name += $"_{x}_{y}";
-            tile.GetComponent<TileGenerator>().Generate(data, true, new Vector2Int(x,y));
-            tile.GetComponent<TileView>().UpdateView(data);
-            tileObjects[x, y] = tile;
-            PlacedTiles[new Vector2Int(x, y)] = data;
-            OnTilePlaced?.Invoke(data, x, y);
-            CheckConnections(data, x, y);
             
-            if( (x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
+            if (tileModel.Position == new Vector2Int(0, 9) || tileModel.Position == new Vector2Int(9, 0)) return;
+            
+            PlaceTile(tileModel);
+            
+            if(tileModel.Type.Contains('M') || tileModel.Type.StartsWith('F'))
             {
-                TryConnectEdgeStructure(ownerId, x, y);
+                SpawnMountain(tileModel);
             }
 
+            if (tileModel.Type.Contains('R'))
+            {
+                SpawnRoad(tileModel);
+            }
+            
+            if (tileModel.Type.Contains('C'))
+            {
+                SpawnCity(tileModel);
+            }
+            
+            
+        }
+        
+        private void SpawnMountain(TileModel tileModel)
+        {
+            GameObject mountain;
+            if (IsSnowBoardPart(tileModel.Position))
+            {
+                mountain = Instantiate(PrefabsManager.Instance.GetRandomSnowMountainTile(),
+                    tileObjects[tileModel.Position.x, tileModel.Position.y].transform.Find("RoadRenderer"));
+            }
+            else
+            {
+                mountain = Instantiate(PrefabsManager.Instance.GetRandomMountainTile(),
+                    tileObjects[tileModel.Position.x, tileModel.Position.y].transform.Find("RoadRenderer"));
+            }
+            foreach (var mountainSprite in mountain.GetComponentsInChildren<SpriteRenderer>())
+            {
+                mountainSprite.sortingOrder = 14;
+            }
+            TileParts[] tileParts = tileObjects[tileModel.Position.x, tileModel.Position.y]
+                .GetComponentsInChildren<TileParts>();
+            tileParts.ToList().ForEach(
+                tileParts =>
+                {
+                    tileParts.Enviroment.SetActive(false);
+                    tileParts.HideForestAreas();
+                    tileParts.Areas.ToList().ForEach(area =>
+                    {
+                        if (area != null) Destroy(area.gameObject);
+                    });
+                    tileParts.Areas.Clear();
+                });
+            CloudsController.AddMountain(mountain.transform.position);
+        }
+
+        private void SpawnRoad(TileModel tileModel)
+        {
+            GameObject tileObject = tileObjects[tileModel.Position.x, tileModel.Position.y];
+            Transform arc = tileObject.transform.Find("BorderArc");
+            arc.gameObject.SetActive(true);
+            TileRotator.GetMirrorRotationStatic(arc, tileModel.Rotation);
+            var pins = tileObject
+                .GetComponent<TileGenerator>().Pins;
+            tileObject.GetComponentsInChildren<TileParts>().ToList().ForEach(tileParts =>
+            {
+                tileParts.Mill.SetActive(false);
+                tileParts.Forest[tileModel.Rotation].SetActive(true);
+            });
+            foreach (var pin in pins)
+            {
+                if (pin == null) continue;
+                pin.Initialize(-1, 1);
+            }
+        }
+
+        private void SpawnCity(TileModel tileModel)
+        {
+            tileObjects[tileModel.Position.x, tileModel.Position.y].GetComponentsInChildren<TileParts>().ToList().ForEach(tileParts =>
+            {
+                tileParts.Forest[tileModel.Rotation].SetActive(true);
+            });
+        }
+        
+
+        public bool PlaceTile(TileModel tile)
+        {
+            TileData data = new TileData(tile);
+            return PlaceTile(data);
+        }
+
+        public bool PlaceTile(TileData tile)
+        {
+            tileData[tile.Position.x, tile.Position.y] = tile;
+            GameObject tileObject = Instantiate(tilePrefab, GetTilePosition(tile.Position.x, tile.Position.y), Quaternion.identity, transform);
+            tileObject.name += $"_{tile.Position.x}_{tile.Position.y}";
+            tileObject.GetComponent<TileGenerator>().Generate(tile, true);
+            tileObjects[tile.Position.x, tile.Position.y] = tileObject;
+            PlacedTiles[tile.Position] = tile;
+            EventBus.Publish(new TilePlacedEvent(tile));
             return true;
+        }
+
+        public struct TilePlacedEvent
+        {
+            public TileData TileData;
+            public TilePlacedEvent(TileData tile) => TileData = tile;
         }
         
         public void FloatingTextAnimation(Vector2Int position)
@@ -366,7 +220,7 @@ namespace TerritoryWars.General
                 if(pin == null) continue;
                 float duration = 2f + UnityEngine.Random.Range(0f, 1f);
                 Vector3 textPosition = pin.transform.position;
-                int cityCount = tileData.id.Count(c => c == 'R');
+                int cityCount = tileData.Type.Count(c => c == 'R');
                 string messageText = cityCount == 2 ? "+2" : "+1";
                 FloatingTextManager.Instance.Show(messageText, textPosition, motion, duration, "road_icon_" + side);
                 if(cityCount == 2) break;
@@ -376,8 +230,8 @@ namespace TerritoryWars.General
         public void ScoreClientPrediction(int playerIndex, TileData data)
         {
             if(!SessionManagerOld.Instance.IsLocalPlayerTurn) return;
-            SessionManagerOld.Instance.gameUI.playerInfoUI.AddClientCityScore(playerIndex, data.id.Count(c => c == 'C') * 2);
-            SessionManagerOld.Instance.gameUI.playerInfoUI.AddClientRoadScore(playerIndex, data.id.Count(r => r == 'R'));
+            SessionManagerOld.Instance.gameUI.playerInfoUI.AddClientCityScore(playerIndex, data.Type.Count(c => c == 'C') * 2);
+            SessionManagerOld.Instance.gameUI.playerInfoUI.AddClientRoadScore(playerIndex, data.Type.Count(r => r == 'R'));
         }
 
         public bool RevertTile(int x, int y)
@@ -443,13 +297,12 @@ namespace TerritoryWars.General
             {
                 if(IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
-                    if(owner != 3) neighborsData[i].OwnerId = owner;
+                    if(owner != 3) neighborsData[i].SetOwner(owner);
                     ConnectEdgeStructureAnimation(owner, neighborsData[i], tilePositions[i][0], tilePositions[i][1], isCityContest, isRoadContest);
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
                     {
-                        (_, byte rotation) = OnChainBoardDataConverter.GetTypeAndRotation(neighborsData[i].id);
-                        tileGenerator.RecolorHouses(owner, isCityContest, rotation);
+                        tileGenerator.RecolorHouses(owner, isCityContest, neighborsData[i].Rotation);
                     }
 
                     if (type == StructureType.All || type == StructureType.Road)
@@ -485,9 +338,9 @@ namespace TerritoryWars.General
             }
         }
         
-        public bool IsSnowBoardPart(int x, int y)
+        public bool IsSnowBoardPart(Vector2Int position)
         {
-            if (x > 4 & y > 4)
+            if (position.x > 4 & position.y > 4)
             {
                 return true; // snow mountain
             }
@@ -578,44 +431,6 @@ namespace TerritoryWars.General
             if (GetTileData(x, y + 1) == null) { closerSides.Add(Side.Left); }
 
             return closerSides;
-        }
-
-        public List<GameObject> GetMountains()
-        {
-            List<GameObject> mountains = new List<GameObject>();
-            
-            for (int i = 0; i < 10; i++)
-            {
-                if (tileData[i, 0].id == "FFFF" && !mountains.Contains(tileObjects[i, 1]))
-                {
-                    mountains.Add(tileObjects[i, 0]);
-                }
-            }
-            
-            for (int i = 0; i < 10; i++)
-            {
-                if (tileData[9, i].id == "FFFF" && !mountains.Contains(tileObjects[9, i]))
-                {
-                    mountains.Add(tileObjects[9, i]);
-                }
-            }
-
-            for (int i = 9; i >= 0 ; i--)
-            {
-                if (tileData[i, 9].id == "FFFF" && !mountains.Contains(tileObjects[i, 9]))
-                {
-                    mountains.Add(tileObjects[i, 9]);
-                }
-            }
-            
-            for (int i = 9; i >= 0 ; i--)
-            {
-                if (tileData[0, i].id == "FFFF" && !mountains.Contains(tileObjects[0, i]))
-                {
-                    mountains.Add(tileObjects[0, i]);
-                }
-            }
-            return mountains;
         }
         
         public List<MineTileInfo> CheckRoadTileSidesToBorder(int x, int y)
@@ -1004,7 +819,7 @@ namespace TerritoryWars.General
                         tile.Rotate();
                     }
 
-                    tile.Rotate(4 - (tile.rotationIndex % 4));
+                    tile.Rotate(4 - (tile.Rotation % 4));
                 }
             }
 
@@ -1049,7 +864,7 @@ namespace TerritoryWars.General
             List<int> validRotations = new List<int>();
 
             
-            int initialRotation = tile.rotationIndex;
+            int initialRotation = tile.Rotation;
 
             
             for (int rotation = 0; rotation < 4; rotation++)
@@ -1062,8 +877,8 @@ namespace TerritoryWars.General
             }
 
             
-            tile.Rotate(4 - (tile.rotationIndex % 4));
-            while (tile.rotationIndex != initialRotation)
+            tile.Rotate(4 - (tile.Rotation % 4));
+            while (tile.Rotation != initialRotation)
             {
                 tile.Rotate();
             }

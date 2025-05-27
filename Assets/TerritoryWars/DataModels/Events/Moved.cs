@@ -10,7 +10,7 @@ namespace TerritoryWars.DataModels.Events
         public string Id;
         public string PlayerId;
         public string PrevMoveId;
-        public Tile Tile;
+        public TileModel tileModel;
         public bool IsJoker;
         public string BoardId;
         public string FirstBoardId;
@@ -18,7 +18,7 @@ namespace TerritoryWars.DataModels.Events
         
         public bool IsSkip()
         {
-            return String.IsNullOrEmpty(Tile.Type);
+            return String.IsNullOrEmpty(tileModel.Type);
         }
 
         public Moved SetData(evolute_duel_Moved moved)
@@ -26,7 +26,7 @@ namespace TerritoryWars.DataModels.Events
             Id = moved.move_id.Hex();
             PlayerId = moved.player.Hex();
             PrevMoveId = moved.prev_move_id.Unwrap()?.Hex();
-            Tile = new Tile()
+            tileModel = new TileModel()
             {
                 Type = GameConfiguration.GetTileType(moved.tile.Unwrap()),
                 Position = GameConfiguration.GetClientPosition(moved.col, moved.row),

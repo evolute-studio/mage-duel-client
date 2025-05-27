@@ -67,7 +67,6 @@ namespace TerritoryWars.General
         public BoardManager Board;
         [SerializeField] public GameUI gameUI;
         [SerializeField] public PlayerInfoUI sessionUI;
-        [SerializeField] private DeckManager deckManager;
         public CloudsController CloudsController;
         public JokerManager JokerManager;
         public TileSelector TileSelector;
@@ -178,13 +177,13 @@ namespace TerritoryWars.General
                     };
                     string tileConfig = OnChainBoardDataConverter.GetTopTile(move.tile);
                     if (tileConfig == null) continue;
-                    TileData tile = new TileData(tileConfig);
                     int rotation = move.rotation;
                     int x = move.col + 1;
                     int y = move.row + 1;
+                    TileData tile = new TileData(tileConfig, new Vector2Int(x, y), owner);
 
                     tile.Rotate((rotation + 3) % 4);
-                    Board.PlaceTile(tile, x, y, owner);
+                    Board.PlaceTile(tile);//, x, y, owner);
                     processedMoves.Add(move);
                 }
 
@@ -337,7 +336,7 @@ namespace TerritoryWars.General
             gameUI.SetSkipTurnButtonActive(true);
 
             TileData currentTile = GetNextTile();
-            currentTile.OwnerId = LocalPlayer.PlayerSide;
+            currentTile.SetOwner(LocalPlayer.PlayerSide);
             TileSelector.SetCurrentTile(_nextTile);
             if (TileSelector.IsExistValidPlacement(currentTile))
             {
@@ -438,13 +437,13 @@ namespace TerritoryWars.General
         private IEnumerator HandleOpponentMoveCoroutine(string playerAddress, TileData tile, Vector2Int position, int rotation)
         {
             tile.Rotate(rotation);
-            tile.OwnerId = RemotePlayer.PlayerSide;
+            tile.SetOwner(RemotePlayer.PlayerSide);
             TileSelector.SetCurrentTile(tile);
             TileSelector.tilePreview.SetPosition(position.x + 1, position.y + 1);
             yield return new WaitForSeconds(0.3f);
             TileSelector.tilePreview.PlaceTile(RemotePlayer.PlayerSide,tile, () =>
             {
-                Board.PlaceTile(tile, position.x + 1, position.y + 1, GetPlayerByAddress(playerAddress).PlayerSide);
+                Board.PlaceTile(tile);//, position.x + 1, position.y + 1, GetPlayerByAddress(playerAddress).PlayerSide);
             });
             yield return new WaitForSeconds(0.5f);
             CurrentTurnPlayer.EndTurn();
@@ -457,7 +456,7 @@ namespace TerritoryWars.General
         public void UpdateTile()
         {
             _nextTile = GetNextTile();
-            _nextTile.OwnerId = RemotePlayer.PlayerSide;
+            _nextTile.SetOwner(RemotePlayer.PlayerSide);
         }
         
         public TileData GetNextTile()

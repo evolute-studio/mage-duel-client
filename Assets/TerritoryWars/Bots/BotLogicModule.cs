@@ -7,6 +7,7 @@ using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using UnityEngine;
 using Microsoft.CSharp;
+using TerritoryWars.DataModels;
 using TerritoryWars.Models;
 
 namespace TerritoryWars.Bots
@@ -206,7 +207,14 @@ namespace TerritoryWars.Bots
 
         private float EvaluateMove(TileData tileData, ValidPlacement validPlacement)
         {
-            TileData tile = new TileData(tileData.id);
+            TileModel tileModel = new TileModel()
+            {
+                Type = tileData.Type,
+                Rotation = validPlacement.rotation,
+                Position = new Vector2Int(validPlacement.x, validPlacement.y),
+                PlayerSide = SessionSideId
+            };
+            TileData tile = new TileData(tileModel);
             tile.Rotate(validPlacement.rotation);
 
             (float basicCityValue, float basicRoad) = EvaluateBasicValue(tile);
@@ -218,7 +226,7 @@ namespace TerritoryWars.Bots
             
             for (int i = 0; i < 4; i++)
             {
-                char sideType = tile.id[i];
+                char sideType = tile.RotatedConfig[i];
                 if (sideType == 'C')
                 {
                     var citySet =
@@ -246,8 +254,8 @@ namespace TerritoryWars.Bots
             float CITY_WEIGHT = 2f;
             float ROAD_WEIGHT = 1f;
             
-            int cityCount = tileData.id.Count(c => c == 'C');
-            int roadCount = tileData.id.Count(c => c == 'R');
+            int cityCount = tileData.Type.Count(c => c == 'C');
+            int roadCount = tileData.Type.Count(c => c == 'R');
             
             return (cityCount * CITY_WEIGHT, + roadCount * ROAD_WEIGHT);
         }

@@ -180,9 +180,9 @@ namespace TerritoryWars.General
 
         private void GenerateFFFFTile()
         {
-            SessionManagerOld.Instance.TileSelector.SetCurrentTile(new TileData("FFFF"));
-            tileGenerator.Generate(new TileData("FFFF"));
-            tileGeneratorForUI.Generate(new TileData("FFFF"));
+            SessionManagerOld.Instance.TileSelector.SetCurrentTile(new TileData());
+            tileGenerator.Generate(new TileData());
+            tileGeneratorForUI.Generate(new TileData());
             tileGenerator.tileParts.HideForestAreas();
         }
 
@@ -315,7 +315,7 @@ namespace TerritoryWars.General
             // currentTween = transform
             //     .DOMove(_initialPosition, moveDuration)
             //     .SetEase(moveEase);
-            tileGenerator.Generate(new TileData("FFFF"));
+            tileGenerator.Generate(new TileData());
             _tileJokerAnimator.SetOffAllAnimationObjects();
             _tileJokerAnimatorPreview.SetOffAllAnimationObjects();
             

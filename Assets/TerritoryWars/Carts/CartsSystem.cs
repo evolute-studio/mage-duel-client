@@ -54,7 +54,7 @@ namespace TerritoryWars.Carts
 
         public void OnTilePlaced(TileData tileData, int x, int y)
         {
-            if (!tileData.id.Contains('R'))
+            if (!tileData.Type.Contains('R'))
             {
                 return;
             }

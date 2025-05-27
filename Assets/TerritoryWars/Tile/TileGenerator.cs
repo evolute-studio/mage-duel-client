@@ -18,7 +18,6 @@ namespace TerritoryWars.Tile
 {
     public class TileGenerator : MonoBehaviour
     {
-        public TileConnector[] connectors;
         public SpriteRenderer RoadRenderer;
         public TileAssetsObject TileAssetsObject => PrefabsManager.Instance.TileAssetsObject;
         public TileParts tileParts;
@@ -32,12 +31,6 @@ namespace TerritoryWars.Tile
 
         [Header("Tile Prefabs")] public List<TilePrefab> TilePrefabs;
 
-        [Header("Roads")] public List<RoadPair> RoadPairs;
-
-        [Header("Cities")] public List<CityData> CityData;
-
-        [HideInInspector] public string TileConfig;
-
         private int _currentHouseIndex = 0;
 
         public List<SpriteRenderer> AllCityRenderers = new List<SpriteRenderer>();
@@ -46,10 +39,7 @@ namespace TerritoryWars.Tile
         private List<TileParts.HouseGameObject> _housesParent = new List<TileParts.HouseGameObject>();
         public List<RoadPin> Pins = new List<RoadPin>();
         
-
-        private byte _rotation;
         private bool _isTilePlacing;
-        private Vector2Int _placingTilePosition;
 
         public GameObject CurrentTileGO { get; private set; }
         public WallPlacer WallPlacer { get; private set; }
@@ -61,21 +51,12 @@ namespace TerritoryWars.Tile
         {
             TileRotator.OnRotation.AddListener(Rotate);
         }
+        
 
-        public void SetConnectorTypes()
+        public void Generate(TileData data, bool isTilePlacing = false)
         {
-            for (int i = 0; i < connectors.Length; i++)
-            {
-                connectors[i].SetLandscape(TileData.CharToLandscape(TileConfig[i]));
-            }
-        }
-
-        public void Generate(TileData data, bool isTilePlacing = false, Vector2Int placingTilePosition = default)
-        {
-            TileConfig = data.id;
             _tileData = data;
             _isTilePlacing = isTilePlacing;
-            _placingTilePosition = placingTilePosition;
             Generate();
         }
 
@@ -95,14 +76,10 @@ namespace TerritoryWars.Tile
             AllCityLineRenderers = new List<LineRenderer>();
 
             TileRotator.ClearLists();
-
-            var tileConfig = OnChainBoardDataConverter.GetTypeAndRotation(TileConfig);
-            string id = OnChainBoardDataConverter.TileTypes[tileConfig.Item1];
-            _rotation = (byte)((tileConfig.Item2 + 1) % 4);
             
             foreach (var tile in TilePrefabs)
             {
-                if (tile.Config == id)
+                if (tile.Config == _tileData.Type)
                 {
                     CurrentTileGO = Instantiate(tile.TilePrefabGO, transform);
                     InitializeTile();
@@ -113,11 +90,10 @@ namespace TerritoryWars.Tile
 
         public void Rotate()
         {
-            string s = "Previous config: " + TileConfig;
-            TileConfig = TileData.GetRotatedConfig(TileConfig);
-            s += " Rotated config: " + TileConfig;
+            string s = "Previous config: " + _tileData.RotatedConfig;
+            _tileData.Rotate();
+            s += " Rotated config: " + _tileData.RotatedConfig;
             Debug.Log(s);
-            SetConnectorTypes();
             
             InitializeTile();
             
@@ -131,15 +107,15 @@ namespace TerritoryWars.Tile
             
             float randomStartDelay = Random.Range(0f, 2f);
             RoadPin[] pins = new RoadPin[4];
-            char[] id = TileConfig.ToCharArray();
-            for (int i = 0; i < id.Length; i++)
+            char[] rotatedConfig = _tileData.RotatedConfig.ToCharArray();
+            for (int i = 0; i < rotatedConfig.Length; i++)
             {
-                if (id[i] == 'R')
+                if (rotatedConfig[i] == 'R')
                 {
                     GameObject pin = Instantiate(PrefabsManager.Instance.PinPrefab, points[i]);
                     RoadPin roadPin = pin.GetComponent<RoadPin>();
-                    if (_tileData.OwnerId == -1) playerId = -1;
-                    int score = GetRoadPoints(TileConfig);
+                    if (_tileData.PlayerSide == -1) playerId = -1;
+                    int score = GetRoadPoints();
                     roadPin.Initialize(playerId, score);
                     pin.transform.parent = points[i];
                     roadPin.transform.localPosition = Vector3.zero;
@@ -156,11 +132,11 @@ namespace TerritoryWars.Tile
             
         }
 
-        private int GetRoadPoints(string config)
+        private int GetRoadPoints()
         {
-            int roadCount = TileConfig.Count(c => c == 'R');
+            int roadCount = _tileData.Type.Count(c => c == 'R');
     
-            bool isCRCR = config == "CRCR" || config == "RCRC";
+            bool isCRCR = _tileData.Type == "CRCR" || _tileData.Type == "RCRC";
             if (isCRCR) return 1;
             if (roadCount == 2) return 2;
             return 1;
@@ -169,10 +145,6 @@ namespace TerritoryWars.Tile
         public void InitializeTile()
         {
             tileParts = CurrentTileGO.GetComponent<TileParts>();
-            
-            var tileConfig = OnChainBoardDataConverter.GetTypeAndRotation(TileConfig);
-            string id = OnChainBoardDataConverter.TileTypes[tileConfig.Item1];
-            _rotation = (byte)((tileConfig.Item2 + 1) % 4);
             
             TileRotator currentGoTileRotator = CurrentTileGO.GetComponent<TileRotator>();
             AllCityRenderers = new List<SpriteRenderer>();
@@ -211,7 +183,7 @@ namespace TerritoryWars.Tile
                         playerId = sessionManagerOld.CurrentTurnPlayer.PlayerSide;
                     }
 
-                    if (_tileData.OwnerId == -1) playerId = -1;
+                    if (_tileData.PlayerSide == -1) playerId = -1;
                     GameObject prefab = _tileData.HouseSprites.Count > i 
                         ? PrefabsManager.Instance.GetNonContestedHousePrefabByReference(_tileData.HouseSprites[i], playerId)
                         : PrefabsManager.Instance.GetRandomNotContestedHouseGameObject(1, playerId);
@@ -245,8 +217,8 @@ namespace TerritoryWars.Tile
             {
                 currentGoTileRotator.LineRenderers.Add(area.lineRenderer);
             }
-            
-            currentGoTileRotator.RotateTile((_rotation + 3) % 4);
+
+            currentGoTileRotator.RotateTile(_tileData.Rotation);
             Transform[] pins = tileParts.PinsPositions;
             
             if (arcRenderers != null)
@@ -276,11 +248,11 @@ namespace TerritoryWars.Tile
             if (SessionManagerOld.Instance.TileSelector.selectedPosition != null || _isTilePlacing)
             {
                 FencePlacerForCloserToBorderCity(SessionManagerOld.Instance.Board.CheckCityTileSidesToBorder(
-                    _placingTilePosition.x,
-                    _placingTilePosition.y));
+                    _tileData.Position.x,
+                    _tileData.Position.y));
                 
-                MinePlaceForCloserToBorderRoad(SessionManagerOld.Instance.Board.CheckRoadTileSidesToBorder(_placingTilePosition.x,
-                    _placingTilePosition.y));
+                MinePlaceForCloserToBorderRoad(SessionManagerOld.Instance.Board.CheckRoadTileSidesToBorder(_tileData.Position.x,
+                    _tileData.Position.y));
             }
         }
         public void RecolorHouses(int playerId, bool isContest = false, int rotation = 0)
@@ -288,7 +260,7 @@ namespace TerritoryWars.Tile
             if (isContest)
             {
                 tileParts.PlaceContestedWalls(rotation);
-                tileParts.PlaceFlags(rotation, playerId == 3 ? _tileData.OwnerId : playerId);
+                tileParts.PlaceFlags(rotation, playerId == 3 ? _tileData.PlayerSide : playerId);
             }
             
             //List<TileParts.HouseGameObject> activeHouses = tileParts.Houses.Where(x => x.Parent.gameObject.activeSelf).ToList();
@@ -299,16 +271,16 @@ namespace TerritoryWars.Tile
                 {
                     if (_tileData.IsCityParallel())
                     {
-                        ReplaceHouses(tileParts.Houses.GetRange(0,2), playerId == 3 ? _tileData.OwnerId : playerId);
-                        ReplaceHouses(tileParts.Houses.GetRange(2,2), playerId == 3 ? _tileData.OwnerId : playerId);
+                        ReplaceHouses(tileParts.Houses.GetRange(0,2), playerId == 3 ? _tileData.PlayerSide : playerId);
+                        ReplaceHouses(tileParts.Houses.GetRange(2,2), playerId == 3 ? _tileData.PlayerSide : playerId);
                     }
                     else if (tileParts.Houses.Count == 8)
                     {
-                        MergeHouses(tileParts.Houses, playerId == 3 ? _tileData.OwnerId : playerId);
+                        MergeHouses(tileParts.Houses, playerId == 3 ? _tileData.PlayerSide : playerId);
                     }
                     else
                     {
-                        ReplaceHouses(tileParts.Houses, playerId == 3 ? _tileData.OwnerId : playerId);
+                        ReplaceHouses(tileParts.Houses, playerId == 3 ? _tileData.PlayerSide : playerId);
                     }
                     
                 }   
@@ -414,7 +386,7 @@ namespace TerritoryWars.Tile
             {
                 if(_tileData.GetSide(side.Direction) != LandscapeType.Road) continue;
                 
-                bool snowBoardPart = SessionManagerOld.Instance.Board.IsSnowBoardPart(side.TileBoardPosition.x, side.TileBoardPosition.y);
+                bool snowBoardPart = SessionManagerOld.Instance.Board.IsSnowBoardPart(side.TileBoardPosition);
 
                 foreach (var prefab in PrefabsManager.Instance.MineEnviromentTiles)
                 {

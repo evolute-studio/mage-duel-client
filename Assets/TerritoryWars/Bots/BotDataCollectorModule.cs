@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
@@ -53,7 +54,7 @@ namespace TerritoryWars.Bots
                 CustomLogger.LogWarning("BotDataCollectorModule: BoardModel or Board is null");
                 return;
             }
-            CurrentTile = new TileData(OnChainBoardDataConverter.GetTopTile(BoardModel.top_tile));
+            CurrentTile = new TileData(new TileModel(OnChainBoardDataConverter.GetTopTile(BoardModel.top_tile)));
             CurrentValidPlacements = Board.GetValidPlacements(CurrentTile);
         }
 

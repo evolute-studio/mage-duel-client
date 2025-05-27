@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;
 using Dojo;
 using Dojo.Starknet;
+using TerritoryWars.DataModels;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Models;
@@ -155,12 +156,13 @@ namespace TerritoryWars.Dojo
                 Option<FieldElement>.Some id => id.value.Hex(),
                 Option<FieldElement>.None => null
             };
-            TileData tile = eventModel.tile is Option<byte>.Some some
-                ? new TileData(OnChainBoardDataConverter.TileTypes[some.value])
-                : null;
+            
             int rotation = (eventModel.rotation + 3) % 4;
             Vector2Int position = new Vector2Int(eventModel.col, eventModel.row);
             bool isJoker = eventModel.is_joker;
+            TileData tile = eventModel.tile is Option<byte>.Some some
+                ? new TileData(new TileModel(OnChainBoardDataConverter.TileTypes[some.value], rotation, position))
+                : null;
             string board_id = eventModel.board_id.Hex();
 
             CustomLogger.LogExecution(
@@ -237,7 +239,7 @@ namespace TerritoryWars.Dojo
             GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreFirst + cartScoreFirst, cityScoreSecond + cartScoreSecond, delay: tilePlacementDuration);
             var tileData = eventModel.top_tile switch
             {
-                Option<byte>.Some topTile => new TileData(OnChainBoardDataConverter.GetTopTile(topTile)),
+                Option<byte>.Some topTile => new TileData(new TileModel(OnChainBoardDataConverter.GetTopTile(topTile))),
                 Option<byte>.None => null
             };
             var availableTiles = eventModel.available_tiles_in_deck.Length;
@@ -733,7 +735,7 @@ namespace TerritoryWars.Dojo
                 {
                     playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                 }
-                tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.rotationIndex);
+                tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.Rotation);
 
                 if (isContested)
                 {
@@ -828,7 +830,7 @@ namespace TerritoryWars.Dojo
                     {
                         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
                     }
-                    tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.rotationIndex);
+                    tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.Rotation);
 
                     if (isContested)
                     {
@@ -952,7 +954,7 @@ namespace TerritoryWars.Dojo
         public TileData GetTopTile()
         {
             if (LocalPlayerBoard == null) return null;
-            return new TileData(OnChainBoardDataConverter.GetTopTile(LocalPlayerBoard.top_tile));
+            return new TileData(new TileModel(OnChainBoardDataConverter.GetTopTile(LocalPlayerBoard.top_tile)));
         }
 
         public void MakeMove(TileData data, int x, int y, bool isJoker)

@@ -142,7 +142,7 @@ namespace TerritoryWars.General
             tilePreview.ResetPosition();
             tilePreview.UpdatePreview(tile);
             currentTile = tile;
-            initialTileConfig = tile.GetConfig();
+            initialTileConfig = tile.RotatedConfig;
             isPlacingTile = true;
             selectedPosition = null;
 
@@ -250,7 +250,8 @@ namespace TerritoryWars.General
 
                 if (selectedPosition.HasValue)
                 {
-                    currentTile.SetConfig(initialTileConfig);
+                    currentTile.UpdateData(initialTileConfig, new Vector2Int(x, y),
+                        SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide);
                     selectedPosition = null;
                     currentValidRotations = null;
                     SetHighlightColor(normalHighlightColor);
@@ -274,21 +275,22 @@ namespace TerritoryWars.General
 
                     foreach (int rotation in currentValidRotations)
                     {
-                        string currentConfig = currentTile.GetConfig();
+                        string currentConfig = currentTile.RotatedConfig;
 
-                        while (currentTile.rotationIndex != rotation)
+                        while (currentTile.Rotation != rotation)
                         {
                             currentTile.Rotate();
                         }
 
-                        string config = currentTile.id;
+                        string config = currentTile.RotatedConfig;
                         if (!uniqueConfigs.Contains(config))
                         {
                             uniqueConfigs.Add(config);
                             uniqueRotations.Add(rotation);
                         }
 
-                        currentTile.SetConfig(currentConfig);
+                        currentTile.UpdateData(currentConfig, new Vector2Int(x, y),
+                            SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide);
                     }
 
                     currentValidRotations = uniqueRotations;
@@ -337,7 +339,7 @@ namespace TerritoryWars.General
         {
             if (currentValidRotations?.Count > 0)
             {
-                while (currentTile.rotationIndex != currentValidRotations[0])
+                while (currentTile.Rotation != currentValidRotations[0])
                 {
                     currentTile.Rotate();
                 }
@@ -384,7 +386,7 @@ namespace TerritoryWars.General
             {
                 if (currentValidRotations?.Count <= 1) return;
 
-                int currentIndex = currentValidRotations.IndexOf(currentTile.rotationIndex);
+                int currentIndex = currentValidRotations.IndexOf(currentTile.Rotation);
 
                 if (currentIndex == -1)
                 {
@@ -393,7 +395,7 @@ namespace TerritoryWars.General
                 }
 
                 int nextIndex = (currentIndex + 1) % currentValidRotations.Count;
-                while (currentTile.rotationIndex != currentValidRotations[nextIndex])
+                while (currentTile.Rotation != currentValidRotations[nextIndex])
                 {
                     currentTile.Rotate();
                 }
@@ -427,8 +429,7 @@ namespace TerritoryWars.General
             {
                 if (!selectedPosition.HasValue) return;
                 
-                if (board.PlaceTile(currentTile, selectedPosition.Value.x, selectedPosition.Value.y,
-                        SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide))
+                if (board.PlaceTile(currentTile))//, selectedPosition.Value.x, selectedPosition.Value.y,SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide))
                 {
                     LastMove = (currentTile, selectedPosition.Value);
                     isPlacingTile = false;
@@ -564,8 +565,7 @@ namespace TerritoryWars.General
         {
             try
             {
-                currentTile.SetConfig(tile.id);
-                currentTile.OwnerId = tile.OwnerId;
+                currentTile.UpdateData(tile.RotatedConfig, tile.Position, tile.PlayerSide);
                 selectedPosition = new Vector2Int(x, y);
                 isPlacingTile = true;
 
