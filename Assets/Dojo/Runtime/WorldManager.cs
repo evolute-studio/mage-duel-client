@@ -3,6 +3,7 @@ using dojo_bindings;
 using UnityEngine;
 using Dojo.Torii;
 using System;
+using System.Collections.Generic;
 using Dojo.Starknet;
 using System.Threading.Tasks;
 
@@ -108,6 +109,16 @@ namespace Dojo
                 .FirstOrDefault(c => c != null && 
                     (fieldName == null || 
                      c.GetType().GetField(fieldName)?.GetValue(c).Equals(value) == true));
+        }
+        
+        public T EntityModel<T>(Dictionary<string, object> filters) where T : ModelInstance
+        {
+            return transform.Cast<Transform>()
+                .Select(t => t.gameObject)
+                .Select(g => g.GetComponent<T>())
+                .FirstOrDefault(c => c != null && 
+                                     filters.All(filter => 
+                                         c.GetType().GetField(filter.Key)?.GetValue(c).Equals(filter.Value) == true));
         }
 
         // Add a new entity game object as a child of the WorldManager game object.

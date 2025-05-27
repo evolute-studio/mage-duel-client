@@ -84,7 +84,7 @@ namespace TerritoryWars.General
         public bool IsGameWithBot => DojoGameManager.Instance.DojoSessionManager.IsGameWithBot;
         public bool IsGameWithBotAsPlayer => DojoGameManager.Instance.DojoSessionManager.IsGameWithBotAsPlayer;
         public bool IsLocalPlayerTurn => CurrentTurnPlayer == LocalPlayer;
-        public bool IsLocalPlayerHost => LocalPlayer.SideId == 0;
+        public bool IsLocalPlayerHost => LocalPlayer.PlayerSide == 0;
         
         public bool IsSessionStarting { get; private set; } = true;
 
@@ -244,8 +244,8 @@ namespace TerritoryWars.General
             Players[0] = hostObject.GetComponent<Player>();
             Players[1] = guestObject.GetComponent<Player>();
             
-            Players[0].Initialize(board.player1.Item1, board.player1.Item2, board.player1.Item3);
-            Players[1].Initialize(board.player2.Item1, board.player2.Item2, board.player2.Item3);
+            //Players[0].Initialize(board.player1.Item1, board.player1.Item2, board.player1.Item3);
+            //Players[1].Initialize(board.player2.Item1, board.player2.Item2, board.player2.Item3);
             
             PlayersData[0] = new PlayerData(hostData);
             PlayersData[1] = new PlayerData(guestData);
@@ -253,7 +253,7 @@ namespace TerritoryWars.General
             
             CurrentTurnPlayer = Players[0];
             
-            LocalPlayer = Players[0].Address.Hex() == DojoGameManager.Instance.LocalAccount.Address.Hex() 
+            LocalPlayer = Players[0].PlayerId == DojoGameManager.Instance.LocalAccount.Address.Hex() 
                 ? Players[0] : Players[1];
             RemotePlayer = LocalPlayer == Players[0] ? Players[1] : Players[0];
             Players[0].SetAnimatorController(sessionUI.charactersObject.GetAnimatorController(PlayersData[0].skin_id));
@@ -337,7 +337,7 @@ namespace TerritoryWars.General
             gameUI.SetSkipTurnButtonActive(true);
 
             TileData currentTile = GetNextTile();
-            currentTile.OwnerId = LocalPlayer.SideId;
+            currentTile.OwnerId = LocalPlayer.PlayerSide;
             TileSelector.SetCurrentTile(_nextTile);
             if (TileSelector.IsExistValidPlacement(currentTile))
             {
@@ -382,11 +382,11 @@ namespace TerritoryWars.General
         private void HandleMove(string playerAddress, TileData tile, Vector2Int position, int rotation, bool isJoker)
         {
             evolute_duel_Player player = DojoGameManager.Instance.GetPlayerData(playerAddress);
-            if(playerAddress == Players[0].Address.Hex() &&  player != null)
+            if(playerAddress == Players[0].PlayerId &&  player != null)
             {
                 PlayersData[0].UpdatePlayerData(player);
             }
-            else if(playerAddress == Players[1].Address.Hex() &&  player != null)
+            else if(playerAddress == Players[1].PlayerId &&  player != null)
             {
                 PlayersData[1].UpdatePlayerData(player);
             }
@@ -396,19 +396,19 @@ namespace TerritoryWars.General
             }
             else
             {
-                if (playerAddress == LocalPlayer.Address.Hex()) CompleteEndTurn(playerAddress);
+                if (playerAddress == LocalPlayer.PlayerId) CompleteEndTurn(playerAddress);
                 else StartCoroutine(HandleOpponentMoveCoroutine(playerAddress, tile, position, rotation));
             }
-            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.DojoSessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.Address.Hex());
+            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.DojoSessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.PlayerId);
         }
         
         private void SkipMove(string playerAddress)
         {
-            if (CurrentTurnPlayer.Address.Hex() != playerAddress) return;
+            if (CurrentTurnPlayer.PlayerId != playerAddress) return;
             CustomLogger.LogDojoLoop("Skip for current player");
             foreach (var player in Players)
             {
-                if(player.Address.Hex() == playerAddress)
+                if(player.PlayerId == playerAddress)
                 {
                     player.PlaySkippedBubbleAnimation();
                     break;
@@ -418,33 +418,33 @@ namespace TerritoryWars.General
             TileSelector.EndTilePlacement();
             CurrentTurnPlayer.EndTurn();
             CompleteEndTurn(playerAddress, 5f);
-            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.DojoSessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.Address.Hex());
+            GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.DojoSessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.PlayerId);
         }
 
         public void ClientLocalPlayerSkip()
         {
-            CustomLogger.LogDojoLoop($"[ClientLocalPlayerSkip] {LocalPlayer.Address.Hex()}");
-            DojoGameManager.Instance.DojoSessionManager.LocalSkipped(LocalPlayer.Address.Hex());
+            CustomLogger.LogDojoLoop($"[ClientLocalPlayerSkip] {LocalPlayer.PlayerId}");
+            DojoGameManager.Instance.DojoSessionManager.LocalSkipped(LocalPlayer.PlayerId);
             DojoGameManager.Instance.DojoSessionManager.SkipMove();
             TileSelector.tilePreview.ResetPosition();
         }
         
         public void ClientRemotePlayerSkip()
         {
-            CustomLogger.LogDojoLoop($"[ClientRemotePlayerSkip] {RemotePlayer.Address.Hex()}");
-            DojoGameManager.Instance.DojoSessionManager.LocalSkipped(RemotePlayer.Address.Hex());
+            CustomLogger.LogDojoLoop($"[ClientRemotePlayerSkip] {RemotePlayer.PlayerId}");
+            DojoGameManager.Instance.DojoSessionManager.LocalSkipped(RemotePlayer.PlayerId);
         }
 
         private IEnumerator HandleOpponentMoveCoroutine(string playerAddress, TileData tile, Vector2Int position, int rotation)
         {
             tile.Rotate(rotation);
-            tile.OwnerId = RemotePlayer.SideId;
+            tile.OwnerId = RemotePlayer.PlayerSide;
             TileSelector.SetCurrentTile(tile);
             TileSelector.tilePreview.SetPosition(position.x + 1, position.y + 1);
             yield return new WaitForSeconds(0.3f);
-            TileSelector.tilePreview.PlaceTile(RemotePlayer.SideId,tile, () =>
+            TileSelector.tilePreview.PlaceTile(RemotePlayer.PlayerSide,tile, () =>
             {
-                Board.PlaceTile(tile, position.x + 1, position.y + 1, GetPlayerByAddress(playerAddress).SideId);
+                Board.PlaceTile(tile, position.x + 1, position.y + 1, GetPlayerByAddress(playerAddress).PlayerSide);
             });
             yield return new WaitForSeconds(0.5f);
             CurrentTurnPlayer.EndTurn();
@@ -457,7 +457,7 @@ namespace TerritoryWars.General
         public void UpdateTile()
         {
             _nextTile = GetNextTile();
-            _nextTile.OwnerId = RemotePlayer.SideId;
+            _nextTile.OwnerId = RemotePlayer.PlayerSide;
         }
         
         public TileData GetNextTile()
@@ -491,7 +491,7 @@ namespace TerritoryWars.General
 
         public void CompleteEndTurn(string lastMovePlayerAddress, float delay = 1f)
         {
-            bool isLocalPlayer = lastMovePlayerAddress == LocalPlayer.Address.Hex();
+            bool isLocalPlayer = lastMovePlayerAddress == LocalPlayer.PlayerId;
             CurrentTurnPlayer = isLocalPlayer ? RemotePlayer : LocalPlayer;
             gameUI.SetEndTurnButtonActive(false);
             Invoke(nameof(StartTurn), delay);
@@ -499,12 +499,12 @@ namespace TerritoryWars.General
         
         public Player GetPlayerByAddress(string address)
         {
-            return Players.FirstOrDefault(player => player.Address.Hex() == address);
+            return Players.FirstOrDefault(player => player.PlayerId == address);
         }
     
         public int GetLocalIdByAddress(FieldElement address)
         {
-            return Players.FirstOrDefault(player => player.Address.Hex() == address.Hex())?.SideId ?? -1;
+            return Players.FirstOrDefault(player => player.PlayerId == address.Hex())?.PlayerSide ?? -1;
         }
 
         private void OnDestroy()

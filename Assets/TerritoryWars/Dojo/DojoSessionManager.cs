@@ -146,8 +146,8 @@ namespace TerritoryWars.Dojo
         private void Moved(evolute_duel_Moved eventModel)
         {
             string player = eventModel.player.Hex();
-            if (player != SessionManager.Instance.LocalPlayer.Address.Hex() &&
-                player != SessionManager.Instance.RemotePlayer.Address.Hex()) return;
+            if (player != SessionManager.Instance.LocalPlayer.PlayerId &&
+                player != SessionManager.Instance.RemotePlayer.PlayerId) return;
             string move_id = eventModel.move_id.Hex();
             LastMoveTimestamp = eventModel.timestamp;
             string prev_move_id = eventModel.prev_move_id switch
@@ -173,8 +173,8 @@ namespace TerritoryWars.Dojo
             string move_id = eventModel.move_id.Hex();
             string player = eventModel.player.Hex();
             
-            if(player != SessionManager.Instance.LocalPlayer.Address.Hex() &&
-                player != SessionManager.Instance.RemotePlayer.Address.Hex()) return;
+            if(player != SessionManager.Instance.LocalPlayer.PlayerId &&
+                player != SessionManager.Instance.RemotePlayer.PlayerId) return;
             
             PopupManager.Instance.ShowInvalidMovePopup();
 
@@ -185,7 +185,7 @@ namespace TerritoryWars.Dojo
         {
             string player = eventModel.player_id.Hex();
 
-            if (player != SessionManager.Instance.LocalPlayer.Address.Hex()) { return; }
+            if (player != SessionManager.Instance.LocalPlayer.PlayerId) { return; }
             
             if(!SessionManager.Instance.IsLocalPlayerTurn) return;
             PopupManager.Instance.NotYourTurnPopup();
@@ -198,7 +198,7 @@ namespace TerritoryWars.Dojo
             string player = eventModel.player_id.Hex();
             string board = eventModel.board_id.Hex();
 
-            if (player != SessionManager.Instance.LocalPlayer.Address.Hex()) { return; }
+            if (player != SessionManager.Instance.LocalPlayer.PlayerId) { return; }
             
             PopupManager.Instance.ShowCantFinishGamePopup();
             
@@ -253,8 +253,8 @@ namespace TerritoryWars.Dojo
         {
             evolute_duel_Board localBoard = GetLocalPlayerBoard();
             bool isCurrentBoard = localBoard != null && localBoard.id.Hex() == board_id.Hex();
-            bool isHostPlayerInSession = SessionManager.Instance.LocalPlayer.Address.Hex() == hostPlayer.Hex() ||
-                                         SessionManager.Instance.RemotePlayer.Address.Hex() == hostPlayer.Hex();
+            bool isHostPlayerInSession = SessionManager.Instance.LocalPlayer.PlayerId == hostPlayer.Hex() ||
+                                         SessionManager.Instance.RemotePlayer.PlayerId == hostPlayer.Hex();
             if (isCurrentBoard || isHostPlayerInSession)
             {
                 _contestProcessor.SetGameFinished(true);
@@ -399,8 +399,8 @@ namespace TerritoryWars.Dojo
         private void GameCanceled(evolute_duel_GameCanceled eventModel)
         {
             string hostPlayer = eventModel.host_player.Hex();
-            if (hostPlayer != SessionManager.Instance.LocalPlayer.Address.Hex() &&
-               hostPlayer != SessionManager.Instance.RemotePlayer.Address.Hex()) return;
+            if (hostPlayer != SessionManager.Instance.LocalPlayer.PlayerId &&
+               hostPlayer != SessionManager.Instance.RemotePlayer.PlayerId) return;
 
             SimpleStorage.ClearCurrentBoardId();
             PopupManager.Instance.ShowOpponentCancelGame();

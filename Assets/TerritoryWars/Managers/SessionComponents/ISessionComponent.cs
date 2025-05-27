@@ -2,7 +2,7 @@ namespace TerritoryWars.Managers.SessionComponents
 {
     public interface ISessionComponent
     {
-        void Initialize(SessionContext context);
+        void Initialize(SessionManagerContext managerContext);
         void Dispose();
     }
 }

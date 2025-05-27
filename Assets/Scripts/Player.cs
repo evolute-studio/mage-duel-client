@@ -1,5 +1,6 @@
 using DG.Tweening;
 using Dojo.Starknet;
+using TerritoryWars.DataModels;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using UnityEngine;
@@ -7,20 +8,26 @@ using UnityEngine.Serialization;
 
 public class Player : MonoBehaviour
 {
+    public string PlayerId;
+    public int PlayerSide;
+    public int JokerCount;
+    public int ActiveSkin;
+    
+    
     private Animator _animator;
     private CharacterAnimator _characterAnimator;
-    public FieldElement Address;
-    //public int SessionSideId;
-    public PlayerSide Side;
-    public int SideId => Side.Unwrap();
-    public int JokerCount;
+   
+    
+    
     public SpriteRenderer GFX;
     
-    public void Initialize(FieldElement address,PlayerSide side, int jokerCount)
+    public void Initialize(SessionPlayer player)
     {
-        Address = address;
-        Side = side;
-        JokerCount = jokerCount;
+        PlayerId = player.PlayerId;
+        PlayerSide = player.PlayerSide;
+        JokerCount = player.JokerCount;
+        ActiveSkin = player.ActiveSkin;
+        
         _animator = GetComponent<Animator>();
         _characterAnimator = new CharacterAnimator(_animator);
     }

@@ -6,12 +6,12 @@ namespace TerritoryWars.Managers.SessionComponents
 {
     public class GameLoopManager: ISessionComponent
     {
-        private SessionContext _context;
+        private SessionManagerContext _managerContext;
         private TurnEndData _turnEndData = new TurnEndData();
 
-        public void Initialize(SessionContext context)
+        public void Initialize(SessionManagerContext managerContext)
         {
-            _context = context;
+            _managerContext = managerContext;
             EventBus.Subscribe<TurnEndData>(OnTurnEnd);
             EventBus.Subscribe<BoardUpdated>((data) => _turnEndData.SetBoardUpdated(ref data));
             EventBus.Subscribe<Moved>((data) => _turnEndData.SetMoved(ref data));

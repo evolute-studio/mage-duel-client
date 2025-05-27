@@ -146,7 +146,7 @@ namespace TerritoryWars.UI
             _resultPopUpUI.SetPlayerHeroAnimator(playerInfoUI.charactersObject.GetAnimatorController(PlayerCharactersManager.GetCurrentCharacterId()),
                 playerInfoUI.charactersObject.GetAnimatorController(PlayerCharactersManager.GetOpponentCurrentCharacterId()));
                 
-            bool isLocalPlayerBlue = SessionManager.Instance.LocalPlayer.SideId == 0;
+            bool isLocalPlayerBlue = SessionManager.Instance.LocalPlayer.PlayerSide == 0;
             string wonText;
             if (score1 > score2 && isLocalPlayerBlue || score1 < score2 && !isLocalPlayerBlue)
                 wonText = "You won!";

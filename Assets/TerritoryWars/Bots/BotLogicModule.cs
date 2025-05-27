@@ -29,7 +29,7 @@ namespace TerritoryWars.Bots
             get
             {
                 if (SessionManager.Instance == null) return -1;
-                return _player.SideId;
+                return _player.PlayerSide;
             }
         }
         

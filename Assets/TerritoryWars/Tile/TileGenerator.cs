@@ -126,7 +126,7 @@ namespace TerritoryWars.Tile
         private void GenerateRoadPins(Transform[] points)
         {
             int playerId = SessionManager.Instance.CurrentTurnPlayer != null
-                ? SessionManager.Instance.CurrentTurnPlayer.SideId
+                ? SessionManager.Instance.CurrentTurnPlayer.PlayerSide
                 : -1;
             
             float randomStartDelay = Random.Range(0f, 2f);
@@ -208,7 +208,7 @@ namespace TerritoryWars.Tile
                     }
                     else
                     {
-                        playerId = sessionManager.CurrentTurnPlayer.SideId;
+                        playerId = sessionManager.CurrentTurnPlayer.PlayerSide;
                     }
 
                     if (_tileData.OwnerId == -1) playerId = -1;
