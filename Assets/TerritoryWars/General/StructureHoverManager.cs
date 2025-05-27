@@ -321,6 +321,11 @@ namespace TerritoryWars.General
             CursorManager.Instance.SetCursor("default");
         }
 
+        public void SetActivePanel(bool active)
+        {
+            structureHoverPanel.gameObject.SetActive(active);
+        }
+
         private Vector2Int tilePosition;
 
         // private void OnGUI()
