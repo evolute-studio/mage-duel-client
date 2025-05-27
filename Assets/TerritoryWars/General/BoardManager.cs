@@ -68,7 +68,7 @@ namespace TerritoryWars.General
             var onChainBoard = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
             char[] edgeTiles = OnChainBoardDataConverter.GetInitialEdgeState(onChainBoard.initial_edge_state);
             CreateBorder(edgeTiles);
-            SessionManager.Instance.CloudsController.SetMountains(GetMountains());
+            SessionManagerOld.Instance.CloudsController.SetMountains(GetMountains());
         }
 
         private void InitializeBoard()
@@ -346,11 +346,11 @@ namespace TerritoryWars.General
         
         public void FloatingTextAnimation(Vector2Int position)
         {
-            GameObject gameObject = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
-            TileData tileData = SessionManager.Instance.Board.GetTileData(position.x, position.y);
+            GameObject gameObject = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y);
+            TileData tileData = SessionManagerOld.Instance.Board.GetTileData(position.x, position.y);
             TileParts tileParts = gameObject.GetComponentInChildren<TileParts>();
             TileGenerator tileGenerator = gameObject.GetComponent<TileGenerator>();
-            int playerId = SessionManager.Instance.CurrentTurnPlayer.PlayerSide;
+            int playerId = SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide;
             playerId = SetLocalPlayerData.GetLocalIndex(playerId);
             string side = playerId == 0 ? "blue" : "red";
             Vector3 motion = new Vector3(0, 0.3f, 0);
@@ -375,9 +375,9 @@ namespace TerritoryWars.General
 
         public void ScoreClientPrediction(int playerIndex, TileData data)
         {
-            if(!SessionManager.Instance.IsLocalPlayerTurn) return;
-            SessionManager.Instance.gameUI.playerInfoUI.AddClientCityScore(playerIndex, data.id.Count(c => c == 'C') * 2);
-            SessionManager.Instance.gameUI.playerInfoUI.AddClientRoadScore(playerIndex, data.id.Count(r => r == 'R'));
+            if(!SessionManagerOld.Instance.IsLocalPlayerTurn) return;
+            SessionManagerOld.Instance.gameUI.playerInfoUI.AddClientCityScore(playerIndex, data.id.Count(c => c == 'C') * 2);
+            SessionManagerOld.Instance.gameUI.playerInfoUI.AddClientRoadScore(playerIndex, data.id.Count(r => r == 'R'));
         }
 
         public bool RevertTile(int x, int y)
@@ -413,7 +413,7 @@ namespace TerritoryWars.General
 
         public void ConnectEdgeStructureAnimation(int ownerId, TileData tileData, int x, int y, bool isCityContest = false, bool isRoadContest = false)
         {
-            if(isCityContest || isRoadContest || SessionManager.Instance.IsSessionStarting) return;
+            if(isCityContest || isRoadContest || SessionManagerOld.Instance.IsSessionStarting) return;
             FloatingTextAnimation(new Vector2Int(x, y));
             ScoreClientPrediction(ownerId, tileData);
         }

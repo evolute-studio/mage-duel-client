@@ -25,9 +25,9 @@ namespace TerritoryWars.DataModels
     
     public enum GameStatus
     {
-        WaitingForPlayers = 0,
-        InProgress = 1,
-        Finished = 2,
-        Aborted = 3
+        Finished = 0,
+        Created = 1,
+        Canceled = 2,
+        InProgress = 3,
     }
 }

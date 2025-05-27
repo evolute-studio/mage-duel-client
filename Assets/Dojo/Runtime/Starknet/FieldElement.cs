@@ -145,6 +145,20 @@ namespace Dojo.Starknet
         {
             return "0x" + BitConverter.ToString(inner.data.ToArray()).Replace("-", "").ToLower();
         }
+        
+        // Equality operator to compare two FieldElement instances
+        public static bool operator ==(FieldElement left, FieldElement right)
+        {
+            if (ReferenceEquals(left, right)) return true;
+            if (ReferenceEquals(left, null) || ReferenceEquals(right, null)) return false;
+            return left.inner.Equals(right.inner);
+        }
+        
+        // Inequality operator to compare two FieldElement instances
+        public static bool operator !=(FieldElement left, FieldElement right)
+        {
+            return !(left == right);
+        }
 
         public string GetString()
         {

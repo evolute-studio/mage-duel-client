@@ -34,12 +34,12 @@ public class PlayerInfoUI : MonoBehaviour
     [Header("Players")]
     public List<PlayerInfo> players;
     
-    private SessionManager _sessionManager;
+    private SessionManagerOld _sessionManagerOld;
 
     public void Initialization()
     {
-        _sessionManager = FindObjectOfType<SessionManager>();
-        SetNames(_sessionManager.PlayersData[0].username, _sessionManager.PlayersData[1].username);
+        _sessionManagerOld = FindObjectOfType<SessionManagerOld>();
+        SetNames(_sessionManagerOld.PlayersData[0].username, _sessionManagerOld.PlayersData[1].username);
         for (int i = 0; i < players.Count; i++)
         {
             cityScoreTextPlayers[i].text = players[i].cityScore.ToString();
@@ -187,7 +187,7 @@ public class PlayerInfoUI : MonoBehaviour
 
     public void ShowPlayerJokerCount(int playerId)
     {
-        if (!SessionManager.Instance.IsLocalPlayerHost)
+        if (!SessionManagerOld.Instance.IsLocalPlayerHost)
         {
             playerId = playerId == 0 ? 1 : 0;
         }
@@ -197,7 +197,7 @@ public class PlayerInfoUI : MonoBehaviour
     
     public void SetJokersCount(int player, int count)
     {
-        if (!SessionManager.Instance.IsLocalPlayerHost)
+        if (!SessionManagerOld.Instance.IsLocalPlayerHost)
         {
             player = player == 0 ? 1 : 0;
         }

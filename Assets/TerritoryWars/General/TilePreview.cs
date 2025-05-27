@@ -70,8 +70,8 @@ namespace TerritoryWars.General
 
         public void Start()
         {
-            SessionManager.Instance.TileSelector.OnTileSelected += SetPosition;
-            SessionManager.Instance.TileSelector.OnTilePlaced.AddListener(ResetPosition);
+            SessionManagerOld.Instance.TileSelector.OnTileSelected += SetPosition;
+            SessionManagerOld.Instance.TileSelector.OnTilePlaced.AddListener(ResetPosition);
             GameUI.OnJokerButtonClickedEvent += GenerateFFFFTile;
             
         }
@@ -180,7 +180,7 @@ namespace TerritoryWars.General
 
         private void GenerateFFFFTile()
         {
-            SessionManager.Instance.TileSelector.SetCurrentTile(new TileData("FFFF"));
+            SessionManagerOld.Instance.TileSelector.SetCurrentTile(new TileData("FFFF"));
             tileGenerator.Generate(new TileData("FFFF"));
             tileGeneratorForUI.Generate(new TileData("FFFF"));
             tileGenerator.tileParts.HideForestAreas();
@@ -295,15 +295,15 @@ namespace TerritoryWars.General
             Vector3 currentPosition = transform.position;
             Vector3 targetPosition = currentPosition;
             targetPosition.y -= tilePreviewSetHeight;
-            SessionManager.Instance.CurrentTurnPlayer.EndTurn();
+            SessionManagerOld.Instance.CurrentTurnPlayer.EndTurn();
             currentTween = transform
                 .DOMove(targetPosition, moveDuration)
                 .SetEase(moveEase)
                 .OnComplete(() =>
                 {
                     callback?.Invoke();
-                    SessionManager.Instance.Board.FloatingTextAnimation(_currentBoardPosition);
-                    SessionManager.Instance.Board.ScoreClientPrediction(playerIndex, currentTile);
+                    SessionManagerOld.Instance.Board.FloatingTextAnimation(_currentBoardPosition);
+                    SessionManagerOld.Instance.Board.ScoreClientPrediction(playerIndex, currentTile);
                 });
         }
 
@@ -327,7 +327,7 @@ namespace TerritoryWars.General
             
             currentTween?.Kill();
             
-            SessionManager.Instance.TileSelector.OnTileSelected -= SetPosition;
+            SessionManagerOld.Instance.TileSelector.OnTileSelected -= SetPosition;
             GameUI.OnJokerButtonClickedEvent -= GenerateFFFFTile;
         }
     }

@@ -26,7 +26,7 @@ public class FinishGameContests
         _mainCameraMouseControll = _mainCamera.GetComponent<MouseControll>();
         PrepareCameraForContest();
         PlayFinishGameAnimation();
-        SessionManager.Instance.gameUI.SetFinishGameUI(false);
+        SessionManagerOld.Instance.gameUI.SetFinishGameUI(false);
     }
 
     private async void PlayFinishGameAnimation()
@@ -36,19 +36,19 @@ public class FinishGameContests
             HashSet<KeyValuePair<TileParts, Side>> roadTileParts = new HashSet<KeyValuePair<TileParts, Side>>();
             List<TileParts> cityTileParts = new List<TileParts>();
             Vector2Int coord = OnChainBoardDataConverter.GetPositionByRoot(contest.Root);
-            GameObject tile = SessionManager.Instance.Board.GetTileObject(coord.x, coord.y);
+            GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(coord.x, coord.y);
             TileParts tileParts = tile.GetComponentInChildren<TileParts>();
             switch (contest.ContestType)
             {
                 case ContestType.Road:
-                    roadTileParts = SessionManager.Instance.StructureHoverManager.GetRoadTilePartsForHighlight(tile.transform, tileParts, contest.Root);
+                    roadTileParts = SessionManagerOld.Instance.StructureHoverManager.GetRoadTilePartsForHighlight(tile.transform, tileParts, contest.Root);
                     foreach (var roadTilePart in roadTileParts)
                     {
                         roadTilePart.Key.RoadOutline(true, roadTilePart.Value, true);
                     }
                     break;
                 case ContestType.City:
-                    cityTileParts = SessionManager.Instance.StructureHoverManager.GetCityTilePartsForHighlight(tile.transform);
+                    cityTileParts = SessionManagerOld.Instance.StructureHoverManager.GetCityTilePartsForHighlight(tile.transform);
                     foreach (TileParts cityTilePart in cityTileParts)
                     {
                         cityTilePart.CityOutline(true, true);
@@ -66,21 +66,21 @@ public class FinishGameContests
             HashSet<KeyValuePair<TileParts, Side>> roadTileParts = new HashSet<KeyValuePair<TileParts, Side>>();
             List<TileParts> cityTileParts = new List<TileParts>();
             Vector2Int coord = OnChainBoardDataConverter.GetPositionByRoot(contest.Root);
-            GameObject tile = SessionManager.Instance.Board.GetTileObject(coord.x, coord.y);
+            GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(coord.x, coord.y);
             TileParts tileParts = tile.GetComponentInChildren<TileParts>();
             MoveCameraToContest(new Vector3(tile.transform.position.x, tile.transform.position.y, _mainCamera.transform.position.z), contest.ContestAction);
             
             switch (contest.ContestType)
             {
                 case ContestType.Road:
-                    roadTileParts = SessionManager.Instance.StructureHoverManager.GetRoadTilePartsForHighlight(tile.transform, tileParts, contest.Root);
+                    roadTileParts = SessionManagerOld.Instance.StructureHoverManager.GetRoadTilePartsForHighlight(tile.transform, tileParts, contest.Root);
                     foreach (var roadTilePart in roadTileParts)
                     {
                         roadTilePart.Key.RoadOutline(true, roadTilePart.Value);
                     }
                     break;
                 case ContestType.City:
-                    cityTileParts = SessionManager.Instance.StructureHoverManager.GetCityTilePartsForHighlight(tile.transform);
+                    cityTileParts = SessionManagerOld.Instance.StructureHoverManager.GetCityTilePartsForHighlight(tile.transform);
                     foreach (TileParts cityTilePart in cityTileParts)
                     {
                         cityTilePart.CityOutline(true);
@@ -94,8 +94,8 @@ public class FinishGameContests
 
             if (contest.ContestType == ContestType.City)
             {
-                SessionManager.Instance.Board.CloseCityStructure(contest.Root);
-                cityTileParts = SessionManager.Instance.StructureHoverManager.GetCityTilePartsForHighlight(tile.transform);
+                SessionManagerOld.Instance.Board.CloseCityStructure(contest.Root);
+                cityTileParts = SessionManagerOld.Instance.StructureHoverManager.GetCityTilePartsForHighlight(tile.transform);
                 foreach (TileParts cityTilePart in cityTileParts)
                 {
                     cityTilePart.CityOutline(true);
@@ -107,14 +107,14 @@ public class FinishGameContests
             switch (contest.ContestType)
             {
                 case ContestType.Road:
-                    roadTileParts = SessionManager.Instance.StructureHoverManager.GetRoadTilePartsForHighlight(tile.transform, tileParts, contest.Root);
+                    roadTileParts = SessionManagerOld.Instance.StructureHoverManager.GetRoadTilePartsForHighlight(tile.transform, tileParts, contest.Root);
                     foreach (var roadTilePart in roadTileParts)
                     {
                         roadTilePart.Key.RoadOutline(false, roadTilePart.Value);
                     }
                     break;
                 case ContestType.City:
-                    cityTileParts = SessionManager.Instance.StructureHoverManager.GetCityTilePartsForHighlight(tile.transform);
+                    cityTileParts = SessionManagerOld.Instance.StructureHoverManager.GetCityTilePartsForHighlight(tile.transform);
                     foreach (TileParts cityTilePart in cityTileParts)
                     {
                         cityTilePart.CityOutline(false);

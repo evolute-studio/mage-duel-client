@@ -20,7 +20,7 @@ public class StructureChecker
 
     public void OnDestroy()
     {
-        SessionManager.Instance.Board.OnTilePlaced -= CreateStructures;
+        SessionManagerOld.Instance.Board.OnTilePlaced -= CreateStructures;
     }
 
 

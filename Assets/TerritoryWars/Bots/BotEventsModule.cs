@@ -23,7 +23,7 @@ namespace TerritoryWars.Bots
         
         private void MoveReceivedHandler(string playerAddress, TileData tile, Vector2Int position, int rotation, bool isJoker)
         {
-            if (playerAddress == Bot.Account.Address.Hex() || playerAddress != SessionManager.Instance.LocalPlayer.PlayerId)
+            if (playerAddress == Bot.Account.Address.Hex() || playerAddress != SessionManagerOld.Instance.LocalPlayer.PlayerId)
             {
                 return;
             }

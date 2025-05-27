@@ -121,7 +121,7 @@ namespace TerritoryWars.General
 
         private void CityHover(Transform objTransform)
         {
-            BoardManager board = SessionManager.Instance.Board;
+            BoardManager board = SessionManagerOld.Instance.Board;
             
             Transform parent = objTransform.transform.parent.parent.parent;
             _hoveredObjects.Add(parent.gameObject);
@@ -155,7 +155,7 @@ namespace TerritoryWars.General
         
         private void RoadHover(Transform objTransform)
         {
-            BoardManager board = SessionManager.Instance.Board;
+            BoardManager board = SessionManagerOld.Instance.Board;
             Transform parent = objTransform.transform.parent.parent;
             _hoveredObjects.Add(parent.gameObject);
             TileParts tileParts = objTransform.transform.parent.GetComponent<TileParts>();
@@ -202,7 +202,7 @@ namespace TerritoryWars.General
             if (_hoveredTiles.Count == 0) return;
             
             if (isHovered) return;
-            BoardManager board = SessionManager.Instance.Board;
+            BoardManager board = SessionManagerOld.Instance.Board;
             foreach (var position in _hoveredTiles)
             {
                 GameObject tile = board.GetTileObject(position.Key.x, position.Key.y);
@@ -226,7 +226,7 @@ namespace TerritoryWars.General
 
         public HashSet<KeyValuePair<TileParts, Side>> GetRoadTilePartsForHighlight(Transform tileParent, TileParts tileParts, byte rootPosition = 0)
         {
-            BoardManager board = SessionManager.Instance.Board;
+            BoardManager board = SessionManagerOld.Instance.Board;
             HashSet<KeyValuePair<TileParts, Side>> roadTileParts = new HashSet<KeyValuePair<TileParts, Side>>();
             HashSet<KeyValuePair<Vector2Int, Side>> hoveredTiles = new HashSet<KeyValuePair<Vector2Int, Side>>();
             
@@ -261,7 +261,7 @@ namespace TerritoryWars.General
 
         public List<TileParts> GetCityTilePartsForHighlight(Transform tileParent)
         {
-            BoardManager board = SessionManager.Instance.Board;
+            BoardManager board = SessionManagerOld.Instance.Board;
             List<TileParts> cityTileParts = new List<TileParts>();
             HashSet<KeyValuePair<Vector2Int, Side>> hoveredTiles = new HashSet<KeyValuePair<Vector2Int, Side>>();
             

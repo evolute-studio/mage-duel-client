@@ -22,7 +22,7 @@ namespace TerritoryWars.General
             }
         }
 
-        private static int _opponentCharacterId => SessionManager.Instance.IsLocalPlayerHost ? SessionManager.Instance.PlayersData[1].skin_id : SessionManager.Instance.PlayersData[0].skin_id;
+        private static int _opponentCharacterId => SessionManagerOld.Instance.IsLocalPlayerHost ? SessionManagerOld.Instance.PlayersData[1].skin_id : SessionManagerOld.Instance.PlayersData[0].skin_id;
         private const string _availableCharactersKey = "AvailableCharacters";
         private static List<int> _availableCharactersList = new List<int>();
         

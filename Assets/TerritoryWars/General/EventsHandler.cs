@@ -21,7 +21,7 @@ namespace TerritoryWars.General
                 // session
                 case evolute_duel_BoardUpdated boardUpdated:
                     BoardUpdated boardUpdate = new BoardUpdated().SetData(boardUpdated);
-                    evolute_duel_Board board = _worldManager.EntityModel<evolute_duel_Board>("id", boardUpdate.Id);
+                    evolute_duel_Board board = _worldManager.EntityModel<evolute_duel_Board>("id", boardUpdated.board_id);
                     Board.AddEdgeTiles(boardUpdate.Tiles, board.initial_edge_state);
                     EventBus.Publish(boardUpdate);
                     break;

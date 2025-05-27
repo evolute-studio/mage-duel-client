@@ -37,9 +37,9 @@ namespace TerritoryWars.General
         }
     }
     
-    public class SessionManager : MonoBehaviour
+    public class SessionManagerOld : MonoBehaviour
     {
-        public static SessionManager Instance { get; private set; }
+        public static SessionManagerOld Instance { get; private set; }
 
         public float StartDuration = 5f;
 

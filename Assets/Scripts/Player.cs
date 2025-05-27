@@ -58,7 +58,7 @@ public class Player : MonoBehaviour
         Vector3 topCenterPosition = new Vector3(GFX.bounds.center.x, GFX.bounds.center.y, GFX.bounds.center.z);
         GameObject bubble = Instantiate(
             PrefabsManager.Instance.InstantiateObject(PrefabsManager.Instance.SkipBubblePrefab),
-            topCenterPosition, Quaternion.identity, SessionManager.Instance.sessionUI.gameObject.transform);
+            topCenterPosition, Quaternion.identity, SessionManagerOld.Instance.sessionUI.gameObject.transform);
         
         bubble.transform.DOMove(bubble.transform.position + new Vector3(0, 1, 0), 1f)
             .OnComplete(() =>

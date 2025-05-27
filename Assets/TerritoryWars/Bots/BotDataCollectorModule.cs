@@ -19,14 +19,14 @@ namespace TerritoryWars.Bots
         {
             get
             {
-                if (SessionManager.Instance == null)
+                if (SessionManagerOld.Instance == null)
                 {
                     CustomLogger.LogWarning("BotDataCollectorModule: SessionManager is null");
                     return null;
                 }
                 if (_board == null)
                 {
-                    _board = SessionManager.Instance.Board;
+                    _board = SessionManagerOld.Instance.Board;
                 }
 
                 return _board;

@@ -82,7 +82,7 @@ public class SessionUIModel
 
     public void RotateCurrentTile()
     {
-        SessionManager.Instance.RotateCurrentTile();
+        SessionManagerOld.Instance.RotateCurrentTile();
     }
 
 }

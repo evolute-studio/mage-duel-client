@@ -14,7 +14,7 @@ namespace TerritoryWars.UI
         
         public void SetScores(ushort blueScore, ushort redScore)
         {
-            if (SessionManager.Instance.IsLocalPlayerHost)
+            if (SessionManagerOld.Instance.IsLocalPlayerHost)
             {
                 BlueScoreText.text = blueScore.ToString();
                 RedScoreText.text = redScore.ToString();
@@ -29,7 +29,7 @@ namespace TerritoryWars.UI
         
         public void SetFlags(ushort blueScore, ushort redScore)
         {
-            if (SessionManager.Instance.IsLocalPlayerHost)
+            if (SessionManagerOld.Instance.IsLocalPlayerHost)
             {
                 if(blueScore == redScore)
                     Background.sprite = ScoreFlags[0];

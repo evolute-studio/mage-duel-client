@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace TerritoryWars.Tools
@@ -67,6 +68,34 @@ namespace TerritoryWars.Tools
                     Debug.Log(logMessage);
                     break;
             }
+        }
+        
+        public static void LogObject(object obj, string label = null)
+        {
+            if (obj == null)
+            {
+                Debug.LogWarning("LogObject: null");
+                return;
+            }
+
+            string output;
+
+            try
+            {
+                output = JsonConvert.SerializeObject(obj, Formatting.Indented);
+                // if (output.Length > 10000)
+                // {
+                //     string objType = obj.GetType().Name;
+                //     string fileName = $"{objType}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+                //     System.IO.File.WriteAllText(fileName, output);
+                // }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("JsonConvert failed: " + e.Message);
+                output = obj.ToString();
+            }
+            Debug.Log(string.IsNullOrEmpty(label) ? output : $"{label}:\n{output}");
         }
         
         public static void LogInfo(string message)

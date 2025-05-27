@@ -672,8 +672,9 @@ GameObject:
   - component: {fileID: 209425370}
   - component: {fileID: 209425369}
   - component: {fileID: 209425368}
-  - component: {fileID: 209425367}
+  - component: {fileID: 209425373}
   - component: {fileID: 209425366}
+  - component: {fileID: 209425367}
   - component: {fileID: 209425371}
   - component: {fileID: 209425372}
   m_Layer: 0
@@ -799,6 +800,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WorldManager: {fileID: 209425369}
+--- !u!114 &209425373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 209425365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 263b57db0bc34e5a8b182e00984a6790, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WorldManager: {fileID: 209425369}
+  SynchronizationMaster: {fileID: 209425372}
 --- !u!1 &398816327
 GameObject:
   m_ObjectHideFlags: 0
@@ -1195,7 +1210,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7330603052455128508, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 292.66
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7330603052455128508, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_LocalPosition.x

@@ -66,16 +66,18 @@ namespace TerritoryWars.Managers.SessionComponents
             Players[1]
                 .SetAnimatorController(playerInfoUI.charactersObject.GetAnimatorController(Players[1].ActiveSkin));
 
-            int hostIndex = SetLocalPlayerData.GetLocalIndex(0);
-            int guestPlayerIndex = SetLocalPlayerData.GetLocalIndex(1);
-            Players[hostIndex].transform.localScale = new Vector3(-0.7f, 0.7f, 1f);
-            Players[hostIndex].transform.position = leftCharacterPath[0];
-            Players[guestPlayerIndex].transform.position = rightCharacterPath[0];
-            Players[hostIndex].transform
+            //int hostIndex = SetLocalPlayerData.GetLocalIndex(0);
+            //int guestPlayerIndex = SetLocalPlayerData.GetLocalIndex(1);
+            
+            Players[0].transform.localScale = new Vector3(-0.7f, 0.7f, 1f);
+            Players[0].transform.position = leftCharacterPath[0];
+            Players[1].transform.position = rightCharacterPath[0];
+            
+            Players[0].transform
                 .DOPath(leftCharacterPath, 2f, PathType.CatmullRom)
                 .SetEase(Ease.OutQuad);
 
-            Players[guestPlayerIndex].transform
+            Players[1].transform
                 .DOPath(rightCharacterPath, 2f, PathType.CatmullRom)
                 .SetEase(Ease.OutQuad);
 

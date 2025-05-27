@@ -125,8 +125,8 @@ namespace TerritoryWars.Tile
 
         private void GenerateRoadPins(Transform[] points)
         {
-            int playerId = SessionManager.Instance.CurrentTurnPlayer != null
-                ? SessionManager.Instance.CurrentTurnPlayer.PlayerSide
+            int playerId = SessionManagerOld.Instance.CurrentTurnPlayer != null
+                ? SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide
                 : -1;
             
             float randomStartDelay = Random.Range(0f, 2f);
@@ -201,14 +201,14 @@ namespace TerritoryWars.Tile
                 {
                     int playerId = 0;
                     TileParts.HouseGameObject house = _housesParent[i];
-                    SessionManager sessionManager = SessionManager.Instance;
-                    if (sessionManager == null || sessionManager.CurrentTurnPlayer == null)
+                    SessionManagerOld sessionManagerOld = SessionManagerOld.Instance;
+                    if (sessionManagerOld == null || sessionManagerOld.CurrentTurnPlayer == null)
                     {
                         playerId = Random.Range(0, 2);
                     }
                     else
                     {
-                        playerId = sessionManager.CurrentTurnPlayer.PlayerSide;
+                        playerId = sessionManagerOld.CurrentTurnPlayer.PlayerSide;
                     }
 
                     if (_tileData.OwnerId == -1) playerId = -1;
@@ -273,13 +273,13 @@ namespace TerritoryWars.Tile
             
             tileParts.SpawnTileObjects();
 
-            if (SessionManager.Instance.TileSelector.selectedPosition != null || _isTilePlacing)
+            if (SessionManagerOld.Instance.TileSelector.selectedPosition != null || _isTilePlacing)
             {
-                FencePlacerForCloserToBorderCity(SessionManager.Instance.Board.CheckCityTileSidesToBorder(
+                FencePlacerForCloserToBorderCity(SessionManagerOld.Instance.Board.CheckCityTileSidesToBorder(
                     _placingTilePosition.x,
                     _placingTilePosition.y));
                 
-                MinePlaceForCloserToBorderRoad(SessionManager.Instance.Board.CheckRoadTileSidesToBorder(_placingTilePosition.x,
+                MinePlaceForCloserToBorderRoad(SessionManagerOld.Instance.Board.CheckRoadTileSidesToBorder(_placingTilePosition.x,
                     _placingTilePosition.y));
             }
         }
@@ -414,14 +414,14 @@ namespace TerritoryWars.Tile
             {
                 if(_tileData.GetSide(side.Direction) != LandscapeType.Road) continue;
                 
-                bool snowBoardPart = SessionManager.Instance.Board.IsSnowBoardPart(side.TileBoardPosition.x, side.TileBoardPosition.y);
+                bool snowBoardPart = SessionManagerOld.Instance.Board.IsSnowBoardPart(side.TileBoardPosition.x, side.TileBoardPosition.y);
 
                 foreach (var prefab in PrefabsManager.Instance.MineEnviromentTiles)
                 {
                     if (prefab.Direction == side.Direction && prefab.BoardPart == (snowBoardPart ? 3 : 0))
                     {
                         GameObject mine = Instantiate(prefab.MineTile, side.Position, Quaternion.identity,
-                            SessionManager.Instance.Board.GetTileObject(side.TileBoardPosition.x, side.TileBoardPosition.y).transform);
+                            SessionManagerOld.Instance.Board.GetTileObject(side.TileBoardPosition.x, side.TileBoardPosition.y).transform);
                         side.Tile.GetComponent<TileGenerator>().RoadRenderer.gameObject.SetActive(false);
                     }
                 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using UnityEngine;
@@ -11,14 +12,39 @@ namespace TerritoryWars.Managers.SessionComponents
 {
     public class SessionManager : MonoBehaviour
     {
+        public static SessionManager Instance { get; private set; }
+        
+        public void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Debug.LogError("SessionManager already exists. Deleting new instance.");
+                Destroy(gameObject);
+            }
+
+            if (!CustomSceneManager.Instance.LoadingScreen.IsLoading)
+            {
+                CustomSceneManager.Instance.LoadingScreen.SetActive(true, 
+                    () => DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount), 
+                    LoadingScreen.connectingText);
+            }
+        }
+        
         public SessionContext SessionContext = new SessionContext();
         private SessionManagerContext _managerContext;
         private List<ISessionComponent> _components;
+        
+        
 
         private void Start()
         {
             SetupData();
             Initialize();
+            CustomSceneManager.Instance.LoadingScreen.SetActive(false);
         }
 
         private void Initialize()

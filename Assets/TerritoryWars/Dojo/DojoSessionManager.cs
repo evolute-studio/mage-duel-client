@@ -146,8 +146,8 @@ namespace TerritoryWars.Dojo
         private void Moved(evolute_duel_Moved eventModel)
         {
             string player = eventModel.player.Hex();
-            if (player != SessionManager.Instance.LocalPlayer.PlayerId &&
-                player != SessionManager.Instance.RemotePlayer.PlayerId) return;
+            if (player != SessionManagerOld.Instance.LocalPlayer.PlayerId &&
+                player != SessionManagerOld.Instance.RemotePlayer.PlayerId) return;
             string move_id = eventModel.move_id.Hex();
             LastMoveTimestamp = eventModel.timestamp;
             string prev_move_id = eventModel.prev_move_id switch
@@ -173,8 +173,8 @@ namespace TerritoryWars.Dojo
             string move_id = eventModel.move_id.Hex();
             string player = eventModel.player.Hex();
             
-            if(player != SessionManager.Instance.LocalPlayer.PlayerId &&
-                player != SessionManager.Instance.RemotePlayer.PlayerId) return;
+            if(player != SessionManagerOld.Instance.LocalPlayer.PlayerId &&
+                player != SessionManagerOld.Instance.RemotePlayer.PlayerId) return;
             
             PopupManager.Instance.ShowInvalidMovePopup();
 
@@ -185,9 +185,9 @@ namespace TerritoryWars.Dojo
         {
             string player = eventModel.player_id.Hex();
 
-            if (player != SessionManager.Instance.LocalPlayer.PlayerId) { return; }
+            if (player != SessionManagerOld.Instance.LocalPlayer.PlayerId) { return; }
             
-            if(!SessionManager.Instance.IsLocalPlayerTurn) return;
+            if(!SessionManagerOld.Instance.IsLocalPlayerTurn) return;
             PopupManager.Instance.NotYourTurnPopup();
             
             CustomLogger.LogError($"[NotYourTurn] | Player: {player}");
@@ -198,7 +198,7 @@ namespace TerritoryWars.Dojo
             string player = eventModel.player_id.Hex();
             string board = eventModel.board_id.Hex();
 
-            if (player != SessionManager.Instance.LocalPlayer.PlayerId) { return; }
+            if (player != SessionManagerOld.Instance.LocalPlayer.PlayerId) { return; }
             
             PopupManager.Instance.ShowCantFinishGamePopup();
             
@@ -243,22 +243,22 @@ namespace TerritoryWars.Dojo
             var availableTiles = eventModel.available_tiles_in_deck.Length;
             var hostPlayerJokers = eventModel.player1.Item3;
             var guestPlayerJokers = eventModel.player2.Item3;
-            SessionManager.Instance.SetNextTile(tileData);
-            SessionManager.Instance.SetTilesInDeck(availableTiles + 1);
-            SessionManager.Instance.JokerManager.SetJokersCount(0, hostPlayerJokers);
-            SessionManager.Instance.JokerManager.SetJokersCount(1, guestPlayerJokers);
+            SessionManagerOld.Instance.SetNextTile(tileData);
+            SessionManagerOld.Instance.SetTilesInDeck(availableTiles + 1);
+            SessionManagerOld.Instance.JokerManager.SetJokersCount(0, hostPlayerJokers);
+            SessionManagerOld.Instance.JokerManager.SetJokersCount(1, guestPlayerJokers);
         }
 
         private void GameFinished(FieldElement board_id, FieldElement hostPlayer)
         {
             evolute_duel_Board localBoard = GetLocalPlayerBoard();
             bool isCurrentBoard = localBoard != null && localBoard.id.Hex() == board_id.Hex();
-            bool isHostPlayerInSession = SessionManager.Instance.LocalPlayer.PlayerId == hostPlayer.Hex() ||
-                                         SessionManager.Instance.RemotePlayer.PlayerId == hostPlayer.Hex();
+            bool isHostPlayerInSession = SessionManagerOld.Instance.LocalPlayer.PlayerId == hostPlayer.Hex() ||
+                                         SessionManagerOld.Instance.RemotePlayer.PlayerId == hostPlayer.Hex();
             if (isCurrentBoard || isHostPlayerInSession)
             {
                 _contestProcessor.SetGameFinished(true);
-                SessionManager.Instance.StructureHoverManager.IsGameFinished = true;
+                SessionManagerOld.Instance.StructureHoverManager.IsGameFinished = true;
                 CustomLogger.LogExecution($"[GameFinished]");
                 FinishGameContests.FinishGameAction = () =>
                 {
@@ -399,8 +399,8 @@ namespace TerritoryWars.Dojo
         private void GameCanceled(evolute_duel_GameCanceled eventModel)
         {
             string hostPlayer = eventModel.host_player.Hex();
-            if (hostPlayer != SessionManager.Instance.LocalPlayer.PlayerId &&
-               hostPlayer != SessionManager.Instance.RemotePlayer.PlayerId) return;
+            if (hostPlayer != SessionManagerOld.Instance.LocalPlayer.PlayerId &&
+               hostPlayer != SessionManagerOld.Instance.RemotePlayer.PlayerId) return;
 
             SimpleStorage.ClearCurrentBoardId();
             PopupManager.Instance.ShowOpponentCancelGame();
@@ -417,7 +417,7 @@ namespace TerritoryWars.Dojo
         {
             ClashAnimation contestAnimation = CreateContestAnimation();
             Vector2Int coord = OnChainBoardDataConverter.GetPositionByRoot(root);
-            GameObject tile = SessionManager.Instance.Board.GetTileObject(coord.x, coord.y);
+            GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(coord.x, coord.y);
             if (tile)
             {
                 Vector3 position = tile.transform.position;
@@ -446,7 +446,7 @@ namespace TerritoryWars.Dojo
             int maxAttempts = 6;
             while (i < maxAttempts)
             {
-                GameObject tile = SessionManager.Instance.Board.GetTileObject(coord.x, coord.y);
+                GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(coord.x, coord.y);
                 if (tile)
                 {
                     Vector3 position = tile.transform.position;
@@ -710,12 +710,12 @@ namespace TerritoryWars.Dojo
             {
                 bool isContested = city.Key.contested;
                 Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
-                if (SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
+                if (SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
                 { 
                     continue;
                 }
-                GameObject tile = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
-                TileData tileData = SessionManager.Instance.Board.GetTileData(position.x, position.y);
+                GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y);
+                TileData tileData = SessionManagerOld.Instance.Board.GetTileData(position.x, position.y);
                 TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
                 int playerOwner;
                 if (city.Key.contested)
@@ -742,7 +742,7 @@ namespace TerritoryWars.Dojo
                     tileGenerator.tileParts.SetActiveWoodenBorderWall(false);
                 }
                     
-                SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
+                SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                     BoardManager.StructureType.City, isContested); 
             }
         }
@@ -758,14 +758,14 @@ namespace TerritoryWars.Dojo
                 {
                     bool isContest = road.Key.contested;
                     (Vector2Int position, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
-                    if(SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
+                    if(SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
                     {
                         continue;
                     }
-                    CustomLogger.LogInfo($"Board: " + SessionManager.Instance.Board);
-                    CustomLogger.LogInfo($"TileObject: " + SessionManager.Instance.Board.GetTileObject(position.x, position.y));
-                    CustomLogger.LogInfo($"TileGenerator: " + SessionManager.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>());
-                    TileGenerator tileGenerator = SessionManager.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>();
+                    CustomLogger.LogInfo($"Board: " + SessionManagerOld.Instance.Board);
+                    CustomLogger.LogInfo($"TileObject: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y));
+                    CustomLogger.LogInfo($"TileGenerator: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>());
+                    TileGenerator tileGenerator = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>();
                     int playerOwner;
                     if (road.Key.contested)
                     {
@@ -790,7 +790,7 @@ namespace TerritoryWars.Dojo
                                 .CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite);
                         
                     }
-                    SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
+                    SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                         BoardManager.StructureType.Road, false, isContest);
                 }
         }
@@ -805,12 +805,12 @@ namespace TerritoryWars.Dojo
                 {
                     bool isContested = city.Key.contested;
                     Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
-                    if (SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
+                    if (SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
                     { 
                         continue;
                     }
-                    GameObject tile = SessionManager.Instance.Board.GetTileObject(position.x, position.y);
-                    TileData tileData = SessionManager.Instance.Board.GetTileData(position.x, position.y);
+                    GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y);
+                    TileData tileData = SessionManagerOld.Instance.Board.GetTileData(position.x, position.y);
                     TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
                     int playerOwner;
                     if (city.Key.contested)
@@ -837,7 +837,7 @@ namespace TerritoryWars.Dojo
                         tileGenerator.tileParts.SetActiveWoodenArcs(false);
                     }
                     
-                    SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
+                    SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                         BoardManager.StructureType.City, isContested); 
                 }
             }
@@ -850,14 +850,14 @@ namespace TerritoryWars.Dojo
                 {
                     bool isContest = road.Key.contested;
                     (Vector2Int position, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
-                    if(SessionManager.Instance.Board == null || SessionManager.Instance.Board.GetTileObject(position.x, position.y) == null)
+                    if(SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
                     {
                         continue;
                     }
-                    CustomLogger.LogInfo($"Board: " + SessionManager.Instance.Board);
-                    CustomLogger.LogInfo($"TileObject: " + SessionManager.Instance.Board.GetTileObject(position.x, position.y));
-                    CustomLogger.LogInfo($"TileGenerator: " + SessionManager.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>());
-                    TileGenerator tileGenerator = SessionManager.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>();
+                    CustomLogger.LogInfo($"Board: " + SessionManagerOld.Instance.Board);
+                    CustomLogger.LogInfo($"TileObject: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y));
+                    CustomLogger.LogInfo($"TileGenerator: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>());
+                    TileGenerator tileGenerator = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>();
                     int playerOwner;
                     if (road.Key.contested)
                     {
@@ -882,7 +882,7 @@ namespace TerritoryWars.Dojo
                                 .CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite);
                         
                     }
-                    SessionManager.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
+                    SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
                         BoardManager.StructureType.Road, false, isContest);
                 }
             }
@@ -890,7 +890,7 @@ namespace TerritoryWars.Dojo
         
         public void CloseAllStructure()
         {
-            SessionManager.Instance.Board.CloseAllStructures();
+            SessionManagerOld.Instance.Board.CloseAllStructures();
         }
 
 
@@ -960,7 +960,7 @@ namespace TerritoryWars.Dojo
             GeneralAccount account = _dojoGameManager.LocalAccount;
             var serverTypes = DojoConverter.MoveClientToServer(data, x, y, isJoker);
             DojoConnector.MakeMove(account, serverTypes.joker_tile, serverTypes.rotation, serverTypes.col, serverTypes.row);
-            SessionManager.Instance.isPlayerMakeMove = true;
+            SessionManagerOld.Instance.isPlayerMakeMove = true;
         }
 
         public void CreateSnapshot()
@@ -970,7 +970,7 @@ namespace TerritoryWars.Dojo
 
         public void SkipMove()
         {
-            if (SessionManager.Instance.isPlayerMakeMove) return;
+            if (SessionManagerOld.Instance.isPlayerMakeMove) return;
             DojoConnector.SkipMove(_localPlayerAccount);
         }
 

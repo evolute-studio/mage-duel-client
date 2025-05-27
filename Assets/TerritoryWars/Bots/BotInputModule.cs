@@ -14,8 +14,8 @@ namespace TerritoryWars.Bots
         {
             get
             {
-                if (SessionManager.Instance == null) return null;
-                return SessionManager.Instance.TileSelector;
+                if (SessionManagerOld.Instance == null) return null;
+                return SessionManagerOld.Instance.TileSelector;
             }
         }
         

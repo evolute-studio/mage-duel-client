@@ -19,7 +19,7 @@ namespace TerritoryWars.Bots
         {
             get
             {
-                if (SessionManager.Instance == null) return null;
+                if (SessionManagerOld.Instance == null) return null;
                 return DojoGameManager.Instance.DojoSessionManager;
             }
         }
@@ -28,7 +28,7 @@ namespace TerritoryWars.Bots
         {
             get
             {
-                if (SessionManager.Instance == null) return -1;
+                if (SessionManagerOld.Instance == null) return -1;
                 return _player.PlayerSide;
             }
         }
@@ -37,8 +37,8 @@ namespace TerritoryWars.Bots
         {
             get
             {
-                if (SessionManager.Instance == null) return null;
-                return SessionManager.Instance.GetPlayerByAddress(Bot.Account.Address.Hex());
+                if (SessionManagerOld.Instance == null) return null;
+                return SessionManagerOld.Instance.GetPlayerByAddress(Bot.Account.Address.Hex());
             }
         }
 

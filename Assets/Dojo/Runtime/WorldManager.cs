@@ -102,13 +102,7 @@ namespace Dojo
         
         public T EntityModel<T>(string fieldName = null, object value = null) where T : ModelInstance
         {
-            // c => c != null && c.GetType().GetField(fieldName)?.GetValue(c).Equals(value) == true);
-            return transform.Cast<Transform>()
-                .Select(t => t.gameObject)
-                .Select(g => g.GetComponent<T>())
-                .FirstOrDefault(c => c != null && 
-                    (fieldName == null || 
-                     c.GetType().GetField(fieldName)?.GetValue(c).Equals(value) == true));
+            return EntityModel<T>(new Dictionary<string, object>{ { fieldName, value } });
         }
         
         public T EntityModel<T>(Dictionary<string, object> filters) where T : ModelInstance
@@ -116,9 +110,44 @@ namespace Dojo
             return transform.Cast<Transform>()
                 .Select(t => t.gameObject)
                 .Select(g => g.GetComponent<T>())
-                .FirstOrDefault(c => c != null && 
-                                     filters.All(filter => 
-                                         c.GetType().GetField(filter.Key)?.GetValue(c).Equals(filter.Value) == true));
+                .Where(c => c != null)
+                .FirstOrDefault(c => 
+                {
+                    foreach (var filter in filters)
+                    {
+                        var field = c.GetType().GetField(filter.Key);
+                        if (field == null)
+                        {
+                            Debug.LogWarning($"Field {filter.Key} not found in component {typeof(T).Name}");
+                            return false;
+                        }
+
+                        var value = field.GetValue(c);
+                        if (value == null)
+                        {
+                            Debug.LogWarning($"Field {filter.Key} has null value in component {typeof(T).Name}");
+                            return false;
+                        }
+
+                        var filterValue = filter.Value;
+                        
+                        if (value is FieldElement fieldElement)
+                        {
+                            value = fieldElement.Hex();
+                            if (filterValue is FieldElement filterFieldElement)
+                            {
+                                filterValue = filterFieldElement.Hex();
+                            }
+                        }
+
+                        if (value.Equals(filterValue))
+                        {
+                            return true;
+                        }
+                        Debug.LogWarning($"Field {filter.Key} with value {value} does not match filter value {filterValue} in component {typeof(T).Name}");
+                    }
+                    return false;
+                });
         }
 
         // Add a new entity game object as a child of the WorldManager game object.

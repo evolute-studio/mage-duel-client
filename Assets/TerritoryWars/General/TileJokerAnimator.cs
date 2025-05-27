@@ -242,12 +242,12 @@ namespace TerritoryWars.General
                 _currentSequence.AppendCallback(() => {
                     try
                     {
-                        if (SessionManager.Instance != null && !_isAnimating) return;
+                        if (SessionManagerOld.Instance != null && !_isAnimating) return;
                         
-                        var jokerTile = SessionManager.Instance.JokerManager.GetGenerateJokerTile(x, y);
+                        var jokerTile = SessionManagerOld.Instance.JokerManager.GetGenerateJokerTile(x, y);
                         if (jokerTile != null)
                         {
-                            SessionManager.Instance.TileSelector.StartJokerTilePlacement(jokerTile, x, y);
+                            SessionManagerOld.Instance.TileSelector.StartJokerTilePlacement(jokerTile, x, y);
                         }
                     }
                     catch (Exception e)
