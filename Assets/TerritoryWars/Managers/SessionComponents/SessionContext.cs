@@ -18,6 +18,17 @@ namespace TerritoryWars.Managers.SessionComponents
         
         public Player RemotePlayer;
         public Player CurrentTurnPlayer;
+
+        public bool IsSessionBoard(string boardId)
+        {
+            return Board.Id == boardId;
+        }
+        
+        
+        public bool IsPlayerInSession(string playerId)
+        {
+            return Players[0].PlayerId == playerId || Players[1].PlayerId == playerId;
+        }
         //public PlayerProfile[] PlayersProfiles = new PlayerProfile[2];
     }
 }

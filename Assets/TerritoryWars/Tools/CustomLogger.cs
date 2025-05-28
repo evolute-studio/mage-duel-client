@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using TerritoryWars.General;
 using UnityEngine;
 
 namespace TerritoryWars.Tools
@@ -15,6 +16,8 @@ namespace TerritoryWars.Tools
         DojoLoop,
         Analytics,
         Filtering,
+        EventsLocal,
+        EventsAll
     }
     
     public static class CustomLogger
@@ -29,6 +32,8 @@ namespace TerritoryWars.Tools
             {LogType.DojoLoop, "#FFD700"},
             {LogType.Analytics, "#FF4500"},
             {LogType.Filtering, "#808080"},
+            {LogType.EventsLocal, "#FFD700"},
+            {LogType.EventsAll, "#736620"},
         };
         
         public static Dictionary<LogType, bool> LogTypeEnabled = new Dictionary<LogType, bool>
@@ -41,6 +46,8 @@ namespace TerritoryWars.Tools
             {LogType.DojoLoop, true},
             {LogType.Analytics, true},
             {LogType.Filtering, false},
+            {LogType.EventsLocal, true},
+            {LogType.EventsAll, true},
             
         };
         
@@ -136,6 +143,18 @@ namespace TerritoryWars.Tools
         public static void LogFiltering(string message)
         {
             Log(LogType.Filtering, message);
+        }
+
+        public static void LogEventsLocal(string message)
+        {
+            message += $"| App State: {ApplicationState.CurrentState} | (Local Player)";
+            Log(LogType.EventsLocal, message);
+        }
+        
+        public static void LogEventsAll(string message)
+        {
+            message += $"| App State: {ApplicationState.CurrentState} | (All Players)";
+            Log(LogType.EventsAll, message);
         }
 
 

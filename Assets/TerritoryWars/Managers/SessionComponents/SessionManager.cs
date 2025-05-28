@@ -102,6 +102,8 @@ namespace TerritoryWars.Managers.SessionComponents
             PlayerProfile player2 = await DojoLayer.Instance.GetPlayerProfile(board.Player2.PlayerId);
             SessionContext.Players[0].ActiveSkin = player1.ActiveSkin;
             SessionContext.Players[1].ActiveSkin = player2.ActiveSkin;
+            
+            DojoGameManager.Instance.GlobalContext.SessionContext = SessionContext;
         }
         
         private void InitializeBoard()
@@ -135,6 +137,7 @@ namespace TerritoryWars.Managers.SessionComponents
         
         private void OnDestroy()
         {
+            DojoGameManager.Instance.GlobalContext.SessionContext = null;
             foreach (var component in _components)
                 component.Dispose();
         }

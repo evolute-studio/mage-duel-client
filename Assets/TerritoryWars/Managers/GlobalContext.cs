@@ -1,5 +1,6 @@
 using System;
 using TerritoryWars.DataModels;
+using TerritoryWars.Managers.SessionComponents;
 
 namespace TerritoryWars.Managers
 {
@@ -10,6 +11,7 @@ namespace TerritoryWars.Managers
         public Shop Shop;
         public PlayerProfile PlayerProfile;
         public GameModel GameInProgress;
+        public SessionContext SessionContext; 
 
         public bool HasGameInProgress => !GameInProgress.IsNull;
     }
