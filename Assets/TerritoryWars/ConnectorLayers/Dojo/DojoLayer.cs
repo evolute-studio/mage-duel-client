@@ -43,6 +43,28 @@ namespace TerritoryWars.ConnectorLayers.Dojo
             EventsHandler = new EventsHandler(WorldManager);
         }
 
+        public async Task<(Rules, Shop)> GetGeneralModels()
+        {
+            Rules rulesModel = new Rules();
+            Shop shopModel = new Shop();
+            evolute_duel_Rules rules = WorldManager.EntityModel<evolute_duel_Rules>();
+            evolute_duel_Shop shop = WorldManager.EntityModel<evolute_duel_Shop>();
+            if (rules == null || shop == null)
+            {
+                await SynchronizationMaster.SyncGeneralModels();
+                rules = WorldManager.EntityModel<evolute_duel_Rules>();
+                shop = WorldManager.EntityModel<evolute_duel_Shop>();
+            }
+            
+            if (rules == null || shop == null)
+            {
+                return (default, default);
+            }
+            rulesModel.SetData(rules);
+            shopModel.SetData(shop);
+            return (rulesModel, shopModel);
+        }
+
         public async Task<Board> GetBoard(string boardId)
         {
             evolute_duel_Board board = WorldManager.EntityModel<evolute_duel_Board>("id", new FieldElement(boardId));

@@ -85,9 +85,9 @@ namespace TerritoryWars.Managers.SessionComponents
                 return;
             }
             SessionContext.Game = game;
-            //Board board = await DojoLayer.Instance.GetBoard(SessionContext.Game.BoardId);
-            IncomingModelsFilter.AllowedBoards.Add("0x0000000000000000000000000000000000000000000000000000000000000038");
-            Board board = await DojoLayer.Instance.GetBoard("0x0000000000000000000000000000000000000000000000000000000000000038");
+            Board board = await DojoLayer.Instance.GetBoard(SessionContext.Game.BoardId);
+            //IncomingModelsFilter.AllowedBoards.Add("0x0000000000000000000000000000000000000000000000000000000000000038");
+            //Board board = await DojoLayer.Instance.GetBoard("0x0000000000000000000000000000000000000000000000000000000000000038");
             if (board.IsNull)
             {
                 CustomLogger.LogError("[SessionManager.SetupData] - Board is null");

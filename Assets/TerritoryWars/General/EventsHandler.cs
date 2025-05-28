@@ -16,6 +16,26 @@ namespace TerritoryWars.General
         
         private void OnEventMessage(ModelInstance modelInstance)
         {
+            switch (ApplicationState.CurrentState)
+            {
+                case ApplicationStates.Initializing:
+                    break;
+                case ApplicationStates.Leaderboard:
+                    break;
+                case ApplicationStates.MatchTab:
+                    break;
+                case ApplicationStates.Menu:
+                    break;
+                case ApplicationStates.Session:
+                    SessionEventHandler(modelInstance);
+                    break;
+                case ApplicationStates.SnapshotTab:
+                    break;
+            }
+        }
+
+        private void SessionEventHandler(ModelInstance modelInstance)
+        {
             switch (modelInstance)
             {
                 // session
@@ -29,8 +49,8 @@ namespace TerritoryWars.General
                     Moved move = new Moved().SetData(moved);
                     EventBus.Publish(move);
                     break;
-                case evolute_duel_Skiped skiped:
-                    Skipped skip = new Skipped().SetData(skiped);
+                case evolute_duel_Skiped skipped:
+                    Skipped skip = new Skipped().SetData(skipped);
                     EventBus.Publish(skip);
                     break;
                 

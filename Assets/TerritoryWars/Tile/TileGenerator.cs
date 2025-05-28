@@ -114,7 +114,6 @@ namespace TerritoryWars.Tile
                     }
                     GameObject pin = Instantiate(PrefabsManager.Instance.PinPrefab, points[i]);
                     int playerId = _tileData.PlayerSide;
-                    CustomLogger.LogObject(_tileData, "_tileData");
                     RoadPin roadPin = pin.GetComponent<RoadPin>();
                     int score = GetRoadPoints();
                     roadPin.Initialize(playerId, score);
@@ -174,7 +173,6 @@ namespace TerritoryWars.Tile
                 {
                     int playerId = _tileData.PlayerSide;
                     TileParts.HouseGameObject house = _housesParent[i];
-                    CustomLogger.LogImportant("TileGenerator Player ID: " + _tileData.PlayerSide);
                     if (_tileData.PlayerSide == -1) playerId = -1;
                     GameObject prefab = _tileData.HouseSprites.Count > i 
                         ? PrefabsManager.Instance.GetNonContestedHousePrefabByReference(_tileData.HouseSprites[i], playerId)

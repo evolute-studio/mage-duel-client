@@ -102,6 +102,13 @@ namespace Dojo
         
         public T EntityModel<T>(string fieldName = null, object value = null) where T : ModelInstance
         {
+            if (fieldName == null && value == null)
+            {
+                return transform.Cast<Transform>()
+                    .Select(t => t.gameObject)
+                    .Select(g => g.GetComponent<T>())
+                    .FirstOrDefault();
+            }
             return EntityModel<T>(new Dictionary<string, object>{ { fieldName, value } });
         }
         
@@ -130,7 +137,6 @@ namespace Dojo
                         }
 
                         var filterValue = filter.Value;
-                        
                         if (value is FieldElement fieldElement)
                         {
                             value = fieldElement.Hex();
