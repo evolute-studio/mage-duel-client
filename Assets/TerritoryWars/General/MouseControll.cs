@@ -63,22 +63,21 @@ namespace TerritoryWars.General
 
         private void HandlePanning()
         {
-            if (wasPinching)
+            // Якщо щойно закінчили зум і залишився один палець
+            if (wasPinching && Input.touchCount == 1)
             {
-                if (Input.touchCount == 1)
-                {
-                    Touch touch = Input.GetTouch(0);
-                    if (touch.phase == TouchPhase.Began)
-                    {
-                        // Скидаємо lastMousePosition при початку нового дотику після масштабування
-                        lastMousePosition = touch.position;
-                        wasPinching = false;
-                    }
-                }
-                else if (Input.touchCount == 0)
-                {
-                    wasPinching = false;
-                }
+                Touch touch = Input.GetTouch(0);
+                // Встановлюємо нову початкову позицію для панорамування
+                lastMousePosition = touch.position;
+                isDragging = true;
+                wasPinching = false;
+                return;
+            }
+            // Якщо щойно закінчили зум і немає дотиків
+            else if (wasPinching && Input.touchCount == 0)
+            {
+                wasPinching = false;
+                isDragging = false;
                 return;
             }
             
@@ -162,12 +161,15 @@ namespace TerritoryWars.General
                 {
                     lastPinchDistance = Vector2.Distance(touch0.position, touch1.position);
                     isPinching = true;
-                    wasPinching = true;
+                    wasPinching = false; // Скидаємо під час початку зуму
+                    isDragging = false; // Зупиняємо панорамування під час зуму
                 }
                 else if (touch0.phase == TouchPhase.Ended || touch1.phase == TouchPhase.Ended)
                 {
                     isPinching = false;
                     _pinchEndTime = Time.time;
+                    // Встановлюємо wasPinching = true коли один з пальців відпускається
+                    wasPinching = true;
                 }
 
                 if (isPinching)
