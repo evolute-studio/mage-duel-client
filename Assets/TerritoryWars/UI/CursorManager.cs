@@ -13,6 +13,7 @@ public class CursorManager : MonoBehaviour
     [SerializeField] RectTransform _canvasRect;
     [SerializeField] Image _cursorImage;
     [SerializeField] Canvas _canvas;
+    private bool _isCursorDisabled = false;
     
     private float baseWidth = 1920f;
     private float baseHeight = 1080f;
@@ -49,17 +50,27 @@ public class CursorManager : MonoBehaviour
         _hotspot = defaultHotspot;
         SetCursor("default");
         UpdateCursorScale();
-        
     }
 
     public void LateUpdate()
     {
+        if (Input.touchCount == 1 || Input.touchCount == 2 && !_isCursorDisabled)
+        {
+            DisableCursor();
+        }
+        
         Vector2 mousePosition = Input.mousePosition;
         
         RectTransformUtility.ScreenPointToLocalPointInRectangle(_canvasRect,
             mousePosition, _canvas.worldCamera, out Vector2 localPoint);
         
         _cursorRect.anchoredPosition = localPoint + _hotspot;
+    }
+    
+    public void DisableCursor()
+    {
+        _cursorImage.color = new Color(1f, 1f, 1f, 0f);
+        _isCursorDisabled = true;
     }
 
     public void UpdateCursorScale()
