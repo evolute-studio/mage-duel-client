@@ -6,6 +6,8 @@ namespace TerritoryWars.DataModels
     [Serializable]
     public struct TileModel
     {
+        public bool IsNull => String.IsNullOrEmpty(Type) || Position == default;
+        
         public string Type;
         public Vector2Int Position;
         public int Rotation;

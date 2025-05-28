@@ -44,6 +44,8 @@ namespace TerritoryWars.DataModels
                     PlayerSide = tile.Item3
                 };
             }
+            CheckEdgeConnections(Tiles);
+            
 
             Player1 = new SessionPlayer()
             {
@@ -80,19 +82,12 @@ namespace TerritoryWars.DataModels
             int countPerSide = edgeState.Length / 4;
             char[] tiles = GameConfiguration.GetInitialEdgeState(edgeState);
             
-            // i: 0 edgeState[0] = 'C' type = "CFFF" rotation = 3, playerSide = 3, position = (1, 0)
-            // i: 8 edgeState[8] = 'R' type = "RFFF" rotation = 2, playerSide = 3
-            // i: 16 edgeState[16] = 'F' type = "FFFF" rotation = 1, playerSide = 3
-            // i: 24 edgeState[24] = 'M' type = "MFFF" rotation = 0, playerSide = 3
             for(int i = 0; i < edgeState.Length; i++)
             {
                 char edgeType = tiles[i];
-                // from 0 to 8 rotation = 3
-                // from 8 to 16 rotation = 2
-                // from 16 to 24 rotation = 1
-                // from 24 to 32 rotation = 0
                 int rotation = (3 - (i / countPerSide)) % 4; 
                 Vector2Int position;
+                int playerSide = -1; // Default no player side
                 switch (i / countPerSide)
                 {
                     case 0: 
@@ -113,17 +108,80 @@ namespace TerritoryWars.DataModels
                 
                 if (!dict.ContainsKey(position))
                 {
+                    string type = "";
+                    switch (edgeType)
+                    {
+                        case 'M' or 'F': 
+                            type = "FFFF"; 
+                            break;
+                        case 'C' : 
+                            type = "CFFF"; 
+                            break;
+                        case 'R' : 
+                            type = "FFFR";
+                            rotation = (rotation + 1) % 4; // Rotate to match the edge
+                            break;
+                    }
                     dict.Add(position, new TileModel()
                     {
-                        Type = $"{edgeType}FFF", // Default empty tile with edge type
+                        Type = type,
                         Position = position,
                         Rotation = (byte)rotation,
-                        PlayerSide = 3 // No player side
+                        PlayerSide = playerSide,
                     });
                 }
                 
                 
             }
+        }
+
+        public static void CheckEdgeConnections(Dictionary<Vector2Int,TileModel> dict)
+        {
+            int countPerSide = GameConfiguration.ClientBoardSize.x - 2;
+            int edgeCount = 4 * countPerSide;
+            for (int i = 0; i < edgeCount; i++)
+            {
+                Vector2Int position;
+                int playerSide = -1;
+                switch (i / countPerSide)
+                {
+                    case 0: 
+                        position = new Vector2Int(i % countPerSide + 1, 0);
+                        var neighbor = dict[new Vector2Int(position.x, position.y + 1)];
+                        playerSide = neighbor.IsNull ? -1 : neighbor.PlayerSide;
+                        break;
+                    case 1: 
+                        position = new Vector2Int(GameConfiguration.ClientBoardSize.x - 1, i % countPerSide + 1);
+                        neighbor = dict[new Vector2Int(position.x - 1, position.y)];
+                        playerSide = neighbor.IsNull ? -1 : neighbor.PlayerSide;
+                        break;
+                    case 2: 
+                        position = new Vector2Int(GameConfiguration.ClientBoardSize.x - (i % countPerSide) - 2, GameConfiguration.ClientBoardSize.y - 1);
+                        neighbor = dict[new Vector2Int(position.x, position.y - 1)];
+                        playerSide = neighbor.IsNull ? -1 : neighbor.PlayerSide;
+                        break;
+                    case 3: 
+                        position = new Vector2Int(0, GameConfiguration.ClientBoardSize.y - (i % countPerSide) - 2);
+                        neighbor = dict[new Vector2Int(position.x + 1, position.y)];
+                        playerSide = neighbor.IsNull ? -1 : neighbor.PlayerSide;
+                        break;
+                    default:
+                        continue; // Should not happen
+                }
+                
+                if (dict.ContainsKey(position))
+                {
+                    TileModel tileModel = dict[position];
+                    tileModel.PlayerSide = playerSide;
+                    dict[position] = tileModel;
+                }
+            }
+        }
+        
+        public static bool IsEdgeTile(Vector2Int position)
+        {
+            return position.x == 0 || position.x == GameConfiguration.ClientBoardSize.x - 1 || 
+                   position.y == 0 || position.y == GameConfiguration.ClientBoardSize.y - 1;
         }
 
         public static void FillCorners(Dictionary<Vector2Int,TileModel> dict)
@@ -144,7 +202,7 @@ namespace TerritoryWars.DataModels
                         Type = "FFFF", // Default empty tile
                         Position = position,
                         Rotation = 0,
-                        PlayerSide = 3 // No player side
+                        PlayerSide = -1 // No player side
                     });
                 }
             }

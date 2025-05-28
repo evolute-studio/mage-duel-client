@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
+using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using UnityEngine;
 
@@ -33,6 +35,8 @@ namespace TerritoryWars.Managers.SessionComponents
                     LoadingScreen.connectingText);
             }
         }
+
+        public bool IsLocalPlayerHost = true;
         
         public SessionContext SessionContext = new SessionContext();
         private SessionManagerContext _managerContext;
@@ -42,9 +46,10 @@ namespace TerritoryWars.Managers.SessionComponents
         public BoardManager BoardManager;
         
 
-        private void Start()
+        private async void Start()
         {
-            SetupData();
+            await SetupData();
+            InitializeBoard();
             Initialize();
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
         }
@@ -69,7 +74,7 @@ namespace TerritoryWars.Managers.SessionComponents
                 component.Initialize(_managerContext);
         }
         
-        public async void SetupData()
+        public async Task SetupData()
         {
             SessionContext.LocalPlayerAddress = DojoGameManager.Instance.LocalAccount.Address.Hex();
             GameModel game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
@@ -80,7 +85,9 @@ namespace TerritoryWars.Managers.SessionComponents
                 return;
             }
             SessionContext.Game = game;
-            Board board = await DojoLayer.Instance.GetBoard(SessionContext.Game.BoardId);
+            //Board board = await DojoLayer.Instance.GetBoard(SessionContext.Game.BoardId);
+            IncomingModelsFilter.AllowedBoards.Add("0x0000000000000000000000000000000000000000000000000000000000000038");
+            Board board = await DojoLayer.Instance.GetBoard("0x0000000000000000000000000000000000000000000000000000000000000038");
             if (board.IsNull)
             {
                 CustomLogger.LogError("[SessionManager.SetupData] - Board is null");
@@ -100,50 +107,30 @@ namespace TerritoryWars.Managers.SessionComponents
         private void InitializeBoard()
         {
             var board = SessionContext.Board;
-            List<Move> processedMoves = new List<Move>();
-            string lastMoveId = board.LastMoveId;
+            BoardManager.Initialize(board);
             
-            BoardManager.Initialize();
-            if (lastMoveId != null)
-            {
-                evolute_duel_Move lastMove = DojoGameManager.Instance.GetMove(lastMoveId);
-                int playerIndex = lastMove.player_side switch
-                {
-                    PlayerSide.Blue => 1,
-                    PlayerSide.Red => 0,
-                    _ => -1
-                };
-                CurrentTurnPlayer = Players[playerIndex];
-                List<evolute_duel_Move> moves = DojoGameManager.Instance.GetMoves(new List<evolute_duel_Move>{lastMove});
-                int moveNumber = 0;
-                foreach (var move in moves)
-                {
-                    int owner = move.player_side switch
-                    {
-                        PlayerSide.Blue => 0,
-                        PlayerSide.Red => 1,
-                        _ => -1
-                    };
-                    string tileConfig = OnChainBoardDataConverter.GetTopTile(move.tile);
-                    if (tileConfig == null) continue;
-                    TileData tile = new TileData(tileConfig);
-                    int rotation = move.rotation;
-                    int x = move.col + 1;
-                    int y = move.row + 1;
-
-                    tile.Rotate((rotation + 3) % 4);
-                    Board.PlaceTile(tile, x, y, owner);
-                    processedMoves.Add(move);
-                }
-
-                GameObject[] allMoves = DojoGameManager.Instance.WorldManager.Entities<evolute_duel_Move>();
-                foreach (var move in allMoves)
-                {
-                    evolute_duel_Move moveComponent = move.GetComponent<evolute_duel_Move>();
-                    if (processedMoves.Contains(moveComponent)) continue;
-                    IncomingModelsFilter.DestroyModel(moveComponent);
-                }
-            } 
+            
+            // if (lastMoveId != null)
+            // {
+            //     Move lastMove = await DojoLayer.Instance.GetMove(lastMoveId);
+            //     //CurrentTurnPlayer = Players[playerIndex];
+            //     List<Move> moves = DojoLayer.Instance.GetMoves(new List<Move>{lastMove});
+            //     int moveNumber = 0;
+            //     foreach (var move in moves)
+            //     {
+            //         TileData tile = new TileData(move.tileModel);
+            //         BoardManager.PlaceTile(tile);
+            //         processedMoves.Add(move);
+            //     }
+            //
+            //     // GameObject[] allMoves = DojoGameManager.Instance.WorldManager.Entities<evolute_duel_Move>();
+            //     // foreach (var move in allMoves)
+            //     // {
+            //     //     evolute_duel_Move moveComponent = move.GetComponent<evolute_duel_Move>();
+            //     //     if (processedMoves.Contains(moveComponent)) continue;
+            //     //     IncomingModelsFilter.DestroyModel(moveComponent);
+            //     // }
+            // } 
         }
         
         private void OnDestroy()

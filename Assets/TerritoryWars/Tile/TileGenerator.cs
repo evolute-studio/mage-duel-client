@@ -101,10 +101,6 @@ namespace TerritoryWars.Tile
 
         private void GenerateRoadPins(Transform[] points)
         {
-            int playerId = SessionManagerOld.Instance.CurrentTurnPlayer != null
-                ? SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide
-                : -1;
-            
             float randomStartDelay = Random.Range(0f, 2f);
             RoadPin[] pins = new RoadPin[4];
             char[] rotatedConfig = _tileData.RotatedConfig.ToCharArray();
@@ -112,9 +108,14 @@ namespace TerritoryWars.Tile
             {
                 if (rotatedConfig[i] == 'R')
                 {
+                    if (_tileData.Position == new Vector2Int(2, 0))
+                    {
+                        
+                    }
                     GameObject pin = Instantiate(PrefabsManager.Instance.PinPrefab, points[i]);
+                    int playerId = _tileData.PlayerSide;
+                    CustomLogger.LogObject(_tileData, "_tileData");
                     RoadPin roadPin = pin.GetComponent<RoadPin>();
-                    if (_tileData.PlayerSide == -1) playerId = -1;
                     int score = GetRoadPoints();
                     roadPin.Initialize(playerId, score);
                     pin.transform.parent = points[i];
@@ -171,18 +172,9 @@ namespace TerritoryWars.Tile
             { 
                 for (int i = 0; i < _housesParent.Count; i++)
                 {
-                    int playerId = 0;
+                    int playerId = _tileData.PlayerSide;
                     TileParts.HouseGameObject house = _housesParent[i];
-                    SessionManagerOld sessionManagerOld = SessionManagerOld.Instance;
-                    if (sessionManagerOld == null || sessionManagerOld.CurrentTurnPlayer == null)
-                    {
-                        playerId = Random.Range(0, 2);
-                    }
-                    else
-                    {
-                        playerId = sessionManagerOld.CurrentTurnPlayer.PlayerSide;
-                    }
-
+                    CustomLogger.LogImportant("TileGenerator Player ID: " + _tileData.PlayerSide);
                     if (_tileData.PlayerSide == -1) playerId = -1;
                     GameObject prefab = _tileData.HouseSprites.Count > i 
                         ? PrefabsManager.Instance.GetNonContestedHousePrefabByReference(_tileData.HouseSprites[i], playerId)

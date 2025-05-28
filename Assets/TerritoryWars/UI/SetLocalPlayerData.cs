@@ -1,4 +1,5 @@
 ﻿using TerritoryWars.General;
+using TerritoryWars.Managers.SessionComponents;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,7 +7,7 @@ namespace TerritoryWars.UI
 {
     public class SetLocalPlayerData
     {
-        private static bool _isLocalPlayerHost => SessionManagerOld.Instance.IsLocalPlayerHost;
+        private static bool _isLocalPlayerHost => SessionManager.Instance.IsLocalPlayerHost;
 
         public static int[] GetLocalPlayerInt(int bluePlayer, int redPlayer)
         {

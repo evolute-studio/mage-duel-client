@@ -93,12 +93,11 @@ namespace TerritoryWars.General
             if (tileModel.Position == new Vector2Int(0, 9) || tileModel.Position == new Vector2Int(9, 0)) return;
             
             PlaceTile(tileModel);
-            
-            if(tileModel.Type.Contains('M') || tileModel.Type.StartsWith('F'))
+            if(tileModel.Type == "FFFF")
             {
                 SpawnMountain(tileModel);
             }
-
+            
             if (tileModel.Type.Contains('R'))
             {
                 SpawnRoad(tileModel);
@@ -151,18 +150,11 @@ namespace TerritoryWars.General
             Transform arc = tileObject.transform.Find("BorderArc");
             arc.gameObject.SetActive(true);
             TileRotator.GetMirrorRotationStatic(arc, tileModel.Rotation);
-            var pins = tileObject
-                .GetComponent<TileGenerator>().Pins;
             tileObject.GetComponentsInChildren<TileParts>().ToList().ForEach(tileParts =>
             {
                 tileParts.Mill.SetActive(false);
                 tileParts.Forest[tileModel.Rotation].SetActive(true);
             });
-            foreach (var pin in pins)
-            {
-                if (pin == null) continue;
-                pin.Initialize(-1, 1);
-            }
         }
 
         private void SpawnCity(TileModel tileModel)
@@ -259,10 +251,10 @@ namespace TerritoryWars.General
 
         public void CheckAndConnectEdgeStructure(int ownerId, int x, int y, StructureType type, bool isCityContest = false, bool isRoadContest = false)
         {
-            if( (x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
-            {
-                TryConnectEdgeStructure(ownerId, x, y, type, isCityContest, isRoadContest);
-            }
+            // if( (x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
+            // {
+            //     TryConnectEdgeStructure(ownerId, x, y, type, isCityContest, isRoadContest);
+            // }
         }
 
         public void ConnectEdgeStructureAnimation(int ownerId, TileData tileData, int x, int y, bool isCityContest = false, bool isRoadContest = false)

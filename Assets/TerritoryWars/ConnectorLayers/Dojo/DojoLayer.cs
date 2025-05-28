@@ -60,6 +60,71 @@ namespace TerritoryWars.ConnectorLayers.Dojo
             return boardModel;
         }
 
+        public async Task<Move> GetMove(string moveId)
+        {
+            evolute_duel_Move move = WorldManager.EntityModel<evolute_duel_Move>("id", new FieldElement(moveId));
+            if (move == null)
+            {
+                await SynchronizationMaster.SyncMoveById(new FieldElement(moveId));
+                move = WorldManager.EntityModel<evolute_duel_Move>("id", new FieldElement(moveId));
+            }
+            if (move == null)
+            {
+                return default;
+            }
+
+            Move boardModel = new Move().SetData(move);
+            return boardModel;
+            
+        }
+        
+        public async Task<Move> GetMoves(string moveId)
+        {
+            evolute_duel_Move move = WorldManager.EntityModel<evolute_duel_Move>("id", new FieldElement(moveId));
+            if (move == null)
+            {
+                await SynchronizationMaster.SyncMoveById(new FieldElement(moveId));
+                move = WorldManager.EntityModel<evolute_duel_Move>("id", new FieldElement(moveId));
+            }
+            if (move == null)
+            {
+                return default;
+            }
+
+            Move boardModel = new Move().SetData(move);
+            return boardModel;
+        }
+        
+        public List<Move> GetMoves(List<Move> moves, GameObject[] allMoveGameObjects = null)
+        {
+            if (allMoveGameObjects == null)
+            {
+                allMoveGameObjects = WorldManager.Entities<evolute_duel_Move>();
+            }
+
+            Move currentMove = moves.First();
+            string previousMoveId = currentMove.PrevMoveId;
+            if (String.IsNullOrEmpty(previousMoveId))
+            {
+                return moves;
+            }
+            
+            foreach (var moveGO in allMoveGameObjects)
+            {
+                if (moveGO.TryGetComponent(out evolute_duel_Move move))
+                {
+                    if (move.id.Hex() == previousMoveId)
+                    {
+                        Move moveData = new Move().SetData(move);
+                        moves.Insert(0, moveData);
+                        return GetMoves(moves, allMoveGameObjects);
+                    }
+                }
+            }
+
+            return moves;
+        }
+
         public async Task<PlayerProfile> GetPlayerProfile(string playerId)
         {
             evolute_duel_Player player = WorldManager.EntityModel<evolute_duel_Player>("player_id", new FieldElement(playerId));

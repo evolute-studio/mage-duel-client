@@ -12153,8 +12153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2464af4682ee44d65b7f8c4173f9c41a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 10
-  height: 10
+  CloudsController: {fileID: 1530375628}
   tilePrefab: {fileID: 1282971855922823901, guid: 774b7ce5654b64e70a908d11e8fec69e, type: 3}
 --- !u!4 &989829361
 Transform:
@@ -15115,6 +15114,7 @@ MonoBehaviour:
     LocalPlayer: {fileID: 0}
     RemotePlayer: {fileID: 0}
     CurrentTurnPlayer: {fileID: 0}
+  BoardManager: {fileID: 989829360}
 --- !u!4 &1143477216
 Transform:
   m_ObjectHideFlags: 0
@@ -20826,7 +20826,6 @@ MonoBehaviour:
   Board: {fileID: 989829360}
   gameUI: {fileID: 288063303}
   sessionUI: {fileID: 579849686}
-  deckManager: {fileID: 1317628979}
   CloudsController: {fileID: 1530375628}
   TileSelector: {fileID: 1530375626}
   StructureHoverManager: {fileID: 766226767}
