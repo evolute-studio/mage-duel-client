@@ -178,7 +178,7 @@ namespace TerritoryWars.UI
             }
             else
             {
-                int evoluteBalance = MenuUIController.Instance.NamePanelController.EvoluteBalance;
+                uint evoluteBalance = MenuUIController.Instance.NamePanelController.EvoluteBalance;
                 if (evoluteBalance >= character.Locker.cost)
                 {
                     character.Locker.Unlock();

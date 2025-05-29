@@ -19,9 +19,8 @@ namespace TerritoryWars.DataModels
         public SessionPlayer Player2;
         public string LastMoveId; // Maybe better store Move struct
         public BoardState GameState;
-        
-        public string OldBoardId; // For snapshot
-        public ushort MoveCount;
+        public byte MovesDone;
+        public ulong LastUpdateTimestamp;
         
         public Board SetData(evolute_duel_Board board)
         {
@@ -71,6 +70,8 @@ namespace TerritoryWars.DataModels
             };
             LastMoveId = board.last_move_id.Unwrap()?.Hex();
             GameState = (BoardState)board.game_state.Unwrap();
+            MovesDone = board.moves_done;
+            LastUpdateTimestamp = board.last_update_timestamp;
             return this;
         }
         

@@ -110,29 +110,6 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             var board = SessionContext.Board;
             BoardManager.Initialize(board);
-            
-            
-            // if (lastMoveId != null)
-            // {
-            //     Move lastMove = await DojoLayer.Instance.GetMove(lastMoveId);
-            //     //CurrentTurnPlayer = Players[playerIndex];
-            //     List<Move> moves = DojoLayer.Instance.GetMoves(new List<Move>{lastMove});
-            //     int moveNumber = 0;
-            //     foreach (var move in moves)
-            //     {
-            //         TileData tile = new TileData(move.tileModel);
-            //         BoardManager.PlaceTile(tile);
-            //         processedMoves.Add(move);
-            //     }
-            //
-            //     // GameObject[] allMoves = DojoGameManager.Instance.WorldManager.Entities<evolute_duel_Move>();
-            //     // foreach (var move in allMoves)
-            //     // {
-            //     //     evolute_duel_Move moveComponent = move.GetComponent<evolute_duel_Move>();
-            //     //     if (processedMoves.Contains(moveComponent)) continue;
-            //     //     IncomingModelsFilter.DestroyModel(moveComponent);
-            //     // }
-            // } 
         }
         
         private void OnDestroy()

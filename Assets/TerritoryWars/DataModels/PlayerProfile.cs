@@ -8,7 +8,7 @@ namespace TerritoryWars.DataModels
         
         public string PlayerId;
         public string Username;
-        public ushort Balance;
+        public uint Balance;
         public int GamesPlayed;
         public byte ActiveSkin;
         public PlayerRole Role;

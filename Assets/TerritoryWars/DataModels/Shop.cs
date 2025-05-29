@@ -6,7 +6,7 @@ namespace TerritoryWars.DataModels
     public struct Shop
     {
         public string ShopId;
-        public ushort[] SkinPrices;
+        public uint[] SkinPrices;
         
         public Shop SetData(evolute_duel_Shop shop)
         {

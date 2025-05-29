@@ -102,6 +102,12 @@ public class evolute_duel_Board : ModelInstance {
 
         [ModelField("game_state")]
         public GameState game_state;
+        
+        [ModelField("moves_done")]
+        public byte moves_done;
+
+        [ModelField("last_update_timestamp")]
+        public ulong last_update_timestamp;
 
     // Start is called before the first frame update
     void Start() {

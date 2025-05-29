@@ -94,7 +94,7 @@ public class SnapshotTabController : MonoBehaviour
                     continue;
                 }
                 string playerName = CairoFieldsConverter.GetStringFromFieldElement(player.username);
-                int evoluteBalance = player.balance;
+                uint evoluteBalance = player.balance;
                 int moveNumber = snapshotModel.move_number;
                 SnapshotListItem snapshotListItem = CreateListItem();
                 snapshotListItem.UpdateItem(playerName, evoluteBalance, moveNumber, () =>
@@ -145,7 +145,7 @@ public class SnapshotListItem
 {
     public GameObject ListItem;
     public string CreatorPlayerName;
-    public int CreatorPlayerEvoluteCount;
+    public uint CreatorPlayerEvoluteCount;
     
     private TextMeshProUGUI _creatorPlayerNameText;
     private TextMeshProUGUI _creatorPlayerEvoluteCountText;
@@ -163,7 +163,7 @@ public class SnapshotListItem
         _restoreButton = listItem.transform.Find("Buttons/RestoreButton").GetComponent<Button>();
     }
 
-    public void UpdateItem(string creatorPlayerName, int creatorPlayerEvoluteCount, int moveNumber, UnityAction onRestore = null)
+    public void UpdateItem(string creatorPlayerName, uint creatorPlayerEvoluteCount, int moveNumber, UnityAction onRestore = null)
     {
         CreatorPlayerName = creatorPlayerName;
         CreatorPlayerEvoluteCount = creatorPlayerEvoluteCount;

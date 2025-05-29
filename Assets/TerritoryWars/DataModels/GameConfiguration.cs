@@ -12,6 +12,7 @@ namespace TerritoryWars.DataModels
         // to client it will be 3, to server it will be 1 (4 - 3)
         public static byte ClientRotationOffset = 3;
         public static Vector2Int ClientBoardSize = new Vector2Int(10, 10);
+        public static Vector2Int ServerBoardSize = new Vector2Int(8, 8);
         
         public static string[] TileTypes =
         {
@@ -29,9 +30,26 @@ namespace TerritoryWars.DataModels
         
         public static Vector2Int GetClientPosition(int index)
         {
-            int x = index / 8;
-            int y = index % 8;
+            int height = ServerBoardSize.x;
+            int x = index / height;
+            int y = index % height;
             return new Vector2Int(x, y) + ClientBoardSizeOffset;
+        }
+        
+        public static Vector2Int GetPositionByRoot(byte root)
+        {
+            int height = ServerBoardSize.x;
+            int tile = root / 4;
+            int x = tile / height;
+            int y = tile % height;
+            return new Vector2Int(x, y) + ClientBoardSizeOffset;
+        }
+        
+        public static (Vector2Int, Side) GetPositionAndSide(byte root)
+        {
+            Vector2Int position = GetPositionByRoot(root);
+            Side side = (Side)((root + ClientRotationOffset) % 4);
+            return (position, side);
         }
         
         public static byte GetClientRotation(byte rotation)

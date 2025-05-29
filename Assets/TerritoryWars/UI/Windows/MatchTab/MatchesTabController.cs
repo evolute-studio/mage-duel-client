@@ -85,7 +85,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
                     if(IsMatchListItemExists(player.player_id.Hex())) continue;
                     
                     string playerName = CairoFieldsConverter.GetStringFromFieldElement(player.username);
-                    int evoluteBalance = player.balance;
+                    uint evoluteBalance = player.balance;
                     FieldElement snapshotId = gameModel.snapshot_id switch
                     {
                         Option<FieldElement>.Some some => some.value,

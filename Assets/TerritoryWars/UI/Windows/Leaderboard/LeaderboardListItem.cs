@@ -10,7 +10,7 @@ namespace TerritoryWars.UI.Windows.Leaderboard
     public class LeaderboardListItem : MonoBehaviour
     {
         private string _playerName;
-        private int _evoluteCount;
+        private uint _evoluteCount;
         private string _address;
         
         [Header("References")]
@@ -28,7 +28,7 @@ namespace TerritoryWars.UI.Windows.Leaderboard
         
         private bool isAnimationPlaying = false;
 
-        public void UpdateItem(string name, int evoluteCount, string address)
+        public void UpdateItem(string name, uint evoluteCount, string address)
         {
             _playerName = name;
             _evoluteCount = evoluteCount;

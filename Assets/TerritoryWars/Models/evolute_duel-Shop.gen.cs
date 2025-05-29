@@ -15,7 +15,7 @@ public class evolute_duel_Shop : ModelInstance {
         public FieldElement shop_id;
 
         [ModelField("skin_prices")]
-        public ushort[] skin_prices;
+        public uint[] skin_prices;
 
     // Start is called before the first frame update
     void Start() {
