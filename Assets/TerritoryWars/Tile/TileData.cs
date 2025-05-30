@@ -45,11 +45,13 @@ namespace TerritoryWars.Tile
             UpdateData(rotatedConfig, position, playerSide);
         }
 
-        public void UpdateData(string rotatedConfig, Vector2Int position, int playerSide)
+        public void UpdateData(string rotatedConfig, Vector2Int position = default, int playerSide = -2)
         {
             (byte type, byte rotation) = OnChainBoardDataConverter.GetTypeAndRotation(rotatedConfig);
             Type = GameConfiguration.GetTileType(type);
             Rotation = rotation;
+            Position = position != default ? position : Position;
+            PlayerSide = playerSide != -2 ? playerSide : PlayerSide;
         }
         
         public void SetOwner(int playerSide)

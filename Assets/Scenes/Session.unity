@@ -3075,6 +3075,7 @@ MonoBehaviour:
   SaveSnapshotText: {fileID: 897750885}
   tilePreview: {fileID: 1558212604}
   tilePreviewUITileJokerAnimator: {fileID: 605219370}
+  _sessionManager: {fileID: 1143477215}
   arrowAnimations: {fileID: 742295723}
 --- !u!4 &288063304
 Transform:
@@ -15061,6 +15062,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75cbc7e6fe08458db4592be704d4e13a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsLocalPlayerHost: 1
   SessionContext:
     LocalPlayerAddress: 
     Game:
@@ -15075,6 +15077,7 @@ MonoBehaviour:
       TopTile: 
       Player1:
         PlayerId: 
+        Username: 
         PlayerSide: 0
         JokerCount: 0
         Score:
@@ -15083,6 +15086,7 @@ MonoBehaviour:
         ActiveSkin: 0
       Player2:
         PlayerId: 
+        Username: 
         PlayerSide: 0
         JokerCount: 0
         Score:
@@ -15091,30 +15095,36 @@ MonoBehaviour:
         ActiveSkin: 0
       LastMoveId: 
       GameState: 0
-      OldBoardId: 
-      MoveCount: 0
+      MovesDone: 0
+      LastUpdateTimestamp: 0
+    PlayersData:
+    - PlayerId: 
+      Username: 
+      PlayerSide: 0
+      JokerCount: 0
+      Score:
+        CityScore: 0
+        RoadScore: 0
+      ActiveSkin: 0
+    - PlayerId: 
+      Username: 
+      PlayerSide: 0
+      JokerCount: 0
+      Score:
+        CityScore: 0
+        RoadScore: 0
+      ActiveSkin: 0
     Players:
-    - PlayerId: 
-      PlayerSide: 0
-      JokerCount: 0
-      Score:
-        CityScore: 0
-        RoadScore: 0
-      ActiveSkin: 0
-    - PlayerId: 
-      PlayerSide: 0
-      JokerCount: 0
-      Score:
-        CityScore: 0
-        RoadScore: 0
-      ActiveSkin: 0
-    SpawnPoints:
-    - {x: -8.939, y: 5.196, z: 0}
-    - {x: 8.939, y: 5.196, z: 0}
+    - {fileID: 0}
+    - {fileID: 0}
     LocalPlayer: {fileID: 0}
     RemotePlayer: {fileID: 0}
     CurrentTurnPlayer: {fileID: 0}
+    SpawnPoints:
+    - {x: -8.939, y: 5.196, z: 0}
+    - {x: 8.939, y: 5.196, z: 0}
   BoardManager: {fileID: 989829360}
+  TileSelector: {fileID: 1530375626}
 --- !u!4 &1143477216
 Transform:
   m_ObjectHideFlags: 0
@@ -16958,6 +16968,10 @@ PrefabInstance:
       propertyPath: DeckCountText
       value: 
       objectReference: {fileID: 656554515}
+    - target: {fileID: 6656283264602794713, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+      propertyPath: _sessionManager
+      value: 
+      objectReference: {fileID: 1143477215}
     - target: {fileID: 6656283264602794713, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: JokerAvailableColor.a
       value: 1

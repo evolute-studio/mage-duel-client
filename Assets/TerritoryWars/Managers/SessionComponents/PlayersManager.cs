@@ -37,9 +37,10 @@ namespace TerritoryWars.Managers.SessionComponents
             Players[0] = hostObject.GetComponent<Player>();
             Players[1] = guestObject.GetComponent<Player>();
 
-            Players[0].Initialize(_managerContext.SessionContext.Players[0]);
-            Players[1].Initialize(_managerContext.SessionContext.Players[1]);
+            Players[0].Initialize(_managerContext.SessionContext.PlayersData[0]);
+            Players[1].Initialize(_managerContext.SessionContext.PlayersData[1]);
             
+            _managerContext.SessionContext.Players = Players;
             _managerContext.SessionContext.LocalPlayer = Players[0].PlayerId == DojoLayer.Instance.LocalPlayerId 
                 ? Players[0] : Players[1];
             _managerContext.SessionContext.RemotePlayer = _managerContext.SessionContext.LocalPlayer.PlayerId == Players[0].PlayerId 

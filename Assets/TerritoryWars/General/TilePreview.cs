@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using TerritoryWars.Tile;
 using UnityEngine;
 using DG.Tweening;
+using TerritoryWars.DataModels.ClientEvents;
 using TerritoryWars.Dojo;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using Random = UnityEngine.Random;
@@ -20,7 +22,7 @@ namespace TerritoryWars.General
         public PolygonCollider2D PreviewPolygonCollider2D;
         public TileJokerAnimator _tileJokerAnimator;
         public TileJokerAnimator _tileJokerAnimatorPreview;
-        
+
         [SerializeField] private TileGenerator tileGeneratorForUI;
         [SerializeField] private LayerMask previewLayerMask;
 
@@ -45,35 +47,44 @@ namespace TerritoryWars.General
             _mainCamera = Camera.main;
             SetInitialPosition();
             SetupSortingLayers();
-            
+
             tileGeneratorForUI.gameObject.SetActive(false);
         }
 
         private void SetInitialPosition()
         {
-            
+
             Vector2 screenSize = new Vector2(Screen.width, Screen.height);
 
-            
+
             Vector2 screenPosition = new Vector2(
                 screenSize.x - screenOffset.x,
                 screenOffset.y
             );
 
-            
+
             _initialPosition = _mainCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, 10));
             _initialPosition.z = 0;
 
-            
+
             transform.position = _initialPosition;
         }
 
         public void Start()
         {
-            SessionManagerOld.Instance.TileSelector.OnTileSelected += SetPosition;
-            SessionManagerOld.Instance.TileSelector.OnTilePlaced.AddListener(ResetPosition);
-            GameUI.OnJokerButtonClickedEvent += GenerateFFFFTile;
-            
+            EventBus.Subscribe<TileSelected>(TileSelected);
+            EventBus.Subscribe<TilePlaced>(ResetPosition);
+            EventBus.Subscribe<ClientInput>(OnClientInput);
+        }
+
+        private void TileSelected(TileSelected tileSelected)
+        {
+            SetPosition(tileSelected.Position);
+        }
+
+    private void OnClientInput(ClientInput input)
+        {
+            if (input.Type == ClientInput.InputType.UseJoker) GenerateFFFFTile();
         }
 
         private void SetupSortingLayers()
@@ -180,18 +191,18 @@ namespace TerritoryWars.General
 
         private void GenerateFFFFTile()
         {
-            SessionManagerOld.Instance.TileSelector.SetCurrentTile(new TileData());
+            //SessionManagerOld.Instance.TileSelector.SetCurrentTile(new TileData());
             tileGenerator.Generate(new TileData());
             tileGeneratorForUI.Generate(new TileData());
             tileGenerator.tileParts.HideForestAreas();
         }
 
-        public void SetPosition(int x, int y)
+        public void SetPosition(Vector2Int currentBoardPosition)
         {
             currentTween?.Kill();
-            _currentBoardPosition = new Vector2Int(x, y);
+            _currentBoardPosition = currentBoardPosition;
 
-            Vector3 targetPosition = BoardManager.GetTilePosition(x, y);
+            Vector3 targetPosition = BoardManager.GetTilePosition(currentBoardPosition.x, currentBoardPosition.y);
             targetPosition.y += tilePreviewSetHeight;
 
             currentTween = transform
@@ -200,10 +211,10 @@ namespace TerritoryWars.General
             //previewTileView.transform.DOScale(1, 0.5f).SetEase(Ease.OutQuint);
         }
         
-        public void PlaceTile(int playerIndex, TileData tileData, Action callback = null)
+        public void PlaceTile(TileData tileData, Action callback = null)
         {
             currentTile = tileData;
-            StartCoroutine(PlaceTileCoroutine(playerIndex, callback));
+            StartCoroutine(PlaceTileCoroutine(tileData.PlayerSide, callback));
         }
         
 
@@ -295,21 +306,21 @@ namespace TerritoryWars.General
             Vector3 currentPosition = transform.position;
             Vector3 targetPosition = currentPosition;
             targetPosition.y -= tilePreviewSetHeight;
-            SessionManagerOld.Instance.CurrentTurnPlayer.EndTurn();
+            SessionManager.Instance.SessionContext.CurrentTurnPlayer.EndTurnAnimation();
             currentTween = transform
                 .DOMove(targetPosition, moveDuration)
                 .SetEase(moveEase)
                 .OnComplete(() =>
                 {
                     callback?.Invoke();
-                    SessionManagerOld.Instance.Board.FloatingTextAnimation(_currentBoardPosition);
-                    SessionManagerOld.Instance.Board.ScoreClientPrediction(playerIndex, currentTile);
+                    SessionManager.Instance.ManagerContext.BoardManager.FloatingTextAnimation(_currentBoardPosition);
+                    SessionManager.Instance.ManagerContext.BoardManager.ScoreClientPrediction(playerIndex, currentTile);
                 });
         }
 
         
 
-        public void ResetPosition()
+        public void ResetPosition(TilePlaced data = default)
         {
             currentTween?.Kill();
             // currentTween = transform
@@ -326,9 +337,10 @@ namespace TerritoryWars.General
         {
             
             currentTween?.Kill();
-            
-            SessionManagerOld.Instance.TileSelector.OnTileSelected -= SetPosition;
-            GameUI.OnJokerButtonClickedEvent -= GenerateFFFFTile;
+
+            EventBus.Unsubscribe<TileSelected>(TileSelected);
+            EventBus.Unsubscribe<ClientInput>(OnClientInput);
+            EventBus.Unsubscribe<TilePlaced>(ResetPosition);
         }
     }
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
@@ -20,14 +21,14 @@ namespace TerritoryWars.Bots
         {
             get
             {
-                if (SessionManagerOld.Instance == null)
+                if (SessionManager.Instance == null)
                 {
                     CustomLogger.LogWarning("BotDataCollectorModule: SessionManager is null");
                     return null;
                 }
                 if (_board == null)
                 {
-                    _board = SessionManagerOld.Instance.Board;
+                    _board = SessionManager.Instance.BoardManager;
                 }
 
                 return _board;
@@ -72,7 +73,7 @@ namespace TerritoryWars.Bots
             foreach (var jokerPlacement in jokerPlacements)
             {
                 Vector2Int position = new Vector2Int(jokerPlacement.x, jokerPlacement.y);
-                TileData jokerTile = JokerManager.GetOneJokerCombination(position.x, position.y);
+                TileData jokerTile = JokerManagerOld.GetOneJokerCombination(position.x, position.y);
                 CurrentJokers.Add(new ValidPlacement(position), jokerTile); 
             }
 

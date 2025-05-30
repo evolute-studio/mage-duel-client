@@ -14,12 +14,15 @@ namespace TerritoryWars.General
         
         public EventsHandler(WorldManager worldManager)
         {
+            CustomLogger.LogImportant("EventsHandler initialized");
             _worldManager = worldManager;
             _worldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
         }
         
         private void OnEventMessage(ModelInstance modelInstance)
         {
+            CustomLogger.LogImportant("OnEventMessage " + nameof(modelInstance));
+            CustomLogger.LogImportant("ApplicationState.CurrentState: " + ApplicationState.CurrentState);
             switch (ApplicationState.CurrentState)
             {
                 case ApplicationStates.Initializing:

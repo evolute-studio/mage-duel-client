@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using TerritoryWars;
 using TerritoryWars.General;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
@@ -34,12 +35,11 @@ public class PlayerInfoUI : MonoBehaviour
     [Header("Players")]
     public List<PlayerInfo> players;
     
-    private SessionManagerOld _sessionManagerOld;
+    [SerializeField] private SessionManager _sessionManager;
 
     public void Initialization()
     {
-        _sessionManagerOld = FindObjectOfType<SessionManagerOld>();
-        SetNames(_sessionManagerOld.PlayersData[0].username, _sessionManagerOld.PlayersData[1].username);
+        SetNames(_sessionManager.SessionContext.PlayersData[0].Username, _sessionManager.SessionContext.PlayersData[1].Username);
         for (int i = 0; i < players.Count; i++)
         {
             cityScoreTextPlayers[i].text = players[i].cityScore.ToString();
@@ -187,7 +187,7 @@ public class PlayerInfoUI : MonoBehaviour
 
     public void ShowPlayerJokerCount(int playerId)
     {
-        if (!SessionManagerOld.Instance.IsLocalPlayerHost)
+        if (!SessionManager.Instance.IsLocalPlayerHost)
         {
             playerId = playerId == 0 ? 1 : 0;
         }
@@ -197,7 +197,7 @@ public class PlayerInfoUI : MonoBehaviour
     
     public void SetJokersCount(int player, int count)
     {
-        if (!SessionManagerOld.Instance.IsLocalPlayerHost)
+        if (!SessionManager.Instance.IsLocalPlayerHost)
         {
             player = player == 0 ? 1 : 0;
         }

@@ -8,6 +8,7 @@ using TerritoryWars.Tools;
 using UnityEngine;
 using Microsoft.CSharp;
 using TerritoryWars.DataModels;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.Models;
 
 namespace TerritoryWars.Bots
@@ -20,7 +21,7 @@ namespace TerritoryWars.Bots
         {
             get
             {
-                if (SessionManagerOld.Instance == null) return null;
+                if (SessionManager.Instance == null) return null;
                 return DojoGameManager.Instance.DojoSessionManager;
             }
         }
@@ -29,7 +30,7 @@ namespace TerritoryWars.Bots
         {
             get
             {
-                if (SessionManagerOld.Instance == null) return -1;
+                if (SessionManager.Instance == null) return -1;
                 return _player.PlayerSide;
             }
         }
@@ -38,8 +39,8 @@ namespace TerritoryWars.Bots
         {
             get
             {
-                if (SessionManagerOld.Instance == null) return null;
-                return SessionManagerOld.Instance.GetPlayerByAddress(Bot.Account.Address.Hex());
+                if (SessionManager.Instance == null) return null;
+                return SessionManager.Instance.SessionContext.GetPlayerById(Bot.Account.Address.Hex());
             }
         }
 

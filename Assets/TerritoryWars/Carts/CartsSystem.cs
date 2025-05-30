@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TerritoryWars.General;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using UnityEngine;
@@ -62,7 +63,7 @@ namespace TerritoryWars.Carts
             GameObject tileObject = board.GetTileObject(x, y);
             //Transform cartsPath = tileObject.GetComponent<TileGenerator>().RoadPath.transform; // TileGenerator is not have RoadPath 
             Transform cartsPath = tileObject.transform;
-            int playerId = SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide;
+            int playerId = SessionManager.Instance.SessionContext.CurrentTurnPlayer.PlayerSide;
             RoadTile roadTile = new RoadTile(playerId, tileObject, tileData, cartsPath);
             
             //int cartsCount = tileData.id.Count(c => c == 'R');

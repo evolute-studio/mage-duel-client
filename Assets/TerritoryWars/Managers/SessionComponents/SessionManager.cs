@@ -8,6 +8,7 @@ using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
+using TerritoryWars.UI;
 using UnityEngine;
 
 namespace TerritoryWars.Managers.SessionComponents
@@ -39,11 +40,12 @@ namespace TerritoryWars.Managers.SessionComponents
         public bool IsLocalPlayerHost = true;
         
         public SessionContext SessionContext = new SessionContext();
-        private SessionManagerContext _managerContext;
+        public SessionManagerContext ManagerContext { get; private set; }
         private List<ISessionComponent> _components;
         
         [Header("Dependencies")]
         public BoardManager BoardManager;
+        public TileSelector TileSelector;
         
 
         private async void Start()
@@ -51,27 +53,33 @@ namespace TerritoryWars.Managers.SessionComponents
             await SetupData();
             InitializeBoard();
             Initialize();
+            GameUI.Instance.Initialize();
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
+            ManagerContext.GameLoopManager.StartGame();
         }
 
         private void Initialize()
         {
-            _managerContext = new SessionManagerContext();
+            ManagerContext = new SessionManagerContext();
             _components = new List<ISessionComponent>();
 
             var playersManager = new PlayersManager();
             var gameLoopManager = new GameLoopManager();
+            var jokerManager = new JokerManager();
+            
 
-            _managerContext.SessionContext = SessionContext;
-            _managerContext.SessionManager = this;
-            _managerContext.PlayersManager = playersManager;
-            _managerContext.GameLoopManager = gameLoopManager;
+            ManagerContext.SessionContext = SessionContext;
+            ManagerContext.SessionManager = this;
+            ManagerContext.PlayersManager = playersManager;
+            ManagerContext.GameLoopManager = gameLoopManager;
+            ManagerContext.JokerManager = jokerManager;
 
             _components.Add(playersManager);
             _components.Add(gameLoopManager);
+            _components.Add(jokerManager);
 
             foreach (var component in _components)
-                component.Initialize(_managerContext);
+                component.Initialize(ManagerContext);
         }
         
         public async Task SetupData()
@@ -96,12 +104,12 @@ namespace TerritoryWars.Managers.SessionComponents
             }
             SessionContext.Board = board;
             SimpleStorage.SaveCurrentBoardId(board.Id);
-            SessionContext.Players[0] = board.Player1;
-            SessionContext.Players[1] = board.Player2;
+            SessionContext.PlayersData[0] = board.Player1;
+            SessionContext.PlayersData[1] = board.Player2;
             PlayerProfile player1 = await DojoLayer.Instance.GetPlayerProfile(board.Player1.PlayerId);
             PlayerProfile player2 = await DojoLayer.Instance.GetPlayerProfile(board.Player2.PlayerId);
-            SessionContext.Players[0].ActiveSkin = player1.ActiveSkin;
-            SessionContext.Players[1].ActiveSkin = player2.ActiveSkin;
+            SessionContext.PlayersData[0].SetData(player1);
+            SessionContext.PlayersData[1].SetData(player2);
             
             DojoGameManager.Instance.GlobalContext.SessionContext = SessionContext;
         }

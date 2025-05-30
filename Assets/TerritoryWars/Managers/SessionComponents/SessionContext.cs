@@ -10,14 +10,23 @@ namespace TerritoryWars.Managers.SessionComponents
         public string LocalPlayerAddress;
         public GameModel Game;
         public Board Board;
-        public SessionPlayer[] Players = new SessionPlayer[2];
+        public SessionPlayer[] PlayersData = new SessionPlayer[2];
         
-        public Vector3[] SpawnPoints; 
-
+        public ulong LastUpdateTimestamp => Board.LastUpdateTimestamp;
+        
+        
+        [Header("Players")]
+        public Player[] Players;
         public Player LocalPlayer;
-        
         public Player RemotePlayer;
         public Player CurrentTurnPlayer;
+        
+        public bool IsLocalPlayerHost => LocalPlayer.PlayerId == Board.Player1.PlayerId;
+        public bool IsLocalPlayerTurn => CurrentTurnPlayer.PlayerId == LocalPlayer.PlayerId;
+        
+        
+        [Header("Session Settings")]
+        public Vector3[] SpawnPoints; 
 
         public bool IsSessionBoard(string boardId)
         {
@@ -27,7 +36,20 @@ namespace TerritoryWars.Managers.SessionComponents
         
         public bool IsPlayerInSession(string playerId)
         {
-            return Players[0].PlayerId == playerId || Players[1].PlayerId == playerId;
+            return PlayersData[0].PlayerId == playerId || PlayersData[1].PlayerId == playerId;
+        }
+
+        public Player GetPlayerById(string playerId)
+        {
+            if (Players[0].PlayerId == playerId)
+            {
+                return Players[0];
+            }
+            if (Players[1].PlayerId == playerId)
+            {
+                return Players[1];
+            }
+            return null;
         }
         //public PlayerProfile[] PlayersProfiles = new PlayerProfile[2];
     }

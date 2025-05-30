@@ -12,7 +12,7 @@ using Random = UnityEngine.Random;
 
 namespace TerritoryWars.General
 {
-    public class JokerManager
+    public class JokerManagerOld
     {
         private SessionManagerOld _sessionManagerOld;
         private Player[] Players => _sessionManagerOld.Players;
@@ -26,7 +26,7 @@ namespace TerritoryWars.General
         
         public bool IsJokerActive => isJokerActive;
         
-        public JokerManager(SessionManagerOld managerOld)
+        public JokerManagerOld(SessionManagerOld managerOld)
         {
             _sessionManagerOld = managerOld;
         }
@@ -86,10 +86,10 @@ namespace TerritoryWars.General
 
         public static TileData GetOneJokerCombination(int x, int y)
         {
-            JokerManager jokerManager = new JokerManager(SessionManagerOld.Instance);
-            string[] possibleCombinations = jokerManager.GenerateAllCombinations(x, y);
+            JokerManagerOld jokerManagerOld = new JokerManagerOld(SessionManagerOld.Instance);
+            string[] possibleCombinations = jokerManagerOld.GenerateAllCombinations(x, y);
             string tileConfig = possibleCombinations[Random.Range(0, possibleCombinations.Length)];
-            TileData jokerTile = new TileData(tileConfig, new Vector2Int(x, y), jokerManager.CurrentTurnPlayer.PlayerSide);
+            TileData jokerTile = new TileData(tileConfig, new Vector2Int(x, y), jokerManagerOld.CurrentTurnPlayer.PlayerSide);
             return jokerTile;
             
         }

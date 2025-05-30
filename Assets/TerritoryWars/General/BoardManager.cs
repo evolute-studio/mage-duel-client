@@ -4,6 +4,7 @@ using System.Linq;
 using DG.Tweening;
 using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.ScriptablesObjects;
 using TerritoryWars.Tile;
@@ -83,7 +84,7 @@ namespace TerritoryWars.General
             foreach (var tile in board.Tiles.Values)
             {
                 if (IsEdgeTile(tile.Position.x, tile.Position.y)) PlaceEdgeTile(tile);
-                else PlaceTile(tile);
+                else if(!tile.IsNull) PlaceTile(tile);
             }
         }
         
@@ -192,11 +193,12 @@ namespace TerritoryWars.General
         
         public void FloatingTextAnimation(Vector2Int position)
         {
-            GameObject gameObject = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y);
-            TileData tileData = SessionManagerOld.Instance.Board.GetTileData(position.x, position.y);
+            SessionManager sessionManager = SessionManager.Instance;
+            GameObject gameObject = sessionManager.BoardManager.GetTileObject(position.x, position.y);
+            TileData tileData = sessionManager.BoardManager.GetTileData(position.x, position.y);
             TileParts tileParts = gameObject.GetComponentInChildren<TileParts>();
             TileGenerator tileGenerator = gameObject.GetComponent<TileGenerator>();
-            int playerId = SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide;
+            int playerId = sessionManager.SessionContext.CurrentTurnPlayer.PlayerSide;
             playerId = SetLocalPlayerData.GetLocalIndex(playerId);
             string side = playerId == 0 ? "blue" : "red";
             Vector3 motion = new Vector3(0, 0.3f, 0);
@@ -221,9 +223,9 @@ namespace TerritoryWars.General
 
         public void ScoreClientPrediction(int playerIndex, TileData data)
         {
-            if(!SessionManagerOld.Instance.IsLocalPlayerTurn) return;
-            SessionManagerOld.Instance.gameUI.playerInfoUI.AddClientCityScore(playerIndex, data.Type.Count(c => c == 'C') * 2);
-            SessionManagerOld.Instance.gameUI.playerInfoUI.AddClientRoadScore(playerIndex, data.Type.Count(r => r == 'R'));
+            if(!SessionManager.Instance.SessionContext.IsLocalPlayerTurn) return;
+            GameUI.Instance.playerInfoUI.AddClientCityScore(playerIndex, data.Type.Count(c => c == 'C') * 2);
+            GameUI.Instance.playerInfoUI.AddClientRoadScore(playerIndex, data.Type.Count(r => r == 'R'));
         }
 
         public bool RevertTile(int x, int y)
@@ -397,7 +399,7 @@ namespace TerritoryWars.General
             if (IsEdgeTile(x,y - 1) && !GetTileData(x, y - 1).IsCity()) { closerSides.Add(Side.Right); }
 
             if (IsEdgeTile(x - 1, y) && !GetTileData(x - 1, y).IsCity()) { closerSides.Add(Side.Bottom); }
-
+    
             if (IsEdgeTile(x, y + 1) && !GetTileData(x, y + 1).IsCity()) { closerSides.Add(Side.Left); }
 
             return closerSides;
@@ -514,6 +516,7 @@ namespace TerritoryWars.General
             
             if (x < 0 || x >= width || y < 0 || y >= height)
             {
+                
                 return false;
             }
 
@@ -537,7 +540,7 @@ namespace TerritoryWars.General
             }
 
             
-            if (placedTiles < 36)
+            if (placedTiles < 33)
             {
                 return true;
             }
@@ -547,6 +550,8 @@ namespace TerritoryWars.General
             bool hasAnyNeighbor = false;
             bool hasNonBorderNeighbor = false;
             bool hasBorderWithNonField = false;
+
+            CustomLogger.LogImportant("Validation for tile at position: " + x + ", " + y);
 
             foreach (Side side in System.Enum.GetValues(typeof(Side)))
             {
@@ -573,17 +578,17 @@ namespace TerritoryWars.General
                     }
                 }
             }
-
+            
             
             if (!hasAnyNeighbor)
             {
+                CustomLogger.LogImportant("Tile at position: " + x + ", " + y + " has no neighbors.");
                 return false;
             }
-
+            
             
             if (hasBorderWithNonField)
             {
-                
                 foreach (var neighbor in neighbors)
                 {
                     Side side = neighbor.Key;
@@ -591,6 +596,7 @@ namespace TerritoryWars.General
                     if (!IsMatchingLandscape(tile.GetSide(side), 
                         adjacentTile.GetSide(GetOppositeSide(side))))
                     {
+                        CustomLogger.LogImportant("Tile at position: " + x + ", " + y + " has a border with non-field neighbor.");
                         return false;
                     }
                 }
@@ -600,6 +606,7 @@ namespace TerritoryWars.General
             
             if (!hasNonBorderNeighbor)
             {
+                CustomLogger.LogImportant("Tile at position: " + x + ", " + y + " has no non-border neighbors.");
                 return false;
             }
 
@@ -615,12 +622,14 @@ namespace TerritoryWars.General
                 
                 if (IsBorderTile(x + GetXOffset(side), y + GetYOffset(side)) && adjacentSide == LandscapeType.Field)
                 {
+                    CustomLogger.LogImportant("Tile at position: " + x + ", " + y + " is a border tile with field neighbor.");
                     continue;
                 }
 
                 
                 if (!IsMatchingLandscape(currentSide, adjacentSide))
                 {
+                    CustomLogger.LogImportant("Tile at position: " + x + ", " + y + " has mismatched landscape with neighbor at side: " + side);
                     return false;
                 }
             }

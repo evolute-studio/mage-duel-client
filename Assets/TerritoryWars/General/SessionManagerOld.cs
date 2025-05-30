@@ -48,6 +48,7 @@ namespace TerritoryWars.General
             if (Instance == null)
             {
                 Instance = this;
+                
             }
             else
             {
@@ -62,13 +63,12 @@ namespace TerritoryWars.General
                     LoadingScreen.connectingText);
             }
         }
-
-
+        
         public BoardManager Board;
         [SerializeField] public GameUI gameUI;
         [SerializeField] public PlayerInfoUI sessionUI;
         public CloudsController CloudsController;
-        public JokerManager JokerManager;
+        public JokerManagerOld JokerManagerOld;
         public TileSelector TileSelector;
         public StructureHoverManager StructureHoverManager;
 
@@ -103,8 +103,8 @@ namespace TerritoryWars.General
             DojoGameManager.Instance.DojoSessionManager.UpdateBoardAfterContests();
             //DojoGameManager.Instance.DojoSessionManager.UpdateBoardAfterRoadContest();
             //DojoGameManager.Instance.DojoSessionManager.UpdateBoardAfterCityContest();
-            JokerManager = new JokerManager(this);
-            gameUI.Initialize();
+            JokerManagerOld = new JokerManagerOld(this);
+            //gameUI.Initialize();
             sessionUI.Initialization();
             evolute_duel_Board board = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
             int cityScoreBlue = board.blue_score.Item1;
@@ -116,7 +116,7 @@ namespace TerritoryWars.General
             GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed, false);
             GameUI.Instance.playerInfoUI.SessionTimerUI.OnClientLocalPlayerTurnEnd.AddListener(ClientLocalPlayerSkip);
             GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.AddListener(ClientRemotePlayerSkip);
-            JokerManager.Initialize(board);
+            JokerManagerOld.Initialize(board);
             SetTilesInDeck(board.available_tiles_in_deck.Length);
             if (CheckGameStatus())
                 CurrentTurnPlayer = Players[DojoGameManager.Instance.DojoSessionManager.WhoseMove()];
@@ -326,7 +326,7 @@ namespace TerritoryWars.General
             }
             
             UpdateTile();
-            LocalPlayer.StartSelecting();
+            LocalPlayer.StartSelectingAnimation();
             evolute_duel_Board board = DojoGameManager.Instance.WorldManager.Entities<evolute_duel_Board>().First().GetComponent<evolute_duel_Board>();
             Players[0].UpdateData(board.player1.Item3);
             Players[1].UpdateData(board.player2.Item3);
@@ -367,7 +367,7 @@ namespace TerritoryWars.General
             
             UpdateTile();
             TileSelector.SetCurrentTile(GetNextTile());
-            RemotePlayer.StartSelecting();
+            RemotePlayer.StartSelectingAnimation();
             evolute_duel_Board board = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
             Players[0].UpdateData(board.player1.Item3);
             Players[1].UpdateData(board.player2.Item3);
@@ -415,7 +415,7 @@ namespace TerritoryWars.General
             }
             GameUI.Instance.SetJokerMode(false);    
             TileSelector.EndTilePlacement();
-            CurrentTurnPlayer.EndTurn();
+            CurrentTurnPlayer.EndTurnAnimation();
             CompleteEndTurn(playerAddress, 5f);
             GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.DojoSessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.PlayerId);
         }
@@ -439,14 +439,14 @@ namespace TerritoryWars.General
             tile.Rotate(rotation);
             tile.SetOwner(RemotePlayer.PlayerSide);
             TileSelector.SetCurrentTile(tile);
-            TileSelector.tilePreview.SetPosition(position.x + 1, position.y + 1);
+            TileSelector.tilePreview.SetPosition(new Vector2Int(position.x + 1, position.y + 1));
             yield return new WaitForSeconds(0.3f);
-            TileSelector.tilePreview.PlaceTile(RemotePlayer.PlayerSide,tile, () =>
+            TileSelector.tilePreview.PlaceTile(tile, () =>
             {
                 Board.PlaceTile(tile);//, position.x + 1, position.y + 1, GetPlayerByAddress(playerAddress).PlayerSide);
             });
             yield return new WaitForSeconds(0.5f);
-            CurrentTurnPlayer.EndTurn();
+            CurrentTurnPlayer.EndTurnAnimation();
             yield return new WaitForSeconds(0.5f);
             TileSelector.tilePreview.ResetPosition();
             CompleteEndTurn(playerAddress);

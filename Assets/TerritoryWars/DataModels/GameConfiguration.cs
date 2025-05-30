@@ -13,6 +13,7 @@ namespace TerritoryWars.DataModels
         public static byte ClientRotationOffset = 3;
         public static Vector2Int ClientBoardSize = new Vector2Int(10, 10);
         public static Vector2Int ServerBoardSize = new Vector2Int(8, 8);
+        public static ushort TurnDuration = 65; // seconds
         
         public static string[] TileTypes =
         {

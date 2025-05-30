@@ -35,11 +35,8 @@ namespace TerritoryWars.ConnectorLayers.Dojo
         public EventsHandler EventsHandler;
         public string LocalPlayerId => DojoGameManager.Instance.LocalAccount.Address.Hex();
 
-        public DojoLayer(WorldManager worldManager, CustomSynchronizationMaster synchronizationMaster)
+        public void Start()
         {
-            WorldManager = worldManager;
-            SynchronizationMaster = synchronizationMaster;
-
             EventsHandler = new EventsHandler(WorldManager);
         }
 

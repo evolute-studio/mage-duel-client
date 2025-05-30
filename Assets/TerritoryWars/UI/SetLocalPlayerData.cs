@@ -1,4 +1,6 @@
-﻿using TerritoryWars.General;
+﻿using TerritoryWars.ConnectorLayers.Dojo;
+using TerritoryWars.Dojo;
+using TerritoryWars.General;
 using TerritoryWars.Managers.SessionComponents;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +9,8 @@ namespace TerritoryWars.UI
 {
     public class SetLocalPlayerData
     {
-        private static bool _isLocalPlayerHost => SessionManager.Instance.IsLocalPlayerHost;
+        private static bool _isLocalPlayerHost =>
+            DojoGameManager.Instance.GlobalContext.SessionContext.IsLocalPlayerHost;
 
         public static int[] GetLocalPlayerInt(int bluePlayer, int redPlayer)
         {

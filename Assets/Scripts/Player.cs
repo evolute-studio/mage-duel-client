@@ -3,6 +3,7 @@ using Dojo.Starknet;
 using TerritoryWars.DataModels;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
+using TerritoryWars.UI;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -23,25 +24,30 @@ public class Player : MonoBehaviour
     
     public void Initialize(SessionPlayer player)
     {
-        PlayerId = player.PlayerId;
-        PlayerSide = player.PlayerSide;
-        JokerCount = player.JokerCount;
-        ActiveSkin = player.ActiveSkin;
+        SetData(player);
         
         _animator = GetComponent<Animator>();
         _characterAnimator = new CharacterAnimator(_animator);
+    }
+
+    public void SetData(SessionPlayer player)
+    {
+        PlayerId = player.PlayerId;
+        PlayerSide = player.PlayerSide;
+        JokerCount = player.JokerCount;
+        ActiveSkin = ActiveSkin != 0 && player.ActiveSkin == 0 ? ActiveSkin : player.ActiveSkin;
     }
 
     public void UpdateData(int jokerCount)
     {
         JokerCount = jokerCount;
     }
-    public void StartSelecting()
+    public void StartSelectingAnimation()
     {
         _characterAnimator.PlayCast(true);
     }
     
-    public void EndTurn()
+    public void EndTurnAnimation()
     {
         _characterAnimator.PlayCast(false);
         _characterAnimator.PlayHit();
@@ -58,7 +64,7 @@ public class Player : MonoBehaviour
         Vector3 topCenterPosition = new Vector3(GFX.bounds.center.x, GFX.bounds.center.y, GFX.bounds.center.z);
         GameObject bubble = Instantiate(
             PrefabsManager.Instance.InstantiateObject(PrefabsManager.Instance.SkipBubblePrefab),
-            topCenterPosition, Quaternion.identity, SessionManagerOld.Instance.sessionUI.gameObject.transform);
+            topCenterPosition, Quaternion.identity, GameUI.Instance.playerInfoUI.gameObject.transform);
         
         bubble.transform.DOMove(bubble.transform.position + new Vector3(0, 1, 0), 1f)
             .OnComplete(() =>

@@ -1,5 +1,6 @@
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
@@ -14,8 +15,8 @@ namespace TerritoryWars.Bots
         {
             get
             {
-                if (SessionManagerOld.Instance == null) return null;
-                return SessionManagerOld.Instance.TileSelector;
+                if (SessionManager.Instance == null) return null;
+                return SessionManager.Instance.TileSelector;
             }
         }
         

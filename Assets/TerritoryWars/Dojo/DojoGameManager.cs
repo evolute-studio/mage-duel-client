@@ -555,7 +555,7 @@ namespace TerritoryWars.Dojo
                 CustomLogger.LogInfo("Start session");
                 // Start session
                 ApplicationState.SetState(ApplicationStates.Initializing);
-                await SyncEverythingForGame();
+                //await SyncEverythingForGame();
                 DojoSessionManager?.OnDestroy();
                 DojoSessionManager = new DojoSessionManager(this);
                 CustomSceneManager.Instance.LoadSession();

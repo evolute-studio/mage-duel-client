@@ -82,7 +82,7 @@ namespace TerritoryWars.Dojo
             IsGameWithBot = SimpleStorage.LoadIsGameWithBot();
             IsGameWithBotAsPlayer = DojoGameManager.Instance.LocalBotAsPlayer != null;
             dojoGameManager.WorldManager.synchronizationMaster.OnModelUpdated.AddListener(OnModelUpdated);
-            dojoGameManager.WorldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
+            //dojoGameManager.WorldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
         }
 
         private void OnModelUpdated(ModelInstance modelInstance)
@@ -247,8 +247,8 @@ namespace TerritoryWars.Dojo
             var guestPlayerJokers = eventModel.player2.Item3;
             SessionManagerOld.Instance.SetNextTile(tileData);
             SessionManagerOld.Instance.SetTilesInDeck(availableTiles + 1);
-            SessionManagerOld.Instance.JokerManager.SetJokersCount(0, hostPlayerJokers);
-            SessionManagerOld.Instance.JokerManager.SetJokersCount(1, guestPlayerJokers);
+            SessionManagerOld.Instance.JokerManagerOld.SetJokersCount(0, hostPlayerJokers);
+            SessionManagerOld.Instance.JokerManagerOld.SetJokersCount(1, guestPlayerJokers);
         }
 
         private void GameFinished(FieldElement board_id, FieldElement hostPlayer)
