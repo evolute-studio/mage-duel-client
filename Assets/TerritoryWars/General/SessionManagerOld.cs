@@ -105,7 +105,7 @@ namespace TerritoryWars.General
             //DojoGameManager.Instance.DojoSessionManager.UpdateBoardAfterCityContest();
             JokerManagerOld = new JokerManagerOld(this);
             //gameUI.Initialize();
-            sessionUI.Initialization();
+            sessionUI.Initialize();
             evolute_duel_Board board = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
             int cityScoreBlue = board.blue_score.Item1;
             int cartScoreBlue = board.blue_score.Item2;

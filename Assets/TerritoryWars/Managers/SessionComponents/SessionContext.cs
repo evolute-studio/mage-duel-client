@@ -23,6 +23,9 @@ namespace TerritoryWars.Managers.SessionComponents
         
         public bool IsLocalPlayerHost => LocalPlayer.PlayerId == Board.Player1.PlayerId;
         public bool IsLocalPlayerTurn => CurrentTurnPlayer.PlayerId == LocalPlayer.PlayerId;
+
+        public bool IsGameWithBot;
+        public bool IsGameWithBotAsPlayer;
         
         
         [Header("Session Settings")]

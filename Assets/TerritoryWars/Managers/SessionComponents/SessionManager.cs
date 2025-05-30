@@ -54,6 +54,7 @@ namespace TerritoryWars.Managers.SessionComponents
             InitializeBoard();
             Initialize();
             GameUI.Instance.Initialize();
+            GameUI.Instance.playerInfoUI.Initialize();
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
             ManagerContext.GameLoopManager.StartGame();
         }
@@ -110,6 +111,9 @@ namespace TerritoryWars.Managers.SessionComponents
             PlayerProfile player2 = await DojoLayer.Instance.GetPlayerProfile(board.Player2.PlayerId);
             SessionContext.PlayersData[0].SetData(player1);
             SessionContext.PlayersData[1].SetData(player2);
+            
+            SessionContext.IsGameWithBot = DojoGameManager.Instance.DojoSessionManager.IsGameWithBot;
+            SessionContext.IsGameWithBotAsPlayer = DojoGameManager.Instance.DojoSessionManager.IsGameWithBotAsPlayer;
             
             DojoGameManager.Instance.GlobalContext.SessionContext = SessionContext;
         }

@@ -164,9 +164,6 @@ namespace TerritoryWars.UI
         {
             if (tilePreview != null)
             {
-                CustomLogger.LogImportant($"SessionManager == null {_sessionManager == null}");
-                CustomLogger.LogImportant($"TileSelector == null {_sessionManager.TileSelector == null}");
-                CustomLogger.LogImportant($"CurrentTile == null {_sessionManager.TileSelector.CurrentTile == null}");
                 CustomLogger.LogObject(_sessionManager.TileSelector.CurrentTile, "CurrentTile");
                 tilePreview.UpdatePreview(_sessionManager.TileSelector.CurrentTile);
             }

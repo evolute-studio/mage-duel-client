@@ -89,9 +89,16 @@ namespace TerritoryWars.DataModels
 
             AvailableTilesInDeck = data.AvailableTilesInDeck;
             TopTile = data.TopTile;
-            Tiles = data.Tiles;
-            Player1 = data.Player1;
-            Player2 = data.Player2;
+            foreach (var eventTile in data.Tiles)
+            {
+                if(!Tiles.ContainsKey(eventTile.Key))
+                {
+                    Tiles[eventTile.Key] = eventTile.Value;
+                }
+                
+            }
+            Player1.Update(data.Player1);
+            Player2.Update(data.Player2);
             LastMoveId = data.LastMoveId;
             GameState = data.GameState;
 

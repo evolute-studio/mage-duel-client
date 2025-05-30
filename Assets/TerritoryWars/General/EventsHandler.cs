@@ -21,8 +21,6 @@ namespace TerritoryWars.General
         
         private void OnEventMessage(ModelInstance modelInstance)
         {
-            CustomLogger.LogImportant("OnEventMessage " + nameof(modelInstance));
-            CustomLogger.LogImportant("ApplicationState.CurrentState: " + ApplicationState.CurrentState);
             switch (ApplicationState.CurrentState)
             {
                 case ApplicationStates.Initializing:
@@ -54,8 +52,9 @@ namespace TerritoryWars.General
                     }
                     
                     BoardUpdated boardUpdate = new BoardUpdated().SetData(boardUpdated);
-                    evolute_duel_Board board = _worldManager.EntityModel<evolute_duel_Board>("id", boardUpdated.board_id);
-                    Board.AddEdgeTiles(boardUpdate.Tiles, board.initial_edge_state);
+                    CustomLogger.LogObject(boardUpdate, "BoardUpdated from Event");
+                    // evolute_duel_Board board = _worldManager.EntityModel<evolute_duel_Board>("id", boardUpdated.board_id);
+                    // Board.AddEdgeTiles(boardUpdate.Tiles, board.initial_edge_state);
                     
                     CustomLogger.LogEventsLocal($"[EventHandler] | {nameof(boardUpdated)}");
                     EventBus.Publish(boardUpdate);

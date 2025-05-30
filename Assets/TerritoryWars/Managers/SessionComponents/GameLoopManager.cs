@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
 using TerritoryWars.DataModels.Events;
+using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
@@ -29,11 +30,11 @@ namespace TerritoryWars.Managers.SessionComponents
         public void Initialize(SessionManagerContext managerContext)
         {
             _managerContext = managerContext;
-            EventBus.Subscribe<TurnEndData>(OnTurnEnd);
             EventBus.Subscribe<BoardUpdated>(BoardUpdate);
             EventBus.Subscribe<Moved>(Moved);
             EventBus.Subscribe<Skipped>(Skipped);
             EventBus.Subscribe<ClientInput>(OnLocalFinishTurn);
+            EventBus.Subscribe<TurnEndData>(OnTurnEnd);
         }
 
         public async void StartGame()
@@ -54,47 +55,72 @@ namespace TerritoryWars.Managers.SessionComponents
         private void StartTurn()
         {
             CustomLogger.LogImportant("StartTurn");
-            CustomLogger.LogImportant($"Current player: {_currentPlayer.PlayerId} ({_currentPlayer.PlayerSide})");
-            CustomLogger.LogImportant($"Local player: {_localPlayer.PlayerId} ({_localPlayer.PlayerSide})");
-            CustomLogger.LogImportant($"Remote player: {_remotePlayer.PlayerId} ({_remotePlayer.PlayerSide})");
+            
+            string currentTile = _sessionContext.Board.TopTile;
+            CustomLogger.LogImportant($"Current tile: {currentTile}");
+            TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
+            _managerContext.TileSelector.tilePreview.UpdatePreview(tileData);
+            
             if(_currentPlayer == _localPlayer) StartLocalTurn();
             if(_currentPlayer == _remotePlayer) StartRemoteTurn();
         }
 
         private void StartLocalTurn()
         {
+            CustomLogger.LogImportant("StartLocalTurn");
             _localPlayer.StartSelectingAnimation();
             string currentTile = _sessionContext.Board.TopTile;
             CustomLogger.LogImportant($"Current tile: {currentTile}");
             TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
             _managerContext.TileSelector.StartTilePlacement(tileData);
+            
+            if (_sessionContext.IsGameWithBotAsPlayer)
+            {
+                DojoGameManager.Instance.LocalBotAsPlayer.MakeMove();
+            }
+        }
+        
+        private void StartRemoteTurn()
+        {
+            CustomLogger.LogImportant("StartRemoteTurn");
+            _remotePlayer.StartSelectingAnimation();
+            
+            if (_sessionContext.IsGameWithBot || _sessionContext.IsGameWithBotAsPlayer)
+            {
+                DojoGameManager.Instance.LocalBot.MakeMove();
+            }
         }
 
         private void BoardUpdate(BoardUpdated data)
         {
-            _turnEndData.SetBoardUpdated(ref data);
             _sessionContext.Board.SetData(data);
+            CustomLogger.LogImportant("GameLoopManager: BoardUpdate. Board Top tile: " + _sessionContext.Board.TopTile);
             _sessionContext.Board.Player1.Update(data.Player1);
             _sessionContext.Board.Player2.Update(data.Player2);
             _sessionContext.PlayersData[0].Update(data.Player1);
             _sessionContext.PlayersData[1].Update(data.Player2);
             _sessionContext.Players[0].SetData(_sessionContext.Board.Player1);
             _sessionContext.Players[1].SetData(_sessionContext.Board.Player2);
+            
+            _turnEndData.SetBoardUpdated(ref data);
         }
 
         private void Moved(Moved data)
         {
-            _turnEndData.SetMoved(ref data);
-            if(data.PlayerId == _localPlayer.PlayerId) return;
             TileData tileData = new TileData(data.tileModel);
             _managerContext.BoardManager.PlaceTile(tileData);
+            
+            _turnEndData.SetMoved(ref data);
         }
 
         private void Skipped(Skipped data)
         {
+            if (data.PlayerId != _localPlayer.PlayerId)
+            {
+                _currentPlayer.PlaySkippedBubbleAnimation();
+            } 
+            
             _turnEndData.SetSkipped(ref data);
-            if(data.PlayerId == _localPlayer.PlayerId) return;
-            _currentPlayer.PlaySkippedBubbleAnimation();
         }
 
         private void OnLocalFinishTurn(ClientInput input)
@@ -125,14 +151,11 @@ namespace TerritoryWars.Managers.SessionComponents
             _managerContext.TileSelector.EndTilePlacement();
         }
 
-        private void StartRemoteTurn()
-        {
-            CustomLogger.LogImportant("StartRemoteTurn");
-            _remotePlayer.StartSelectingAnimation();
-        }
+        
         
         public void OnTurnEnd(TurnEndData turnEndData)
         {
+            _managerContext.TileSelector.tilePreview.ResetPosition();
             _currentPlayer.EndTurnAnimation();
             _turnEndData.Reset();
             byte nextTurnSide = (byte)((_currentPlayer.PlayerSide + 1) % 2);
@@ -216,7 +239,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         public void IsTurnEnded()
         {
-            if (!BoardUpdated.IsNull && (Moved.IsNull || Skipped.IsNull))
+            if (!BoardUpdated.IsNull && (!Moved.IsNull || !Skipped.IsNull))
             {
                 EventBus.Publish(this);
                 Reset();

@@ -158,7 +158,6 @@ namespace TerritoryWars.General
             selectedPosition = null;
 
             _currentValidPlacements = board.GetValidPlacements(currentTile);
-            CustomLogger.LogImportant($"Valid placements for tile {currentTile.RotatedConfig}: {_currentValidPlacements.Count}");
             ShowPossiblePlacements(_currentValidPlacements);
             gameUI.SetEndTurnButtonActive(false);
             gameUI.SetRotateButtonActive(false);
@@ -430,6 +429,9 @@ namespace TerritoryWars.General
 
             gameUI.SetRotateButtonActive(false);
             
+            CustomLogger.LogObject(currentTile, "Placed tile");
+            CustomLogger.LogImportant($"Placing tile at position: {selectedPosition.Value.x}, {selectedPosition.Value.y}");
+            CustomLogger.LogImportant($"Is Joker Mode: {isJokerMode}");
             DojoGameManager.Instance.DojoSessionManager.MakeMove(currentTile, selectedPosition.Value.x, selectedPosition.Value.y, isJokerMode);
             tilePreview.PlaceTile(currentTile, CompleteTilePlacement);
             ClearHighlights();

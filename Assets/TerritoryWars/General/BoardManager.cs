@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using JetBrains.Annotations;
 using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
 using TerritoryWars.Managers.SessionComponents;
@@ -393,14 +394,29 @@ namespace TerritoryWars.General
             
             List<Side> closerSides = new List<Side>();
             if(IsEdgeTile(x,y)) return closerSides;
+            TileData tile = GetTileData(x + 1, y);
+            if (IsEdgeTile(x + 1, y) && tile != null && tile.IsCity())
+            {
+                closerSides.Add(Side.Top);
+            }
 
-            if (IsEdgeTile(x + 1, y) && !GetTileData(x + 1, y).IsCity()) { closerSides.Add(Side.Top); }
+            tile = GetTileData(x, y - 1);
+            if (IsEdgeTile(x,y - 1) && tile != null && tile.IsCity())
+            {
+                closerSides.Add(Side.Right);
+            }
 
-            if (IsEdgeTile(x,y - 1) && !GetTileData(x, y - 1).IsCity()) { closerSides.Add(Side.Right); }
-
-            if (IsEdgeTile(x - 1, y) && !GetTileData(x - 1, y).IsCity()) { closerSides.Add(Side.Bottom); }
+            tile = GetTileData(x - 1, y);
+            if (IsEdgeTile(x - 1, y) && tile != null && tile.IsCity())
+            {
+                closerSides.Add(Side.Bottom);
+            }
     
-            if (IsEdgeTile(x, y + 1) && !GetTileData(x, y + 1).IsCity()) { closerSides.Add(Side.Left); }
+            tile = GetTileData(x, y + 1);
+            if (IsEdgeTile(x, y + 1) && tile != null && tile.IsCity())
+            {
+                closerSides.Add(Side.Left);
+            }
 
             return closerSides;
         }
@@ -437,8 +453,8 @@ namespace TerritoryWars.General
             
             List<MineTileInfo> closerSides = new List<MineTileInfo>();
             if(IsEdgeTile(x,y)) return closerSides;
-
-            if (IsEdgeTile(x + 1, y) && !GetTileData(x + 1, y).IsRoad())
+            TileData tile = GetTileData(x + 1, y);
+            if (IsEdgeTile(x + 1, y) && tile != null && !tile.IsRoad())
             {
                 closerSides.Add(new MineTileInfo
                 {
@@ -449,7 +465,8 @@ namespace TerritoryWars.General
                 });
             }
 
-            if (IsEdgeTile(x, y - 1) && !GetTileData(x, y - 1).IsRoad())
+            tile = GetTileData(x, y - 1);
+            if (IsEdgeTile(x, y - 1) && tile != null && !tile.IsRoad())
             {
                 closerSides.Add(new MineTileInfo
                 {
@@ -460,7 +477,8 @@ namespace TerritoryWars.General
                 });
             }
 
-            if (IsEdgeTile(x - 1, y) && !GetTileData(x - 1, y).IsRoad())
+            tile = GetTileData(x - 1, y);
+            if (IsEdgeTile(x - 1, y) && tile != null && !tile.IsRoad())
             {
                 closerSides.Add(new MineTileInfo
                 {
@@ -471,7 +489,8 @@ namespace TerritoryWars.General
                 });
             }
 
-            if (IsEdgeTile(x, y + 1) && !GetTileData(x, y + 1).IsRoad())
+            tile = GetTileData(x, y + 1);
+            if (IsEdgeTile(x, y + 1) && tile != null && !tile.IsRoad())
             {
                 closerSides.Add(new MineTileInfo
                 {
@@ -551,8 +570,6 @@ namespace TerritoryWars.General
             bool hasNonBorderNeighbor = false;
             bool hasBorderWithNonField = false;
 
-            CustomLogger.LogImportant("Validation for tile at position: " + x + ", " + y);
-
             foreach (Side side in System.Enum.GetValues(typeof(Side)))
             {
                 int newX = x + GetXOffset(side);
@@ -582,7 +599,6 @@ namespace TerritoryWars.General
             
             if (!hasAnyNeighbor)
             {
-                CustomLogger.LogImportant("Tile at position: " + x + ", " + y + " has no neighbors.");
                 return false;
             }
             
@@ -596,7 +612,6 @@ namespace TerritoryWars.General
                     if (!IsMatchingLandscape(tile.GetSide(side), 
                         adjacentTile.GetSide(GetOppositeSide(side))))
                     {
-                        CustomLogger.LogImportant("Tile at position: " + x + ", " + y + " has a border with non-field neighbor.");
                         return false;
                     }
                 }
@@ -606,10 +621,8 @@ namespace TerritoryWars.General
             
             if (!hasNonBorderNeighbor)
             {
-                CustomLogger.LogImportant("Tile at position: " + x + ", " + y + " has no non-border neighbors.");
                 return false;
             }
-
             
             foreach (var neighbor in neighbors)
             {
@@ -622,14 +635,12 @@ namespace TerritoryWars.General
                 
                 if (IsBorderTile(x + GetXOffset(side), y + GetYOffset(side)) && adjacentSide == LandscapeType.Field)
                 {
-                    CustomLogger.LogImportant("Tile at position: " + x + ", " + y + " is a border tile with field neighbor.");
                     continue;
                 }
 
                 
                 if (!IsMatchingLandscape(currentSide, adjacentSide))
                 {
-                    CustomLogger.LogImportant("Tile at position: " + x + ", " + y + " has mismatched landscape with neighbor at side: " + side);
                     return false;
                 }
             }
@@ -891,11 +902,11 @@ namespace TerritoryWars.General
         {
             return tileObjects[x, y];
         }
-
+        
         public TileData GetTileData(int x, int y)
         {
             if (!IsValidPosition(x, y)) return null;
-            return tileData[x, y];
+            return tileData[x, y] == null ? new TileData() : tileData[x, y];
         }
 
         public class RoadStructure

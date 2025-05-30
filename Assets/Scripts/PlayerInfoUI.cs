@@ -37,7 +37,7 @@ public class PlayerInfoUI : MonoBehaviour
     
     [SerializeField] private SessionManager _sessionManager;
 
-    public void Initialization()
+    public void Initialize()
     {
         SetNames(_sessionManager.SessionContext.PlayersData[0].Username, _sessionManager.SessionContext.PlayersData[1].Username);
         for (int i = 0; i < players.Count; i++)
@@ -187,7 +187,7 @@ public class PlayerInfoUI : MonoBehaviour
 
     public void ShowPlayerJokerCount(int playerId)
     {
-        if (!SessionManager.Instance.IsLocalPlayerHost)
+        if (!SessionManager.Instance.SessionContext.IsLocalPlayerHost)
         {
             playerId = playerId == 0 ? 1 : 0;
         }
@@ -197,7 +197,7 @@ public class PlayerInfoUI : MonoBehaviour
     
     public void SetJokersCount(int player, int count)
     {
-        if (!SessionManager.Instance.IsLocalPlayerHost)
+        if (!SessionManager.Instance.SessionContext.IsLocalPlayerHost)
         {
             player = player == 0 ? 1 : 0;
         }

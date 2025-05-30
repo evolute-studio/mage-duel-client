@@ -3,6 +3,7 @@ using System.Linq;
 using DG.Tweening;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
+using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.UI;
 using UnityEngine;
@@ -27,6 +28,16 @@ namespace TerritoryWars.Managers.SessionComponents
         
         public void SpawnPlayers()
         {
+            if (_managerContext.SessionContext.IsGameWithBot)
+            {
+                DojoGameManager.Instance.LocalBot.SessionStarted();
+            }
+            if(_managerContext.SessionContext.IsGameWithBotAsPlayer)
+            {
+                DojoGameManager.Instance.LocalBot.SessionStarted();
+                DojoGameManager.Instance.LocalBotAsPlayer.SessionStarted();
+            }
+            
             Players = new Player[2];
             ref Board board = ref _managerContext.SessionContext.Board;
             GameObject hostPrefab = PrefabsManager.Instance.GetPlayer(board.Player1.ActiveSkin);
