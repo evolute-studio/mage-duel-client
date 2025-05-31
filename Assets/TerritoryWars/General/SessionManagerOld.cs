@@ -5,6 +5,7 @@ using System.Linq;
 using DG.Tweening;
 using Dojo.Starknet;
 using TerritoryWars.Bots;
+using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.ModelsDataConverters;

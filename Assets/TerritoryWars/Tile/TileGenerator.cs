@@ -172,6 +172,7 @@ namespace TerritoryWars.Tile
                 for (int i = 0; i < _housesParent.Count; i++)
                 {
                     int playerId = _tileData.PlayerSide;
+                    //CustomLogger.LogImportant("TileGenerator: generate houses for tile: " + _tileData.Position + " playerId: " + playerId);
                     TileParts.HouseGameObject house = _housesParent[i];
                     if (_tileData.PlayerSide == -1) playerId = -1;
                     GameObject prefab = _tileData.HouseSprites.Count > i 

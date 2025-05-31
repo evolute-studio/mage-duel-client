@@ -70,10 +70,14 @@ namespace TerritoryWars.Managers.SessionComponents
             CustomLogger.LogImportant("StartLocalTurn");
             _localPlayer.StartSelectingAnimation();
             string currentTile = _sessionContext.Board.TopTile;
-            CustomLogger.LogImportant($"Current tile: {currentTile}");
+            CustomLogger.LogImportant($"Current tile: {currentTile} for local player {_localPlayer.PlayerId}");
             TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
             _managerContext.TileSelector.StartTilePlacement(tileData);
             
+            GameUI.Instance.SetEndTurnButtonActive(false);
+            GameUI.Instance.SetRotateButtonActive(false);
+            GameUI.Instance.SetSkipTurnButtonActive(true);
+
             if (_sessionContext.IsGameWithBotAsPlayer)
             {
                 DojoGameManager.Instance.LocalBotAsPlayer.MakeMove();
@@ -107,8 +111,13 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void Moved(Moved data)
         {
-            TileData tileData = new TileData(data.tileModel);
-            _managerContext.BoardManager.PlaceTile(tileData);
+            CustomLogger.LogImportant($"Moved event received. PlayerId: {data.PlayerId}, TileModel: {data.tileModel}");
+            if (data.PlayerId != _localPlayer.PlayerId)
+            {
+                CustomLogger.LogError($"Moved event received for player {data.PlayerId}, but current player is {_localPlayer.PlayerId}. Ignoring.");
+                TileData tileData = new TileData(data.tileModel);
+                _managerContext.BoardManager.PlaceTile(tileData); 
+            }
             
             _turnEndData.SetMoved(ref data);
         }
@@ -158,8 +167,11 @@ namespace TerritoryWars.Managers.SessionComponents
             _managerContext.TileSelector.tilePreview.ResetPosition();
             _currentPlayer.EndTurnAnimation();
             _turnEndData.Reset();
+            CustomLogger.LogImportant("OnTurnEnd: Current player " + _currentPlayer.PlayerId + " ended turn.");
+            CustomLogger.LogImportant("OnTurnEnd: It was a local player? " + (_currentPlayer == _localPlayer));
+            CustomLogger.LogImportant("OnTurnEnd: Next player is " + _sessionContext.Players[(byte)((_currentPlayer.PlayerSide + 1) % 2)].PlayerId);
             byte nextTurnSide = (byte)((_currentPlayer.PlayerSide + 1) % 2);
-            _currentPlayer = _sessionContext.Players[nextTurnSide];
+            _currentPlayer = _sessionContext.Players[nextTurnSide]; 
             StartTurn();
         }
         

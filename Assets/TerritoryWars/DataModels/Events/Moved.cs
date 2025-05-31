@@ -1,4 +1,5 @@
 using System;
+using TerritoryWars.Managers.SessionComponents;
 
 namespace TerritoryWars.DataModels.Events
 {
@@ -31,7 +32,7 @@ namespace TerritoryWars.DataModels.Events
                 Type = GameConfiguration.GetTileType(moved.tile.Unwrap()),
                 Position = GameConfiguration.GetClientPosition(moved.col, moved.row),
                 Rotation = GameConfiguration.GetClientRotation(moved.rotation),
-                //PlayerSide = PlayerSide
+                PlayerSide = SessionManager.Instance?.SessionContext?.GetPlayerById(PlayerId).PlayerSide ?? 0,
             };
             IsJoker = moved.is_joker;
             BoardId = moved.board_id.Hex();

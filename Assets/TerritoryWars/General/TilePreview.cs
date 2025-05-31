@@ -31,7 +31,7 @@ namespace TerritoryWars.General
 
         [Header("Animation Settings")] [SerializeField]
         private float moveDuration = 0.3f;
-
+        public float FullAnimationDuration => moveDuration + 0.5f;
         [SerializeField] private Ease moveEase = Ease.OutQuint;
 
         private TileData currentTile;
@@ -309,13 +309,18 @@ namespace TerritoryWars.General
             SessionManager.Instance.SessionContext.CurrentTurnPlayer.EndTurnAnimation();
             currentTween = transform
                 .DOMove(targetPosition, moveDuration)
-                .SetEase(moveEase)
-                .OnComplete(() =>
-                {
-                    callback?.Invoke();
-                    SessionManager.Instance.ManagerContext.BoardManager.FloatingTextAnimation(_currentBoardPosition);
-                    SessionManager.Instance.ManagerContext.BoardManager.ScoreClientPrediction(playerIndex, currentTile);
-                });
+                .SetEase(moveEase);
+            Sequence sequence = DOTween.Sequence();
+            sequence.AppendInterval(moveDuration);
+            sequence.AppendCallback(() =>
+            {
+                CustomLogger.LogImportant($"TilePreview: Placing tile at position {_currentBoardPosition} for player {playerIndex}");
+                callback?.Invoke();
+                SessionManager.Instance.ManagerContext.BoardManager.FloatingTextAnimation(_currentBoardPosition);
+                SessionManager.Instance.ManagerContext.BoardManager.ScoreClientPrediction(playerIndex, currentTile);
+            });
+            sequence.Play();
+
         }
 
         
