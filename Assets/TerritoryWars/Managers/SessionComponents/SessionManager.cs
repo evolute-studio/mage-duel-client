@@ -59,6 +59,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
             GameUI.Instance.Initialize();
             GameUI.Instance.playerInfoUI.Initialize();
+            GameUI.Instance.playerInfoUI.UpdateData(SessionContext.PlayersData);
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
             ManagerContext.GameLoopManager.StartGame();
         }

@@ -35,6 +35,11 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             return Board.Id == boardId;
         }
+
+        public bool IsSessionMove(string moveId, string boardId)
+        {
+            return Board.Id == boardId || Board.LastMoveId == moveId; 
+        }
         
         
         public bool IsPlayerInSession(string playerId)

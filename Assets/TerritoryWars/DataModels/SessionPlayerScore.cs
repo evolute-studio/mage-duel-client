@@ -13,5 +13,7 @@ namespace TerritoryWars.DataModels
             CityScore = cityScore;
             RoadScore = roadScore;
         }
+
+        public ushort TotalScore => (ushort)(CityScore + RoadScore); 
     }
 }

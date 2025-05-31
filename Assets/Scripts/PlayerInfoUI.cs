@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Serialization;
+using TerritoryWars.DataModels;
 
 public class PlayerInfoUI : MonoBehaviour
 {
@@ -57,6 +58,13 @@ public class PlayerInfoUI : MonoBehaviour
         
         SetPlayersAvatars(charactersObject.GetAvatar(PlayerCharactersManager.GetCurrentCharacterId()), 
             charactersObject.GetAvatar(PlayerCharactersManager.GetOpponentCurrentCharacterId()));
+    }
+
+    public void UpdateData(SessionPlayer[] players){
+        //SetNames(players[0].Username, players[1].Username);
+        SetCityScores(players[0].Score.CityScore, players[1].Score.CityScore, false);
+        SetRoadScores(players[0].Score.RoadScore, players[1].Score.RoadScore, false);
+        SetPlayerScores(players[0].Score.TotalScore, players[1].Score.TotalScore, false);
     }
     
     public void SetPlayersAvatars(Sprite localPlayerSprite, Sprite remotePlayerSprite)

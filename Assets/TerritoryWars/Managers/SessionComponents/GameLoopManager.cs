@@ -102,7 +102,7 @@ namespace TerritoryWars.Managers.SessionComponents
             _sessionContext.PlayersData[1].Update(data.Player2);
             _sessionContext.Players[0].SetData(_sessionContext.Board.Player1);
             _sessionContext.Players[1].SetData(_sessionContext.Board.Player2);
-            
+            GameUI.Instance.playerInfoUI.UpdateData(_sessionContext.PlayersData);
             _turnEndData.SetBoardUpdated(ref data);
         }
 

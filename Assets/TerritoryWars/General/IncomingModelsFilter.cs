@@ -6,6 +6,7 @@ using TerritoryWars.Tools;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Linq;
+using TerritoryWars.Managers;
 
 namespace TerritoryWars.General
 {
@@ -15,6 +16,8 @@ namespace TerritoryWars.General
         public static string CurrentBoardId;
         public static List<string> AllowedBoards = new List<string>();
         public static List<string> AllowedPlayers = new List<string>();
+
+        private static GlobalContext _globalContext => DojoGameManager.Instance.GlobalContext;
         
         public static UnityEvent<ModelInstance> OnModelPassed = new UnityEvent<ModelInstance>();
         
@@ -266,56 +269,37 @@ namespace TerritoryWars.General
                 // Have condition
                 case nameof(evolute_duel_Board):
                     evolute_duel_Board board = (evolute_duel_Board)model;
-                    if(board.id == null)
+                    if(board.id == null) return true; 
+       
+                    if(_globalContext.SessionContext.IsSessionBoard(board.id.Hex()))
                     {
-                        if (GameObject.Find(model.gameObject.name) != null)
-                        {
-                            CustomLogger.LogWarning("Board id is null, But client has the board. Allowing.");
-                            return true;
-                        }
-                        else
-                        {
-                            CustomLogger.LogWarning("Board id is null, And client doesn't have the board. Denying.");
-                            return false;
-                        }
-                        
-                    }
-                    CustomLogger.LogFiltering($"Checking board {board.id.Hex()}");
-                    CustomLogger.LogFiltering($"Allowed boards: {AllowedBoards.Count}");
-                    bool isBoardAllowed = AllowedBoards.Contains(board.id.Hex());
-                    bool isBoardHasLocalPlayer = board.player1.Item1.Hex() == LocalPlayerId || board.player2.Item1.Hex() == LocalPlayerId;
-                    if(isBoardHasLocalPlayer) AddBoardToAllowedBoards(board.id.Hex());
-                    if(isBoardAllowed || isBoardHasLocalPlayer)
+                        CustomLogger.LogFiltering($"Board {board.id.Hex()} is session board. Allowing.");
                         return true;
+                    }
                     return false;
                 case nameof(evolute_duel_Move):
                     evolute_duel_Move move = (evolute_duel_Move)model;
-                    CustomLogger.LogFiltering($"Checking move board first id {move.first_board_id.Hex()}");
-                    bool isAllowed = AllowedBoards.Contains(move.first_board_id.Hex());
-                    CustomLogger.LogFiltering($"Is move allowed: {isAllowed}");
-                    if(AllowedBoards.Contains(move.first_board_id.Hex()))
+                    if(_globalContext.SessionContext.IsSessionMove(move.id.Hex(), move.first_board_id.Hex()))
+                    {
+                        CustomLogger.LogFiltering($"Move {move.id.Hex()} is session move. Allowing.");
                         return true;
-                    return false;
-                case nameof(evolute_duel_CityNode):
-                    evolute_duel_CityNode cityNode = (evolute_duel_CityNode)model;
-                    if(AllowedBoards.Contains(cityNode.board_id.Hex()))
-                        return true;
-                    return false;
-                case nameof(evolute_duel_RoadNode):
-                    evolute_duel_RoadNode roadNode = (evolute_duel_RoadNode)model;
-                    if(AllowedBoards.Contains(roadNode.board_id.Hex()))
-                        return true;
+                    }
                     return false;
                 case nameof(evolute_duel_Player):
                     evolute_duel_Player player = (evolute_duel_Player)model;
-                    if(AllowedPlayers.Contains(player.player_id.Hex()))
+                    if(_globalContext.SessionContext.IsPlayerInSession(player.player_id.Hex()))
+                    {
+                        CustomLogger.LogFiltering($"Player {player.player_id.Hex()} is session player. Allowing.");
                         return true;
+                    } 
                     return false;
                 case nameof(evolute_duel_Game): 
                     evolute_duel_Game game = (evolute_duel_Game)model;
                     if(game.player.Hex() == LocalPlayerId)
                         return true;
                     return false;
+
+                // TODO: Add UnionFindModel
                 
                 // Always allow
                 case nameof(evolute_duel_Rules):
