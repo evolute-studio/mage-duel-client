@@ -50,9 +50,13 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private async void Start()
         {
-            await SetupData();
-            InitializeBoard();
             Initialize();
+            await SetupData();
+            ManagerContext.PlayersManager.Initialize(ManagerContext);
+            InitializeBoard();
+            ManagerContext.GameLoopManager.Initialize(ManagerContext);
+            ManagerContext.JokerManager.Initialize(ManagerContext);
+
             GameUI.Instance.Initialize();
             GameUI.Instance.playerInfoUI.Initialize();
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
@@ -78,9 +82,6 @@ namespace TerritoryWars.Managers.SessionComponents
             _components.Add(playersManager);
             _components.Add(gameLoopManager);
             _components.Add(jokerManager);
-
-            foreach (var component in _components)
-                component.Initialize(ManagerContext);
         }
         
         public async Task SetupData()

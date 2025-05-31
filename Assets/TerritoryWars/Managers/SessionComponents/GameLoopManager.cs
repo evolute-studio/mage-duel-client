@@ -54,10 +54,9 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void StartTurn()
         {
-            CustomLogger.LogImportant("StartTurn");
+            CustomLogger.LogDojoLoop("StartTurn");
             
             string currentTile = _sessionContext.Board.TopTile;
-            CustomLogger.LogImportant($"Current tile: {currentTile}");
             TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
             _managerContext.TileSelector.tilePreview.UpdatePreview(tileData);
             
@@ -67,10 +66,9 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void StartLocalTurn()
         {
-            CustomLogger.LogImportant("StartLocalTurn");
+            CustomLogger.LogDojoLoop("StartLocalTurn");
             _localPlayer.StartSelectingAnimation();
             string currentTile = _sessionContext.Board.TopTile;
-            CustomLogger.LogImportant($"Current tile: {currentTile} for local player {_localPlayer.PlayerId}");
             TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
             _managerContext.TileSelector.StartTilePlacement(tileData);
             
@@ -86,7 +84,7 @@ namespace TerritoryWars.Managers.SessionComponents
         
         private void StartRemoteTurn()
         {
-            CustomLogger.LogImportant("StartRemoteTurn");
+            CustomLogger.LogDojoLoop("StartRemoteTurn");
             _remotePlayer.StartSelectingAnimation();
             
             if (_sessionContext.IsGameWithBot || _sessionContext.IsGameWithBotAsPlayer)
@@ -98,7 +96,6 @@ namespace TerritoryWars.Managers.SessionComponents
         private void BoardUpdate(BoardUpdated data)
         {
             _sessionContext.Board.SetData(data);
-            CustomLogger.LogImportant("GameLoopManager: BoardUpdate. Board Top tile: " + _sessionContext.Board.TopTile);
             _sessionContext.Board.Player1.Update(data.Player1);
             _sessionContext.Board.Player2.Update(data.Player2);
             _sessionContext.PlayersData[0].Update(data.Player1);
@@ -111,11 +108,9 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void Moved(Moved data)
         {
-            CustomLogger.LogImportant($"Moved event received. PlayerId: {data.PlayerId}, TileModel: {data.tileModel}");
             if (data.PlayerId != _localPlayer.PlayerId)
             {
-                CustomLogger.LogError($"Moved event received for player {data.PlayerId}, but current player is {_localPlayer.PlayerId}. Ignoring.");
-                TileData tileData = new TileData(data.tileModel);
+                 TileData tileData = new TileData(data.tileModel);
                 _managerContext.BoardManager.PlaceTile(tileData); 
             }
             
@@ -134,7 +129,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void OnLocalFinishTurn(ClientInput input)
         {
-            CustomLogger.LogImportant("OnLocalFinishTurn");
+            
             switch (input.Type)
             {
                 case ClientInput.InputType.Skip: SkipLocalTurn(); break;
@@ -144,9 +139,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void FinishLocalTurn()
         {
-            CustomLogger.LogImportant("FinishLocalTurn");
-            CustomLogger.LogImportant($"Current player: {_currentPlayer.PlayerId} ({_currentPlayer.PlayerSide})");
-            CustomLogger.LogImportant($"Current tile: {_managerContext.TileSelector.CurrentTile}");
+          
             if (_managerContext.TileSelector.CurrentTile != null && _currentPlayer == _localPlayer)
             {
                 _managerContext.TileSelector.PlaceCurrentTile();
@@ -164,12 +157,10 @@ namespace TerritoryWars.Managers.SessionComponents
         
         public void OnTurnEnd(TurnEndData turnEndData)
         {
+            CustomLogger.LogDojoLoop("OnTurnEnd");
             _managerContext.TileSelector.tilePreview.ResetPosition();
             _currentPlayer.EndTurnAnimation();
             _turnEndData.Reset();
-            CustomLogger.LogImportant("OnTurnEnd: Current player " + _currentPlayer.PlayerId + " ended turn.");
-            CustomLogger.LogImportant("OnTurnEnd: It was a local player? " + (_currentPlayer == _localPlayer));
-            CustomLogger.LogImportant("OnTurnEnd: Next player is " + _sessionContext.Players[(byte)((_currentPlayer.PlayerSide + 1) % 2)].PlayerId);
             byte nextTurnSide = (byte)((_currentPlayer.PlayerSide + 1) % 2);
             _currentPlayer = _sessionContext.Players[nextTurnSide]; 
             StartTurn();
