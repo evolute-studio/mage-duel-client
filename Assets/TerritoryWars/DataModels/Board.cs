@@ -104,6 +104,11 @@ namespace TerritoryWars.DataModels
 
             return this;
         }
+        
+        public void UpdateTimestamp(ulong timestamp)
+        {
+            LastUpdateTimestamp = timestamp;
+        }
 
         public int GetOnlyMovesCount()
         {

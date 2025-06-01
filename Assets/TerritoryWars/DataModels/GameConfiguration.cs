@@ -13,22 +13,23 @@ namespace TerritoryWars.DataModels
         public static byte ClientRotationOffset = 3;
         public static Vector2Int ClientBoardSize = new Vector2Int(10, 10);
         public static Vector2Int ServerBoardSize = new Vector2Int(8, 8);
-        public static ushort TurnDuration = 65; // seconds
-        
+        public static ushort TurnDuration = 60; // seconds
+        public static ushort PassingTurnDuration = 5; // TurnDuration includ
+
         public static string[] TileTypes =
         {
             "CCCC", "FFFF", "RRRR", "CCCF", "CCCR", "CCRR", "CFFF", "FFFR", "CRRR", "FRRR",
             "CCFF", "CFCF", "CRCR", "FFRR", "FRFR", "CCFR", "CCRF", "CFCR", "CFFR", "CFRF",
             "CRFF", "CRRF", "CRFR", "CFRR"
         };
-        
+
         public static char[] EdgeTypes = { 'C', 'R', 'M', 'F' };
-        
+
         public static Vector2Int GetClientPosition(byte col, byte row)
         {
             return new Vector2Int(col, row) + ClientBoardSizeOffset;
         }
-        
+
         public static Vector2Int GetClientPosition(int index)
         {
             int height = ServerBoardSize.x;
@@ -36,7 +37,7 @@ namespace TerritoryWars.DataModels
             int y = index % height;
             return new Vector2Int(x, y) + ClientBoardSizeOffset;
         }
-        
+
         public static Vector2Int GetPositionByRoot(byte root)
         {
             int height = ServerBoardSize.x;
@@ -45,19 +46,19 @@ namespace TerritoryWars.DataModels
             int y = tile % height;
             return new Vector2Int(x, y) + ClientBoardSizeOffset;
         }
-        
+
         public static (Vector2Int, Side) GetPositionAndSide(byte root)
         {
             Vector2Int position = GetPositionByRoot(root);
             Side side = (Side)((root + ClientRotationOffset) % 4);
             return (position, side);
         }
-        
+
         public static byte GetClientRotation(byte rotation)
         {
             return (byte)((rotation + 3) % 4);
         }
-        
+
         public static string GetTileType(int index)
         {
             if (index < 0 || index >= TileTypes.Length)
@@ -66,7 +67,7 @@ namespace TerritoryWars.DataModels
             }
             return TileTypes[index];
         }
-        
+
         public static char[] GetInitialEdgeState(byte[] initialEdgeState)
         {
             char[] charArray = Array.ConvertAll(initialEdgeState, c => EdgeTypes[(int)c]);

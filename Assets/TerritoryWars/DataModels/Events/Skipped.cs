@@ -13,6 +13,15 @@ namespace TerritoryWars.DataModels.Events
         public string PrevMoveId;
         public string BoardId;
         public ulong Timestamp;
+
+        public Skipped(string id, string playerId, string prevMoveId, string boardId, ulong timestamp)
+        {
+            Id = id;
+            PlayerId = playerId;
+            PrevMoveId = prevMoveId;
+            BoardId = boardId;
+            Timestamp = timestamp;
+        }
         
         public Skipped SetData(evolute_duel_Skiped skiped)
         {

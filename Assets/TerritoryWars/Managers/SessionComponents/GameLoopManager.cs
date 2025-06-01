@@ -2,8 +2,10 @@ using System;
 using System.Threading.Tasks;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
+using TerritoryWars.DataModels.ClientEvents;
 using TerritoryWars.DataModels.Events;
 using TerritoryWars.Dojo;
+using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
@@ -30,10 +32,11 @@ namespace TerritoryWars.Managers.SessionComponents
         public void Initialize(SessionManagerContext managerContext)
         {
             _managerContext = managerContext;
-            EventBus.Subscribe<BoardUpdated>(BoardUpdate);
-            EventBus.Subscribe<Moved>(Moved);
-            EventBus.Subscribe<Skipped>(Skipped);
+            EventBus.Subscribe<BoardUpdated>(OnBoardUpdate);
+            EventBus.Subscribe<Moved>(OnMoved);
+            EventBus.Subscribe<Skipped>(OnSkipped);
             EventBus.Subscribe<ClientInput>(OnLocalFinishTurn);
+            EventBus.Subscribe<TimerEvent>(OnTimerEvent);
             EventBus.Subscribe<TurnEndData>(OnTurnEnd);
         }
 
@@ -55,6 +58,7 @@ namespace TerritoryWars.Managers.SessionComponents
         private void StartTurn()
         {
             CustomLogger.LogDojoLoop("StartTurn");
+            EventBus.Publish(new TimerEvent(TimerEventType.Started, GetTimerTimestamp()));
             
             string currentTile = _sessionContext.Board.TopTile;
             TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
@@ -93,7 +97,7 @@ namespace TerritoryWars.Managers.SessionComponents
             }
         }
 
-        private void BoardUpdate(BoardUpdated data)
+        private void OnBoardUpdate(BoardUpdated data)
         {
             _sessionContext.Board.SetData(data);
             _sessionContext.Board.Player1.Update(data.Player1);
@@ -106,24 +110,26 @@ namespace TerritoryWars.Managers.SessionComponents
             _turnEndData.SetBoardUpdated(ref data);
         }
 
-        private void Moved(Moved data)
+        private void OnMoved(Moved data)
         {
             if (data.PlayerId != _localPlayer.PlayerId)
             {
                  TileData tileData = new TileData(data.tileModel);
                 _managerContext.BoardManager.PlaceTile(tileData); 
             }
-            
+
+            _sessionContext.Board.UpdateTimestamp(data.Timestamp);
             _turnEndData.SetMoved(ref data);
         }
 
-        private void Skipped(Skipped data)
+        private void OnSkipped(Skipped data)
         {
             if (data.PlayerId != _localPlayer.PlayerId)
             {
                 _currentPlayer.PlaySkippedBubbleAnimation();
             } 
             
+            _sessionContext.Board.UpdateTimestamp(data.Timestamp);
             _turnEndData.SetSkipped(ref data);
         }
 
@@ -134,6 +140,18 @@ namespace TerritoryWars.Managers.SessionComponents
             {
                 case ClientInput.InputType.Skip: SkipLocalTurn(); break;
                 case ClientInput.InputType.Move: FinishLocalTurn(); break;
+            }
+        }
+
+        private void OnTimerEvent(TimerEvent timerEvent)
+        {
+            if (timerEvent.Type == TimerEventType.TurnTimeElapsed && _sessionContext.IsLocalPlayerTurn)
+            {
+                SkipLocalTurn();
+            }
+            else if (timerEvent.Type == TimerEventType.PassingTimeElapsed && !_sessionContext.IsLocalPlayerTurn)
+            {
+                SkipOpponentTurnLocally();
             }
         }
 
@@ -151,6 +169,21 @@ namespace TerritoryWars.Managers.SessionComponents
             if(_currentPlayer != _localPlayer) return;
             GameUI.Instance.SetJokerMode(false);    
             _managerContext.TileSelector.EndTilePlacement();
+            DojoConnector.SkipMove(DojoGameManager.Instance.LocalAccount);
+        }
+
+        private void SkipOpponentTurnLocally()
+        {
+            if(_currentPlayer != _remotePlayer) return;
+            string id = "0x0";
+            string playerId = _remotePlayer.PlayerId;
+            string prevMoveId = _sessionContext.Board.LastMoveId;
+            string boardId = _sessionContext.Board.Id;
+            ulong timestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            Skipped skipped = new Skipped(id, playerId, prevMoveId, boardId, timestamp);
+            OnSkipped(skipped);
+            BoardUpdated data = new BoardUpdated().SetData(_sessionContext.Board);
+            OnBoardUpdate(data);
         }
 
         
@@ -186,6 +219,15 @@ namespace TerritoryWars.Managers.SessionComponents
             return currentTurnSide;
         }
 
+        private ulong GetTimerTimestamp()
+        {
+            ulong wholeTurnDuration = (ulong)GameConfiguration.TurnDuration * GameConfiguration.PassingTurnDuration;
+            ulong currentTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            ulong lastTimestamp = _sessionContext.Board.LastUpdateTimestamp;
+            ulong delta = currentTimestamp - lastTimestamp;
+            return lastTimestamp + wholeTurnDuration * (delta / wholeTurnDuration);
+        }
+
         private ushort GetTurnCount(ulong lastTimestamp)
         {
             ushort moveDuration = GameConfiguration.TurnDuration;
@@ -201,10 +243,11 @@ namespace TerritoryWars.Managers.SessionComponents
         public void Dispose()
         {
             EventBus.Unsubscribe<TurnEndData>(OnTurnEnd);
-            EventBus.Unsubscribe<BoardUpdated>(BoardUpdate);
-            EventBus.Unsubscribe<Moved>(Moved);
-            EventBus.Unsubscribe<Skipped>(Skipped);
+            EventBus.Unsubscribe<BoardUpdated>(OnBoardUpdate);
+            EventBus.Unsubscribe<Moved>(OnMoved);
+            EventBus.Unsubscribe<Skipped>(OnSkipped);
             EventBus.Unsubscribe<ClientInput>(OnLocalFinishTurn);
+            EventBus.Unsubscribe<TimerEvent>(OnTimerEvent);
         }
     }
 

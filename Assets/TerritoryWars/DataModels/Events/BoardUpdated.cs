@@ -66,5 +66,19 @@ namespace TerritoryWars.DataModels.Events
             GameState = (BoardState)boardUpdated.game_state.Unwrap();
             return this;
         }
+
+        public BoardUpdated SetData(Board board)
+        {
+            Id = board.Id;
+            AvailableTilesInDeck = board.AvailableTilesInDeck;
+            TopTile = board.TopTile;
+            Tiles = board.Tiles;
+            Player1 = board.Player1;
+            Player2 = board.Player2;
+            LastMoveId = board.LastMoveId;
+            GameState = board.GameState;
+            return this;
+            
+        }
     }
 }
