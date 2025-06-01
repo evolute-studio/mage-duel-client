@@ -35,8 +35,8 @@ namespace TerritoryWars.Bots
                 return _player.PlayerSide;
             }
         }
-        
-        private Player _player 
+
+        private Player _player
         {
             get
             {
@@ -49,9 +49,8 @@ namespace TerritoryWars.Bots
         {
         }
 
-        public virtual async void ExecuteLogic()
+        public virtual void ExecuteLogic()
         {
-            await Task.Delay(3000);
             if (Bot.IsDebug)
             {
                 Bot.DebugModule.Recalculate();
@@ -67,7 +66,7 @@ namespace TerritoryWars.Bots
             bool hasJokers = _player.JokerCount > 0;
             return !isJoker || !hasJokers;
         }
-        
+
         public float GetJokerChance()
         {
             float k = 4f;
@@ -95,7 +94,7 @@ namespace TerritoryWars.Bots
                 MakeJokerMove();
             }
         }
-        
+
         public void MakeSimpleMove()
         {
             (TileData tileData, ValidPlacement validPlacement) = SelectMoveVariant();
@@ -112,7 +111,7 @@ namespace TerritoryWars.Bots
             }
             PlaceTile(tileData, validPlacement, false);
         }
-        
+
         public void MakeJokerMove()
         {
             (TileData tileData, ValidPlacement validPlacement) = GetJokerMoveVariant();
@@ -129,13 +128,13 @@ namespace TerritoryWars.Bots
         {
             Bot.InputModule.PlaceTile(tileData, validPlacement, isJoker);
         }
-        
+
         public void SkipMove()
         {
             DojoConnector.SkipMove(Bot.Account);
         }
-        
-        
+
+
 
         public (TileData, ValidPlacement) GetJokerMoveVariant()
         {
@@ -187,7 +186,7 @@ namespace TerritoryWars.Bots
             var result = moves.OrderByDescending(x => x.Value).First();
             return result.Key;
         }
-        
+
         public Dictionary<ValidPlacement, float> EvaluateAllMoves(TileData tileData, List<ValidPlacement> validPlacements)
         {
             Dictionary<ValidPlacement, float> moves = new Dictionary<ValidPlacement, float>();
@@ -197,7 +196,7 @@ namespace TerritoryWars.Bots
             }
             return moves;
         }
-        
+
         public Dictionary<ValidPlacement, float> EvaluateAllJokerMoves(Dictionary<ValidPlacement, TileData> jokers)
         {
             Dictionary<ValidPlacement, float> moves = new Dictionary<ValidPlacement, float>();
@@ -223,10 +222,10 @@ namespace TerritoryWars.Bots
             (float basicCityValue, float basicRoad) = EvaluateBasicValue(tile);
             float cityValue = basicCityValue;
             float roadValue = basicRoad;
-            
+
             List<evolute_duel_CityNode> processedCities = new List<evolute_duel_CityNode>();
             List<evolute_duel_RoadNode> processedRoads = new List<evolute_duel_RoadNode>();
-            
+
             for (int i = 0; i < 4; i++)
             {
                 char sideType = tile.RotatedConfig[i];
@@ -251,16 +250,16 @@ namespace TerritoryWars.Bots
             }
             return cityValue + roadValue;
         }
-        
+
         private (float cityValue, float roadValue) EvaluateBasicValue(TileData tileData)
         {
             float CITY_WEIGHT = 2f;
             float ROAD_WEIGHT = 1f;
-            
+
             int cityCount = tileData.Type.Count(c => c == 'C');
             int roadCount = tileData.Type.Count(c => c == 'R');
-            
-            return (cityCount * CITY_WEIGHT, + roadCount * ROAD_WEIGHT);
+
+            return (cityCount * CITY_WEIGHT, +roadCount * ROAD_WEIGHT);
         }
 
         private float EvaluateStructure<T>(KeyValuePair<T, List<T>> kvp) where T : class
@@ -270,7 +269,7 @@ namespace TerritoryWars.Bots
 
             INode structure = kvp.Key as INode;
             if (structure == null) return 0;
-            
+
             int bluePoints = structure.GetBluePoints();
             int redPoints = structure.GetRedPoints();
             int openEdges = structure.GetOpenEdges();

@@ -7,7 +7,7 @@ namespace TerritoryWars.DataModels.Events
     public struct Moved
     {
         public bool IsNull => String.IsNullOrEmpty(Id);
-        
+
         public string Id;
         public string PlayerId;
         public string PrevMoveId;
@@ -16,7 +16,7 @@ namespace TerritoryWars.DataModels.Events
         public string BoardId;
         public string FirstBoardId;
         public ulong Timestamp;
-        
+
         public bool IsSkip()
         {
             return String.IsNullOrEmpty(tileModel.Type);
