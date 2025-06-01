@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
@@ -48,8 +49,9 @@ namespace TerritoryWars.Bots
         {
         }
 
-        public virtual void ExecuteLogic()
+        public virtual async void ExecuteLogic()
         {
+            await Task.Delay(3000);
             if (Bot.IsDebug)
             {
                 Bot.DebugModule.Recalculate();

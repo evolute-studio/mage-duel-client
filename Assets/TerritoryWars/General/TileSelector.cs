@@ -164,7 +164,7 @@ namespace TerritoryWars.General
             gameUI.UpdateUI();
         }
 
-        private void ShowPossiblePlacements(List<ValidPlacement> placements)
+        public void ShowPossiblePlacements(List<ValidPlacement> placements)
         {
             ClearHighlights();
             foreach (var placement in placements)

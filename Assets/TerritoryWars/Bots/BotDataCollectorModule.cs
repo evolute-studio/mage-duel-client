@@ -57,6 +57,7 @@ namespace TerritoryWars.Bots
             }
             CurrentTile = new TileData(new TileModel(OnChainBoardDataConverter.GetTopTile(BoardModel.top_tile)));
             CurrentValidPlacements = Board.GetValidPlacements(CurrentTile);
+            SessionManager.Instance.TileSelector.ShowPossiblePlacements(CurrentValidPlacements);
         }
 
         public void CollectJokerData()
