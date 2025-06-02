@@ -221,7 +221,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private ulong GetTimerTimestamp()
         {
-            ulong wholeTurnDuration = (ulong)GameConfiguration.TurnDuration * GameConfiguration.PassingTurnDuration;
+            ulong wholeTurnDuration = (ulong)GameConfiguration.TurnDuration + GameConfiguration.PassingTurnDuration;
             ulong currentTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
             ulong lastTimestamp = _sessionContext.Board.LastUpdateTimestamp;
             ulong delta = currentTimestamp - lastTimestamp;
