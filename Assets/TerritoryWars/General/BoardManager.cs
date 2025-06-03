@@ -187,7 +187,7 @@ namespace TerritoryWars.General
 
             if ((x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
             {
-                TryConnectEdgeStructure(tile.PlayerSide, x, y);
+                TryConnectEdgeStructure(tile.PlayerSide, x, y, StructureType.None, false, false, true);
                 //if (isConnected)
                 //{
                 //    ConnectEdgeStructureAnimation(tile.PlayerSide, tile, x, y);
@@ -257,20 +257,22 @@ namespace TerritoryWars.General
 
         public void CheckAndConnectEdgeStructure(int ownerId, int x, int y, StructureType type, bool isCityContest = false, bool isRoadContest = false)
         {
+            CustomLogger.LogImportant($"[CheckAndConnectEdgeStructure] OwnerId: {ownerId}, Position: ({x}, {y}), Type: {type}, IsCityContest: {isCityContest}, IsRoadContest: {isRoadContest}");
             if( (x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
             {
-                TryConnectEdgeStructure(ownerId, x, y, type, isCityContest, isRoadContest);
+                CustomLogger.LogImportant($"[CheckAndConnectEdgeStructure] Attempting to connect edge structure at ({x}, {y})");
+                TryConnectEdgeStructure(ownerId, x, y, type, isCityContest, isRoadContest, false);
             }
         }
 
-        public void ConnectEdgeStructureAnimation(int ownerId, TileData tileData, int x, int y, bool isCityContest = false, bool isRoadContest = false)
+        public void ConnectEdgeStructureAnimation(int ownerId, TileData tileData, int x, int y, bool isCityContest = false, bool isRoadContest = false, bool isPlacing = false)
         {
-            if (isCityContest || isRoadContest || !SessionManager.Instance.IsInitialized) return;
+            if (isCityContest || isRoadContest || !isPlacing| !SessionManager.Instance.IsInitialized) return;
             FloatingTextAnimation(new Vector2Int(x, y));
             ScoreClientPrediction(ownerId, tileData);
         }
 
-        private bool TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.None, bool isCityContest = false, bool isRoadContest = false)
+        private bool TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.None, bool isCityContest = false, bool isRoadContest = false, bool isPlacing = false)
         {
             bool result = false;
             GameObject[] neighborsGO = new GameObject[4];
@@ -297,7 +299,7 @@ namespace TerritoryWars.General
                 if (IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
                     if (owner != 3) neighborsData[i].SetOwner(owner);
-                    ConnectEdgeStructureAnimation(owner, neighborsData[i], tilePositions[i][0], tilePositions[i][1], isCityContest, isRoadContest);
+                    ConnectEdgeStructureAnimation(owner, neighborsData[i], tilePositions[i][0], tilePositions[i][1], isCityContest, isRoadContest, isPlacing);
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.None || type == StructureType.City)
                     {

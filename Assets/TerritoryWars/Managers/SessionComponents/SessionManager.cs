@@ -103,11 +103,16 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             SessionContext.LocalPlayerAddress = DojoGameManager.Instance.LocalAccount.Address.Hex();
             GameModel game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
-            if (game.IsNull)
+            if (game.IsNull || game.BoardId == null)
             {
-                CustomLogger.LogError("[SessionManager.SetupData] - Game is null");
-                CustomSceneManager.Instance.ForceLoadScene(CustomSceneManager.Instance.Menu);
-                return;
+                CustomLogger.LogWarning("[SessionManager.SetupData] - Game is null or BoardId is null");
+                await Coroutines.CoroutineAsync(() => { }, 1f);
+                game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
+                if (game.BoardId == null)
+                {
+                    CustomLogger.LogError("[SessionManager.SetupData] - Game is still null or BoardId is null after retry");
+                    CustomSceneManager.Instance.ForceLoadScene(CustomSceneManager.Instance.Menu);
+                }
             }
             SessionContext.Game = game;
             CustomLogger.LogObject(SessionContext.Game, "Game");
