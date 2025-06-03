@@ -15,7 +15,7 @@ namespace TerritoryWars.Managers.SessionComponents
     {
         private SessionManagerContext _managerContext;
         
-        private ContestProcessor _contestProcessor = new ContestProcessor();
+        public ContestProcessor ContestProcessor = new ContestProcessor();
         
         public void Initialize(SessionManagerContext managerContext)
         {
@@ -25,7 +25,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void OnContest(Contested contest)
         {
-            _contestProcessor.AddModel(new ContestInformation(contest.Position, contest.Side, contest.Type,() =>
+            ContestProcessor.AddModel(new ContestInformation(contest.Position, contest.Side, contest.Type,() =>
             {
                 ContestAnimation(contest, RecolorStructures);
             }));

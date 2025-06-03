@@ -107,7 +107,7 @@ namespace TerritoryWars.General
                     break;
 
                 case evolute_duel_InvalidMove invalidMove:
-                    if (_globalContext.PlayerProfile.PlayerId != invalidMove.player.Hex())
+                    if (_globalContext.SessionContext.IsPlayerInSession(invalidMove.player.Hex()))
                     {
                         CustomLogger.LogEventsAll($"[EventHandler] | {nameof(invalidMove)}");
                         return;

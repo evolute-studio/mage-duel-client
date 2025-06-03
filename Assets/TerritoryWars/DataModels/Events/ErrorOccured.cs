@@ -5,7 +5,7 @@ namespace TerritoryWars.DataModels.Events
     [Serializable]
     public struct ErrorOccured
     {
-        public string ErrorType;
+        public ServerErrorType ErrorType;
         public string Player;
         // InvalidMove
         public string MoveId;
@@ -14,7 +14,7 @@ namespace TerritoryWars.DataModels.Events
         
         public ErrorOccured SetData(evolute_duel_InvalidMove invalidMove)
         {
-            ErrorType = "InvalidMove";
+            ErrorType = ServerErrorType.InvalidMove;
             MoveId = invalidMove.move_id.Hex();
             Player = invalidMove.player.Hex();
             return this;
@@ -22,10 +22,17 @@ namespace TerritoryWars.DataModels.Events
         
         public ErrorOccured SetData(evolute_duel_NotYourTurn notYourTurn)
         {
-            ErrorType = "NotYourTurn";
+            ErrorType = ServerErrorType.NotYourTurn;
             Player = notYourTurn.player_id.Hex();
             board_id = notYourTurn.board_id.Hex();
             return this;
         }
+    }
+    
+    [Serializable]
+    public enum ServerErrorType
+    {
+        InvalidMove,
+        NotYourTurn
     }
 }

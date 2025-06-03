@@ -11,6 +11,7 @@ using TerritoryWars.General;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using TerritoryWars.UI.Popups;
 using UnityEngine;
 
 namespace TerritoryWars.Managers.SessionComponents
@@ -39,6 +40,8 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Subscribe<ClientInput>(OnLocalFinishTurn);
             EventBus.Subscribe<TimerEvent>(OnTimerEvent);
             EventBus.Subscribe<UnionFind>(OnUnionFind);
+            EventBus.Subscribe<GameFinished>(OnEndGame);
+            EventBus.Subscribe<ErrorOccured>(OnError);
             EventBus.Subscribe<TurnEndData>(OnTurnEnd);
         }
 
@@ -263,7 +266,40 @@ namespace TerritoryWars.Managers.SessionComponents
             StartTurn();
         }
 
-        public void EndGame() { }
+        public void OnEndGame(GameFinished gameFinished)
+        {
+            _managerContext.ContestManager.ContestProcessor.SetGameFinished(true);
+            SessionManagerOld.Instance.StructureHoverManager.IsGameFinished = true;
+            CustomLogger.LogExecution($"[GameFinished]");
+            FinishGameContests.FinishGameAction = () =>
+            {
+                Coroutines.StartRoutine(GameFinishedDelayed());
+            };
+        }
+
+        public void OnError(ErrorOccured error)
+        {
+            var errorType = error.ErrorType;
+            switch (errorType)
+            {
+                case ServerErrorType.InvalidMove:
+                    PopupManager.Instance.ShowInvalidMovePopup();
+                    break;
+                case ServerErrorType.NotYourTurn:
+                    PopupManager.Instance.NotYourTurnPopup();
+                    break;
+            }
+
+            CustomLogger.LogError($"[{errorType}] | Player: {error.Player}");
+        }
+
+        private IEnumerator GameFinishedDelayed()
+        {
+            yield return new WaitForSeconds(2f);
+            SimpleStorage.ClearCurrentBoardId();
+            GameUI.Instance.ShowResultPopUp();
+        }
+        
 
         private bool CheckGameStatus()
         {
@@ -335,6 +371,8 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Unsubscribe<ClientInput>(OnLocalFinishTurn);
             EventBus.Unsubscribe<UnionFind>(OnUnionFind);
             EventBus.Unsubscribe<TimerEvent>(OnTimerEvent);
+            EventBus.Unsubscribe<GameFinished>(OnEndGame);
+            EventBus.Unsubscribe<ErrorOccured>(OnError);
         }
     }
 
