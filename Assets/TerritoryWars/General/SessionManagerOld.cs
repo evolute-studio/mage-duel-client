@@ -131,7 +131,7 @@ namespace TerritoryWars.General
 
         private void FinishGame()
         {
-            // DojoConnector.FinishGame(DojoGameManager.Instance.LocalAccount,
+            //DojoConnector.FinishGame(DojoGameManager.Instance.LocalAccount,
             //     DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard.id);
         }
 
