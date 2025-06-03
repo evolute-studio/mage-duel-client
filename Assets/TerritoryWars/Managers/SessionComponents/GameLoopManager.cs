@@ -14,12 +14,12 @@ using UnityEngine;
 
 namespace TerritoryWars.Managers.SessionComponents
 {
-    public class GameLoopManager: ISessionComponent
+    public class GameLoopManager : ISessionComponent
     {
         private SessionManagerContext _managerContext;
         private SessionContext _sessionContext => _managerContext.SessionContext;
         private TurnEndData _turnEndData = new TurnEndData();
-        
+
         private Player _currentPlayer
         {
             get { return _sessionContext.CurrentTurnPlayer; }
@@ -43,7 +43,7 @@ namespace TerritoryWars.Managers.SessionComponents
         public async void StartGame()
         {
             Board board = _sessionContext.Board;
-            if(board.IsNull)
+            if (board.IsNull)
             {
                 CustomLogger.LogError("GameLoopManager: Board is null or not initialized.");
                 return;
@@ -51,21 +51,39 @@ namespace TerritoryWars.Managers.SessionComponents
             byte whoseTurnSide = await WhoseTurn();
             //byte convertedSide = (byte)SetLocalPlayerData.GetLocalIndex(whoseTurnSide);
             _currentPlayer = _sessionContext.Players[whoseTurnSide];
-            
+
+            if (!CheckGameStatus())
+            {
+                FinishGame();
+                return;
+            }
+
             StartTurn();
+        }
+
+        private void FinishGame()
+        {
+            DojoConnector.FinishGame(DojoGameManager.Instance.LocalAccount,
+                DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard.id);
         }
 
         private void StartTurn()
         {
+            if (!CheckGameStatus())
+            {
+                FinishGame();
+                return;
+            }
+
             CustomLogger.LogDojoLoop("StartTurn");
             EventBus.Publish(new TimerEvent(TimerEventType.Started, GetTimerTimestamp()));
-            
+
             string currentTile = _sessionContext.Board.TopTile;
             TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
             _managerContext.TileSelector.tilePreview.UpdatePreview(tileData);
-            
-            if(_currentPlayer == _localPlayer) StartLocalTurn();
-            if(_currentPlayer == _remotePlayer) StartRemoteTurn();
+
+            if (_currentPlayer == _localPlayer) StartLocalTurn();
+            if (_currentPlayer == _remotePlayer) StartRemoteTurn();
         }
 
         private void StartLocalTurn()
@@ -75,7 +93,7 @@ namespace TerritoryWars.Managers.SessionComponents
             string currentTile = _sessionContext.Board.TopTile;
             TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
             _managerContext.TileSelector.StartTilePlacement(tileData);
-            
+
             GameUI.Instance.SetEndTurnButtonActive(false);
             GameUI.Instance.SetRotateButtonActive(false);
             GameUI.Instance.SetSkipTurnButtonActive(true);
@@ -85,12 +103,12 @@ namespace TerritoryWars.Managers.SessionComponents
                 DojoGameManager.Instance.LocalBotAsPlayer.MakeMove();
             }
         }
-        
+
         private void StartRemoteTurn()
         {
             CustomLogger.LogDojoLoop("StartRemoteTurn");
             _remotePlayer.StartSelectingAnimation();
-            
+
             if (_sessionContext.IsGameWithBot || _sessionContext.IsGameWithBotAsPlayer)
             {
                 DojoGameManager.Instance.LocalBot.MakeMove();
@@ -114,8 +132,8 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             if (data.PlayerId != _localPlayer.PlayerId)
             {
-                 TileData tileData = new TileData(data.tileModel);
-                _managerContext.BoardManager.PlaceTile(tileData); 
+                TileData tileData = new TileData(data.tileModel);
+                _managerContext.BoardManager.PlaceTile(tileData);
             }
 
             _sessionContext.Board.UpdateTimestamp(data.Timestamp);
@@ -127,15 +145,15 @@ namespace TerritoryWars.Managers.SessionComponents
             if (data.PlayerId != _localPlayer.PlayerId)
             {
                 _currentPlayer.PlaySkippedBubbleAnimation();
-            } 
-            
+            }
+
             _sessionContext.Board.UpdateTimestamp(data.Timestamp);
             _turnEndData.SetSkipped(ref data);
         }
 
         private void OnLocalFinishTurn(ClientInput input)
         {
-            
+
             switch (input.Type)
             {
                 case ClientInput.InputType.Skip: SkipLocalTurn(); break;
@@ -157,7 +175,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void FinishLocalTurn()
         {
-          
+
             if (_managerContext.TileSelector.CurrentTile != null && _currentPlayer == _localPlayer)
             {
                 _managerContext.TileSelector.PlaceCurrentTile();
@@ -166,15 +184,15 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void SkipLocalTurn()
         {
-            if(_currentPlayer != _localPlayer) return;
-            GameUI.Instance.SetJokerMode(false);    
+            if (_currentPlayer != _localPlayer) return;
+            GameUI.Instance.SetJokerMode(false);
             _managerContext.TileSelector.EndTilePlacement();
             DojoConnector.SkipMove(DojoGameManager.Instance.LocalAccount);
         }
 
         private void SkipOpponentTurnLocally()
         {
-            if(_currentPlayer != _remotePlayer) return;
+            if (_currentPlayer != _remotePlayer) return;
             string id = "0x0";
             string playerId = _remotePlayer.PlayerId;
             string prevMoveId = _sessionContext.Board.LastMoveId;
@@ -186,8 +204,8 @@ namespace TerritoryWars.Managers.SessionComponents
             OnBoardUpdate(data);
         }
 
-        
-        
+
+
         public void OnTurnEnd(TurnEndData turnEndData)
         {
             CustomLogger.LogDojoLoop("OnTurnEnd");
@@ -195,13 +213,35 @@ namespace TerritoryWars.Managers.SessionComponents
             _currentPlayer.EndTurnAnimation();
             _turnEndData.Reset();
             byte nextTurnSide = (byte)((_currentPlayer.PlayerSide + 1) % 2);
-            _currentPlayer = _sessionContext.Players[nextTurnSide]; 
+            _currentPlayer = _sessionContext.Players[nextTurnSide];
             StartTurn();
         }
-        
+
         public void EndGame() { }
-        
-        
+
+        private bool CheckGameStatus()
+        {
+            int turns = GetTurnGoneCount();
+            if (turns >= 2)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private int GetTurnGoneCount()
+        {
+            Board board = _sessionContext.Board;
+            if (board.LastUpdateTimestamp == 0)
+            {
+                return 0;
+            }
+            ulong currentTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            ulong elapsedTime = currentTimestamp - board.LastUpdateTimestamp;
+            ulong turnDuration = (ulong)GameConfiguration.TurnDuration + GameConfiguration.PassingTurnDuration;
+            return (int)(elapsedTime / turnDuration);
+        }
+
         private async Task<byte> WhoseTurn()
         {
             Board board = _sessionContext.Board;
@@ -231,7 +271,7 @@ namespace TerritoryWars.Managers.SessionComponents
         private ushort GetTurnCount(ulong lastTimestamp)
         {
             ushort moveDuration = GameConfiguration.TurnDuration;
-            ulong currentTimestamp = (ulong) (System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
+            ulong currentTimestamp = (ulong)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
             if (lastTimestamp == 0)
             {
                 return 0;
@@ -256,26 +296,26 @@ namespace TerritoryWars.Managers.SessionComponents
         public BoardUpdated BoardUpdated;
         public Moved Moved;
         public Skipped Skipped;
-        
+
 
         public void SetBoardUpdated(ref BoardUpdated boardUpdated)
         {
             BoardUpdated = boardUpdated;
             IsTurnEnded();
         }
-        
+
         public void SetMoved(ref Moved moved)
         {
             Moved = moved;
             IsTurnEnded();
         }
-        
+
         public void SetSkipped(ref Skipped skipped)
         {
             Skipped = skipped;
             IsTurnEnded();
         }
-        
+
         public void Reset()
         {
             BoardUpdated = default;

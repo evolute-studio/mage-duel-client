@@ -16,7 +16,7 @@ namespace TerritoryWars.Managers.SessionComponents
     public class SessionManager : MonoBehaviour
     {
         public static SessionManager Instance { get; private set; }
-        
+
         public void Awake()
         {
             if (Instance == null)
@@ -31,23 +31,23 @@ namespace TerritoryWars.Managers.SessionComponents
 
             if (!CustomSceneManager.Instance.LoadingScreen.IsLoading)
             {
-                CustomSceneManager.Instance.LoadingScreen.SetActive(true, 
-                    () => DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount), 
+                CustomSceneManager.Instance.LoadingScreen.SetActive(true,
+                    () => DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount),
                     LoadingScreen.connectingText);
             }
         }
 
         public bool IsLocalPlayerHost = true;
-        
+
         public SessionContext SessionContext = new SessionContext();
         public SessionManagerContext ManagerContext { get; private set; }
         private List<ISessionComponent> _components;
         public bool IsInitialized = false;
-        
+
         [Header("Dependencies")]
         public BoardManager BoardManager;
         public TileSelector TileSelector;
-        
+
 
         private async void Start()
         {
@@ -61,7 +61,12 @@ namespace TerritoryWars.Managers.SessionComponents
             GameUI.Instance.Initialize();
             GameUI.Instance.playerInfoUI.Initialize();
             GameUI.Instance.playerInfoUI.UpdateData(SessionContext.PlayersData);
+            GameUI.Instance.playerInfoUI.SetDeckCount(SessionContext.Board.AvailableTilesInDeck.Length);
+
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
+
+
+
             ManagerContext.GameLoopManager.StartGame();
             IsInitialized = true;
         }
@@ -74,7 +79,7 @@ namespace TerritoryWars.Managers.SessionComponents
             var playersManager = new PlayersManager();
             var gameLoopManager = new GameLoopManager();
             var jokerManager = new JokerManager();
-            
+
 
             ManagerContext.SessionContext = SessionContext;
             ManagerContext.SessionManager = this;
@@ -86,7 +91,7 @@ namespace TerritoryWars.Managers.SessionComponents
             _components.Add(gameLoopManager);
             _components.Add(jokerManager);
         }
-        
+
         public async Task SetupData()
         {
             SessionContext.LocalPlayerAddress = DojoGameManager.Instance.LocalAccount.Address.Hex();
@@ -115,19 +120,19 @@ namespace TerritoryWars.Managers.SessionComponents
             PlayerProfile player2 = await DojoLayer.Instance.GetPlayerProfile(board.Player2.PlayerId);
             SessionContext.PlayersData[0].SetData(player1);
             SessionContext.PlayersData[1].SetData(player2);
-            
+
             SessionContext.IsGameWithBot = DojoGameManager.Instance.DojoSessionManager.IsGameWithBot;
             SessionContext.IsGameWithBotAsPlayer = DojoGameManager.Instance.DojoSessionManager.IsGameWithBotAsPlayer;
-            
+
             DojoGameManager.Instance.GlobalContext.SessionContext = SessionContext;
         }
-        
+
         private void InitializeBoard()
         {
             var board = SessionContext.Board;
             BoardManager.Initialize(board);
         }
-        
+
         private void OnDestroy()
         {
             DojoGameManager.Instance.GlobalContext.SessionContext = null;
