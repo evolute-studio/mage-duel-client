@@ -221,6 +221,7 @@ namespace TerritoryWars.General
 
         private IEnumerator PlaceTileCoroutine(int playerIndex, Action callback = null)
         {
+            CustomLogger.LogImportant("TilePreview: Placing tile");
             if (!gameObject.activeSelf) yield break;
             // shake animation Y
             transform.DOShakePosition(0.5f, 0.1f, 18, 45, false, true);
@@ -328,6 +329,7 @@ namespace TerritoryWars.General
 
         public void ResetPosition(TilePlaced data = default)
         {
+            CustomLogger.LogImportant("TilePreview: Resetting position");
             currentTween?.Kill();
             // currentTween = transform
             //     .DOMove(_initialPosition, moveDuration)

@@ -163,8 +163,12 @@ namespace TerritoryWars.Managers.SessionComponents
             {
                 TileData tileData = new TileData(data.tileModel);
                 //_managerContext.BoardManager.PlaceTile(tileData);
-                
+
                 Coroutines.StartRoutine(HandleOpponentMoveCoroutine(tileData));
+            }
+            else
+            {
+                _turnEndData.OnTilePlaced();
             }
 
             _sessionContext.Board.UpdateTimestamp(data.Timestamp);
@@ -174,11 +178,13 @@ namespace TerritoryWars.Managers.SessionComponents
         private IEnumerator HandleOpponentMoveCoroutine(TileData tile)
         {
             _managerContext.TileSelector.SetCurrentTile(tile);
+            CustomLogger.LogImportant("HandleOpponentMoveCoroutine: Placing tile ");
             _managerContext.TileSelector.tilePreview.SetPosition(tile.Position);
             yield return new WaitForSeconds(0.3f);
             _managerContext.TileSelector.tilePreview.PlaceTile(tile, () =>
             {
                 _managerContext.BoardManager.PlaceTile(tile);
+                _turnEndData.OnTilePlaced();
             });
             yield return new WaitForSeconds(0.5f);
             _currentPlayer.EndTurnAnimation();
@@ -388,6 +394,8 @@ namespace TerritoryWars.Managers.SessionComponents
         public BoardUpdated BoardUpdated;
         public Moved Moved;
         public Skipped Skipped;
+
+        public bool IsMoveDone;
         public void SetBoardUpdated(ref BoardUpdated boardUpdated)
         {
             BoardUpdated = boardUpdated;
@@ -397,6 +405,12 @@ namespace TerritoryWars.Managers.SessionComponents
         public void SetMoved(ref Moved moved)
         {
             Moved = moved;
+            IsTurnEnded();
+        }
+
+        public void OnTilePlaced()
+        {
+            IsMoveDone = true;
             IsTurnEnded();
         }
 
@@ -411,11 +425,16 @@ namespace TerritoryWars.Managers.SessionComponents
             BoardUpdated = default;
             Moved = default;
             Skipped = default;
+            IsMoveDone = false;
         }
 
         public void IsTurnEnded()
         {
-            if (!BoardUpdated.IsNull && (!Moved.IsNull || !Skipped.IsNull))
+            bool isBoardUpdated = !BoardUpdated.IsNull;
+            bool isMoved = !Moved.IsNull;
+            bool isSkipped = !Skipped.IsNull;
+            bool isTilePlaced = isMoved && IsMoveDone;
+            if (isBoardUpdated && (isSkipped || isTilePlaced))
             {
                 EventBus.Publish(this);
                 Reset();
