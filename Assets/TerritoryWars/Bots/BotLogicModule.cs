@@ -219,39 +219,22 @@ namespace TerritoryWars.Bots
             TileData tile = new TileData(tileModel);
             tile.Rotate(validPlacement.rotation);
 
-            (float basicCityValue, float basicRoad) = EvaluateBasicValue(tile);
-            float cityValue = basicCityValue;
-            float roadValue = basicRoad;
+            float value = EvaluateBasicValue(tile);
 
-            List<evolute_duel_CityNode> processedCities = new List<evolute_duel_CityNode>();
-            List<evolute_duel_RoadNode> processedRoads = new List<evolute_duel_RoadNode>();
+            List<Structure> processedStructures = new List<Structure>();
 
             for (int i = 0; i < 4; i++)
             {
-                char sideType = tile.RotatedConfig[i];
-                if (sideType == 'C')
-                {
-                    var citySet =
-                        DojoSessionManager.GetNearSetByPositionAndSide<evolute_duel_CityNode>(
-                            new Vector2Int(validPlacement.x, validPlacement.y), (Side)i);
-                    if (citySet.Key == null || processedCities.Contains(citySet.Key)) continue;
-                    cityValue += EvaluateStructure(citySet);
-                    processedCities.Add(citySet.Key);
-                }
-                if (sideType == 'R')
-                {
-                    var roadSet =
-                        DojoSessionManager.GetNearSetByPositionAndSide<evolute_duel_RoadNode>(
-                            new Vector2Int(validPlacement.x, validPlacement.y), (Side)i);
-                    if (roadSet.Key == null || processedRoads.Contains(roadSet.Key)) continue;
-                    roadValue += EvaluateStructure(roadSet);
-                    processedRoads.Add(roadSet.Key);
-                }
+                var mightyStructurePosition = BoardManager.GetNearTileSide(new Vector2Int(validPlacement.x, validPlacement.y), (Side)i);
+                var structure = SessionManager.Instance.SessionContext.UnionFind.GetStructureByNode(mightyStructurePosition.Item1, mightyStructurePosition.Item2);
+                if (!structure.HasValue) continue;
+                value += EvaluateStructure(structure.Value);
+                processedStructures.Add(structure.Value);
             }
-            return cityValue + roadValue;
+            return value;
         }
 
-        private (float cityValue, float roadValue) EvaluateBasicValue(TileData tileData)
+        private float EvaluateBasicValue(TileData tileData)
         {
             float CITY_WEIGHT = 2f;
             float ROAD_WEIGHT = 1f;
@@ -259,20 +242,17 @@ namespace TerritoryWars.Bots
             int cityCount = tileData.Type.Count(c => c == 'C');
             int roadCount = tileData.Type.Count(c => c == 'R');
 
-            return (cityCount * CITY_WEIGHT, +roadCount * ROAD_WEIGHT);
+            return cityCount * CITY_WEIGHT + roadCount * ROAD_WEIGHT;
         }
 
-        private float EvaluateStructure<T>(KeyValuePair<T, List<T>> kvp) where T : class
+        private float EvaluateStructure(Structure structure)
         {
             const float OPEN_EDGE_WEIGHT = 0.5f;
             const float POINTS_WEIGHT = 1f;
 
-            INode structure = kvp.Key as INode;
-            if (structure == null) return 0;
-
-            int bluePoints = structure.GetBluePoints();
-            int redPoints = structure.GetRedPoints();
-            int openEdges = structure.GetOpenEdges();
+            int bluePoints = structure.Points[0];
+            int redPoints = structure.Points[1];
+            int openEdges = structure.OpenEdges;
 
             int myPoints = SessionSideId == 0 ? bluePoints : redPoints;
             int enemyPoints = SessionSideId == 0 ? redPoints : bluePoints;

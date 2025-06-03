@@ -101,31 +101,34 @@ namespace TerritoryWars.Managers.SessionComponents
 
         public async Task SetupData()
         {
+            CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Starting SetupData");
             SessionContext.LocalPlayerAddress = DojoGameManager.Instance.LocalAccount.Address.Hex();
             GameModel game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
             if (game.IsNull || game.BoardId == null)
             {
-                CustomLogger.LogWarning("[SessionManager.SetupData] - Game is null or BoardId is null");
+                CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game is null or BoardId is null. Retrying...");
                 await Coroutines.CoroutineAsync(() => { }, 1f);
                 game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
                 if (game.BoardId == null)
                 {
-                    CustomLogger.LogError("[SessionManager.SetupData] - Game is still null or BoardId is null after retry");
+                    CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game is still null or BoardId is null after retry. Redirecting to menu.");
                     CustomSceneManager.Instance.ForceLoadScene(CustomSceneManager.Instance.Menu);
                 }
             }
             SessionContext.Game = game;
-            CustomLogger.LogObject(SessionContext.Game, "Game");
+            CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game retrieved successfully");
             Board board = await DojoLayer.Instance.GetBoard(SessionContext.Game.BoardId);
             //IncomingModelsFilter.AllowedBoards.Add("0x0000000000000000000000000000000000000000000000000000000000000038");
             //Board board = await DojoLayer.Instance.GetBoard("0x0000000000000000000000000000000000000000000000000000000000000038");
             if (board.IsNull)
             {
-                CustomLogger.LogError("[SessionManager.SetupData] - Board is null");
+                CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Board is null. Redirecting to menu.");
                 CustomSceneManager.Instance.ForceLoadScene(CustomSceneManager.Instance.Menu);
                 return;
             }
+            CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Board retrieved successfully");
             UnionFind unionFind = await DojoLayer.Instance.GetUnionFind(board.Id);
+            CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Union Find retrieved successfully");
 
             SessionContext.Board = board;
             SessionContext.UnionFind = unionFind;
@@ -133,7 +136,9 @@ namespace TerritoryWars.Managers.SessionComponents
             SessionContext.PlayersData[0] = board.Player1;
             SessionContext.PlayersData[1] = board.Player2;
             PlayerProfile player1 = await DojoLayer.Instance.GetPlayerProfile(board.Player1.PlayerId);
+            CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Player 1 retrieved successfully");
             PlayerProfile player2 = await DojoLayer.Instance.GetPlayerProfile(board.Player2.PlayerId);
+            CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Player 2 retrieved successfully");
             SessionContext.PlayersData[0].SetData(player1);
             SessionContext.PlayersData[1].SetData(player2);
 
@@ -141,6 +146,7 @@ namespace TerritoryWars.Managers.SessionComponents
             SessionContext.IsGameWithBotAsPlayer = DojoGameManager.Instance.DojoSessionManager.IsGameWithBotAsPlayer;
 
             DojoGameManager.Instance.GlobalContext.SessionContext = SessionContext;
+            CustomLogger.LogDojoLoop("[SessionManager.SetupData] - SessionContext initialized successfully");
         }
 
         private void InitializeBoard()

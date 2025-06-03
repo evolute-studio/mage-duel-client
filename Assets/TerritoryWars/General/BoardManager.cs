@@ -360,36 +360,7 @@ namespace TerritoryWars.General
             }
             return new Vector2Int(-1, -1);
         }
-
-        public void CloseAllStructures()
-        {
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    GameObject tile = GetTileObject(x, y);
-                    if (tile == null || tile.TryGetComponent(out TileGenerator tryGetTileGenerator)) continue;
-                    TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
-                    List<Side> sides = CheckCityTileSidesToEmpty(x, y);
-                    tileGenerator.FencePlacerForCloserToBorderCity(sides);
-                }
-            }
-        }
-
-        public void CloseCityStructure(byte root)
-        {
-            var city = DojoGameManager.Instance.DojoSessionManager.GetCityByPosition(root);
-
-            foreach (var node in city.Value)
-            {
-                Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
-                GameObject tile = GetTileObject(position.x, position.y);
-                if (tile == null || !tile.TryGetComponent(out TileGenerator tileGenerator)) continue;
-                List<Side> sides = CheckCityTileSidesToEmpty(position.x, position.y);
-                tileGenerator.FencePlacerForCloserToBorderCity(sides);
-            }
-        }
-
+        
         public List<Side> CheckCityTileSidesToBorder(int x, int y)
         {
             // returns list int of sides that are closer to the border 
@@ -748,6 +719,32 @@ namespace TerritoryWars.General
                 Side.None => Side.None,
                 //_ => throw new System.ArgumentException($"Invalid side: {side}")
             };
+        }
+        
+        public static (Vector2Int, Side) GetNearTileSide(Vector2Int position, Side side)
+        {
+            Vector2Int targetPosition = position;
+            Side targetSide = side;
+            switch (side)
+            {
+                case Side.Top:
+                    targetPosition = new Vector2Int(position.x + 1, position.y);
+                    targetSide = Side.Bottom;
+                    break;
+                case Side.Right:
+                    targetPosition = new Vector2Int(position.x, position.y - 1);
+                    targetSide = Side.Left;
+                    break;
+                case Side.Bottom:
+                    targetPosition = new Vector2Int(position.x - 1, position.y);
+                    targetSide = Side.Top;
+                    break;
+                case Side.Left:
+                    targetPosition = new Vector2Int(position.x, position.y + 1);
+                    targetSide = Side.Right;
+                    break;
+            }
+            return (targetPosition, targetSide);
         }
 
         public int GetXOffset(Side dir)

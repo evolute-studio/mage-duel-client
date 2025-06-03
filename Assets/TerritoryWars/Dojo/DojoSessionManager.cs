@@ -159,240 +159,206 @@ namespace TerritoryWars.Dojo
             return contestAnimation;
         }
 
-        private Dictionary<evolute_duel_CityNode, List<evolute_duel_CityNode>> cities;
-        private Dictionary<evolute_duel_RoadNode, List<evolute_duel_RoadNode>> roads;
+        // private Dictionary<evolute_duel_CityNode, List<evolute_duel_CityNode>> cities;
+        // private Dictionary<evolute_duel_RoadNode, List<evolute_duel_RoadNode>> roads;
+        //
+        // private void BuildCitySets()
+        // {
+        //     cities = new Dictionary<evolute_duel_CityNode, List<evolute_duel_CityNode>>();
+        //     var cityNodesList = GetCityNodes();
+        //     foreach (var cityNode in cityNodesList)
+        //     {
+        //         var root = GetCityRoot(cityNode);
+        //         if (!cities.ContainsKey(root))
+        //         {
+        //             cities[root] = new List<evolute_duel_CityNode>();
+        //         }
+        //
+        //         cities[root].Add(cityNode);
+        //     }
+        // }
+        //
+        // public KeyValuePair<T, List<T>> GetNearSetByPositionAndSide<T>(Vector2Int position, Side side)
+        //     where T : class
+        // {
+        //     (Vector2Int targetPosition, Side targetSide) = GetNearTileSide(position, side);
+        //     var root = OnChainBoardDataConverter.GetRootByPositionAndSide(targetPosition, targetSide);
+        //     
+        //     Dictionary<T, List<T>> targetDict;
+        //     if (typeof(T) == typeof(evolute_duel_CityNode))
+        //     {
+        //         // update cities
+        //         BuildCitySets();
+        //         targetDict = cities as Dictionary<T, List<T>>;
+        //     }
+        //     else if (typeof(T) == typeof(evolute_duel_RoadNode))
+        //     {
+        //         // update roads
+        //         BuildRoadSets();
+        //         targetDict = roads as Dictionary<T, List<T>>;
+        //     }
+        //     else
+        //     {
+        //         return new KeyValuePair<T, List<T>>();
+        //     }
+        //
+        //     foreach (var set in targetDict)
+        //     {
+        //         foreach (var node in set.Value)
+        //         {
+        //             INode iNode = node as INode;
+        //             if (iNode == null) continue;
+        //             byte nodePosition = iNode.GetPosition();
+        //             if (nodePosition == root)
+        //             {
+        //                 return set;
+        //             }
+        //         }
+        //     }
+        //
+        //     return new KeyValuePair<T, List<T>>();
+        // }
+        //
+        // public KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>> GetCityByPosition(Vector2Int position)
+        // {
+        //     byte[] roots = OnChainBoardDataConverter.GetRootsByPosition(position);
+        //     BuildCitySets();
+        //     foreach (var root in roots)
+        //     {
+        //         foreach (var set in cities)
+        //         {
+        //             foreach (var node in set.Value)
+        //             {
+        //                 INode iNode = node as INode;
+        //                 if (iNode == null) continue;
+        //                 byte nodePosition = iNode.GetPosition();
+        //                 if (nodePosition == root)
+        //                 {
+        //                     return set;
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     return new KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>>();
+        // }
+        //
+        // public KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>> GetCityByPosition(byte position)
+        // {
+        //     BuildCitySets();
+        //     foreach (var set in cities)
+        //     {
+        //         foreach (var node in set.Value)
+        //         {
+        //             INode iNode = node as INode;
+        //             if (iNode == null) continue;
+        //             byte nodePosition = iNode.GetPosition();
+        //             if (nodePosition == position)
+        //             {
+        //                 return set;
+        //             }
+        //         }
+        //     }
+        //     return new KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>>();
+        // }
+        //
+        // public KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>> GetRoadByPosition(Vector2Int position)
+        // {
+        //     byte[] roots = OnChainBoardDataConverter.GetRootsByPosition(position);
+        //     BuildRoadSets();
+        //     foreach (var root in roots)
+        //     {
+        //         foreach (var set in roads)
+        //         {
+        //             foreach (var node in set.Value)
+        //             {
+        //                 INode iNode = node as INode;
+        //                 if (iNode == null) continue;
+        //                 byte nodePosition = iNode.GetPosition();
+        //                 if (nodePosition == root)
+        //                 {
+        //                     return set;
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     return new KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>>();
+        // }
+        //
+        // public KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>> GetRoadByPosition(byte position)
+        // {
+        //     BuildRoadSets();
+        //     foreach (var set in roads)
+        //     {
+        //         foreach (var node in set.Value)
+        //         {
+        //             INode iNode = node as INode;
+        //             if (iNode == null) continue;
+        //             byte nodePosition = iNode.GetPosition();
+        //             if (nodePosition == position)
+        //             {
+        //                 return set;
+        //             }
+        //         }
+        //     }
+        //     return new KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>>();
+        // }
 
-        private void BuildCitySets()
-        {
-            cities = new Dictionary<evolute_duel_CityNode, List<evolute_duel_CityNode>>();
-            var cityNodesList = GetCityNodes();
-            foreach (var cityNode in cityNodesList)
-            {
-                var root = GetCityRoot(cityNode);
-                if (!cities.ContainsKey(root))
-                {
-                    cities[root] = new List<evolute_duel_CityNode>();
-                }
-
-                cities[root].Add(cityNode);
-            }
-        }
-
-        public KeyValuePair<T, List<T>> GetNearSetByPositionAndSide<T>(Vector2Int position, Side side)
-            where T : class
-        {
-            (Vector2Int targetPosition, Side targetSide) = GetNearTileSide(position, side);
-            var root = OnChainBoardDataConverter.GetRootByPositionAndSide(targetPosition, targetSide);
-            
-            Dictionary<T, List<T>> targetDict;
-            if (typeof(T) == typeof(evolute_duel_CityNode))
-            {
-                // update cities
-                BuildCitySets();
-                targetDict = cities as Dictionary<T, List<T>>;
-            }
-            else if (typeof(T) == typeof(evolute_duel_RoadNode))
-            {
-                // update roads
-                BuildRoadSets();
-                targetDict = roads as Dictionary<T, List<T>>;
-            }
-            else
-            {
-                return new KeyValuePair<T, List<T>>();
-            }
-            string dictContent = "";
-            foreach (var set in targetDict)
-            {
-                dictContent += "Root: " + set.Key + " | ";
-                foreach (var node in set.Value)
-                {
-                    INode iNode = node as INode;
-                    dictContent += $"\n {node} | {iNode.GetPosition()}";
-                }
-            }
-
-            foreach (var set in targetDict)
-            {
-                foreach (var node in set.Value)
-                {
-                    INode iNode = node as INode;
-                    if (iNode == null) continue;
-                    byte nodePosition = iNode.GetPosition();
-                    if (nodePosition == root)
-                    {
-                        return set;
-                    }
-                }
-            }
-
-            return new KeyValuePair<T, List<T>>();
-        }
-
-        public KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>> GetCityByPosition(Vector2Int position)
-        {
-            byte[] roots = OnChainBoardDataConverter.GetRootsByPosition(position);
-            BuildCitySets();
-            foreach (var root in roots)
-            {
-                foreach (var set in cities)
-                {
-                    foreach (var node in set.Value)
-                    {
-                        INode iNode = node as INode;
-                        if (iNode == null) continue;
-                        byte nodePosition = iNode.GetPosition();
-                        if (nodePosition == root)
-                        {
-                            return set;
-                        }
-                    }
-                }
-            }
-            return new KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>>();
-        }
         
-        public KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>> GetCityByPosition(byte position)
-        {
-            BuildCitySets();
-            foreach (var set in cities)
-            {
-                foreach (var node in set.Value)
-                {
-                    INode iNode = node as INode;
-                    if (iNode == null) continue;
-                    byte nodePosition = iNode.GetPosition();
-                    if (nodePosition == position)
-                    {
-                        return set;
-                    }
-                }
-            }
-            return new KeyValuePair<evolute_duel_CityNode, List<evolute_duel_CityNode>>();
-        }
-        
-        public KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>> GetRoadByPosition(Vector2Int position)
-        {
-            byte[] roots = OnChainBoardDataConverter.GetRootsByPosition(position);
-            BuildRoadSets();
-            foreach (var root in roots)
-            {
-                foreach (var set in roads)
-                {
-                    foreach (var node in set.Value)
-                    {
-                        INode iNode = node as INode;
-                        if (iNode == null) continue;
-                        byte nodePosition = iNode.GetPosition();
-                        if (nodePosition == root)
-                        {
-                            return set;
-                        }
-                    }
-                }
-            }
-            return new KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>>();
-        }
-        
-        public KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>> GetRoadByPosition(byte position)
-        {
-            BuildRoadSets();
-            foreach (var set in roads)
-            {
-                foreach (var node in set.Value)
-                {
-                    INode iNode = node as INode;
-                    if (iNode == null) continue;
-                    byte nodePosition = iNode.GetPosition();
-                    if (nodePosition == position)
-                    {
-                        return set;
-                    }
-                }
-            }
-            return new KeyValuePair<evolute_duel_RoadNode, List<evolute_duel_RoadNode>>();
-        }
-
-        private (Vector2Int, Side) GetNearTileSide(Vector2Int position, Side side)
-        {
-            Vector2Int targetPosition = position;
-            Side targetSide = side;
-            switch (side)
-            {
-                case Side.Top:
-                    targetPosition = new Vector2Int(position.x + 1, position.y);
-                    targetSide = Side.Bottom;
-                    break;
-                case Side.Right:
-                    targetPosition = new Vector2Int(position.x, position.y - 1);
-                    targetSide = Side.Left;
-                    break;
-                case Side.Bottom:
-                    targetPosition = new Vector2Int(position.x - 1, position.y);
-                    targetSide = Side.Top;
-                    break;
-                case Side.Left:
-                    targetPosition = new Vector2Int(position.x, position.y + 1);
-                    targetSide = Side.Right;
-                    break;
-            }
-            return (targetPosition, targetSide);
-        }
 
 
-        private void BuildRoadSets()
-        {
-            roads = new Dictionary<evolute_duel_RoadNode, List<evolute_duel_RoadNode>>();
-            var roadNodesList = GetRoadNodes();
-            foreach (var roadNode in roadNodesList)
-            {
-                var root = GetRoadRoot(roadNode);
-                if (!roads.ContainsKey(root))
-                {
-                    roads[root] = new List<evolute_duel_RoadNode>();
-                }
-
-                roads[root].Add(roadNode);
-            }
-        }
-
-        private evolute_duel_RoadNode GetRoadRoot(evolute_duel_RoadNode road)
-        {
-            if (road.position == road.parent)
-            {
-                return road;
-            }
-
-            var parentPosition = road.parent;
-            foreach (var roadNode in roadNodes)
-            {
-                if (roadNode.position == parentPosition)
-                {
-                    return GetRoadRoot(roadNode);
-                }
-            }
-
-            return road;
-        }
-
-        private evolute_duel_CityNode GetCityRoot(evolute_duel_CityNode city)
-        {
-            if (city.position == city.parent)
-            {
-                return city;
-            }
-
-            var parentPosition = city.parent;
-            foreach (var cityNode in cityNodes)
-            {
-                if (cityNode.position == parentPosition)
-                {
-                    return GetCityRoot(cityNode);
-                }
-            }
-
-            return city;
-        }
+        // private void BuildRoadSets()
+        // {
+        //     roads = new Dictionary<evolute_duel_RoadNode, List<evolute_duel_RoadNode>>();
+        //     var roadNodesList = GetRoadNodes();
+        //     foreach (var roadNode in roadNodesList)
+        //     {
+        //         var root = GetRoadRoot(roadNode);
+        //         if (!roads.ContainsKey(root))
+        //         {
+        //             roads[root] = new List<evolute_duel_RoadNode>();
+        //         }
+        //
+        //         roads[root].Add(roadNode);
+        //     }
+        // }
+        //
+        // private evolute_duel_RoadNode GetRoadRoot(evolute_duel_RoadNode road)
+        // {
+        //     if (road.position == road.parent)
+        //     {
+        //         return road;
+        //     }
+        //
+        //     var parentPosition = road.parent;
+        //     foreach (var roadNode in roadNodes)
+        //     {
+        //         if (roadNode.position == parentPosition)
+        //         {
+        //             return GetRoadRoot(roadNode);
+        //         }
+        //     }
+        //
+        //     return road;
+        // }
+        //
+        // private evolute_duel_CityNode GetCityRoot(evolute_duel_CityNode city)
+        // {
+        //     if (city.position == city.parent)
+        //     {
+        //         return city;
+        //     }
+        //
+        //     var parentPosition = city.parent;
+        //     foreach (var cityNode in cityNodes)
+        //     {
+        //         if (cityNode.position == parentPosition)
+        //         {
+        //             return GetCityRoot(cityNode);
+        //         }
+        //     }
+        //
+        //     return city;
+        // }
 
         public void UpdateBoardAfterCityContest(byte root)
         {
@@ -583,60 +549,38 @@ namespace TerritoryWars.Dojo
         
 
 
-        private List<evolute_duel_CityNode> cityNodes;
-        private List<evolute_duel_CityNode> GetCityNodes()
-        {
-            // cityNodes = new List<evolute_duel_CityNode>();
-            // GameObject[] cityNodesGO = _dojoGameManager.WorldManager.Entities<evolute_duel_CityNode>();
-            // foreach (var cityNodeGO in cityNodesGO)
-            // {
-            //     if (cityNodeGO.TryGetComponent(out evolute_duel_CityNode cityNode))
-            //     {
-            //         if (cityNode.board_id.Hex() == LocalPlayerBoard.id.Hex())
-            //             cityNodes.Add(cityNode);
-            //     }
-            // }
-            return cityNodes;
-        }
+        //private List<evolute_duel_CityNode> cityNodes;
+        // private List<evolute_duel_CityNode> GetCityNodes()
+        // {
+        //     // cityNodes = new List<evolute_duel_CityNode>();
+        //     // GameObject[] cityNodesGO = _dojoGameManager.WorldManager.Entities<evolute_duel_CityNode>();
+        //     // foreach (var cityNodeGO in cityNodesGO)
+        //     // {
+        //     //     if (cityNodeGO.TryGetComponent(out evolute_duel_CityNode cityNode))
+        //     //     {
+        //     //         if (cityNode.board_id.Hex() == LocalPlayerBoard.id.Hex())
+        //     //             cityNodes.Add(cityNode);
+        //     //     }
+        //     // }
+        //     return cityNodes;
+        // }
 
-        private List<evolute_duel_RoadNode> roadNodes;
-        private List<evolute_duel_RoadNode> GetRoadNodes()
-        {
-            // roadNodes = new List<evolute_duel_RoadNode>();
-            // GameObject[] roadNodesGO = _dojoGameManager.WorldManager.Entities<evolute_duel_RoadNode>();
-            // foreach (var roadNodeGO in roadNodesGO)
-            // {
-            //     if (roadNodeGO.TryGetComponent(out evolute_duel_RoadNode roadNode))
-            //     {
-            //         if (roadNode.board_id.Hex() == LocalPlayerBoard.id.Hex())
-            //             roadNodes.Add(roadNode);
-            //     }
-            // }
-            // return roadNodes;
-            return new List<evolute_duel_RoadNode>();
-        }
-
-        public evolute_duel_Board GetLocalPlayerBoard()
-        {
-            return GetBoard(_dojoGameManager.LocalAccount.Address.Hex());
-        }
-
-        public evolute_duel_Board GetBoard(string playerAddress)
-        {
-            GameObject[] boardsGO = _dojoGameManager.WorldManager.Entities<evolute_duel_Board>();
-            foreach (var boardGO in boardsGO)
-            {
-                if (boardGO.TryGetComponent(out evolute_duel_Board board))
-                {
-                    //public (FieldElement, PlayerSide, byte, bool) player1;
-                    if (board.player1.Item1.Hex() == playerAddress || board.player2.Item1.Hex() == playerAddress)
-                    {
-                        return board;
-                    }
-                }
-            }
-            return null;
-        }
+        // private List<evolute_duel_RoadNode> roadNodes;
+        // private List<evolute_duel_RoadNode> GetRoadNodes()
+        // {
+        //     // roadNodes = new List<evolute_duel_RoadNode>();
+        //     // GameObject[] roadNodesGO = _dojoGameManager.WorldManager.Entities<evolute_duel_RoadNode>();
+        //     // foreach (var roadNodeGO in roadNodesGO)
+        //     // {
+        //     //     if (roadNodeGO.TryGetComponent(out evolute_duel_RoadNode roadNode))
+        //     //     {
+        //     //         if (roadNode.board_id.Hex() == LocalPlayerBoard.id.Hex())
+        //     //             roadNodes.Add(roadNode);
+        //     //     }
+        //     // }
+        //     // return roadNodes;
+        //     return new List<evolute_duel_RoadNode>();
+        // }
         
 
         public void MakeMove(TileData data, int x, int y, bool isJoker)

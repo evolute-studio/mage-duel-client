@@ -85,17 +85,31 @@ namespace TerritoryWars.DataModels
             return currentNode;
         }
 
-        public Structure GetStructureByNode(Vector2Int position, Side side)
+        public Structure? GetStructureByNode(Vector2Int position, Side side, StructureType type = default)
         {
             foreach (var structure in Structures)
             {
-                if(structure.Value.ContainsNode(position, side))
+                if(structure.Value.ContainsNode(position, side) && 
+                   (type == default || structure.Value.Type == type))
                 {
                     return structure.Value;
                 }
             }
-            CustomLogger.LogError($"No structure found for position {position} and side {side}");
-            return new Structure(StructureType.City) { Parent = new StructureNode { Position = position, Side = side } };
+            CustomLogger.LogWarning($"No structure found for position {position} and side {side}");
+            return null;
+        }
+        
+        public Structure? GetStructureByPosition(Vector2Int position, StructureType structureType = default)
+        {
+            foreach (var structure in Structures)
+            {
+                if(structure.Value.ContainsNode(position) && (structure.Value.Type == structureType || structureType == default))
+                {
+                    return structure.Value;
+                }
+            }
+
+            return null;
         }
         
         public List<Structure> GetStructures()
@@ -142,11 +156,11 @@ namespace TerritoryWars.DataModels
             Nodes.Add(node);
         }
 
-        public bool ContainsNode(Vector2Int position, Side side)
+        public bool ContainsNode(Vector2Int position, Side side = default)
         {
             foreach (var node in Nodes)
             {
-                if (node.Position == position && node.Side == side)
+                if (node.Position == position && (node.Side == side || side == default))
                 {
                     return true;
                 }
