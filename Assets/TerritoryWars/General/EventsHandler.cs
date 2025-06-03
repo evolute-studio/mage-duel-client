@@ -225,7 +225,6 @@ namespace TerritoryWars.General
                 }
                 UnionFind unionFind = new UnionFind().SetData(unionFindModel);
                 CustomLogger.LogEventsLocal($"[EventHandler] | {nameof(unionFindModel)}");
-                CustomLogger.LogObject(unionFind, "UnionFind from Event");
                 EventBus.Publish(unionFind);
                     
             }

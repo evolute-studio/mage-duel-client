@@ -175,8 +175,7 @@ namespace TerritoryWars.General
         }
 
         public bool PlaceTile(TileData tile)
-        {
-            CustomLogger.LogImportant($"BoardManager: Placing tile at position: {tile.Position.x}, {tile.Position.y} with type: {tile.Type}");
+        { 
             tileData[tile.Position.x, tile.Position.y] = tile;
             GameObject tileObject = Instantiate(tilePrefab, GetTilePosition(tile.Position.x, tile.Position.y), Quaternion.identity, transform);
             tileObject.name += $"_{tile.Position.x}_{tile.Position.y}";

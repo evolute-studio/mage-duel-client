@@ -87,8 +87,6 @@ namespace TerritoryWars.Managers.SessionComponents
                 foreach (var structure in structures)
                 {
                     bool isContested = structure.Contested;
-                    CustomLogger.LogImportant( $"[ContestManager.RecolorStructures] - Recoloring structure at {structure.Position} with contested: {isContested}");
-                    CustomLogger.LogObject(structure, "Structure");
                     foreach (var node in structure.Nodes)
                     {
                         var position = node.Position;

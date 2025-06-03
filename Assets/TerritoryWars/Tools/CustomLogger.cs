@@ -90,12 +90,12 @@ namespace TerritoryWars.Tools
             try
             {
                 output = JsonConvert.SerializeObject(obj, Formatting.Indented);
-                if (output.Length > 10000)
-                {
-                    string objType = obj.GetType().Name;
-                    string fileName = $"{objType}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
-                    System.IO.File.WriteAllText(fileName, output);
-                }
+                // if (output.Length > 10000)
+                // {
+                //     string objType = obj.GetType().Name;
+                //     string fileName = $"{objType}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+                //     System.IO.File.WriteAllText(fileName, output);
+                // }
             }
             catch (Exception e)
             {

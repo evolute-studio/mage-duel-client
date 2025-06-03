@@ -91,11 +91,7 @@ namespace TerritoryWars.DataModels
             TopTile = data.TopTile;
             foreach (var eventTile in data.Tiles)
             {
-                if(!Tiles.ContainsKey(eventTile.Key))
-                {
-                    Tiles[eventTile.Key] = eventTile.Value;
-                }
-                
+                Tiles[eventTile.Key] = eventTile.Value;
             }
             Player1.Update(data.Player1);
             Player2.Update(data.Player2);
