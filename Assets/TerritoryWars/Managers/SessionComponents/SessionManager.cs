@@ -42,6 +42,7 @@ namespace TerritoryWars.Managers.SessionComponents
         public SessionContext SessionContext = new SessionContext();
         public SessionManagerContext ManagerContext { get; private set; }
         private List<ISessionComponent> _components;
+        public bool IsInitialized = false;
         
         [Header("Dependencies")]
         public BoardManager BoardManager;
@@ -62,6 +63,7 @@ namespace TerritoryWars.Managers.SessionComponents
             GameUI.Instance.playerInfoUI.UpdateData(SessionContext.PlayersData);
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
             ManagerContext.GameLoopManager.StartGame();
+            IsInitialized = true;
         }
 
         private void Initialize()

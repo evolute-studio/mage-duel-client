@@ -21,7 +21,7 @@ namespace TerritoryWars.General
         public int x { get; set; }
         public int y { get; set; }
         public int rotation { get; set; }
-        
+
         public ValidPlacement(int x, int y, int rotation)
         {
             this.x = x;
@@ -35,7 +35,7 @@ namespace TerritoryWars.General
             this.y = y;
             rotation = 0;
         }
-        
+
         public ValidPlacement(Vector2Int vector)
         {
             x = vector.x;
@@ -60,7 +60,7 @@ namespace TerritoryWars.General
 
         private GameObject[,] tileObjects;
         private TileData[,] tileData;
-        
+
         public Dictionary<Vector2Int, TileData> PlacedTiles = new Dictionary<Vector2Int, TileData>();
 
         public delegate void TilePlaced(TileData tile, int x, int y);
@@ -72,47 +72,47 @@ namespace TerritoryWars.General
             var onChainBoard = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
             char[] edgeTiles = OnChainBoardDataConverter.GetInitialEdgeState(onChainBoard.initial_edge_state);
         }
-        
+
         private void InitializeBoard()
         {
             tileObjects = new GameObject[width, height];
             tileData = new TileData[width, height];
         }
-        
+
         public void Initialize(Board board)
         {
             InitializeBoard();
             foreach (var tile in board.Tiles.Values)
             {
                 if (IsEdgeTile(tile.Position.x, tile.Position.y)) PlaceEdgeTile(tile);
-                else if(!tile.IsNull) PlaceTile(tile);
+                else if (!tile.IsNull) PlaceTile(tile);
             }
         }
-        
+
         public void PlaceEdgeTile(TileModel tileModel)
         {
-            
+
             if (tileModel.Position == new Vector2Int(0, 9) || tileModel.Position == new Vector2Int(9, 0)) return;
-            
+
             PlaceTile(tileModel);
-            if(tileModel.Type == "FFFF")
+            if (tileModel.Type == "FFFF")
             {
                 SpawnMountain(tileModel);
             }
-            
+
             if (tileModel.Type.Contains('R'))
             {
                 SpawnRoad(tileModel);
             }
-            
+
             if (tileModel.Type.Contains('C'))
             {
                 SpawnCity(tileModel);
             }
-            
-            
+
+
         }
-        
+
         private void SpawnMountain(TileModel tileModel)
         {
             GameObject mountain;
@@ -166,7 +166,7 @@ namespace TerritoryWars.General
                 tileParts.Forest[tileModel.Rotation].SetActive(true);
             });
         }
-        
+
 
         public bool PlaceTile(TileModel tile)
         {
@@ -183,6 +183,18 @@ namespace TerritoryWars.General
             tileObject.GetComponent<TileGenerator>().Generate(tile, true);
             tileObjects[tile.Position.x, tile.Position.y] = tileObject;
             PlacedTiles[tile.Position] = tile;
+
+            var (x, y) = (tile.Position.x, tile.Position.y);
+
+            if ((x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
+            {
+                TryConnectEdgeStructure(tile.PlayerSide, x, y);
+                //if (isConnected)
+                //{
+                //    ConnectEdgeStructureAnimation(tile.PlayerSide, tile, x, y);
+                //}
+            }
+
             EventBus.Publish(new TilePlacedEvent(tile));
             return true;
         }
@@ -192,19 +204,18 @@ namespace TerritoryWars.General
             public TileData TileData;
             public TilePlacedEvent(TileData tile) => TileData = tile;
         }
-        
+
         public void FloatingTextAnimation(Vector2Int position)
         {
-            SessionManager sessionManager = SessionManager.Instance;
-            GameObject gameObject = sessionManager.BoardManager.GetTileObject(position.x, position.y);
-            TileData tileData = sessionManager.BoardManager.GetTileData(position.x, position.y);
+            GameObject gameObject = GetTileObject(position.x, position.y);
+            TileData tileData = GetTileData(position.x, position.y);
             TileParts tileParts = gameObject.GetComponentInChildren<TileParts>();
             TileGenerator tileGenerator = gameObject.GetComponent<TileGenerator>();
-            int playerId = sessionManager.SessionContext.CurrentTurnPlayer.PlayerSide;
+            int playerId = SessionManager.Instance.SessionContext.CurrentTurnPlayer.PlayerSide;
             playerId = SetLocalPlayerData.GetLocalIndex(playerId);
             string side = playerId == 0 ? "blue" : "red";
             Vector3 motion = new Vector3(0, 0.3f, 0);
-                    
+
             foreach (var house in tileParts.Houses)
             {
                 float duration = 2f + UnityEngine.Random.Range(0f, 1f);
@@ -213,38 +224,38 @@ namespace TerritoryWars.General
             }
             foreach (var pin in tileGenerator.Pins)
             {
-                if(pin == null) continue;
+                if (pin == null) continue;
                 float duration = 2f + UnityEngine.Random.Range(0f, 1f);
                 Vector3 textPosition = pin.transform.position;
                 int cityCount = tileData.Type.Count(c => c == 'R');
                 string messageText = cityCount == 2 ? "+2" : "+1";
                 FloatingTextManager.Instance.Show(messageText, textPosition, motion, duration, "road_icon_" + side);
-                if(cityCount == 2) break;
+                if (cityCount == 2) break;
             }
         }
 
         public void ScoreClientPrediction(int playerIndex, TileData data)
         {
-            if(!SessionManager.Instance.SessionContext.IsLocalPlayerTurn) return;
+            if (!SessionManager.Instance.SessionContext.IsLocalPlayerTurn) return;
             GameUI.Instance.playerInfoUI.AddClientCityScore(playerIndex, data.Type.Count(c => c == 'C') * 2);
             GameUI.Instance.playerInfoUI.AddClientRoadScore(playerIndex, data.Type.Count(r => r == 'R'));
         }
 
         public bool RevertTile(int x, int y)
         {
-            Destroy(tileObjects[x,y]);
+            Destroy(tileObjects[x, y]);
             tileObjects[x, y] = null;
             tileData[x, y] = null;
             PlacedTiles.Remove(new Vector2Int(x, y));
 
-            if(tileObjects[x,y] == null && tileData[x,y] == null && PlacedTiles.ContainsKey(new Vector2Int(x, y)))
+            if (tileObjects[x, y] == null && tileData[x, y] == null && PlacedTiles.ContainsKey(new Vector2Int(x, y)))
             {
                 return true;
             }
-            
+
             return false;
         }
-        
+
         public enum StructureType
         {
             City,
@@ -263,16 +274,17 @@ namespace TerritoryWars.General
 
         public void ConnectEdgeStructureAnimation(int ownerId, TileData tileData, int x, int y, bool isCityContest = false, bool isRoadContest = false)
         {
-            if(isCityContest || isRoadContest || SessionManagerOld.Instance.IsSessionStarting) return;
+            if (isCityContest || isRoadContest || !SessionManager.Instance.IsInitialized) return;
             FloatingTextAnimation(new Vector2Int(x, y));
             ScoreClientPrediction(ownerId, tileData);
         }
 
-        private void TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false, bool isRoadContest = false)
+        private bool TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false, bool isRoadContest = false)
         {
+            bool result = false;
             GameObject[] neighborsGO = new GameObject[4];
             TileData[] neighborsData = new TileData[4];
-            int[][] positions = new[] { new int[] {1, 0}, new int[] {0, -1}, new int[] {-1, 0}, new int[] {0, 1} };
+            int[][] positions = new[] { new int[] { 1, 0 }, new int[] { 0, -1 }, new int[] { -1, 0 }, new int[] { 0, 1 } };
             int[][] tilePositions = new int[4][];
             for (int index = 0; index < 4; index++)
             {
@@ -288,17 +300,18 @@ namespace TerritoryWars.General
                 neighborsGO[i] = tileObjects[newX, newY];
                 neighborsData[i] = tileData[newX, newY];
             }
-            
-            for( int i = 0; i < 4; i++)
+
+            for (int i = 0; i < 4; i++)
             {
-                if(IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
+                if (IsEdgeTile(tilePositions[i][0], tilePositions[i][1]) && neighborsGO[i] != null)
                 {
-                    if(owner != 3) neighborsData[i].SetOwner(owner);
+                    if (owner != 3) neighborsData[i].SetOwner(owner);
                     ConnectEdgeStructureAnimation(owner, neighborsData[i], tilePositions[i][0], tilePositions[i][1], isCityContest, isRoadContest);
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.All || type == StructureType.City)
                     {
                         tileGenerator.RecolorHouses(owner, isCityContest, neighborsData[i].Rotation);
+                        result = true;
                     }
 
                     if (type == StructureType.All || type == StructureType.Road)
@@ -306,7 +319,7 @@ namespace TerritoryWars.General
                         TileGenerator placedTileGenerator = tileObjects[x, y].GetComponent<TileGenerator>();
                         List<Side> roadSides = neighborsData[i].GetRoadSides();
                         if (roadSides.Count == 0) continue;
-
+                        result = true;
                         if (isRoadContest)
                         {
                             foreach (var road in tileGenerator.CurrentTileGO.GetComponent<TileParts>().RoadRenderers)
@@ -317,7 +330,7 @@ namespace TerritoryWars.General
                                 }
                             }
                         }
-                        
+
                         for (int j = 0; j < tileGenerator.Pins.Count; j++)
                         {
                             if (tileGenerator.Pins[j] == null) continue;
@@ -327,13 +340,14 @@ namespace TerritoryWars.General
                             int ownerToSet = placedTilePin.OwnerId;
                             bool isContested = placedTilePin.IsContested;
                             tileGenerator.Pins[j].SetPin(ownerToSet, isContested);
-                            
+
                         }
                     }
                 }
             }
+            return result;
         }
-        
+
         public bool IsSnowBoardPart(Vector2Int position)
         {
             if (position.x > 4 & position.y > 4)
@@ -355,15 +369,15 @@ namespace TerritoryWars.General
             }
             return new Vector2Int(-1, -1);
         }
-        
+
         public void CloseAllStructures()
         {
-            for(int x = 0; x < width; x++)
+            for (int x = 0; x < width; x++)
             {
-                for(int y = 0; y < height; y++)
+                for (int y = 0; y < height; y++)
                 {
                     GameObject tile = GetTileObject(x, y);
-                    if(tile == null || tile.TryGetComponent(out TileGenerator tryGetTileGenerator)) continue;
+                    if (tile == null || tile.TryGetComponent(out TileGenerator tryGetTileGenerator)) continue;
                     TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
                     List<Side> sides = CheckCityTileSidesToEmpty(x, y);
                     tileGenerator.FencePlacerForCloserToBorderCity(sides);
@@ -392,9 +406,9 @@ namespace TerritoryWars.General
             // 1 - Right
             // 2 - Bottom
             // 3 - Left
-            
+
             List<Side> closerSides = new List<Side>();
-            if(IsEdgeTile(x,y)) return closerSides;
+            if (IsEdgeTile(x, y)) return closerSides;
             TileData tile = GetTileData(x + 1, y);
             if (IsEdgeTile(x + 1, y) && tile != null && tile.IsCity())
             {
@@ -402,7 +416,7 @@ namespace TerritoryWars.General
             }
 
             tile = GetTileData(x, y - 1);
-            if (IsEdgeTile(x,y - 1) && tile != null && tile.IsCity())
+            if (IsEdgeTile(x, y - 1) && tile != null && tile.IsCity())
             {
                 closerSides.Add(Side.Right);
             }
@@ -412,7 +426,7 @@ namespace TerritoryWars.General
             {
                 closerSides.Add(Side.Bottom);
             }
-    
+
             tile = GetTileData(x, y + 1);
             if (IsEdgeTile(x, y + 1) && tile != null && tile.IsCity())
             {
@@ -421,7 +435,7 @@ namespace TerritoryWars.General
 
             return closerSides;
         }
-        
+
         public List<Side> CheckCityTileSidesToEmpty(int x, int y)
         {
             // returns list int of sides that are closer to the border 
@@ -429,9 +443,9 @@ namespace TerritoryWars.General
             // 1 - Right
             // 2 - Bottom
             // 3 - Left
-            
+
             List<Side> closerSides = new List<Side>();
-            if(IsEdgeTile(x,y)) return closerSides;
+            if (IsEdgeTile(x, y)) return closerSides;
 
             if (GetTileData(x + 1, y) == null) { closerSides.Add(Side.Top); }
 
@@ -443,7 +457,7 @@ namespace TerritoryWars.General
 
             return closerSides;
         }
-        
+
         public List<MineTileInfo> CheckRoadTileSidesToBorder(int x, int y)
         {
             // returns list int of sides that are closer to the border 
@@ -451,9 +465,9 @@ namespace TerritoryWars.General
             // 1 - Right
             // 2 - Bottom
             // 3 - Left
-            
+
             List<MineTileInfo> closerSides = new List<MineTileInfo>();
-            if(IsEdgeTile(x,y)) return closerSides;
+            if (IsEdgeTile(x, y)) return closerSides;
             TileData tile = GetTileData(x + 1, y);
             if (IsEdgeTile(x + 1, y) && tile != null && !tile.IsRoad())
             {
@@ -504,7 +518,7 @@ namespace TerritoryWars.General
 
             return closerSides;
         }
-        
+
         public bool IsEdgeTile(int x, int y)
         {
             return x == 0 || x == width - 1 || y == 0 || y == height - 1;
@@ -530,23 +544,23 @@ namespace TerritoryWars.General
             }
             return (new Vector2Int(-1, -1), Side.None);
         }
-        
+
         public bool CanPlaceTile(TileData tile, int x, int y)
         {
-            
+
             if (x < 0 || x >= width || y < 0 || y >= height)
             {
-                
+
                 return false;
             }
 
-            
+
             if (tileData[x, y] != null)
             {
                 return false;
             }
 
-            
+
             int placedTiles = 0;
             for (int i = 0; i < width; i++)
             {
@@ -559,13 +573,13 @@ namespace TerritoryWars.General
                 }
             }
 
-            
+
             if (placedTiles < 33)
             {
                 return true;
             }
 
-            
+
             Dictionary<Side, TileData> neighbors = new Dictionary<Side, TileData>();
             bool hasAnyNeighbor = false;
             bool hasNonBorderNeighbor = false;
@@ -583,7 +597,7 @@ namespace TerritoryWars.General
 
                     if (IsBorderTile(newX, newY))
                     {
-                        
+
                         LandscapeType borderSide = tileData[newX, newY].GetSide(GetOppositeSide(side));
                         if (borderSide != LandscapeType.Field)
                         {
@@ -596,21 +610,21 @@ namespace TerritoryWars.General
                     }
                 }
             }
-            
-            
+
+
             if (!hasAnyNeighbor)
             {
                 return false;
             }
-            
-            
+
+
             if (hasBorderWithNonField)
             {
                 foreach (var neighbor in neighbors)
                 {
                     Side side = neighbor.Key;
                     TileData adjacentTile = neighbor.Value;
-                    if (!IsMatchingLandscape(tile.GetSide(side), 
+                    if (!IsMatchingLandscape(tile.GetSide(side),
                         adjacentTile.GetSide(GetOppositeSide(side))))
                     {
                         return false;
@@ -619,12 +633,12 @@ namespace TerritoryWars.General
                 return true;
             }
 
-            
+
             if (!hasNonBorderNeighbor)
             {
                 return false;
             }
-            
+
             foreach (var neighbor in neighbors)
             {
                 Side side = neighbor.Key;
@@ -633,13 +647,13 @@ namespace TerritoryWars.General
                 LandscapeType currentSide = tile.GetSide(side);
                 LandscapeType adjacentSide = adjacentTile.GetSide(GetOppositeSide(side));
 
-                
+
                 if (IsBorderTile(x + GetXOffset(side), y + GetYOffset(side)) && adjacentSide == LandscapeType.Field)
                 {
                     continue;
                 }
 
-                
+
                 if (!IsMatchingLandscape(currentSide, adjacentSide))
                 {
                     return false;
@@ -679,12 +693,12 @@ namespace TerritoryWars.General
                     }
                 }
             }
-            
+
             if (!hasAnyNeighbor)
             {
                 return;
             }
-            
+
             if (neighbors.Count == 1 && !hasNonBorderNeighbor)
             {
                 var neighbor = neighbors.First();
@@ -693,7 +707,7 @@ namespace TerritoryWars.General
                     return;
                 }
             }
-            
+
             foreach (var neighbor in neighbors)
             {
                 Side side = neighbor.Key;
@@ -705,19 +719,19 @@ namespace TerritoryWars.General
                 {
                     continue;
                 }
-                
+
                 if (currentSide == LandscapeType.City && adjacentSide == LandscapeType.City)
                 {
-                    
+
                 }
 
                 if (currentSide == LandscapeType.Road && adjacentSide == LandscapeType.Road)
                 {
-                    
+
                 }
             }
         }
-        
+
 
         private bool IsMatchingLandscape(LandscapeType type1, LandscapeType type2)
         {
@@ -747,7 +761,7 @@ namespace TerritoryWars.General
 
         public int GetXOffset(Side dir)
         {
-           // In isometric projection:
+            // In isometric projection:
             // x increases when moving up (Top)
             // x decreases when moving down (Bottom)
             return dir switch
@@ -791,14 +805,14 @@ namespace TerritoryWars.General
             float yPosition = (x + y) * (tileSpacing / 2);
             return new Vector3(xPosition, yPosition, 0);
         }
-        
+
         public static Vector2Int GetPositionByWorld(Vector3 worldPosition)
         {
             float x = (worldPosition.x + worldPosition.y) / tileSpacing;
             float y = (worldPosition.y - worldPosition.x) / tileSpacing * 2;
             return new Vector2Int(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
         }
-        
+
         public Vector2Int GetPositionByObject(GameObject tile)
         {
             for (int x = 0; x < width; x++)
@@ -814,7 +828,7 @@ namespace TerritoryWars.General
 
             return new Vector2Int(-1, -1);
         }
-        
+
         public List<ValidPlacement> GetValidPlacements(TileData tile)
         {
             List<ValidPlacement> validPlacements = new List<ValidPlacement>();
@@ -856,7 +870,7 @@ namespace TerritoryWars.General
             }
             return validPlacements;
         }
-        
+
         public bool HasNeighbor(int x, int y)
         {
             for (int i = 0; i < 4; i++)
@@ -876,10 +890,10 @@ namespace TerritoryWars.General
         {
             List<int> validRotations = new List<int>();
 
-            
+
             int initialRotation = tile.Rotation;
 
-            
+
             for (int rotation = 0; rotation < 4; rotation++)
             {
                 if (CanPlaceTile(tile, x, y))
@@ -889,7 +903,7 @@ namespace TerritoryWars.General
                 tile.Rotate();
             }
 
-            
+
             tile.Rotate(4 - (tile.Rotation % 4));
             while (tile.Rotation != initialRotation)
             {
@@ -903,7 +917,7 @@ namespace TerritoryWars.General
         {
             return tileObjects[x, y];
         }
-        
+
         public TileData GetTileData(int x, int y)
         {
             if (!IsValidPosition(x, y)) return null;
