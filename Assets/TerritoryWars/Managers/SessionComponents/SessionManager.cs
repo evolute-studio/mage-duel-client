@@ -47,6 +47,7 @@ namespace TerritoryWars.Managers.SessionComponents
         [Header("Dependencies")]
         public BoardManager BoardManager;
         public TileSelector TileSelector;
+        public StructureHoverManager StructureHoverManager;
 
 
         private async void Start()
@@ -57,6 +58,7 @@ namespace TerritoryWars.Managers.SessionComponents
             InitializeBoard();
             ManagerContext.GameLoopManager.Initialize(ManagerContext);
             ManagerContext.JokerManager.Initialize(ManagerContext);
+            ManagerContext.ContestManager.Initialize(ManagerContext);
 
             GameUI.Instance.Initialize();
             GameUI.Instance.playerInfoUI.Initialize();
@@ -79,6 +81,7 @@ namespace TerritoryWars.Managers.SessionComponents
             var playersManager = new PlayersManager();
             var gameLoopManager = new GameLoopManager();
             var jokerManager = new JokerManager();
+            var contestManager = new ContestManager();
 
 
             ManagerContext.SessionContext = SessionContext;
@@ -86,10 +89,12 @@ namespace TerritoryWars.Managers.SessionComponents
             ManagerContext.PlayersManager = playersManager;
             ManagerContext.GameLoopManager = gameLoopManager;
             ManagerContext.JokerManager = jokerManager;
+            ManagerContext.ContestManager = contestManager;
 
             _components.Add(playersManager);
             _components.Add(gameLoopManager);
             _components.Add(jokerManager);
+            _components.Add(contestManager);
         }
 
         public async Task SetupData()
@@ -112,7 +117,10 @@ namespace TerritoryWars.Managers.SessionComponents
                 CustomSceneManager.Instance.ForceLoadScene(CustomSceneManager.Instance.Menu);
                 return;
             }
+            UnionFind unionFind = await DojoLayer.Instance.GetUnionFind(board.Id);
+
             SessionContext.Board = board;
+            SessionContext.UnionFind = unionFind;
             SimpleStorage.SaveCurrentBoardId(board.Id);
             SessionContext.PlayersData[0] = board.Player1;
             SessionContext.PlayersData[1] = board.Player2;

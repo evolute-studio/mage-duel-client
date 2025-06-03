@@ -428,7 +428,7 @@ namespace TerritoryWars.Dojo
                new FieldElement(LocalBot.AccountModule.GetDefaultUsername(), true));
             CustomLogger.LogDojoLoop("Bot username changed");
             await DojoConnector.CreateGame(LocalAccount);
-            CustomLogger.LogDojoLoop("Game created");
+            CustomLogger.LogDojoLoop("Game created"); 
             DojoConnector.JoinGame(LocalBot.Account, LocalAccount.Address);
             CustomLogger.LogDojoLoop("Bot joined game");
         }

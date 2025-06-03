@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using TerritoryWars.Dojo;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.Models;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
@@ -226,7 +227,7 @@ namespace TerritoryWars.General
 
         public HashSet<KeyValuePair<TileParts, Side>> GetRoadTilePartsForHighlight(Transform tileParent, TileParts tileParts, byte rootPosition = 0)
         {
-            BoardManager board = SessionManagerOld.Instance.Board;
+            BoardManager board = SessionManager.Instance.BoardManager;
             HashSet<KeyValuePair<TileParts, Side>> roadTileParts = new HashSet<KeyValuePair<TileParts, Side>>();
             HashSet<KeyValuePair<Vector2Int, Side>> hoveredTiles = new HashSet<KeyValuePair<Vector2Int, Side>>();
             

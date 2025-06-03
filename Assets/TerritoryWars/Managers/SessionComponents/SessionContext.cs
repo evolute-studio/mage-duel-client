@@ -10,6 +10,7 @@ namespace TerritoryWars.Managers.SessionComponents
         public string LocalPlayerAddress;
         public GameModel Game;
         public Board Board;
+        public UnionFind UnionFind;
         public SessionPlayer[] PlayersData = new SessionPlayer[2];
 
         public ulong LastUpdateTimestamp => Board.LastUpdateTimestamp;

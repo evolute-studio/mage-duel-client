@@ -308,94 +308,94 @@ namespace TerritoryWars.Dojo
 
         private void RoadContestWon(evolute_duel_RoadContestWon eventModel)
         {
-            string board_id = eventModel.board_id.Hex();
-
-            if (LocalPlayerBoard.id.Hex() != board_id) return;
-
-            byte root = eventModel.root;
-            int winner = eventModel.winner switch
-            {
-                PlayerSide.Blue => 0,
-                PlayerSide.Red => 1,
-            };
-            ushort red_points = eventModel.red_points;
-            ushort blue_points = eventModel.blue_points;
-            
-            
-            _contestProcessor.AddModel(new ContestInformation(root, ContestType.Road,() => 
-            {
-                ContestAnimation(root, new ushort[] { blue_points, red_points }, () => UpdateBoardAfterRoadContest(root), true,
-                false);
-            }));
-            
-            CustomLogger.LogExecution(
-                $"[RoadContestWon] | Player: {winner} | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
+            // string board_id = eventModel.board_id.Hex();
+            //
+            // if (LocalPlayerBoard.id.Hex() != board_id) return;
+            //
+            // byte root = eventModel.root;
+            // int winner = eventModel.winner switch
+            // {
+            //     PlayerSide.Blue => 0,
+            //     PlayerSide.Red => 1,
+            // };
+            // ushort red_points = eventModel.red_points;
+            // ushort blue_points = eventModel.blue_points;
+            //
+            //
+            // _contestProcessor.AddModel(new ContestInformation(root, ContestType.Road,() => 
+            // {
+            //     ContestAnimation(root, new ushort[] { blue_points, red_points }, () => UpdateBoardAfterRoadContest(root), true,
+            //     false);
+            // }));
+            //
+            // CustomLogger.LogExecution(
+            //     $"[RoadContestWon] | Player: {winner} | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
         }
 
         private void RoadContestDraw(evolute_duel_RoadContestDraw eventModel)
         {
-            string board_id = eventModel.board_id.Hex();
-
-            if (LocalPlayerBoard.id.Hex() != board_id) return;
-
-            byte root = eventModel.root;
-            ushort red_points = eventModel.red_points;
-            ushort blue_points = eventModel.blue_points;
-
-            _contestProcessor.AddModel(new ContestInformation(root, ContestType.Road, () =>
-            {
-                ContestAnimation(root, new ushort[] { blue_points, red_points }, () => UpdateBoardAfterRoadContest(root), true,
-                    false);
-            }));
-
-            CustomLogger.LogExecution(
-                $"[RoadContestDraw] | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
+            // string board_id = eventModel.board_id.Hex();
+            //
+            // if (LocalPlayerBoard.id.Hex() != board_id) return;
+            //
+            // byte root = eventModel.root;
+            // ushort red_points = eventModel.red_points;
+            // ushort blue_points = eventModel.blue_points;
+            //
+            // _contestProcessor.AddModel(new ContestInformation(root, ContestType.Road, () =>
+            // {
+            //     ContestAnimation(root, new ushort[] { blue_points, red_points }, () => UpdateBoardAfterRoadContest(root), true,
+            //         false);
+            // }));
+            //
+            // CustomLogger.LogExecution(
+            //     $"[RoadContestDraw] | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
         }
 
 
         private void CityContestWon(evolute_duel_CityContestWon eventModel)
         {
-            string board_id = eventModel.board_id.Hex();
-
-            if (LocalPlayerBoard.id.Hex() != board_id) return;
-
-            byte root = eventModel.root;
-            int winner = eventModel.winner switch
-            {
-                PlayerSide.Blue => 0,
-                PlayerSide.Red => 1,
-            };
-            ushort red_points = eventModel.red_points;
-            ushort blue_points = eventModel.blue_points;
-
-            _contestProcessor.AddModel(new ContestInformation(root, ContestType.City,() =>
-            {
-                ContestAnimation(root, new ushort[] { blue_points, red_points },() =>  UpdateBoardAfterCityContest(root), false,
-                    true);
-            }));
-            
-            CustomLogger.LogExecution(
-                $"[CityContestWon] | Player: {winner} | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
+            // string board_id = eventModel.board_id.Hex();
+            //
+            // if (LocalPlayerBoard.id.Hex() != board_id) return;
+            //
+            // byte root = eventModel.root;
+            // int winner = eventModel.winner switch
+            // {
+            //     PlayerSide.Blue => 0,
+            //     PlayerSide.Red => 1,
+            // };
+            // ushort red_points = eventModel.red_points;
+            // ushort blue_points = eventModel.blue_points;
+            //
+            // _contestProcessor.AddModel(new ContestInformation(root, ContestType.City,() =>
+            // {
+            //     ContestAnimation(root, new ushort[] { blue_points, red_points },() =>  UpdateBoardAfterCityContest(root), false,
+            //         true);
+            // }));
+            //
+            // CustomLogger.LogExecution(
+            //     $"[CityContestWon] | Player: {winner} | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
         }
 
         private void CityContestDraw(evolute_duel_CityContestDraw eventModel)
         {
-            string board_id = eventModel.board_id.Hex();
-
-            if (LocalPlayerBoard.id.Hex() != board_id) return;
-
-            byte root = eventModel.root;
-            ushort red_points = eventModel.red_points;
-            ushort blue_points = eventModel.blue_points;
-
-            _contestProcessor.AddModel(new ContestInformation(root, ContestType.City,() =>
-            {
-                ContestAnimation(root, new ushort[] { blue_points, red_points }, () => UpdateBoardAfterCityContest(root), false,
-                    true);
-            }));
-
-            CustomLogger.LogExecution(
-                $"[CityContestDraw] | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
+            // string board_id = eventModel.board_id.Hex();
+            //
+            // if (LocalPlayerBoard.id.Hex() != board_id) return;
+            //
+            // byte root = eventModel.root;
+            // ushort red_points = eventModel.red_points;
+            // ushort blue_points = eventModel.blue_points;
+            //
+            // _contestProcessor.AddModel(new ContestInformation(root, ContestType.City,() =>
+            // {
+            //     ContestAnimation(root, new ushort[] { blue_points, red_points }, () => UpdateBoardAfterCityContest(root), false,
+            //         true);
+            // }));
+            //
+            // CustomLogger.LogExecution(
+            //     $"[CityContestDraw] | BluePoints: {blue_points} | RedPoints: {red_points} | BoardId: {board_id}");
         }
 
         private void GameCanceled(evolute_duel_GameCanceled eventModel)

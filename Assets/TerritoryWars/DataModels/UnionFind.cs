@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TerritoryWars.Tools;
 using UnityEngine;
 
 namespace TerritoryWars.DataModels
@@ -7,6 +8,7 @@ namespace TerritoryWars.DataModels
     [Serializable]
     public struct UnionFind
     {
+        public bool IsNull => string.IsNullOrEmpty(BoardId);
         public string BoardId;
         public Dictionary<(Vector2Int, Side), Structure> Structures;
 
@@ -17,9 +19,9 @@ namespace TerritoryWars.DataModels
 
             List<StructureNode> structureNodes = GetStructureNodes(data);
             Structures = GetStructure(structureNodes);
-            
+
             return this;
-            
+
         }
 
         private List<StructureNode> GetStructureNodes(evolute_duel_UnionFind data)
@@ -35,7 +37,7 @@ namespace TerritoryWars.DataModels
                     ParentSide = parentSide,
                     Position = position,
                     Side = side,
-                    Points = new [] {data.nodes_blue_points[i], data.nodes_red_points[i]},
+                    Points = new[] { data.nodes_blue_points[i], data.nodes_red_points[i] },
                     OpenEdges = data.nodes_open_edges[i],
                     Contested = data.nodes_contested[i],
                     Type = (StructureType)data.nodes_types[i]
@@ -45,7 +47,8 @@ namespace TerritoryWars.DataModels
             return structureNodes;
         }
 
-        private Dictionary<(Vector2Int, Side), Structure> GetStructure(List<StructureNode> nodes){
+        private Dictionary<(Vector2Int, Side), Structure> GetStructure(List<StructureNode> nodes)
+        {
             Dictionary<(Vector2Int, Side), Structure> structures = new Dictionary<(Vector2Int, Side), Structure>();
             foreach (var node in nodes)
             {
@@ -60,8 +63,9 @@ namespace TerritoryWars.DataModels
             }
             return structures;
         }
-        
-        private StructureNode GetNodeRoot(List<StructureNode> nodes, StructureNode currentNode)
+
+        private StructureNode 
+            GetNodeRoot(List<StructureNode> nodes, StructureNode currentNode)
         {
             if (currentNode.Position == currentNode.ParentPosition && currentNode.Side == currentNode.ParentSide)
             {
@@ -78,24 +82,47 @@ namespace TerritoryWars.DataModels
                 }
             }
 
-            return currentNode; 
+            return currentNode;
+        }
+
+        public Structure GetStructureByNode(Vector2Int position, Side side)
+        {
+            foreach (var structure in Structures)
+            {
+                if(structure.Value.ContainsNode(position, side))
+                {
+                    return structure.Value;
+                }
+            }
+            CustomLogger.LogError($"No structure found for position {position} and side {side}");
+            return new Structure(StructureType.City) { Parent = new StructureNode { Position = position, Side = side } };
+        }
+        
+        public List<Structure> GetStructures()
+        {
+            List<Structure> result = new List<Structure>();
+            foreach (var structure in Structures.Values)
+            {
+                result.Add(structure);
+            }
+            return result;
         }
     }
-    
-    
+
+
 
     [Serializable]
     public struct Structure
     {
         public StructureType Type;
         public StructureNode Parent;
-        
+
         public Vector2Int Position => Parent.Position;
         public Side Side => Parent.Side;
         public ushort[] Points => Parent.Points;
         public byte OpenEdges => Parent.OpenEdges;
         public bool Contested => Parent.Contested;
-        
+
         public List<StructureNode> Nodes;
 
         public Structure(StructureType type)
@@ -104,17 +131,17 @@ namespace TerritoryWars.DataModels
             Parent = new StructureNode();
             Nodes = new List<StructureNode>();
         }
-        
+
         public void SetParent(StructureNode parent)
         {
             Parent = parent;
         }
-        
+
         public void AddNode(StructureNode node)
         {
             Nodes.Add(node);
         }
-        
+
         public bool ContainsNode(Vector2Int position, Side side)
         {
             foreach (var node in Nodes)
@@ -127,7 +154,7 @@ namespace TerritoryWars.DataModels
             return false;
         }
     }
-    
+
     [Serializable]
     public struct StructureNode
     {
@@ -141,7 +168,7 @@ namespace TerritoryWars.DataModels
         public StructureType Type;
 
     }
-    
+
     public enum StructureType
     {
         City = 0,

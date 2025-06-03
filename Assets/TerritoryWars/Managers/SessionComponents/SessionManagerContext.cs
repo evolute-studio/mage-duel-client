@@ -10,8 +10,10 @@ namespace TerritoryWars.Managers.SessionComponents
         public PlayersManager PlayersManager { get; set; }
         public GameLoopManager GameLoopManager { get; set; }
         public JokerManager JokerManager { get; set; }
+        public ContestManager ContestManager { get; set; }
         
         public BoardManager BoardManager => SessionManager.BoardManager;
         public TileSelector TileSelector => SessionManager.TileSelector;
+        public StructureHoverManager StructureHoverManager => SessionManager.StructureHoverManager;
     }
 }

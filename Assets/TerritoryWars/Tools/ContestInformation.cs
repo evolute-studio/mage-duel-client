@@ -1,25 +1,29 @@
 ﻿using System;
+using TerritoryWars.DataModels;
+using UnityEngine;
 
 namespace TerritoryWars.Tools
 {
     public class ContestInformation
     {
-        public byte Root;
-        public ContestType ContestType;
+        public Vector2Int Position;
+        public Side Side;
+        public StructureType StructureType;
         public Action ContestAction;
 
-        public ContestInformation(byte root, ContestType contestType, Action contestAction)
+        public ContestInformation(Vector2Int position, Side side, StructureType structureType, Action contestAction)
         {
-            Root = root;
+            Position = position;
+            Side = side;
             ContestAction = contestAction;
-            ContestType = contestType;
+            StructureType = structureType;
         }
     }
 
-    public enum ContestType
-    {
-        Road,
-        City,
-        None
-    }
+    // public enum ContestType
+    // {
+    //     Road,
+    //     City,
+    //     None
+    // }
 }

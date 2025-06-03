@@ -16,7 +16,7 @@ namespace TerritoryWars.Dojo
         public static bool dont_include_hashed_keys = false;
         public static OrderBy[] order_by = null;
         public static ulong entity_updated_after = 0;
-        
+
         /// <summary>
         /// Gets a query to fetch a single player by their address
         /// </summary>
@@ -31,12 +31,12 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = address })
                 );
-            
-            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys, 
+
+            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys,
                                     order_by, entity_models, entity_updated_after);
             return query;
         }
-        
+
         /// <summary>
         /// Gets a query to fetch multiple players by their addresses
         /// </summary>
@@ -45,19 +45,19 @@ namespace TerritoryWars.Dojo
         public static Query GetQueryPlayersArray(FieldElement[] addresses)
         {
             string[] entity_models = new[] { GetModelName<evolute_duel_Player>() };
-            
-            var addressValues = addresses.Select(addr => 
+
+            var addressValues = addresses.Select(addr =>
                 new MemberValue(new Primitive { Felt252 = addr })
             ).ToArray();
-            
+
             var memberClause = new MemberClause(
                 GetModelName<evolute_duel_Player>(),
                 "player_id",
-                dojo.ComparisonOperator.In, 
-                new MemberValue(addressValues) 
+                dojo.ComparisonOperator.In,
+                new MemberValue(addressValues)
             );
-            
-            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys, 
+
+            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys,
                                     order_by, entity_models, entity_updated_after);
             return query;
         }
@@ -65,21 +65,21 @@ namespace TerritoryWars.Dojo
         public static Query GetQueryTopPlayersForLeaderboard(uint count, uint playersBalance)
         {
             string[] entity_models = new[] { GetModelName<evolute_duel_Player>() };
-            
+
             var notBotClause = new MemberClause(
                 GetModelName<evolute_duel_Player>(),
                 "role",
                 dojo.ComparisonOperator.Neq,
-                new MemberValue( new Primitive{ U8 = 2} )
+                new MemberValue(new Primitive { U8 = 2 })
             );
-            
+
             var balanceClause = new MemberClause(
                 GetModelName<evolute_duel_Player>(),
                 "balance",
                 dojo.ComparisonOperator.Gte,
-                new MemberValue( new Primitive{ U8 = (byte)playersBalance} )
+                new MemberValue(new Primitive { U8 = (byte)playersBalance })
             );
-            
+
             OrderBy[] order_by = new[]
             {
                 new OrderBy(
@@ -87,12 +87,12 @@ namespace TerritoryWars.Dojo
                     member: "balance",
                     direction: dojo.OrderDirection.Desc)
             };
-            
+
             var compositeClause = new CompositeClause(
                 dojo.LogicalOperator.And,
                 new[] { (Clause)notBotClause, balanceClause }
             );
-            Query query = new Query(count, offset, compositeClause, dont_include_hashed_keys, 
+            Query query = new Query(count, offset, compositeClause, dont_include_hashed_keys,
                                     order_by, entity_models, entity_updated_after);
             return query;
         }
@@ -105,7 +105,7 @@ namespace TerritoryWars.Dojo
         public static Query GetQueryPlayerInProgressGame(FieldElement address)
         {
             string[] entity_models = new[] { GetModelName<evolute_duel_Game>() };
-            
+
             var playerClause = new MemberClause(
                 GetModelName<evolute_duel_Game>(),
                 "player",
@@ -119,17 +119,17 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue("InProgress")
                 );
-            
+
             var compositeClause = new CompositeClause(
                 dojo.LogicalOperator.And,
             new[] { (Clause)playerClause, (Clause)statusClause }
                 );
-            
-            Query query = new Query(limit, offset, compositeClause, dont_include_hashed_keys, 
+
+            Query query = new Query(limit, offset, compositeClause, dont_include_hashed_keys,
                                     order_by, entity_models, entity_updated_after);
             return query;
         }
-        
+
         /// <summary>
         /// Gets a query to fetch general game models including Rules and Shop
         /// </summary>
@@ -137,11 +137,11 @@ namespace TerritoryWars.Dojo
         public static Query GetGeneralModels()
         {
             string[] entity_models = new[] { GetModelName<evolute_duel_Rules>(), GetModelName<evolute_duel_Shop>() };
-            Query query = new Query(limit, offset, null, dont_include_hashed_keys, 
+            Query query = new Query(limit, offset, null, dont_include_hashed_keys,
                                     order_by, entity_models, entity_updated_after);
             return query;
         }
-        
+
         /// <summary>
         /// Gets a query to fetch a specific game board by its ID
         /// </summary>
@@ -156,12 +156,27 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = id })
             );
-            
-            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys, 
+
+            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys,
                                     order_by, entity_models, entity_updated_after);
             return query;
         }
-        
+
+        public static Query GetQueryUnionFind(FieldElement id)
+        {
+            string[] entity_models = new[] { GetModelName<evolute_duel_UnionFind>() };
+            var memberClause = new MemberClause(
+                GetModelName<evolute_duel_UnionFind>(),
+                "board_id",
+                dojo.ComparisonOperator.Eq,
+                new MemberValue(new Primitive { Felt252 = id })
+            );
+
+            Query query = new Query(423, offset, memberClause, dont_include_hashed_keys,
+                                    order_by, entity_models, entity_updated_after);
+            return query;
+        }
+
         /// <summary>
         /// Gets a query to fetch a game board and all its dependencies (city nodes, road nodes)
         /// </summary>
@@ -171,7 +186,7 @@ namespace TerritoryWars.Dojo
         {
             string[] entity_models = new[]
             {
-                GetModelName<evolute_duel_Board>(), 
+                GetModelName<evolute_duel_Board>(),
                 GetModelName<evolute_duel_CityNode>(),
                 GetModelName<evolute_duel_RoadNode>(),
             };
@@ -181,34 +196,34 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = id })
             );
-            
-            var moveClause = new MemberClause( 
+
+            var moveClause = new MemberClause(
                 GetModelName<evolute_duel_Move>(),
-                "first_board_id", 
+                "first_board_id",
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = id })
             );
-            
+
             var cityNodeClause = new MemberClause(
                 GetModelName<evolute_duel_CityNode>(),
                 "board_id",
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = id })
             );
-            
+
             var roadNodeClause = new MemberClause(
                 GetModelName<evolute_duel_RoadNode>(),
                 "board_id",
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = id })
             );
-            
+
             var compositeClause = new CompositeClause(
                 dojo.LogicalOperator.Or,
                 new[] { (Clause)boardIdClause, cityNodeClause, roadNodeClause }
             );
-            
-            Query query = new Query(limit, offset, compositeClause, dont_include_hashed_keys, 
+
+            Query query = new Query(limit, offset, compositeClause, dont_include_hashed_keys,
                                     order_by, entity_models, entity_updated_after);
             return query;
         }
@@ -221,17 +236,17 @@ namespace TerritoryWars.Dojo
         {
             string[] entity_models = new[]
             {
-                GetModelName<evolute_duel_Move>(), 
-            };
-            
-            var moveClause = new MemberClause( 
                 GetModelName<evolute_duel_Move>(),
-                "first_board_id", 
+            };
+
+            var moveClause = new MemberClause(
+                GetModelName<evolute_duel_Move>(),
+                "first_board_id",
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = id })
             );
-            
-            Query query = new Query(limit, offset, moveClause, dont_include_hashed_keys, 
+
+            Query query = new Query(limit, offset, moveClause, dont_include_hashed_keys,
                 order_by, entity_models, entity_updated_after);
             return query;
         }
@@ -240,44 +255,44 @@ namespace TerritoryWars.Dojo
         {
             string[] entity_models = new[]
             {
-                GetModelName<evolute_duel_Move>(), 
-            };
-            
-            var moveClause = new MemberClause( 
                 GetModelName<evolute_duel_Move>(),
-                "id", 
+            };
+
+            var moveClause = new MemberClause(
+                GetModelName<evolute_duel_Move>(),
+                "id",
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = id })
             );
-            
-            Query query = new Query(limit, offset, moveClause, dont_include_hashed_keys, 
+
+            Query query = new Query(limit, offset, moveClause, dont_include_hashed_keys,
                 order_by, entity_models, entity_updated_after);
             return query;
         }
-        
+
         public static Query GetQueryMoveByIdArray(FieldElement[] ids)
         {
             string[] entity_models = new[]
             {
-                GetModelName<evolute_duel_Move>(), 
+                GetModelName<evolute_duel_Move>(),
             };
-            
-            var idValues = ids.Select(id => 
+
+            var idValues = ids.Select(id =>
                 new MemberValue(new Primitive { Felt252 = id })
             ).ToArray();
-            
+
             var memberClause = new MemberClause(
                 GetModelName<evolute_duel_Move>(),
                 "id",
-                dojo.ComparisonOperator.In, 
-                new MemberValue(idValues) 
+                dojo.ComparisonOperator.In,
+                new MemberValue(idValues)
             );
-            
-            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys, 
+
+            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys,
                                     order_by, entity_models, entity_updated_after);
             return query;
         }
-        
+
         /// <summary>
         /// Gets a query to fetch all games with 'Created' status
         /// </summary>
@@ -292,12 +307,12 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue("Created")
             );
-            
-            Query query = new Query(limit, offset, statusClause, dont_include_hashed_keys, 
+
+            Query query = new Query(limit, offset, statusClause, dont_include_hashed_keys,
                                     order_by, entity_models, entity_updated_after);
             return query;
         }
-        
+
         /// <summary>
         /// Gets a query to fetch all snapshots for a specific player
         /// </summary>
@@ -313,28 +328,28 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = playerAddress })
             );
-            
-            Query query = new Query(limit, offset, statusClause, dont_include_hashed_keys, 
+
+            Query query = new Query(limit, offset, statusClause, dont_include_hashed_keys,
                                     order_by, entity_models, entity_updated_after);
             return query;
         }
-        
+
         public static Query GetQuerySnapshotArray(FieldElement[] snapshotIds)
         {
             string[] entity_models = new[] { GetModelName<evolute_duel_Snapshot>() };
-            
-            var snapshotValues = snapshotIds.Select(id => 
+
+            var snapshotValues = snapshotIds.Select(id =>
                 new MemberValue(new Primitive { Felt252 = id })
             ).ToArray();
-            
+
             var memberClause = new MemberClause(
                 GetModelName<evolute_duel_Snapshot>(),
                 "snapshot_id",
-                dojo.ComparisonOperator.In, 
-                new MemberValue(snapshotValues) 
+                dojo.ComparisonOperator.In,
+                new MemberValue(snapshotValues)
             );
-            
-            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys, 
+
+            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys,
                                     order_by, entity_models, entity_updated_after);
             return query;
         }

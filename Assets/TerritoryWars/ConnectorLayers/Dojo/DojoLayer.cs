@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace TerritoryWars.ConnectorLayers.Dojo
 {
-    public class DojoLayer: MonoBehaviour
+    public class DojoLayer : MonoBehaviour
     {
         public static DojoLayer Instance { get; private set; }
         private void Awake()
@@ -28,10 +28,10 @@ namespace TerritoryWars.ConnectorLayers.Dojo
                 Destroy(gameObject);
             }
         }
-        
+
         public WorldManager WorldManager;
         public CustomSynchronizationMaster SynchronizationMaster;
-        
+
         public EventsHandler EventsHandler;
         public string LocalPlayerId => DojoGameManager.Instance.LocalAccount.Address.Hex();
 
@@ -52,7 +52,7 @@ namespace TerritoryWars.ConnectorLayers.Dojo
                 rules = WorldManager.EntityModel<evolute_duel_Rules>();
                 shop = WorldManager.EntityModel<evolute_duel_Shop>();
             }
-            
+
             if (rules == null || shop == null)
             {
                 return (default, default);
@@ -79,6 +79,23 @@ namespace TerritoryWars.ConnectorLayers.Dojo
             return boardModel;
         }
 
+        public async Task<UnionFind> GetUnionFind(string boardId)
+        {
+            evolute_duel_UnionFind unionFind = WorldManager.EntityModel<evolute_duel_UnionFind>("board_id", new FieldElement(boardId));
+            if (unionFind == null)
+            {
+                await SynchronizationMaster.SyncUnionFind(new FieldElement(boardId));
+                unionFind = WorldManager.EntityModel<evolute_duel_UnionFind>("board_id", new FieldElement(boardId));
+            }
+            if (unionFind == null)
+            {
+                return default;
+            }
+
+            UnionFind unionFindModel = new UnionFind().SetData(unionFind);
+            return unionFindModel;
+        }
+
         public async Task<Move> GetMove(string moveId)
         {
             evolute_duel_Move move = WorldManager.EntityModel<evolute_duel_Move>("id", new FieldElement(moveId));
@@ -94,9 +111,9 @@ namespace TerritoryWars.ConnectorLayers.Dojo
 
             Move boardModel = new Move().SetData(move);
             return boardModel;
-            
+
         }
-        
+
         public async Task<Move> GetMoves(string moveId)
         {
             evolute_duel_Move move = WorldManager.EntityModel<evolute_duel_Move>("id", new FieldElement(moveId));
@@ -113,7 +130,7 @@ namespace TerritoryWars.ConnectorLayers.Dojo
             Move boardModel = new Move().SetData(move);
             return boardModel;
         }
-        
+
         public List<Move> GetMoves(List<Move> moves, GameObject[] allMoveGameObjects = null)
         {
             if (allMoveGameObjects == null)
@@ -127,7 +144,7 @@ namespace TerritoryWars.ConnectorLayers.Dojo
             {
                 return moves;
             }
-            
+
             foreach (var moveGO in allMoveGameObjects)
             {
                 if (moveGO.TryGetComponent(out evolute_duel_Move move))
@@ -181,7 +198,17 @@ namespace TerritoryWars.ConnectorLayers.Dojo
             return gameModel;
         }
 
-        
-
+        public void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+            }
+            if (EventsHandler != null)
+            {
+                EventsHandler.Dispose();
+                EventsHandler = null;
+            }
+        }
     }
 }

@@ -38,6 +38,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Subscribe<Skipped>(OnSkipped);
             EventBus.Subscribe<ClientInput>(OnLocalFinishTurn);
             EventBus.Subscribe<TimerEvent>(OnTimerEvent);
+            EventBus.Subscribe<UnionFind>(OnUnionFind);
             EventBus.Subscribe<TurnEndData>(OnTurnEnd);
         }
 
@@ -192,6 +193,11 @@ namespace TerritoryWars.Managers.SessionComponents
             _turnEndData.SetSkipped(ref data);
         }
 
+        private void OnUnionFind(UnionFind unionFind)
+        {
+            _sessionContext.UnionFind = unionFind;
+        }
+
         private void OnLocalFinishTurn(ClientInput input)
         {
 
@@ -327,6 +333,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Unsubscribe<Moved>(OnMoved);
             EventBus.Unsubscribe<Skipped>(OnSkipped);
             EventBus.Unsubscribe<ClientInput>(OnLocalFinishTurn);
+            EventBus.Unsubscribe<UnionFind>(OnUnionFind);
             EventBus.Unsubscribe<TimerEvent>(OnTimerEvent);
         }
     }
@@ -336,8 +343,6 @@ namespace TerritoryWars.Managers.SessionComponents
         public BoardUpdated BoardUpdated;
         public Moved Moved;
         public Skipped Skipped;
-
-
         public void SetBoardUpdated(ref BoardUpdated boardUpdated)
         {
             BoardUpdated = boardUpdated;
