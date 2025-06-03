@@ -140,7 +140,7 @@ namespace TerritoryWars.Managers.SessionComponents
                         bool isCityContest = node.Type == StructureType.City && isContested;
                         bool isRoadContest = node.Type == StructureType.Road && isContested;
                         _managerContext.BoardManager.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                            BoardManager.StructureType.Road, isRoadContest, isCityContest);
+                            structure.Type, isRoadContest, isCityContest);
                     }
                     
                 }

@@ -255,20 +255,12 @@ namespace TerritoryWars.General
             return false;
         }
 
-        public enum StructureType
-        {
-            City,
-            Road,
-            All,
-            None,
-        }
-
         public void CheckAndConnectEdgeStructure(int ownerId, int x, int y, StructureType type, bool isCityContest = false, bool isRoadContest = false)
         {
-            // if( (x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
-            // {
-            //     TryConnectEdgeStructure(ownerId, x, y, type, isCityContest, isRoadContest);
-            // }
+            if( (x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
+            {
+                TryConnectEdgeStructure(ownerId, x, y, type, isCityContest, isRoadContest);
+            }
         }
 
         public void ConnectEdgeStructureAnimation(int ownerId, TileData tileData, int x, int y, bool isCityContest = false, bool isRoadContest = false)
@@ -278,7 +270,7 @@ namespace TerritoryWars.General
             ScoreClientPrediction(ownerId, tileData);
         }
 
-        private bool TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.All, bool isCityContest = false, bool isRoadContest = false)
+        private bool TryConnectEdgeStructure(int owner, int x, int y, StructureType type = StructureType.None, bool isCityContest = false, bool isRoadContest = false)
         {
             bool result = false;
             GameObject[] neighborsGO = new GameObject[4];
@@ -307,13 +299,13 @@ namespace TerritoryWars.General
                     if (owner != 3) neighborsData[i].SetOwner(owner);
                     ConnectEdgeStructureAnimation(owner, neighborsData[i], tilePositions[i][0], tilePositions[i][1], isCityContest, isRoadContest);
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
-                    if (type == StructureType.All || type == StructureType.City)
+                    if (type == StructureType.None || type == StructureType.City)
                     {
                         tileGenerator.RecolorHouses(owner, isCityContest, neighborsData[i].Rotation);
                         result = true;
                     }
 
-                    if (type == StructureType.All || type == StructureType.Road)
+                    if (type == StructureType.None || type == StructureType.Road)
                     {
                         TileGenerator placedTileGenerator = tileObjects[x, y].GetComponent<TileGenerator>();
                         List<Side> roadSides = neighborsData[i].GetRoadSides();

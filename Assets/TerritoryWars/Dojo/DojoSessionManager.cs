@@ -705,189 +705,189 @@ namespace TerritoryWars.Dojo
 
         public void UpdateBoardAfterCityContest(byte root)
         {
-            BuildCitySets();
-
-            var city = GetCityByPosition(root);
-            foreach (var node in city.Value)
-            {
-                bool isContested = city.Key.contested;
-                Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
-                if (SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
-                { 
-                    continue;
-                }
-                GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y);
-                TileData tileData = SessionManagerOld.Instance.Board.GetTileData(position.x, position.y);
-                TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
-                int playerOwner;
-                if (city.Key.contested)
-                { 
-                    if (city.Key.blue_points == city.Key.red_points)
-                    { 
-                        playerOwner = 3;
-                    }
-                    else
-                    {
-                        playerOwner = city.Key.blue_points > city.Key.red_points ? 0 : 1;
-                    }
-                }
-                else
-                {
-                    playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
-                }
-                tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.Rotation);
-
-                if (isContested)
-                {
-                    tileGenerator.ChangeEnvironmentForContest();
-                    tileGenerator.tileParts.SetActiveWoodenArcs(false);
-                    tileGenerator.tileParts.SetActiveWoodenBorderWall(false);
-                }
-                    
-                SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                    BoardManager.StructureType.City, isContested); 
-            }
+            // BuildCitySets();
+            //
+            // var city = GetCityByPosition(root);
+            // foreach (var node in city.Value)
+            // {
+            //     bool isContested = city.Key.contested;
+            //     Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
+            //     if (SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
+            //     { 
+            //         continue;
+            //     }
+            //     GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y);
+            //     TileData tileData = SessionManagerOld.Instance.Board.GetTileData(position.x, position.y);
+            //     TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
+            //     int playerOwner;
+            //     if (city.Key.contested)
+            //     { 
+            //         if (city.Key.blue_points == city.Key.red_points)
+            //         { 
+            //             playerOwner = 3;
+            //         }
+            //         else
+            //         {
+            //             playerOwner = city.Key.blue_points > city.Key.red_points ? 0 : 1;
+            //         }
+            //     }
+            //     else
+            //     {
+            //         playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
+            //     }
+            //     tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.Rotation);
+            //
+            //     if (isContested)
+            //     {
+            //         tileGenerator.ChangeEnvironmentForContest();
+            //         tileGenerator.tileParts.SetActiveWoodenArcs(false);
+            //         tileGenerator.tileParts.SetActiveWoodenBorderWall(false);
+            //     }
+            //         
+            //     SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
+            //         BoardManager.StructureType.City, isContested); 
+            // }
         }
 
 
         public void UpdateBoardAfterRoadContest(byte root)
         {
-            BuildRoadSets();
-            
-            var road = GetRoadByPosition(root);
-            
-                foreach (var node in road.Value)
-                {
-                    bool isContest = road.Key.contested;
-                    (Vector2Int position, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
-                    if(SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
-                    {
-                        continue;
-                    }
-                    CustomLogger.LogInfo($"Board: " + SessionManagerOld.Instance.Board);
-                    CustomLogger.LogInfo($"TileObject: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y));
-                    CustomLogger.LogInfo($"TileGenerator: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>());
-                    TileGenerator tileGenerator = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>();
-                    int playerOwner;
-                    if (road.Key.contested)
-                    {
-                        if (road.Key.blue_points == road.Key.red_points)
-                        {
-                            playerOwner = 3;
-                        }
-                        else
-                        {
-                            playerOwner = road.Key.blue_points > road.Key.red_points ? 0 : 1;
-                        }
-                    }
-                    else
-                    {
-                        playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
-                    }
-                    tileGenerator.RecolorPinOnSide(playerOwner, (int)side, isContest);
-                    if (isContest)
-                    {
-                        tileGenerator.CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite =
-                            PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(tileGenerator
-                                .CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite);
-                        
-                    }
-                    SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                        BoardManager.StructureType.Road, false, isContest);
-                }
+            // BuildRoadSets();
+            //
+            // var road = GetRoadByPosition(root);
+            //
+            //     foreach (var node in road.Value)
+            //     {
+            //         bool isContest = road.Key.contested;
+            //         (Vector2Int position, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
+            //         if(SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
+            //         {
+            //             continue;
+            //         }
+            //         CustomLogger.LogInfo($"Board: " + SessionManagerOld.Instance.Board);
+            //         CustomLogger.LogInfo($"TileObject: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y));
+            //         CustomLogger.LogInfo($"TileGenerator: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>());
+            //         TileGenerator tileGenerator = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>();
+            //         int playerOwner;
+            //         if (road.Key.contested)
+            //         {
+            //             if (road.Key.blue_points == road.Key.red_points)
+            //             {
+            //                 playerOwner = 3;
+            //             }
+            //             else
+            //             {
+            //                 playerOwner = road.Key.blue_points > road.Key.red_points ? 0 : 1;
+            //             }
+            //         }
+            //         else
+            //         {
+            //             playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
+            //         }
+            //         tileGenerator.RecolorPinOnSide(playerOwner, (int)side, isContest);
+            //         if (isContest)
+            //         {
+            //             tileGenerator.CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite =
+            //                 PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(tileGenerator
+            //                     .CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite);
+            //             
+            //         }
+            //         SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
+            //             BoardManager.StructureType.Road, false, isContest);
+            //     }
         }
 
         public void UpdateBoardAfterContests()
         {
-            BuildCitySets();
-
-            foreach (var city in cities)
-            {
-                foreach (var node in city.Value)
-                {
-                    bool isContested = city.Key.contested;
-                    Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
-                    if (SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
-                    { 
-                        continue;
-                    }
-                    GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y);
-                    TileData tileData = SessionManagerOld.Instance.Board.GetTileData(position.x, position.y);
-                    TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
-                    int playerOwner;
-                    if (city.Key.contested)
-                    { 
-                        if (city.Key.blue_points == city.Key.red_points)
-                        { 
-                            playerOwner = 3;
-                        }
-                        else
-                        {
-                            playerOwner = city.Key.blue_points > city.Key.red_points ? 0 : 1;
-                        }
-                    }
-                    else
-                    {
-                        playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
-                    }
-                    tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.Rotation);
-
-                    if (isContested)
-                    {
-                        tileGenerator.ChangeEnvironmentForContest();
-                        tileGenerator.tileParts.SetActiveWoodenBorderWall(false);
-                        tileGenerator.tileParts.SetActiveWoodenArcs(false);
-                    }
-                    
-                    SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                        BoardManager.StructureType.City, isContested); 
-                }
-            }
-            
-            BuildRoadSets();
-
-            foreach (var road in roads)
-            {
-                foreach (var node in road.Value)
-                {
-                    bool isContest = road.Key.contested;
-                    (Vector2Int position, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
-                    if(SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
-                    {
-                        continue;
-                    }
-                    CustomLogger.LogInfo($"Board: " + SessionManagerOld.Instance.Board);
-                    CustomLogger.LogInfo($"TileObject: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y));
-                    CustomLogger.LogInfo($"TileGenerator: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>());
-                    TileGenerator tileGenerator = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>();
-                    int playerOwner;
-                    if (road.Key.contested)
-                    {
-                        if (road.Key.blue_points == road.Key.red_points)
-                        {
-                            playerOwner = 3;
-                        }
-                        else
-                        {
-                            playerOwner = road.Key.blue_points > road.Key.red_points ? 0 : 1;
-                        }
-                    }
-                    else
-                    {
-                        playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
-                    }
-                    tileGenerator.RecolorPinOnSide(playerOwner, (int)side, isContest);
-                    if (isContest)
-                    {
-                        tileGenerator.CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite =
-                            PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(tileGenerator
-                                .CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite);
-                        
-                    }
-                    SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
-                        BoardManager.StructureType.Road, false, isContest);
-                }
-            }
+            // BuildCitySets();
+            //
+            // foreach (var city in cities)
+            // {
+            //     foreach (var node in city.Value)
+            //     {
+            //         bool isContested = city.Key.contested;
+            //         Vector2Int position = OnChainBoardDataConverter.GetPositionByRoot(node.position);
+            //         if (SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
+            //         { 
+            //             continue;
+            //         }
+            //         GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y);
+            //         TileData tileData = SessionManagerOld.Instance.Board.GetTileData(position.x, position.y);
+            //         TileGenerator tileGenerator = tile.GetComponent<TileGenerator>();
+            //         int playerOwner;
+            //         if (city.Key.contested)
+            //         { 
+            //             if (city.Key.blue_points == city.Key.red_points)
+            //             { 
+            //                 playerOwner = 3;
+            //             }
+            //             else
+            //             {
+            //                 playerOwner = city.Key.blue_points > city.Key.red_points ? 0 : 1;
+            //             }
+            //         }
+            //         else
+            //         {
+            //             playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
+            //         }
+            //         tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.Rotation);
+            //
+            //         if (isContested)
+            //         {
+            //             tileGenerator.ChangeEnvironmentForContest();
+            //             tileGenerator.tileParts.SetActiveWoodenBorderWall(false);
+            //             tileGenerator.tileParts.SetActiveWoodenArcs(false);
+            //         }
+            //         
+            //         SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
+            //             BoardManager.StructureType.City, isContested); 
+            //     }
+            // }
+            //
+            // BuildRoadSets();
+            //
+            // foreach (var road in roads)
+            // {
+            //     foreach (var node in road.Value)
+            //     {
+            //         bool isContest = road.Key.contested;
+            //         (Vector2Int position, Side side) = OnChainBoardDataConverter.GetPositionAndSide(node.position);
+            //         if(SessionManagerOld.Instance.Board == null || SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y) == null)
+            //         {
+            //             continue;
+            //         }
+            //         CustomLogger.LogInfo($"Board: " + SessionManagerOld.Instance.Board);
+            //         CustomLogger.LogInfo($"TileObject: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y));
+            //         CustomLogger.LogInfo($"TileGenerator: " + SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>());
+            //         TileGenerator tileGenerator = SessionManagerOld.Instance.Board.GetTileObject(position.x, position.y).GetComponent<TileGenerator>();
+            //         int playerOwner;
+            //         if (road.Key.contested)
+            //         {
+            //             if (road.Key.blue_points == road.Key.red_points)
+            //             {
+            //                 playerOwner = 3;
+            //             }
+            //             else
+            //             {
+            //                 playerOwner = road.Key.blue_points > road.Key.red_points ? 0 : 1;
+            //             }
+            //         }
+            //         else
+            //         {
+            //             playerOwner = OnChainBoardDataConverter.WhoPlaceTile(LocalPlayerBoard, position);
+            //         }
+            //         tileGenerator.RecolorPinOnSide(playerOwner, (int)side, isContest);
+            //         if (isContest)
+            //         {
+            //             tileGenerator.CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite =
+            //                 PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(tileGenerator
+            //                     .CurrentTileGO.GetComponent<TileParts>().RoadRenderers[(int)side].sprite);
+            //             
+            //         }
+            //         SessionManagerOld.Instance.Board.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
+            //             BoardManager.StructureType.Road, false, isContest);
+            //     }
+            // }
         }
         
         public void CloseAllStructure()
