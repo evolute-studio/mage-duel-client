@@ -201,8 +201,9 @@ namespace TerritoryWars.General
         {
             currentTween?.Kill();
             _currentBoardPosition = currentBoardPosition;
-
+            CustomLogger.LogImportant($"TilePreview: Setting position to {currentBoardPosition}");
             Vector3 targetPosition = BoardManager.GetTilePosition(currentBoardPosition.x, currentBoardPosition.y);
+            CustomLogger.LogImportant($"TilePreview: Target position is {targetPosition}");
             targetPosition.y += tilePreviewSetHeight;
 
             currentTween = transform

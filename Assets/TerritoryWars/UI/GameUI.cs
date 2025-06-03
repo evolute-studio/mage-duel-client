@@ -146,7 +146,7 @@ namespace TerritoryWars.UI
                 playerInfoUI.charactersObject.GetAnimatorController(PlayerCharactersManager
                     .GetOpponentCurrentCharacterId()));
 
-            bool isLocalPlayerBlue = SessionManagerOld.Instance.LocalPlayer.PlayerSide == 0;
+            bool isLocalPlayerBlue = SessionManager.Instance.SessionContext.LocalPlayer.PlayerSide == 0;
             string wonText;
             if (score1 > score2 && isLocalPlayerBlue || score1 < score2 && !isLocalPlayerBlue)
                 wonText = "You won!";
@@ -268,8 +268,8 @@ namespace TerritoryWars.UI
 
         public void OnJokerButtonClicked()
         {
-            if (SessionManagerOld.Instance.CurrentTurnPlayer.JokerCount <= 0 || _isJokerActive ||
-                !SessionManagerOld.Instance.IsLocalPlayerTurn) return;
+            if (SessionManager.Instance.SessionContext.CurrentTurnPlayer.JokerCount <= 0 || _isJokerActive ||
+                !SessionManager.Instance.SessionContext.IsLocalPlayerTurn) return;
             _isJokerActive = true;
 
             SetJokerMode(true);
@@ -284,7 +284,7 @@ namespace TerritoryWars.UI
         }
 
         public void SetJokerMode(bool active)
-        {
+        {   
             _isJokerActive = active;
             if (active)
             {
@@ -304,7 +304,7 @@ namespace TerritoryWars.UI
                 _sessionManager.ManagerContext.JokerManager.DeactivateJoker();
                 tilePreview._tileJokerAnimator.StopIdleJokerAnimation();
                 tilePreviewUITileJokerAnimator.StopIdleJokerAnimation();
-                SessionManagerOld.Instance.TileSelector.CancelJokerMode();
+                SessionManager.Instance.TileSelector.CancelJokerMode();
                 UpdateUI();
             }
         }

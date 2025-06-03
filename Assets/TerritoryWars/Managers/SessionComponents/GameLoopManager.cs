@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
@@ -97,6 +98,23 @@ namespace TerritoryWars.Managers.SessionComponents
             GameUI.Instance.SetEndTurnButtonActive(false);
             GameUI.Instance.SetRotateButtonActive(false);
             GameUI.Instance.SetSkipTurnButtonActive(true);
+            GameUI.Instance.SetActiveDeckContainer(true);
+            
+            if (_managerContext.TileSelector.IsExistValidPlacement(tileData))
+            {
+                _managerContext.TileSelector.StartTilePlacement(tileData);
+            }
+            else
+            {
+                if (_currentPlayer.JokerCount > 0)
+                {
+                    GameUI.Instance.OnJokerButtonClicked();
+                }
+                else
+                {
+                    GameUI.Instance.SetActiveSkipButtonPulse(true);
+                }
+            }
 
             if (_sessionContext.IsGameWithBotAsPlayer)
             {
@@ -108,6 +126,11 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             CustomLogger.LogDojoLoop("StartRemoteTurn");
             _remotePlayer.StartSelectingAnimation();
+            
+            GameUI.Instance.SetEndTurnButtonActive(false);
+            GameUI.Instance.SetRotateButtonActive(false);
+            GameUI.Instance.SetSkipTurnButtonActive(false);
+            GameUI.Instance.SetActiveDeckContainer(false);
 
             if (_sessionContext.IsGameWithBot || _sessionContext.IsGameWithBotAsPlayer)
             {
@@ -125,6 +148,7 @@ namespace TerritoryWars.Managers.SessionComponents
             _sessionContext.Players[0].SetData(_sessionContext.Board.Player1);
             _sessionContext.Players[1].SetData(_sessionContext.Board.Player2);
             GameUI.Instance.playerInfoUI.UpdateData(_sessionContext.PlayersData);
+            GameUI.Instance.playerInfoUI.SetDeckCount(_sessionContext.Board.AvailableTilesInDeck.Length);
             _turnEndData.SetBoardUpdated(ref data);
         }
 
@@ -133,11 +157,28 @@ namespace TerritoryWars.Managers.SessionComponents
             if (data.PlayerId != _localPlayer.PlayerId)
             {
                 TileData tileData = new TileData(data.tileModel);
-                _managerContext.BoardManager.PlaceTile(tileData);
+                //_managerContext.BoardManager.PlaceTile(tileData);
+                
+                Coroutines.StartRoutine(HandleOpponentMoveCoroutine(tileData));
             }
 
             _sessionContext.Board.UpdateTimestamp(data.Timestamp);
             _turnEndData.SetMoved(ref data);
+        }
+        
+        private IEnumerator HandleOpponentMoveCoroutine(TileData tile)
+        {
+            _managerContext.TileSelector.SetCurrentTile(tile);
+            _managerContext.TileSelector.tilePreview.SetPosition(tile.Position);
+            yield return new WaitForSeconds(0.3f);
+            _managerContext.TileSelector.tilePreview.PlaceTile(tile, () =>
+            {
+                _managerContext.BoardManager.PlaceTile(tile);
+            });
+            yield return new WaitForSeconds(0.5f);
+            _currentPlayer.EndTurnAnimation();
+            yield return new WaitForSeconds(0.5f);
+            _managerContext.TileSelector.tilePreview.ResetPosition();
         }
 
         private void OnSkipped(Skipped data)
@@ -209,7 +250,6 @@ namespace TerritoryWars.Managers.SessionComponents
         public void OnTurnEnd(TurnEndData turnEndData)
         {
             CustomLogger.LogDojoLoop("OnTurnEnd");
-            _managerContext.TileSelector.tilePreview.ResetPosition();
             _currentPlayer.EndTurnAnimation();
             _turnEndData.Reset();
             byte nextTurnSide = (byte)((_currentPlayer.PlayerSide + 1) % 2);
