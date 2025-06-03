@@ -1,4 +1,5 @@
 using TerritoryWars.General;
+using TerritoryWars.Managers.SessionComponents;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +15,7 @@ namespace TerritoryWars.UI
         
         public void SetScores(ushort blueScore, ushort redScore)
         {
-            if (SessionManagerOld.Instance.IsLocalPlayerHost)
+            if (SessionManager.Instance.IsLocalPlayerHost)
             {
                 BlueScoreText.text = blueScore.ToString();
                 RedScoreText.text = redScore.ToString();
@@ -29,7 +30,7 @@ namespace TerritoryWars.UI
         
         public void SetFlags(ushort blueScore, ushort redScore)
         {
-            if (SessionManagerOld.Instance.IsLocalPlayerHost)
+            if (SessionManager.Instance.IsLocalPlayerHost)
             {
                 if(blueScore == redScore)
                     Background.sprite = ScoreFlags[0];

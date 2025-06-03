@@ -122,7 +122,7 @@ namespace TerritoryWars.General
 
         private void CityHover(Transform objTransform)
         {
-            BoardManager board = SessionManagerOld.Instance.Board;
+            BoardManager board = SessionManager.Instance.BoardManager;
             
             Transform parent = objTransform.transform.parent.parent.parent;
             _hoveredObjects.Add(parent.gameObject);
@@ -156,7 +156,7 @@ namespace TerritoryWars.General
         
         private void RoadHover(Transform objTransform)
         {
-            BoardManager board = SessionManagerOld.Instance.Board;
+            BoardManager board = SessionManager.Instance.BoardManager;
             Transform parent = objTransform.transform.parent.parent;
             _hoveredObjects.Add(parent.gameObject);
             TileParts tileParts = objTransform.transform.parent.GetComponent<TileParts>();
@@ -203,7 +203,7 @@ namespace TerritoryWars.General
             if (_hoveredTiles.Count == 0) return;
             
             if (isHovered) return;
-            BoardManager board = SessionManagerOld.Instance.Board;
+            BoardManager board = SessionManager.Instance.BoardManager;
             foreach (var position in _hoveredTiles)
             {
                 GameObject tile = board.GetTileObject(position.Key.x, position.Key.y);
@@ -262,7 +262,7 @@ namespace TerritoryWars.General
 
         public List<TileParts> GetCityTilePartsForHighlight(Transform tileParent)
         {
-            BoardManager board = SessionManagerOld.Instance.Board;
+            BoardManager board = SessionManager.Instance.BoardManager;
             List<TileParts> cityTileParts = new List<TileParts>();
             HashSet<KeyValuePair<Vector2Int, Side>> hoveredTiles = new HashSet<KeyValuePair<Vector2Int, Side>>();
             

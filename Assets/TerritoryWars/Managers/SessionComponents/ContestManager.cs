@@ -35,7 +35,7 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             ClashAnimation contestAnimation = CreateContestAnimation();
             Vector2Int coord = contest.Position;
-            GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(coord.x, coord.y);
+            GameObject tile = SessionManager.Instance.BoardManager.GetTileObject(coord.x, coord.y);
             
             Vector3 offset = new Vector3(0, 1.5f, 0);
             int winner = contest.WinnerId;
@@ -59,7 +59,7 @@ namespace TerritoryWars.Managers.SessionComponents
             int maxAttempts = 6;
             while (i < maxAttempts)
             {
-                GameObject tile = SessionManagerOld.Instance.Board.GetTileObject(coord.x, coord.y);
+                GameObject tile = SessionManager.Instance.BoardManager.GetTileObject(coord.x, coord.y);
                 if (tile)
                 {
                     Vector3 position = tile.transform.position;

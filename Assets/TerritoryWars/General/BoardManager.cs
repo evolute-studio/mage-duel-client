@@ -69,8 +69,6 @@ namespace TerritoryWars.General
         public void Initialize()
         {
             InitializeBoard();
-            var onChainBoard = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
-            char[] edgeTiles = OnChainBoardDataConverter.GetInitialEdgeState(onChainBoard.initial_edge_state);
         }
 
         private void InitializeBoard()
@@ -914,7 +912,7 @@ namespace TerritoryWars.General
         public TileData GetTileData(int x, int y)
         {
             if (!IsValidPosition(x, y)) return null;
-            return tileData[x, y] == null ? new TileData() : tileData[x, y];
+            return tileData[x, y];
         }
 
         public class RoadStructure

@@ -539,11 +539,14 @@ namespace TerritoryWars.General
 
         private bool IsValidJokerPosition(int x, int y)
         {
+            //CustomLogger.LogObject(board.GetTileData(x, y), "TileSelector: IsValidJokerPosition - Tile Data");
             if (board.GetTileData(x, y) != null) return false;
 
             bool hasValidNeighbor = false;
             foreach (Side side in System.Enum.GetValues(typeof(Side)))
             {
+                if(side == Side.None) 
+                    continue;
                 int newX = x + board.GetXOffset(side);
                 int newY = y + board.GetYOffset(side);
 
@@ -608,10 +611,12 @@ namespace TerritoryWars.General
             tilePreview.ResetPosition();
             ClearHighlights();
 
-            var currentTile = DojoGameManager.Instance.DojoSessionManager.GetTopTile();
+            var currentTile = SessionManager.Instance.SessionContext.Board.TopTile;
+            TileData topTile = new TileData(currentTile, -Vector2Int.one,
+                SessionManager.Instance.SessionContext.CurrentTurnPlayer.PlayerSide);
             if (currentTile != null)
             {
-                StartTilePlacement(currentTile);
+                StartTilePlacement(topTile);
             }
         }
 

@@ -11,6 +11,7 @@ using TerritoryWars.General;
 using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
+using TerritoryWars.UI;
 using UnityEngine;
 
 public class FinishGameContests
@@ -28,7 +29,7 @@ public class FinishGameContests
         _mainCameraMouseControll = _mainCamera.GetComponent<MouseControll>();
         PrepareCameraForContest();
         PlayFinishGameAnimation();
-        SessionManagerOld.Instance.gameUI.SetFinishGameUI(false);
+        GameUI.Instance.SetFinishGameUI(false);
     }
 
     private async void PlayFinishGameAnimation()

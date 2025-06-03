@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using Dojo.Starknet;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
 using TerritoryWars.DataModels.ClientEvents;
@@ -42,6 +43,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Subscribe<UnionFind>(OnUnionFind);
             EventBus.Subscribe<GameFinished>(OnEndGame);
             EventBus.Subscribe<ErrorOccured>(OnError);
+            EventBus.Subscribe<GameCanceled>(OnGameCanceled);
             EventBus.Subscribe<TurnEndData>(OnTurnEnd);
         }
 
@@ -68,8 +70,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void FinishGame()
         {
-            DojoConnector.FinishGame(DojoGameManager.Instance.LocalAccount,
-                DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard.id);
+            DojoConnector.FinishGame(DojoGameManager.Instance.LocalAccount, new FieldElement(_sessionContext.Board.Id));
         }
 
         private void StartTurn()
@@ -269,7 +270,7 @@ namespace TerritoryWars.Managers.SessionComponents
         public void OnEndGame(GameFinished gameFinished)
         {
             _managerContext.ContestManager.ContestProcessor.SetGameFinished(true);
-            SessionManagerOld.Instance.StructureHoverManager.IsGameFinished = true;
+            SessionManager.Instance.StructureHoverManager.IsGameFinished = true;
             CustomLogger.LogExecution($"[GameFinished]");
             FinishGameContests.FinishGameAction = () =>
             {
@@ -291,6 +292,12 @@ namespace TerritoryWars.Managers.SessionComponents
             }
 
             CustomLogger.LogError($"[{errorType}] | Player: {error.Player}");
+        }
+        
+        private void OnGameCanceled(GameCanceled gameCanceled)
+        {
+            SimpleStorage.ClearCurrentBoardId();
+            PopupManager.Instance.ShowOpponentCancelGame();
         }
 
         private IEnumerator GameFinishedDelayed()

@@ -8,6 +8,7 @@ using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 using System.Linq;
 using System.Collections.Generic;
+using TerritoryWars.Managers.SessionComponents;
 
 namespace TerritoryWars.General
 {
@@ -242,12 +243,12 @@ namespace TerritoryWars.General
                 _currentSequence.AppendCallback(() => {
                     try
                     {
-                        if (SessionManagerOld.Instance != null && !_isAnimating) return;
+                        if (SessionManager.Instance != null && !_isAnimating) return;
                         
-                        var jokerTile = SessionManagerOld.Instance.JokerManagerOld.GetGenerateJokerTile(x, y);
+                        var jokerTile = SessionManager.Instance.ManagerContext.JokerManager.GetGenerateJokerTile(x, y);
                         if (jokerTile != null)
                         {
-                            SessionManagerOld.Instance.TileSelector.StartJokerTilePlacement(jokerTile, x, y);
+                            SessionManager.Instance.TileSelector.StartJokerTilePlacement(jokerTile, x, y);
                         }
                     }
                     catch (Exception e)

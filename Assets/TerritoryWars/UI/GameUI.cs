@@ -2,6 +2,7 @@ using System;
 using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
+using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.Managers.SessionComponents;
@@ -128,11 +129,11 @@ namespace TerritoryWars.UI
             _resultPopUpUI.SetupButtons();
             _resultPopUpUI.SetPlayersName(_sessionManager.SessionContext.PlayersData[0].Username,
                 _sessionManager.SessionContext.PlayersData[1].Username);
-            evolute_duel_Board board = DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
-            int cityScoreBlue = board.blue_score.Item1;
-            int cartScoreBlue = board.blue_score.Item2;
-            int cityScoreRed = board.red_score.Item1;
-            int cartScoreRed = board.red_score.Item2;
+            Board board = SessionManager.Instance.SessionContext.Board;
+            int cityScoreBlue = board.Player1.Score.CityScore;
+            int cartScoreBlue = board.Player1.Score.RoadScore;
+            int cityScoreRed = board.Player2.Score.CityScore;
+            int cartScoreRed = board.Player2.Score.RoadScore;
             int score1 = cityScoreBlue + cartScoreBlue + _sessionManager.SessionContext.Players[0].JokerCount * 5;
             int score2 = cityScoreRed + cartScoreRed + _sessionManager.SessionContext.Players[1].JokerCount * 5;
             _resultPopUpUI.SetPlayersScore(score1, score2);
@@ -155,7 +156,7 @@ namespace TerritoryWars.UI
             else
                 wonText = "Draw!";
             _resultPopUpUI.SetWinnerText(wonText);
-            _resultPopUpUI.SetPlayersJoker(board.GetJokerCountPlayer1(), board.GetJokerCountPlayer2());
+            _resultPopUpUI.SetPlayersJoker(board.Player1.JokerCount, board.Player2.JokerCount);
             _resultPopUpUI.SetResultPopupActive(true);
             _resultPopUpUI.ViewResults();
         }

@@ -4,6 +4,7 @@ using System.Linq;
 using DG.Tweening;
 using NUnit.Framework;
 using TerritoryWars.General;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.ScriptablesObjects;
 using TerritoryWars.Tools;
@@ -236,13 +237,13 @@ namespace TerritoryWars.Tile
             
             tileParts.SpawnTileObjects();
 
-            if (SessionManagerOld.Instance.TileSelector.selectedPosition != null || _isTilePlacing)
+            if (SessionManager.Instance.TileSelector.selectedPosition != null || _isTilePlacing)
             {
-                FencePlacerForCloserToBorderCity(SessionManagerOld.Instance.Board.CheckCityTileSidesToBorder(
+                FencePlacerForCloserToBorderCity(SessionManager.Instance.BoardManager.CheckCityTileSidesToBorder(
                     _tileData.Position.x,
                     _tileData.Position.y));
                 
-                MinePlaceForCloserToBorderRoad(SessionManagerOld.Instance.Board.CheckRoadTileSidesToBorder(_tileData.Position.x,
+                MinePlaceForCloserToBorderRoad(SessionManager.Instance.BoardManager.CheckRoadTileSidesToBorder(_tileData.Position.x,
                     _tileData.Position.y));
             }
         }
@@ -377,14 +378,14 @@ namespace TerritoryWars.Tile
             {
                 if(_tileData.GetSide(side.Direction) != LandscapeType.Road) continue;
                 
-                bool snowBoardPart = SessionManagerOld.Instance.Board.IsSnowBoardPart(side.TileBoardPosition);
+                bool snowBoardPart = SessionManager.Instance.BoardManager.IsSnowBoardPart(side.TileBoardPosition);
 
                 foreach (var prefab in PrefabsManager.Instance.MineEnviromentTiles)
                 {
                     if (prefab.Direction == side.Direction && prefab.BoardPart == (snowBoardPart ? 3 : 0))
                     {
                         GameObject mine = Instantiate(prefab.MineTile, side.Position, Quaternion.identity,
-                            SessionManagerOld.Instance.Board.GetTileObject(side.TileBoardPosition.x, side.TileBoardPosition.y).transform);
+                            SessionManager.Instance.BoardManager.GetTileObject(side.TileBoardPosition.x, side.TileBoardPosition.y).transform);
                         side.Tile.GetComponent<TileGenerator>().RoadRenderer.gameObject.SetActive(false);
                     }
                 }

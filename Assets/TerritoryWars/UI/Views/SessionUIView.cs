@@ -29,6 +29,6 @@ public class SessionUIView : MonoBehaviour
     [SerializeField] private TilePreview tilePreview;
     [SerializeField] private TileJokerAnimator tilePreviewUITileJokerAnimator;
     
-    private SessionManagerOld _sessionManagerOld;
+    //private SessionManagerOld _sessionManagerOld;
     
 }
