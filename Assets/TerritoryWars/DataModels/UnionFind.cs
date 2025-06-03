@@ -171,7 +171,8 @@ namespace TerritoryWars.DataModels
 
     public enum StructureType
     {
-        City = 0,
-        Road = 1
+        None = 0,
+        City = 1,
+        Road = 2,
     }
 }

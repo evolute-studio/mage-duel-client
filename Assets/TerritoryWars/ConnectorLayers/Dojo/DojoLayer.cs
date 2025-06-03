@@ -9,6 +9,7 @@ using TerritoryWars.DataModels.Events;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
+using TerritoryWars.Tools;
 using UnityEngine;
 
 namespace TerritoryWars.ConnectorLayers.Dojo
@@ -64,6 +65,7 @@ namespace TerritoryWars.ConnectorLayers.Dojo
 
         public async Task<Board> GetBoard(string boardId)
         {
+            CustomLogger.LogImportant($"Getting board with ID: {boardId}");
             evolute_duel_Board board = WorldManager.EntityModel<evolute_duel_Board>("id", new FieldElement(boardId));
             if (board == null)
             {

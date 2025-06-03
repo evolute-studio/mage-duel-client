@@ -18,7 +18,7 @@ namespace TerritoryWars.General
         public static List<string> AllowedBoards = new List<string>();
         public static List<string> AllowedPlayers = new List<string>();
 
-        private static GlobalContext _globalContext => DojoGameManager.Instance.GlobalContext;
+        private static SessionContext _sessionContext => SessionManager.Instance?.SessionContext;
 
         public static UnityEvent<ModelInstance> OnModelPassed = new UnityEvent<ModelInstance>();
 
@@ -278,7 +278,7 @@ namespace TerritoryWars.General
                     evolute_duel_Board board = (evolute_duel_Board)model;
                     if (board.id == null) return true;
 
-                    if (_globalContext.SessionContext.IsSessionBoard(board.id.Hex()))
+                    if (_sessionContext.IsSessionBoard(board.id.Hex()))
                     {
                         CustomLogger.LogFiltering($"Board {board.id.Hex()} is session board. Allowing.");
                         return true;
@@ -288,7 +288,7 @@ namespace TerritoryWars.General
                     evolute_duel_UnionFind unionFind = (evolute_duel_UnionFind)model;
                     if (unionFind.board_id == null) return true;
                     
-                    if (_globalContext.SessionContext.IsSessionBoard(unionFind.board_id.Hex()))
+                    if (_sessionContext.IsSessionBoard(unionFind.board_id.Hex()))
                     {
                         CustomLogger.LogFiltering($"UnionFind {unionFind.board_id.Hex()} is session board. Allowing.");
                         return true;
@@ -296,7 +296,7 @@ namespace TerritoryWars.General
                     return false;
                 case nameof(evolute_duel_Move):
                     evolute_duel_Move move = (evolute_duel_Move)model;
-                    if (_globalContext.SessionContext.IsSessionMove(move.id.Hex(), move.first_board_id.Hex()))
+                    if (_sessionContext.IsSessionMove(move.id.Hex(), move.first_board_id.Hex()))
                     {
                         CustomLogger.LogFiltering($"Move {move.id.Hex()} is session move. Allowing.");
                         return true;
@@ -304,7 +304,7 @@ namespace TerritoryWars.General
                     return false;
                 case nameof(evolute_duel_Player):
                     evolute_duel_Player player = (evolute_duel_Player)model;
-                    if (_globalContext.SessionContext.IsPlayerInSession(player.player_id.Hex()))
+                    if (_sessionContext.IsPlayerInSession(player.player_id.Hex()))
                     {
                         CustomLogger.LogFiltering($"Player {player.player_id.Hex()} is session player. Allowing.");
                         return true;

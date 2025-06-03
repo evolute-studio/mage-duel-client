@@ -52,6 +52,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private async void Start()
         {
+            ApplicationState.CurrentState = ApplicationStates.Initializing;
             Initialize();
             await SetupData();
             ManagerContext.PlayersManager.Initialize(ManagerContext);
@@ -70,6 +71,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
 
             ManagerContext.GameLoopManager.StartGame();
+            ApplicationState.CurrentState = ApplicationStates.Session;
             IsInitialized = true;
         }
 
@@ -108,6 +110,7 @@ namespace TerritoryWars.Managers.SessionComponents
                 return;
             }
             SessionContext.Game = game;
+            CustomLogger.LogObject(SessionContext.Game, "Game");
             Board board = await DojoLayer.Instance.GetBoard(SessionContext.Game.BoardId);
             //IncomingModelsFilter.AllowedBoards.Add("0x0000000000000000000000000000000000000000000000000000000000000038");
             //Board board = await DojoLayer.Instance.GetBoard("0x0000000000000000000000000000000000000000000000000000000000000038");
