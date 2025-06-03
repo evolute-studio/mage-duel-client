@@ -63,7 +63,7 @@ namespace TerritoryWars.Bots
             foreach (var jokerPlacement in jokerPlacements)
             {
                 Vector2Int position = new Vector2Int(jokerPlacement.x, jokerPlacement.y);
-                TileData jokerTile = JokerManagerOld.GetOneJokerCombination(position.x, position.y);
+                TileData jokerTile = JokerManager.GetOneJokerCombination(position.x, position.y);
                 CurrentJokers.Add(new ValidPlacement(position), jokerTile);
             }
 

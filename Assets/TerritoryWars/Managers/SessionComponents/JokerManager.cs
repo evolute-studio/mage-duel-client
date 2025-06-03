@@ -68,7 +68,7 @@ namespace TerritoryWars.Managers.SessionComponents
             _currentCombinationIndex[(x, y)] = (currentIndex + 1) % possibleCombinations.Length;
             
             // TODO: Mb here will be problem with player side, need to check
-            TileData jokerTile = new TileData(tileConfig, Vector2Int.zero, SetLocalPlayerData.GetLocalIndex(_managerContext.SessionContext.LocalPlayer.PlayerSide));
+            TileData jokerTile = new TileData(tileConfig, Vector2Int.zero, _managerContext.SessionContext.CurrentTurnPlayer.PlayerSide);
             return jokerTile;
         }
         
