@@ -10,8 +10,11 @@ using UnityEngine;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using TerritoryWars.Bots;
+using TerritoryWars.ConnectorLayers.Dojo;
+using TerritoryWars.DataModels;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
+using TerritoryWars.Managers;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
@@ -69,6 +72,8 @@ namespace TerritoryWars.Dojo
 
         private evolute_duel_Game _gameInProgress;
         private evolute_duel_Board _boardInProgress;
+        
+        public GlobalContext GlobalContext { get; private set; } = new GlobalContext();
         
         public evolute_duel_Game GameInProgress
         {
@@ -172,21 +177,15 @@ namespace TerritoryWars.Dojo
         public async Task SyncInitialModels()
         {
             int count = 0;
-            await CustomSynchronizationMaster.SyncGeneralModels();
-            await CustomSynchronizationMaster.SyncPlayer(LocalAccount.Address);
-            await CustomSynchronizationMaster.SyncPlayerInProgressGame(LocalAccount.Address);
-            // if player has an in progress game, sync the board with dependencies
-            // TODO: remove logic duplication. It's already in SessionManager.Start
-            bool hasGame = await CheckGameInProgress();
-            if (hasGame)
-            {
-                await SyncEverythingForGame();
-                //RestoreGame(board);
-            }
-            else
-            {
-                //LoadMenu();
-            }
+            (Rules rules, Shop shop) = await DojoLayer.Instance.GetGeneralModels();
+            GlobalContext.Rules = rules;
+            GlobalContext.Shop = shop;
+            
+            PlayerProfile playerProfile = await DojoLayer.Instance.GetPlayerProfile(LocalAccount.Address.Hex());
+            GlobalContext.PlayerProfile = playerProfile;
+            
+            GameModel game = await DojoLayer.Instance.GetGameInProgress(LocalAccount.Address.Hex());
+            GlobalContext.GameInProgress = game;
         }
 
         public async Task SyncEverythingForGame()
@@ -215,45 +214,42 @@ namespace TerritoryWars.Dojo
             CustomLogger.LogDojoLoop("SyncEverythingForGame. Synced boards: " + count);
         }
         
-        private async Task<bool> CheckGameInProgress()
-        {
-            int boardCount = 0;
-            GameObject[] games = WorldManager.Entities<evolute_duel_Game>();
-            if (games.Length > 0)
-            {
-                evolute_duel_Game game = GameInProgress;
-                if (game == null)
-                {
-                    CustomLogger.LogError("Failed to load game model");
-                    return false;
-                }
-                var player = await CustomSynchronizationMaster.WaitForModelByPredicate<evolute_duel_Player>(
-                    p => p.player_id.Hex() == game.player.Hex()
-                );
-                
-                if (player == null)
-                {
-                    CustomLogger.LogError("Failed to load player model for game");
-                    return false;
-                }
-
-                FieldElement boardId = game.board_id switch
-                {
-                    Option<FieldElement>.Some some => some.value,
-                    _ => null
-                };
-                
-                boardCount = await CustomSynchronizationMaster.SyncBoardWithDependencies(boardId);
-            }
-            return boardCount > 0;
-        }
+        // private async Task<bool> CheckGameInProgress()
+        // {
+        //     int boardCount = 0;
+        //     GameObject[] games = WorldManager.Entities<evolute_duel_Game>();
+        //     if (games.Length > 0)
+        //     {
+        //         evolute_duel_Game game = GameInProgress;
+        //         if (game == null)
+        //         {
+        //             CustomLogger.LogError("Failed to load game model");
+        //             return false;
+        //         }
+        //         var player = await CustomSynchronizationMaster.WaitForModelByPredicate<evolute_duel_Player>(
+        //             p => p.player_id.Hex() == game.player.Hex()
+        //         );
+        //         
+        //         if (player == null)
+        //         {
+        //             CustomLogger.LogError("Failed to load player model for game");
+        //             return false;
+        //         }
+        //
+        //         FieldElement boardId = game.board_id switch
+        //         {
+        //             Option<FieldElement>.Some some => some.value,
+        //             _ => null
+        //         };
+        //         
+        //         boardCount = await CustomSynchronizationMaster.SyncBoardWithDependencies(boardId);
+        //     }
+        //     return boardCount > 0;
+        // }
 
         public void LoadGame()
         {
-            GameObject boardObject = BoardInProgress?.gameObject;
-            CustomLogger.LogInfo($"LoadGame. Board object: {boardObject}");
-            // it's mean that player has an in progress game, so load the session
-            if (boardObject != null)
+            if (GlobalContext.HasGameInProgress)
                 RestoreGame();
             else
                 LoadMenu();
@@ -432,7 +428,7 @@ namespace TerritoryWars.Dojo
                new FieldElement(LocalBot.AccountModule.GetDefaultUsername(), true));
             CustomLogger.LogDojoLoop("Bot username changed");
             await DojoConnector.CreateGame(LocalAccount);
-            CustomLogger.LogDojoLoop("Game created");
+            CustomLogger.LogDojoLoop("Game created"); 
             DojoConnector.JoinGame(LocalBot.Account, LocalAccount.Address);
             CustomLogger.LogDojoLoop("Bot joined game");
         }
@@ -508,7 +504,6 @@ namespace TerritoryWars.Dojo
         
         private void OnEventMessage(ModelInstance modelInstance)
         {
-            CustomLogger.LogDojoLoop($"Received event: {modelInstance.Model.Name}");
             switch (modelInstance)
             {
                 case evolute_duel_PlayerUsernameChanged playerUsernameChanged:
@@ -559,7 +554,7 @@ namespace TerritoryWars.Dojo
                 CustomLogger.LogInfo("Start session");
                 // Start session
                 ApplicationState.SetState(ApplicationStates.Initializing);
-                await SyncEverythingForGame();
+                //await SyncEverythingForGame();
                 DojoSessionManager?.OnDestroy();
                 DojoSessionManager = new DojoSessionManager(this);
                 CustomSceneManager.Instance.LoadSession();

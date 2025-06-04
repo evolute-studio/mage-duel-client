@@ -128,6 +128,7 @@ namespace TerritoryWars.ExternalConnections
         
         public static async void FinishGame(GeneralAccount account, FieldElement boardId)
         {
+            return;
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(FinishGame)}] " +
                              $"\n Account: {account.Address.Hex()} " +
@@ -160,7 +161,6 @@ namespace TerritoryWars.ExternalConnections
             }
             else
             {
-                Debug.Log(ControllerContracts.make_move(joker_tile, rotation, col, row));
                 await TryExecuteAction(
                     account.Account,
                     () => GameContract.make_move(account.Account, joker_tile, rotation, col, row),

@@ -58,7 +58,9 @@ public class CursorManager : MonoBehaviour
         {
             DisableCursor();
         }
-        
+
+        Cursor.visible = false;
+
         Vector2 mousePosition = Input.mousePosition;
         
         RectTransformUtility.ScreenPointToLocalPointInRectangle(_canvasRect,

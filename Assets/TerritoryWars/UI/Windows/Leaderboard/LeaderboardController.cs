@@ -67,7 +67,7 @@ namespace TerritoryWars.UI.Windows.Leaderboard
                 LeaderboardListItem leaderboardItem = CreateListItem<LeaderboardListItem>();
                 string name = CairoFieldsConverter.GetStringFromFieldElement(players[i].username);
                 string address = players[i].player_id.Hex();
-                int balance = players[i].balance;
+                uint balance = players[i].balance;
                 leaderboardItem.UpdateItem(name, balance, address);
                 leaderboardItem.SetLeaderPlace(i + 1, _leaderPlaceToShow);
                 

@@ -19,7 +19,7 @@ namespace TerritoryWars.UI.CharacterSelector
         public bool IsOwned;
         public bool IsEquipped;
 
-        public void SetInfo(Character character, int playerBalance, bool equipped)
+        public void SetInfo(Character character, uint playerBalance, bool equipped)
         {
             CharacterNameText.text = character.CharacterName;
             CharacterDescriptionText.text = character.CharacterDescription;

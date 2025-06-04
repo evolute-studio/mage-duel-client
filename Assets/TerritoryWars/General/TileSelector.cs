@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using TerritoryWars.DataModels.ClientEvents;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
@@ -14,7 +16,7 @@ namespace TerritoryWars.General
     public class TileSelector : MonoBehaviour
     {
         [Header("References")]
-        [SerializeField] private Board board;
+        [SerializeField] private BoardManager board;
         [SerializeField] private GameUI gameUI;
         [SerializeField] private Material highlightMaterial;
         [SerializeField] private LayerMask backgroundLayer;
@@ -43,11 +45,7 @@ namespace TerritoryWars.General
         private bool onEnterHoverObject = false;
 
         public TileData CurrentTile => currentTile;
-
-        public delegate void TileSelected(int x, int y);
-
-        public event TileSelected OnTileSelected;
-        public UnityEvent OnTilePlaced = new UnityEvent();
+        
         public UnityEvent OnTurnStarted = new UnityEvent();
         public UnityEvent OnTurnEnding = new UnityEvent();
 
@@ -58,6 +56,19 @@ namespace TerritoryWars.General
         {
             highlightedTiles = new GameObject("HighlightedTiles");
             highlightedTiles.transform.parent = transform;
+        }
+
+        public void Start()
+        {
+            EventBus.Subscribe<ClientInput>(OnClientInput);
+        }
+
+        private void OnClientInput(ClientInput input)
+        {
+            if (input.Type == ClientInput.InputType.RotateTile) 
+            {
+                RotateCurrentTile();
+            }
         }
 
         private void Update()
@@ -142,19 +153,18 @@ namespace TerritoryWars.General
             tilePreview.ResetPosition();
             tilePreview.UpdatePreview(tile);
             currentTile = tile;
-            initialTileConfig = tile.GetConfig();
+            initialTileConfig = tile.RotatedConfig;
             isPlacingTile = true;
             selectedPosition = null;
 
             _currentValidPlacements = board.GetValidPlacements(currentTile);
-
             ShowPossiblePlacements(_currentValidPlacements);
             gameUI.SetEndTurnButtonActive(false);
             gameUI.SetRotateButtonActive(false);
             gameUI.UpdateUI();
         }
 
-        private void ShowPossiblePlacements(List<ValidPlacement> placements)
+        public void ShowPossiblePlacements(List<ValidPlacement> placements)
         {
             ClearHighlights();
             foreach (var placement in placements)
@@ -170,8 +180,8 @@ namespace TerritoryWars.General
             var highlightUpperBorder = new GameObject("HighlightUpperBorder");
             highlight.transform.SetParent(highlightedTiles.transform);
             highlightUpperBorder.transform.SetParent(highlight.transform);
-            highlight.transform.position = Board.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
-            highlightUpperBorder.transform.position = Board.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
+            highlight.transform.position = BoardManager.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
+            highlightUpperBorder.transform.position = BoardManager.GetTilePosition(x, y) + new Vector3(0f, highlightYOffset, 0f);
             
 
             var spriteRenderer = highlight.AddComponent<SpriteRenderer>();
@@ -223,7 +233,7 @@ namespace TerritoryWars.General
                     
                     UpdateHighlights(x, y);
                     selectedPosition = new Vector2Int(x, y);
-                    tilePreview.SetPosition(x, y);
+                    tilePreview.SetPosition(new Vector2Int(x, y));
                     
                     TileJokerAnimator.EvoluteTileDisappear();
                     TileJokerAnimatorUI.EvoluteTileDisappear();
@@ -250,7 +260,7 @@ namespace TerritoryWars.General
 
                 if (selectedPosition.HasValue)
                 {
-                    currentTile.SetConfig(initialTileConfig);
+                    currentTile.UpdateData(initialTileConfig, new Vector2Int(x, y));
                     selectedPosition = null;
                     currentValidRotations = null;
                     SetHighlightColor(normalHighlightColor);
@@ -274,21 +284,21 @@ namespace TerritoryWars.General
 
                     foreach (int rotation in currentValidRotations)
                     {
-                        string currentConfig = currentTile.GetConfig();
+                        string currentConfig = currentTile.RotatedConfig;
 
-                        while (currentTile.rotationIndex != rotation)
+                        while (currentTile.Rotation != rotation)
                         {
                             currentTile.Rotate();
                         }
 
-                        string config = currentTile.id;
+                        string config = currentTile.RotatedConfig;
                         if (!uniqueConfigs.Contains(config))
                         {
                             uniqueConfigs.Add(config);
                             uniqueRotations.Add(rotation);
                         }
 
-                        currentTile.SetConfig(currentConfig);
+                        currentTile.UpdateData(currentConfig, new Vector2Int(x, y));
                     }
 
                     currentValidRotations = uniqueRotations;
@@ -297,8 +307,8 @@ namespace TerritoryWars.General
                 UpdateHighlights(x, y);
                 selectedPosition = new Vector2Int(x, y);
                 RotateToFirstValidRotation();
-
-                OnTileSelected?.Invoke(x, y);
+                
+                EventBus.Publish(new TileSelected(x, y));
                 gameUI.SetRotateButtonActive(currentValidRotations.Count > 1);
                 gameUI.SetEndTurnButtonActive(true);
             
@@ -337,7 +347,7 @@ namespace TerritoryWars.General
         {
             if (currentValidRotations?.Count > 0)
             {
-                while (currentTile.rotationIndex != currentValidRotations[0])
+                while (currentTile.Rotation != currentValidRotations[0])
                 {
                     currentTile.Rotate();
                 }
@@ -384,7 +394,7 @@ namespace TerritoryWars.General
             {
                 if (currentValidRotations?.Count <= 1) return;
 
-                int currentIndex = currentValidRotations.IndexOf(currentTile.rotationIndex);
+                int currentIndex = currentValidRotations.IndexOf(currentTile.Rotation);
 
                 if (currentIndex == -1)
                 {
@@ -393,7 +403,7 @@ namespace TerritoryWars.General
                 }
 
                 int nextIndex = (currentIndex + 1) % currentValidRotations.Count;
-                while (currentTile.rotationIndex != currentValidRotations[nextIndex])
+                while (currentTile.Rotation != currentValidRotations[nextIndex])
                 {
                     currentTile.Rotate();
                 }
@@ -411,45 +421,50 @@ namespace TerritoryWars.General
 
         public void PlaceCurrentTile()
         {
+            CustomLogger.LogImportant($"Selected position: {selectedPosition}");
+            
             if (!selectedPosition.HasValue) return;
 
             OnTurnEnding.Invoke();
 
             gameUI.SetRotateButtonActive(false);
             
+            CustomLogger.LogObject(currentTile, "Placed tile");
+            CustomLogger.LogImportant($"Placing tile at position: {selectedPosition.Value.x}, {selectedPosition.Value.y}");
+            CustomLogger.LogImportant($"Is Joker Mode: {isJokerMode}");
             DojoGameManager.Instance.DojoSessionManager.MakeMove(currentTile, selectedPosition.Value.x, selectedPosition.Value.y, isJokerMode);
-            tilePreview.PlaceTile(SessionManager.Instance.CurrentTurnPlayer.SideId, currentTile, CompleteTilePlacement);
+            tilePreview.PlaceTile(currentTile, CompleteTilePlacement);
+            ClearHighlights();
         }
 
         public void CompleteTilePlacement()
-        {
-            try
+        {            
+            if (!selectedPosition.HasValue) return;
+            if( currentTile.Position != selectedPosition.Value)
             {
-                if (!selectedPosition.HasValue) return;
-                
-                if (board.PlaceTile(currentTile, selectedPosition.Value.x, selectedPosition.Value.y,
-                        SessionManager.Instance.CurrentTurnPlayer.SideId))
+               
+                CustomLogger.LogImportant($"Updating tile position from {currentTile.Position} to {selectedPosition.Value}");
+                currentTile.UpdateData(currentTile.RotatedConfig, selectedPosition.Value, currentTile.PlayerSide);
+            }
+            if (board.PlaceTile(currentTile))//, selectedPosition.Value.x, selectedPosition.Value.y,SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide))
+            {
+                LastMove = (currentTile, selectedPosition.Value);
+                CustomLogger.LogImportant($"Tile placed at position: {selectedPosition.Value.x}, {selectedPosition.Value.y} | Tile: {currentTile.RotatedConfig} | Player: {currentTile.PlayerSide}");
+                isPlacingTile = false;
+                if(isJokerMode) 
                 {
-                    LastMove = (currentTile, selectedPosition.Value);
-                    isPlacingTile = false;
-                    if(isJokerMode) 
-                    {
-                        SessionManager.Instance.JokerManager.CompleteJokerPlacement();
-                    }
-                    isJokerMode = false;
-                    jokerPosition = null;
-                    ClearHighlights();
-                    OnTilePlaced.Invoke();
-                    gameUI.SetEndTurnButtonActive(false);
-                    gameUI.SetRotateButtonActive(false);
-                    gameUI.SetSkipTurnButtonActive(true);
-                    selectedPosition = null;
+                    SessionManager.Instance.ManagerContext.JokerManager.CompleteJokerPlacement();
                 }
+                isJokerMode = false;
+                jokerPosition = null;
+                ClearHighlights();
+                EventBus.Publish(new TilePlaced());
+                gameUI.SetEndTurnButtonActive(false);
+                gameUI.SetRotateButtonActive(false);
+                gameUI.SetSkipTurnButtonActive(true);
+                selectedPosition = null;
             }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"Error in CompleteTilePlacement: {e}");
-            }
+            
         }
 
         public void ClearHighlights()
@@ -524,11 +539,14 @@ namespace TerritoryWars.General
 
         private bool IsValidJokerPosition(int x, int y)
         {
+            //CustomLogger.LogObject(board.GetTileData(x, y), "TileSelector: IsValidJokerPosition - Tile Data");
             if (board.GetTileData(x, y) != null) return false;
 
             bool hasValidNeighbor = false;
             foreach (Side side in System.Enum.GetValues(typeof(Side)))
             {
+                if(side == Side.None) 
+                    continue;
                 int newX = x + board.GetXOffset(side);
                 int newY = y + board.GetYOffset(side);
 
@@ -564,8 +582,7 @@ namespace TerritoryWars.General
         {
             try
             {
-                currentTile.SetConfig(tile.id);
-                currentTile.OwnerId = tile.OwnerId;
+                currentTile.UpdateData(tile.RotatedConfig, tile.Position, tile.PlayerSide);
                 selectedPosition = new Vector2Int(x, y);
                 isPlacingTile = true;
 
@@ -575,7 +592,7 @@ namespace TerritoryWars.General
                
                 UpdateHighlights(x, y);
                 
-                tilePreview.SetPosition(x, y);
+                tilePreview.SetPosition(new Vector2Int(x, y));
             }
             catch (System.Exception e)
             {
@@ -594,11 +611,26 @@ namespace TerritoryWars.General
             tilePreview.ResetPosition();
             ClearHighlights();
 
-            var currentTile = DojoGameManager.Instance.DojoSessionManager.GetTopTile();
+            var currentTile = SessionManager.Instance.SessionContext.Board.TopTile;
+            TileData topTile = new TileData(currentTile, -Vector2Int.one,
+                SessionManager.Instance.SessionContext.CurrentTurnPlayer.PlayerSide);
             if (currentTile != null)
             {
-                StartTilePlacement(currentTile);
+                StartTilePlacement(topTile);
             }
+        }
+
+        public void OnDestroy()
+        {
+            EventBus.Unsubscribe<ClientInput>(OnClientInput);
+            ClearHighlights();
+            Destroy(highlightedTiles);
+            highlightedTiles = null;
+            tilePreview.ResetPosition();
+            isPlacingTile = false;
+            isJokerMode = false;
+            selectedPosition = null;
+            jokerPosition = null;
         }
     }
 }

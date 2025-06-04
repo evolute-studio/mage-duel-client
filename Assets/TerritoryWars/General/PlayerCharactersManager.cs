@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TerritoryWars.Dojo;
+using TerritoryWars.Managers.SessionComponents;
 using UnityEngine;
 
 namespace TerritoryWars.General
@@ -22,7 +23,9 @@ namespace TerritoryWars.General
             }
         }
 
-        private static int _opponentCharacterId => SessionManager.Instance.IsLocalPlayerHost ? SessionManager.Instance.PlayersData[1].skin_id : SessionManager.Instance.PlayersData[0].skin_id;
+        private static int _opponentCharacterId => SessionManager.Instance.SessionContext.IsLocalPlayerHost 
+            ? SessionManager.Instance.SessionContext.PlayersData[1].ActiveSkin 
+            : SessionManager.Instance.SessionContext.PlayersData[0].ActiveSkin;
         private const string _availableCharactersKey = "AvailableCharacters";
         private static List<int> _availableCharactersList = new List<int>();
         

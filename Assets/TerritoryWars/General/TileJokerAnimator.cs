@@ -8,6 +8,7 @@ using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 using System.Linq;
 using System.Collections.Generic;
+using TerritoryWars.Managers.SessionComponents;
 
 namespace TerritoryWars.General
 {
@@ -198,11 +199,9 @@ namespace TerritoryWars.General
         
         public void JokerConfChanging(int x, int y)
         {
-            Debug.Log("Starting JokerConfChanging");
             
             if (_isAnimating)
             {
-                Debug.Log("Animation is already running");
                 return;
             }
             
@@ -244,7 +243,7 @@ namespace TerritoryWars.General
                     {
                         if (SessionManager.Instance != null && !_isAnimating) return;
                         
-                        var jokerTile = SessionManager.Instance.JokerManager.GetGenerateJokerTile(x, y);
+                        var jokerTile = SessionManager.Instance.ManagerContext.JokerManager.GetGenerateJokerTile(x, y);
                         if (jokerTile != null)
                         {
                             SessionManager.Instance.TileSelector.StartJokerTilePlacement(jokerTile, x, y);
@@ -293,8 +292,7 @@ namespace TerritoryWars.General
                     })
                     .OnKill(() => CleanupAndReset())
                     .Play();
-
-                Debug.Log("JokerConfChanging sequence started");
+                
             }
             catch (Exception e)
             {

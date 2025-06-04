@@ -15,7 +15,7 @@ public class NamePanelController : MonoBehaviour
 {
     public ChangeNamePanelUIController ChangeNamePanelUIController;
     
-    public int EvoluteBalance;
+    public uint EvoluteBalance;
     
     public GameObject NamePanel;
     public GameObject ChangeNamePanel;
@@ -94,7 +94,7 @@ public class NamePanelController : MonoBehaviour
         OnNameChanged?.Invoke(name);
     }
     
-    public void SetEvoluteBalance(int value)
+    public void SetEvoluteBalance(uint value)
     {
         EvoluteBalance = value;
         EvoluteCountText.text = value.ToString();

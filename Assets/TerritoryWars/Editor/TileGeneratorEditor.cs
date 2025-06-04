@@ -23,7 +23,7 @@ namespace TerritoryWars.Editor
             
             TileGenerator tileGenerator = (TileGenerator)target;
             
-            tileGenerator.TileConfig = EditorGUILayout.TextField("Tile Config", tileGenerator.TileConfig);
+            //tileGenerator.TileConfig = EditorGUILayout.TextField("Tile Config", tileGenerator.TileConfig);
             
             if (GUILayout.Button("Generate"))
             {

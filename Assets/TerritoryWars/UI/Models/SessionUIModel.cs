@@ -80,9 +80,4 @@ public class SessionUIModel
         PlayerAvatars = playerAvatars;
     }
 
-    public void RotateCurrentTile()
-    {
-        SessionManager.Instance.RotateCurrentTile();
-    }
-
 }
