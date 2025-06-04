@@ -166,9 +166,9 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = id })
             );
-
-            Query query = new Query(423, offset, memberClause, dont_include_hashed_keys,
-                                    order_by, entity_models, entity_updated_after);
+            
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, memberClause, dont_include_hashed_keys, entity_models);
             return query;
         }
 

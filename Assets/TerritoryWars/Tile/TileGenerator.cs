@@ -247,7 +247,7 @@ namespace TerritoryWars.Tile
                     _tileData.Position.y));
             }
         }
-        public void RecolorHouses(int playerId, bool isContest = false, int rotation = 0)
+        public void RecolorHouses(int playerId, bool isContest = false, int rotation = 0, bool isEdgeStructure = false)
         {
             if (isContest)
             {
@@ -279,7 +279,7 @@ namespace TerritoryWars.Tile
             }
             else
             {
-                if (tileParts.Houses.Count == 0 || playerId == _tileData.PlayerSide) return;
+                if (tileParts.Houses.Count == 0 || (playerId == _tileData.PlayerSide && isEdgeStructure != true)) return;
                 
                 foreach (var house in tileParts.Houses)
                 {

@@ -300,7 +300,7 @@ namespace TerritoryWars.General
                     TileGenerator tileGenerator = neighborsGO[i].GetComponent<TileGenerator>();
                     if (type == StructureType.None || type == StructureType.City)
                     {
-                        tileGenerator.RecolorHouses(owner, isCityContest, neighborsData[i].Rotation);
+                        tileGenerator.RecolorHouses(owner, isCityContest, neighborsData[i].Rotation, true);
                         result = true;
                     }
 
