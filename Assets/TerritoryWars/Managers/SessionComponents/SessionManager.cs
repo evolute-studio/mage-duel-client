@@ -56,10 +56,11 @@ namespace TerritoryWars.Managers.SessionComponents
             Initialize();
             await SetupData();
             ManagerContext.PlayersManager.Initialize(ManagerContext);
+            ManagerContext.ContestManager.Initialize(ManagerContext);
             InitializeBoard();
             ManagerContext.GameLoopManager.Initialize(ManagerContext);
             ManagerContext.JokerManager.Initialize(ManagerContext);
-            ManagerContext.ContestManager.Initialize(ManagerContext);
+            
 
             GameUI.Instance.Initialize();
             GameUI.Instance.playerInfoUI.Initialize();
@@ -153,6 +154,7 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             var board = SessionContext.Board;
             BoardManager.Initialize(board);
+            ManagerContext.ContestManager.RecolorStructures();
         }
 
         private void OnDestroy()
