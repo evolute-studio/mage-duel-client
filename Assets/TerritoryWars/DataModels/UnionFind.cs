@@ -100,11 +100,11 @@ namespace TerritoryWars.DataModels
             return null;
         }
         
-        public Structure? GetStructureByPosition(Vector2Int position, StructureType structureType = default)
+        public Structure? GetStructureByPosition(Vector2Int position, StructureType structureType = StructureType.None)
         {
             foreach (var structure in Structures)
             {
-                if(structure.Value.ContainsNode(position) && (structure.Value.Type == structureType || structureType == default))
+                if(structure.Value.ContainsNode(position) && (structure.Value.Type == structureType || structureType == StructureType.None))
                 {
                     return structure.Value;
                 }

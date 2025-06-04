@@ -279,7 +279,7 @@ namespace TerritoryWars.Tile
             }
             else
             {
-                if (tileParts.Houses.Count == 0) return;
+                if (tileParts.Houses.Count == 0 || playerId == _tileData.PlayerSide) return;
                 
                 foreach (var house in tileParts.Houses)
                 {
