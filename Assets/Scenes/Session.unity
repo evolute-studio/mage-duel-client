@@ -1091,7 +1091,7 @@ Texture2D:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 3
+  serializedVersion: 4
   m_Width: 210
   m_Height: 210
   m_CompleteImageSize: 234880
@@ -3068,6 +3068,7 @@ MonoBehaviour:
   - {fileID: 931255410}
   _deckContainerCanvasGroup: {fileID: 81638378}
   _gameMenuView: {fileID: 1261502054}
+  disabledDeckAlpha: 0
   _resultPopUpUI: {fileID: 751280849}
   playerInfoUI: {fileID: 579849686}
   SaveSnapshotButton: {fileID: 2065015180}
@@ -3559,7 +3560,6 @@ Sprite:
   m_Pivot: {x: 0.5, y: 0.5}
   m_Extrude: 0
   m_IsPolygon: 0
-  m_AtlasName: 
   m_PackingTag: 
   m_RenderDataKey:
     00000000000000000000000000000000: 0
@@ -7652,6 +7652,7 @@ GameObject:
   - component: {fileID: 655485718}
   - component: {fileID: 655485720}
   - component: {fileID: 655485719}
+  - component: {fileID: 655485721}
   m_Layer: 5
   m_Name: Circle
   m_TagString: Untagged
@@ -7716,6 +7717,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 655485717}
   m_CullTransparentMesh: 1
+--- !u!225 &655485721
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655485717}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 1
 --- !u!1 &656554513
 GameObject:
   m_ObjectHideFlags: 0
@@ -9714,7 +9727,6 @@ Sprite:
   m_Pivot: {x: 0.5, y: 0.5}
   m_Extrude: 0
   m_IsPolygon: 0
-  m_AtlasName: 
   m_PackingTag: 
   m_RenderDataKey:
     00000000000000000000000000000000: 0
@@ -16607,7 +16619,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2830814437745457310, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -176.10002
+      value: -176.10004
       objectReference: {fileID: 0}
     - target: {fileID: 3217211773555182124, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -16835,7 +16847,7 @@ PrefabInstance:
       objectReference: {fileID: 815765889}
     - target: {fileID: 6109183991225066217, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -129.99998
+      value: -130
       objectReference: {fileID: 0}
     - target: {fileID: 6203119516440962481, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -16932,6 +16944,10 @@ PrefabInstance:
     - target: {fileID: 8405329765709005866, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_MatchWidthOrHeight
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8789522931451654825, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+      propertyPath: PassingTurnDuration
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8875410662727051685, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -20793,6 +20809,7 @@ MonoBehaviour:
   - {fileID: 6849612934398127024, guid: a995aaa8a0d2d034ba3bc5c29e0bed8f, type: 3}
   - {fileID: 6849612934398127024, guid: 5f722b2805741974ca9e61437e8a80ef, type: 3}
   - {fileID: 6849612934398127024, guid: 9f70761f3d6e4d65eb29f4ff6ee03078, type: 3}
+  - {fileID: 3550129045187158546, guid: 7b16cf8a1a5571b48ab1eb010263ae0b, type: 3}
   MillPrefab: {fileID: 3455373684899882535, guid: fcd9b48a23aea57cfb312a4245521c07, type: 3}
   ClashAnimationPrefab: {fileID: 3572563069366787145, guid: 1150a510853d224fd89883a8f0548b6c, type: 3}
   PinPrefab: {fileID: 4552174000051031344, guid: 68fa6979b3f7643588120e3008d09c5d, type: 3}
@@ -21253,7 +21270,6 @@ Sprite:
   m_Pivot: {x: 0.5, y: 0.5}
   m_Extrude: 0
   m_IsPolygon: 0
-  m_AtlasName: 
   m_PackingTag: 
   m_RenderDataKey:
     00000000000000000000000000000000: 0
@@ -23154,7 +23170,7 @@ Texture2D:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 3
+  serializedVersion: 4
   m_Width: 210
   m_Height: 210
   m_CompleteImageSize: 234880
@@ -23686,6 +23702,7 @@ GameObject:
   - component: {fileID: 1785638489}
   - component: {fileID: 1785638491}
   - component: {fileID: 1785638490}
+  - component: {fileID: 1785638492}
   m_Layer: 5
   m_Name: TilePreviewImage
   m_TagString: Untagged
@@ -23747,6 +23764,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1785638488}
   m_CullTransparentMesh: 1
+--- !u!225 &1785638492
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1785638488}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 1
 --- !u!1 &1799313759
 GameObject:
   m_ObjectHideFlags: 0
@@ -26836,7 +26865,7 @@ Texture2D:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 3
+  serializedVersion: 4
   m_Width: 200
   m_Height: 200
   m_CompleteImageSize: 213260

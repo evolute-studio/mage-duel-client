@@ -38,10 +38,10 @@ namespace TerritoryWars.Dojo
             return count;
         }
 
-        public async Task<int> SyncTopPlayersForLeaderboard(uint playersCount)
+        public async Task<int> SyncTopPlayersForLeaderboard(uint playersCount, uint playersBalance)
         {
             int count = await SyncConstruction(
-                DojoQueries.GetQueryTopPlayersForLeaderboard(playersCount), 
+                DojoQueries.GetQueryTopPlayersForLeaderboard(playersCount, playersBalance), 
                 nameof(SyncTopPlayersForLeaderboard));
             CustomLogger.LogDojoLoop($"Synced {count} top players for leaderboard with count {playersCount}");
             return count;

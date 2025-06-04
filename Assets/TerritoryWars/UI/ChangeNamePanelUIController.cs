@@ -27,7 +27,7 @@ public class ChangeNamePanelUIController : MonoBehaviour
     private void Initialization()
     {
         MenuUIController.Instance.NamePanelController.OnNameChanged.AddListener(NameChanged);
-        _confirmButton.onClick.AddListener(GetNameFromInputField);
+        _confirmButton.onClick.AddListener(SetNameFromInputField);
         _cancelButton.onClick.AddListener(OnCancelButtonClick);
     }
     
@@ -51,16 +51,14 @@ public class ChangeNamePanelUIController : MonoBehaviour
         SetNamePanelActive(false);
     }
 
-    private void GetNameFromInputField()
+    public void SetName(string name, bool withValidation = true)
     {
-        _name = NameInputField.text;
-        if (IsNameValid())
+        bool isValid = IsNameValid(name) || !withValidation;
+        if(isValid)
         {
-            //SetNamePanelActive(false);
             DojoConnector.ChangeUsername(
                 DojoGameManager.Instance.LocalAccount,
-                CairoFieldsConverter.GetFieldElementFromString(_name));
-            //ControllerContracts.change_username(CairoFieldsConverter.GetFieldElementFromString(_name));
+                CairoFieldsConverter.GetFieldElementFromString(name)); ;
             SetNamePanelControlActive(false);
             evolute_duel_Player profile = DojoGameManager.Instance.GetLocalPlayerData();
             if (profile == null)
@@ -68,8 +66,6 @@ public class ChangeNamePanelUIController : MonoBehaviour
                 CustomLogger.LogWarning("profile is null");
                 return;
             }
-            
-            //MenuUIController.Instance._namePanelController.SetName(CairoFieldsConverter.GetStringFromFieldElement(profile.username));
             MenuUIController.Instance.NamePanelController.SetEvoluteBalance(profile.balance);
         }
         else
@@ -77,23 +73,29 @@ public class ChangeNamePanelUIController : MonoBehaviour
             Debug.LogError("Name is not valid");
         }
     }
+
+    private void SetNameFromInputField()
+    {
+        _name = NameInputField.text;
+        SetName(_name);
+    }
     
-    private bool IsNameValid()
+    private bool IsNameValid(string name)
     {
         TextMeshProUGUI placeholder = NameInputField.placeholder.GetComponent<TextMeshProUGUI>();
-        if(_name.Length < 3 || _name.Length > 20)
+        if(name.Length < 3 || name.Length > 20)
         {
             placeholder.text = "3-20 characters";
             NameInputField.text = string.Empty;
             return false;
         }
-        if (!System.Text.RegularExpressions.Regex.IsMatch(_name, @"^[a-zA-Z0-9]+$"))
+        if (!System.Text.RegularExpressions.Regex.IsMatch(name, @"^[a-zA-Z0-9]+$"))
         {
             placeholder.text = "Only latin letters and numbers";
             NameInputField.text = string.Empty;
             return false;
         }
-        if (_name.StartsWith("Guest")){
+        if (name.StartsWith("Guest")){
             NameInputField.text = string.Empty;
             return false;
         }

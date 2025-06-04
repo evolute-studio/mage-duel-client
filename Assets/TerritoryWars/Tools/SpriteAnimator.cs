@@ -64,8 +64,8 @@ namespace TerritoryWars.Tools
                 SetSprite(sprites[0]);
                 return;
             }
-
-            StartCoroutine(Animate());
+            
+            if(gameObject.activeSelf && gameObject.activeInHierarchy && enabled) StartCoroutine(Animate());
         }
 
         public SpriteAnimator Play(Sprite[] animation, float duration = default)

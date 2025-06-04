@@ -74,6 +74,7 @@ namespace TerritoryWars.General
             _currentCombinationIndex[(x, y)] = (currentIndex + 1) % possibleCombinations.Length;
             
             TileData jokerTile = new TileData(tileConfig);
+            jokerTile.OwnerId = SetLocalPlayerData.GetLocalIndex(_sessionManager.LocalPlayer.SideId);
             CustomLogger.LogImportant("Joker tile generated: " + jokerTile.id);
             return jokerTile;
         }

@@ -87,7 +87,8 @@ namespace TerritoryWars.General
         public bool IsLocalPlayerHost => LocalPlayer.SideId == 0;
         
         public bool IsSessionStarting { get; private set; } = true;
-        
+
+        public bool isPlayerMakeMove = false;
        
 
         public void Start()
@@ -114,7 +115,7 @@ namespace TerritoryWars.General
             GameUI.Instance.playerInfoUI.SetCityScores(cityScoreBlue, cityScoreRed, false);
             GameUI.Instance.playerInfoUI.SetRoadScores(cartScoreBlue, cartScoreRed, false);
             GameUI.Instance.playerInfoUI.SetPlayerScores(cityScoreBlue + cartScoreBlue, cityScoreRed + cartScoreRed, false);
-            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.AddListener(ClientLocalPlayerSkip);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnClientLocalPlayerTurnEnd.AddListener(ClientLocalPlayerSkip);
             GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.AddListener(ClientRemotePlayerSkip);
             JokerManager.Initialize(board);
             SetTilesInDeck(board.available_tiles_in_deck.Length);
@@ -318,6 +319,7 @@ namespace TerritoryWars.General
 
         private void StartLocalTurn()
         {
+            isPlayerMakeMove = false;
             CustomLogger.LogDojoLoop("StartLocalTurn");
             if (IsGameWithBotAsPlayer)
             {
@@ -415,10 +417,10 @@ namespace TerritoryWars.General
                     break;
                 }
             }
-            GameUI.Instance.SetJokerMode(false);
+            GameUI.Instance.SetJokerMode(false);    
             TileSelector.EndTilePlacement();
             CurrentTurnPlayer.EndTurn();
-            CompleteEndTurn(playerAddress, 3f);
+            CompleteEndTurn(playerAddress, 5f);
             GameUI.Instance.playerInfoUI.SessionTimerUI.StartTurnTimer(DojoGameManager.Instance.DojoSessionManager.LastMoveTimestamp, playerAddress != LocalPlayer.Address.Hex());
         }
 
@@ -427,6 +429,7 @@ namespace TerritoryWars.General
             CustomLogger.LogImportant($"[ClientLocalPlayerSkip] {LocalPlayer.Address.Hex()}");
             DojoGameManager.Instance.DojoSessionManager.LocalSkipped(LocalPlayer.Address.Hex());
             DojoGameManager.Instance.DojoSessionManager.SkipMove();
+            TileSelector.tilePreview.ResetPosition();
         }
         
         public void ClientRemotePlayerSkip()
@@ -511,7 +514,7 @@ namespace TerritoryWars.General
         {
             DojoGameManager.Instance.DojoSessionManager.OnMoveReceived -= HandleMove;
             DojoGameManager.Instance.DojoSessionManager.OnSkipMoveReceived -= SkipMove;
-            GameUI.Instance.playerInfoUI.SessionTimerUI.OnLocalPlayerTurnEnd.RemoveListener(ClientLocalPlayerSkip);
+            GameUI.Instance.playerInfoUI.SessionTimerUI.OnClientLocalPlayerTurnEnd.RemoveListener(ClientLocalPlayerSkip);
             GameUI.Instance.playerInfoUI.SessionTimerUI.OnOpponentPlayerTurnEnd.RemoveListener(ClientRemotePlayerSkip);
         }
 

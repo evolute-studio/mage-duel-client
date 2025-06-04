@@ -63,27 +63,22 @@ namespace TerritoryWars.General
 
         private void HandlePanning()
         {
-            if (wasPinching && Time.time - _pinchEndTime < PINCH_END_THRESHOLD)
+            // Якщо щойно закінчили зум і залишився один палець
+            if (wasPinching && Input.touchCount == 1)
             {
-                // If the finger has started to move after a recent zuma, allow you to move
-                if (Input.touchCount == 1)
-                {
-                    Touch touch = Input.GetTouch(0);
-                    if (touch.phase == TouchPhase.Moved)
-                    {
-                        wasPinching = false; // We throw away the box to allow moving
-                    }
-                }
-                else if (Input.touchCount == 0)
-                {
-                    wasPinching = false;
-                }
-        
-                // If still in the period after zoom, do not process moving
-                if (wasPinching)
-                {
-                    return;
-                }
+                Touch touch = Input.GetTouch(0);
+                // Встановлюємо нову початкову позицію для панорамування
+                lastMousePosition = touch.position;
+                isDragging = true;
+                wasPinching = false;
+                return;
+            }
+            // Якщо щойно закінчили зум і немає дотиків
+            else if (wasPinching && Input.touchCount == 0)
+            {
+                wasPinching = false;
+                isDragging = false;
+                return;
             }
             
             if (Input.touchCount == 1) // One finger to move
@@ -166,12 +161,15 @@ namespace TerritoryWars.General
                 {
                     lastPinchDistance = Vector2.Distance(touch0.position, touch1.position);
                     isPinching = true;
-                    wasPinching = true;
+                    wasPinching = false; // Скидаємо під час початку зуму
+                    isDragging = false; // Зупиняємо панорамування під час зуму
                 }
                 else if (touch0.phase == TouchPhase.Ended || touch1.phase == TouchPhase.Ended)
                 {
                     isPinching = false;
                     _pinchEndTime = Time.time;
+                    // Встановлюємо wasPinching = true коли один з пальців відпускається
+                    wasPinching = true;
                 }
 
                 if (isPinching)

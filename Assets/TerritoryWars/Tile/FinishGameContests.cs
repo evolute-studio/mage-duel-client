@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DG.Tweening;
 using Dojo;
@@ -31,6 +32,16 @@ public class FinishGameContests
 
     private async void PlayFinishGameAnimation()
     {
+        int outlineLayer = LayerMask.NameToLayer("Outline");
+        GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
+        var outlineObjects = allObjects.Where(obj => obj.layer == outlineLayer).ToList();
+
+        foreach (var outlineObject in outlineObjects)
+        {
+            outlineObject.layer = LayerMask.NameToLayer("Default");
+        }
+        SessionManager.Instance.StructureHoverManager.SetActivePanel(false);
+        
         foreach (var contest in _contests)
         {
             HashSet<KeyValuePair<TileParts, Side>> roadTileParts = new HashSet<KeyValuePair<TileParts, Side>>();

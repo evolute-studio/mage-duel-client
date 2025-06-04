@@ -16,6 +16,7 @@ namespace TerritoryWars.UI.Windows.Leaderboard
     public class LeaderboardController : NetworkWindow
     {
         [SerializeField] private uint _playerToShow = 20;
+        [SerializeField] private uint _playerBalanceToShow = 100;
         [SerializeField] private uint _leaderPlaceToShow = 3;
 
         // General Window Methods
@@ -32,7 +33,7 @@ namespace TerritoryWars.UI.Windows.Leaderboard
         {
             ApplicationState.SetState(ApplicationStates.Leaderboard);
             int count =
-                await DojoGameManager.Instance.CustomSynchronizationMaster.SyncTopPlayersForLeaderboard(_playerToShow);
+                await DojoGameManager.Instance.CustomSynchronizationMaster.SyncTopPlayersForLeaderboard(_playerToShow, _playerBalanceToShow);
             ApplicationState.SetState(ApplicationStates.Menu);
             GameObject[] playersGO = DojoGameManager.Instance.WorldManager.Entities<evolute_duel_Player>();
             List<evolute_duel_Player> players = new List<evolute_duel_Player>();
