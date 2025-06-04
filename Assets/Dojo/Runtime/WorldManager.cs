@@ -12,8 +12,11 @@ namespace Dojo
     public class WorldManager : MonoBehaviour
     {
         public SynchronizationMaster synchronizationMaster;
-        public ToriiClient toriiClient;
+#if UNITY_WEBGL && !UNITY_EDITOR
         public ToriiWasmClient wasmClient;
+#else
+        public ToriiClient toriiClient;
+#endif
         [SerializeField] public WorldManagerData dojoConfig;
 
         public async void Initialize(string rpcUrl = null, string toriiUrl = null, string worldAddress = null)
