@@ -371,25 +371,25 @@ namespace TerritoryWars.General
             List<Side> closerSides = new List<Side>();
             if (IsEdgeTile(x, y)) return closerSides;
             TileData tile = GetTileData(x + 1, y);
-            if (IsEdgeTile(x + 1, y) && tile != null && tile.IsCity())
+            if (IsEdgeTile(x + 1, y) && tile?.Type == "FFFF")
             {
                 closerSides.Add(Side.Top);
             }
 
             tile = GetTileData(x, y - 1);
-            if (IsEdgeTile(x, y - 1) && tile != null && tile.IsCity())
+            if (IsEdgeTile(x, y - 1) && tile?.Type == "FFFF")
             {
                 closerSides.Add(Side.Right);
             }
 
             tile = GetTileData(x - 1, y);
-            if (IsEdgeTile(x - 1, y) && tile != null && tile.IsCity())
+            if (IsEdgeTile(x - 1, y) && tile?.Type == "FFFF")
             {
                 closerSides.Add(Side.Bottom);
             }
 
             tile = GetTileData(x, y + 1);
-            if (IsEdgeTile(x, y + 1) && tile != null && tile.IsCity())
+            if (IsEdgeTile(x, y + 1) && tile?.Type == "FFFF")
             {
                 closerSides.Add(Side.Left);
             }
