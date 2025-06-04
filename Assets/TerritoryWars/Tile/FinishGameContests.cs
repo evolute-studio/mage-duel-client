@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using DG.Tweening;
 using Dojo;
-using NUnit.Framework;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;

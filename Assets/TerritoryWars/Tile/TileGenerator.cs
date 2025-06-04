@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
-using NUnit.Framework;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.ScriptablesObjects;

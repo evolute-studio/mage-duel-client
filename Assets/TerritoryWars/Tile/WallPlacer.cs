@@ -72,13 +72,13 @@ namespace TerritoryWars.Tile
                 SpriteRenderer pillarRenderer = pillar.GetComponent<SpriteRenderer>();
                 pillarRenderer.sprite = pillarSprite;
                 pillarRenderer.spriteSortPoint = SpriteSortPoint.Pivot;
-                if (!pillar.TryGetComponent<SpriteMask>(out var mask))
-                {
-                    mask = pillar.gameObject.AddComponent<SpriteMask>();
-                }
-                mask.sprite = pillarSprite;
-                mask.isCustomRangeActive = true;
-                mask.frontSortingOrder = 15;
+                // if (!pillar.TryGetComponent<SpriteMask>(out var mask))
+                // {
+                //     mask = pillar.gameObject.AddComponent<SpriteMask>();
+                // }
+                // mask.sprite = pillarSprite;
+                // mask.isCustomRangeActive = true;
+                // mask.frontSortingOrder = 15;
             }
         }
 
