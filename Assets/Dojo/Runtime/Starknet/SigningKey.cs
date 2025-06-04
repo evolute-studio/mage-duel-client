@@ -18,7 +18,7 @@ namespace Dojo.Starknet
             get
             {
 #if UNITY_WEBGL && !UNITY_EDITOR
-                return new VerifyingKey(StarknetInterop.NewVerifyingKey(new CString(Inner.Hex())));
+                return new VerifyingKey(StarknetInterop.DeriveVerifyingKey(new CString(Inner.Hex())));
 #else
                 return new VerifyingKey(dojo.verifying_key_new(Inner.Inner));
 #endif
@@ -28,7 +28,7 @@ namespace Dojo.Starknet
         public SigningKey()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            Inner = new FieldElement(StarknetInterop.NewSigningKey());
+            Inner = new FieldElement(StarknetInterop.RandomSigningKey());
 #else
             Inner = new FieldElement(dojo.signing_key_new());
 #endif

@@ -12,19 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faed63f2427f3ed83a42d16bb3e73e6d, type: 3}
   m_Name: SlotTest_WorldManagerData 1
   m_EditorClassIdentifier: 
-  toriiUrl: https://api.cartridge.gg/x/liyard-evolute-duel/torii
-  rpcUrl: https://api.cartridge.gg/x/liyard-evolute-duel/katana
+  toriiUrl: https://api.cartridge.gg/x/new-evolute-duel/torii
+  rpcUrl: https://api.cartridge.gg/x/new-evolute-duel/katana
   relayUrl: 
   relayWebrtcUrl: 
-  gameAddress: 0x00313745d6c27cc77e9943b4ae18bc48cfd97b67d26dd376f52670da1fbcdcef
-  playerProfileActionsAddress: 0x07d946710da9ccc6fa1a1f6362c77fa329fa8e74557eb81dcf6b27161ab5c298
+  gameAddress: 0x0132530791951d3342514400bad691927e7614fe18faf5a84d5c303b7e8fd005
+  playerProfileActionsAddress: 0x0146e20efd54a28d59ddc580b5104d4992741eebf40db4ca574b3fb191039997
   worldAddress:
-    hex: 0x06a4d87ac4a224fbc633b46ec896545f8783cfc6d87ce8a4ef8c5630a3c17711
+    hex: 0x021b0b3f4d01adbbb5c4ec2db0e2a5d150d8dc9b44b6e7fbd7c4647a82f6f077
   query:
-    limit: 10000
-    offset: 0
-    dont_include_hashed_keys: 0
-    order_by: []
-    entity_models: []
-    entity_updated_after: 0
-  SlotDataVersion: 18
+    pagination:
+      limit: 0
+      cursor: 
+      order_by: []
+      direction: 0
+    no_hashed_keys: 0
+    models: []
+    historical: 0
+  SlotDataVersion: 20
