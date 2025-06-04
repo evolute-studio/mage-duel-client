@@ -29,6 +29,7 @@ namespace TerritoryWars.DataModels
             List<StructureNode> structureNodes = new List<StructureNode>();
             for (int i = 0; i < data.nodes_parents.Length; i++)
             {
+                if (data.nodes_types[i] == (byte)StructureType.None) continue;
                 var (parentPosition, parentSide) = GameConfiguration.GetPositionAndSide(data.nodes_parents[i]);
                 var (position, side) = GameConfiguration.GetPositionAndSide((byte)i);
                 StructureNode node = new StructureNode
@@ -99,11 +100,11 @@ namespace TerritoryWars.DataModels
             return null;
         }
         
-        public Structure? GetStructureByPosition(Vector2Int position, StructureType structureType = default)
+        public Structure? GetStructureByPosition(Vector2Int position, StructureType structureType = StructureType.None)
         {
             foreach (var structure in Structures)
             {
-                if(structure.Value.ContainsNode(position) && (structure.Value.Type == structureType || structureType == default))
+                if(structure.Value.ContainsNode(position) && (structure.Value.Type == structureType || structureType == StructureType.None))
                 {
                     return structure.Value;
                 }
@@ -185,8 +186,8 @@ namespace TerritoryWars.DataModels
 
     public enum StructureType
     {
-        None = 0,
-        City = 1,
-        Road = 2,
+        City = 0,
+        Road = 1,
+        None = 2,
     }
 }
