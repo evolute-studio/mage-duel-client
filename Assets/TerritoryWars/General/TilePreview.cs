@@ -201,9 +201,7 @@ namespace TerritoryWars.General
         {
             currentTween?.Kill();
             _currentBoardPosition = currentBoardPosition;
-            CustomLogger.LogImportant($"TilePreview: Setting position to {currentBoardPosition}");
             Vector3 targetPosition = BoardManager.GetTilePosition(currentBoardPosition.x, currentBoardPosition.y);
-            CustomLogger.LogImportant($"TilePreview: Target position is {targetPosition}");
             targetPosition.y += tilePreviewSetHeight;
 
             currentTween = transform
@@ -221,7 +219,6 @@ namespace TerritoryWars.General
 
         private IEnumerator PlaceTileCoroutine(int playerIndex, Action callback = null)
         {
-            CustomLogger.LogImportant("TilePreview: Placing tile");
             if (!gameObject.activeSelf) yield break;
             // shake animation Y
             transform.DOShakePosition(0.5f, 0.1f, 18, 45, false, true);
@@ -316,9 +313,8 @@ namespace TerritoryWars.General
             sequence.AppendInterval(moveDuration);
             sequence.AppendCallback(() =>
             {
-                CustomLogger.LogImportant($"TilePreview: Placing tile at position {_currentBoardPosition} for player {playerIndex}");
                 callback?.Invoke();
-                SessionManager.Instance.ManagerContext.BoardManager.FloatingTextAnimation(_currentBoardPosition);
+                SessionManager.Instance.ManagerContext.BoardManager.FloatingTextAnimation(currentTile);
                 SessionManager.Instance.ManagerContext.BoardManager.ScoreClientPrediction(playerIndex, currentTile);
             });
             sequence.Play();
@@ -329,7 +325,6 @@ namespace TerritoryWars.General
 
         public void ResetPosition(TilePlaced data = default)
         {
-            CustomLogger.LogImportant("TilePreview: Resetting position");
             currentTween?.Kill();
             // currentTween = transform
             //     .DOMove(_initialPosition, moveDuration)

@@ -199,11 +199,9 @@ namespace TerritoryWars.General
         
         public void JokerConfChanging(int x, int y)
         {
-            Debug.Log("Starting JokerConfChanging");
             
             if (_isAnimating)
             {
-                Debug.Log("Animation is already running");
                 return;
             }
             
@@ -294,8 +292,7 @@ namespace TerritoryWars.General
                     })
                     .OnKill(() => CleanupAndReset())
                     .Play();
-
-                Debug.Log("JokerConfChanging sequence started");
+                
             }
             catch (Exception e)
             {

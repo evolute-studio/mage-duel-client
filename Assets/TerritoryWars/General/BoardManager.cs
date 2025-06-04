@@ -202,13 +202,14 @@ namespace TerritoryWars.General
             public TilePlacedEvent(TileData tile) => TileData = tile;
         }
 
-        public void FloatingTextAnimation(Vector2Int position)
+        public void FloatingTextAnimation(TileData tile)
         {
+            Vector2Int position = tile.Position;
             GameObject gameObject = GetTileObject(position.x, position.y);
             TileData tileData = GetTileData(position.x, position.y);
             TileParts tileParts = gameObject.GetComponentInChildren<TileParts>();
             TileGenerator tileGenerator = gameObject.GetComponent<TileGenerator>();
-            int playerId = SessionManager.Instance.SessionContext.CurrentTurnPlayer.PlayerSide;
+            int playerId = tile.PlayerSide;
             playerId = SetLocalPlayerData.GetLocalIndex(playerId);
             string side = playerId == 0 ? "blue" : "red";
             Vector3 motion = new Vector3(0, 0.3f, 0);
@@ -255,10 +256,8 @@ namespace TerritoryWars.General
 
         public void CheckAndConnectEdgeStructure(int ownerId, int x, int y, StructureType type, bool isCityContest = false, bool isRoadContest = false)
         {
-            CustomLogger.LogImportant($"[CheckAndConnectEdgeStructure] OwnerId: {ownerId}, Position: ({x}, {y}), Type: {type}, IsCityContest: {isCityContest}, IsRoadContest: {isRoadContest}");
             if( (x == 1 || x == width - 2 || y == 1 || y == height - 2) && !IsEdgeTile(x, y))
             {
-                CustomLogger.LogImportant($"[CheckAndConnectEdgeStructure] Attempting to connect edge structure at ({x}, {y})");
                 TryConnectEdgeStructure(ownerId, x, y, type, isCityContest, isRoadContest, false);
             }
         }
@@ -266,7 +265,7 @@ namespace TerritoryWars.General
         public void ConnectEdgeStructureAnimation(int ownerId, TileData tileData, int x, int y, bool isCityContest = false, bool isRoadContest = false, bool isPlacing = false)
         {
             if (isCityContest || isRoadContest || !isPlacing| !SessionManager.Instance.IsInitialized) return;
-            FloatingTextAnimation(new Vector2Int(x, y));
+            FloatingTextAnimation(tileData);
             ScoreClientPrediction(ownerId, tileData);
         }
 

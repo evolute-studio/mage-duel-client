@@ -85,7 +85,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Publish(new TimerEvent(TimerEventType.Started, GetTimerTimestamp()));
 
             string currentTile = _sessionContext.Board.TopTile;
-            TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
+            TileData tileData = new TileData(currentTile, Vector2Int.zero, _currentPlayer.PlayerSide);
             _managerContext.TileSelector.tilePreview.UpdatePreview(tileData);
 
             if (_currentPlayer == _localPlayer) StartLocalTurn();
