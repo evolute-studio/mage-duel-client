@@ -19,7 +19,6 @@ namespace TerritoryWars.General
         {
             ApplicationState.CurrentState = ApplicationStates.Initializing;
             gameModel = await DojoLayer.Instance.GetGameInProgress(PlayerId);
-            CustomLogger.LogObject(gameModel, "Game Model");
         }
     }
 }

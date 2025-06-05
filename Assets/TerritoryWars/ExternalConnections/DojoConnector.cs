@@ -72,7 +72,7 @@ namespace TerritoryWars.ExternalConnections
         }
         
         // this method also have to use SessionManager = new DojoSessionManager(this); but I gonna refactor DojoSessionManager first
-        public static async void JoinGame(GeneralAccount account, FieldElement hostPlayer)
+        public static async Task JoinGame(GeneralAccount account, FieldElement hostPlayer)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithLoading(LoadingScreen.connectingText, () => CancelGame(account))

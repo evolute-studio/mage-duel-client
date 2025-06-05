@@ -415,6 +415,8 @@ namespace TerritoryWars.Dojo
 
         public async void CreateGameWithBots()
         {
+            EventBus.Subscribe<GameCreated>(BotJoinToPlayer);
+            
             CustomLogger.LogDojoLoop("CreateGameWithBots");
             LocalBot ??= await GetBotForGame(false);
             CustomLogger.LogDojoLoop("Bot created");
@@ -429,8 +431,15 @@ namespace TerritoryWars.Dojo
             CustomLogger.LogDojoLoop("Bot username changed");
             await DojoConnector.CreateGame(LocalAccount);
             CustomLogger.LogDojoLoop("Game created"); 
-            DojoConnector.JoinGame(LocalBot.Account, LocalAccount.Address);
+            
+        }
+
+        private async void BotJoinToPlayer(GameCreated gameCreated)
+        {
+            if(gameCreated.PlayerId != LocalAccount.Address.Hex()) return;
+            await DojoConnector.JoinGame(LocalBot.Account, LocalAccount.Address);
             CustomLogger.LogDojoLoop("Bot joined game");
+            EventBus.Unsubscribe<GameCreated>(BotJoinToPlayer);
         }
         
         [ContextMenu("Create game between bots")]
