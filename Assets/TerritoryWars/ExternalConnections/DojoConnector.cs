@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dojo.Starknet;
 using TerritoryWars.Contracts;
+using TerritoryWars.DataModels;
+using TerritoryWars.DataModels.Dev;
+using TerritoryWars.DataModels.Events;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
@@ -28,6 +31,8 @@ namespace TerritoryWars.ExternalConnections
         #region Game Actions
         public static async Task CreateGame(GeneralAccount account)
         {
+            RequestResponse rr = new RequestResponse();
+            ulong startTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithLoading(LoadingScreen.waitAnotherPlayerText, () => CancelGame(account))
                 .WithMessage($"DojoCall: [{nameof(CreateGame)}] " +
@@ -38,11 +43,17 @@ namespace TerritoryWars.ExternalConnections
             }
             else
             {
+                rr = new RequestResponse().Initialize<GameCreated>();
+                Debug.Log($"HJJJ before timestamp: {DateTime.UtcNow.ToString("HH:mm:ss.fff")}");
                 await TryExecuteAction(
                     account.Account,
                     () => GameContract.create_game(account.Account),
                     executeConfig
                 );
+                ulong endTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
+                rr.TransactionHashTimestamp = endTimestamp;
+                Debug.Log($"RR: [{rr.Name}], Request - Transaction hash: {endTimestamp-startTimestamp} m.");
+                
             }
             
         }
@@ -118,17 +129,22 @@ namespace TerritoryWars.ExternalConnections
             }
             else
             {
+                RequestResponse rr = new RequestResponse().Initialize<GameCanceled>();
+                ulong startTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
                 await TryExecuteAction(
                     account.Account,
                     () => GameContract.cancel_game(account.Account),
                     executeConfig
                 );
+                ulong endTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
+                rr.TransactionHashTimestamp = endTimestamp;
+                Debug.Log($"RR: [{rr.Name}], Request - Transaction hash: {endTimestamp-startTimestamp} m.");
+                
             }
         }
         
         public static async void FinishGame(GeneralAccount account, FieldElement boardId)
         {
-            return;
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(FinishGame)}] " +
                              $"\n Account: {account.Address.Hex()} " +
@@ -140,11 +156,17 @@ namespace TerritoryWars.ExternalConnections
             }
             else
             {
+                RequestResponse rr = new RequestResponse().Initialize<GameFinished>();
+                ulong startTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
                 await TryExecuteAction(
                     account.Account,
                     () => GameContract.finish_game(account.Account, boardId),
                     executeConfig
                 );
+                ulong endTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
+                rr.TransactionHashTimestamp = endTimestamp;
+                Debug.Log($"RR: [{rr.Name}], Request - Transaction hash: {endTimestamp-startTimestamp} m.");
+                
             }
         }
         
@@ -161,11 +183,17 @@ namespace TerritoryWars.ExternalConnections
             }
             else
             {
+                RequestResponse rr = new RequestResponse().Initialize<Moved>();
+                ulong startTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
                 await TryExecuteAction(
                     account.Account,
                     () => GameContract.make_move(account.Account, joker_tile, rotation, col, row),
                     executeConfig
                 );
+                ulong endTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
+                rr.TransactionHashTimestamp = endTimestamp;
+                Debug.Log($"RR: [{rr.Name}], Request - Transaction hash: {endTimestamp-startTimestamp} m.");
+                
             }
         }
 
@@ -202,11 +230,17 @@ namespace TerritoryWars.ExternalConnections
             }
             else
             {
+                RequestResponse rr = new RequestResponse().Initialize<Skipped>();
+                ulong startTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
                 await TryExecuteAction(
                     account.Account,
                     () => GameContract.skip_move(account.Account),
                     executeConfig
                 );
+                ulong endTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
+                rr.TransactionHashTimestamp = endTimestamp;
+                Debug.Log($"RR: [{rr.Name}], Request - Transaction hash: {endTimestamp-startTimestamp} m.");
+                
             }
         }
         #endregion

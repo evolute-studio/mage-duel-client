@@ -42,7 +42,7 @@ namespace TerritoryWars.Tools
             {LogType.Warning, false},
             {LogType.Execution, true},
             {LogType.Error, true},
-            {LogType.Important, false},
+            {LogType.Important, true},
             {LogType.DojoLoop, true},
             {LogType.Analytics, true},
             {LogType.Filtering, false},
