@@ -10,11 +10,27 @@ using BigInteger = System.Numerics.BigInteger;
 
 
 // Type definition for `evolute_duel::packing::GameStatus` enum
-public abstract record GameStatus() : Enum {
+public abstract record GameStatus() : Enum
+{
     public record Finished() : GameStatus;
+
     public record Created() : GameStatus;
+
     public record Canceled() : GameStatus;
+
     public record InProgress() : GameStatus;
+
+    public int Unwrap()
+    {
+        return this switch
+        {
+            Finished => 0,
+            Created => 1,
+            Canceled => 2,
+            InProgress => 3,
+            _ => throw new Exception("Unexpected case in Unwrap")
+        };
+    }
 }
 
 
@@ -31,6 +47,7 @@ public class evolute_duel_Game : ModelInstance {
         
         [ModelField("snapshot_id")]
         public Option<FieldElement> snapshot_id;
+    
 
     // Start is called before the first frame update
     void Start() {

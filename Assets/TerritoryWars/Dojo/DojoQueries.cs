@@ -14,7 +14,6 @@ namespace TerritoryWars.Dojo
         public static uint limit = 1000;
         public static uint offset = 0;
         public static bool dont_include_hashed_keys = false;
-        public static OrderBy[] order_by = null;
         public static ulong entity_updated_after = 0;
         
         /// <summary>
@@ -31,9 +30,8 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = address })
                 );
-            
-            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys, 
-                                    order_by, entity_models, entity_updated_after);
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, memberClause, dont_include_hashed_keys, entity_models);
             return query;
         }
         
@@ -45,8 +43,8 @@ namespace TerritoryWars.Dojo
         public static Query GetQueryPlayersArray(FieldElement[] addresses)
         {
             string[] entity_models = new[] { GetModelName<evolute_duel_Player>() };
-            
-            var addressValues = addresses.Select(addr => 
+
+            var addressValues = addresses.Select(addr =>
                 new MemberValue(new Primitive { Felt252 = addr })
             ).ToArray();
             
@@ -56,9 +54,8 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.In, 
                 new MemberValue(addressValues) 
             );
-            
-            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys, 
-                                    order_by, entity_models, entity_updated_after);
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, memberClause, dont_include_hashed_keys, entity_models);
             return query;
         }
 
@@ -70,14 +67,14 @@ namespace TerritoryWars.Dojo
                 GetModelName<evolute_duel_Player>(),
                 "role",
                 dojo.ComparisonOperator.Neq,
-                new MemberValue( new Primitive{ U8 = 2} )
+                new MemberValue(new Primitive { U8 = 2 })
             );
-            
+
             var balanceClause = new MemberClause(
                 GetModelName<evolute_duel_Player>(),
                 "balance",
                 dojo.ComparisonOperator.Gte,
-                new MemberValue( new Primitive{ U8 = (byte)playersBalance} )
+                new MemberValue(new Primitive { U8 = (byte)playersBalance })
             );
             
             OrderBy[] order_by = new[]
@@ -87,13 +84,13 @@ namespace TerritoryWars.Dojo
                     member: "balance",
                     direction: dojo.OrderDirection.Desc)
             };
-            
             var compositeClause = new CompositeClause(
                 dojo.LogicalOperator.And,
                 new[] { (Clause)notBotClause, balanceClause }
             );
-            Query query = new Query(count, offset, compositeClause, dont_include_hashed_keys, 
-                                    order_by, entity_models, entity_updated_after);
+            
+            Pagination pagination = new Pagination(limit: count, order_by: order_by);
+            Query query = new Query(pagination, notBotClause, dont_include_hashed_keys, entity_models);
             return query;
         }
 
@@ -124,9 +121,24 @@ namespace TerritoryWars.Dojo
                 dojo.LogicalOperator.And,
             new[] { (Clause)playerClause, (Clause)statusClause }
                 );
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, compositeClause, dont_include_hashed_keys, entity_models);
+            return query;
+        }
+        
+        public static Query GetQueryGameByBoardId(FieldElement boardId)
+        {
+            string[] entity_models = new[] { GetModelName<evolute_duel_Game>() };
             
-            Query query = new Query(limit, offset, compositeClause, dont_include_hashed_keys, 
-                                    order_by, entity_models, entity_updated_after);
+            var boardIdClause = new MemberClause(
+                GetModelName<evolute_duel_Game>(),
+                "board_id",
+                dojo.ComparisonOperator.Eq,
+                new MemberValue(new Primitive { Felt252 = boardId })
+            );
+            
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, boardIdClause, dont_include_hashed_keys, entity_models);
             return query;
         }
         
@@ -137,8 +149,8 @@ namespace TerritoryWars.Dojo
         public static Query GetGeneralModels()
         {
             string[] entity_models = new[] { GetModelName<evolute_duel_Rules>(), GetModelName<evolute_duel_Shop>() };
-            Query query = new Query(limit, offset, null, dont_include_hashed_keys, 
-                                    order_by, entity_models, entity_updated_after);
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, null, dont_include_hashed_keys, entity_models);
             return query;
         }
         
@@ -156,12 +168,26 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = id })
             );
-            
-            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys, 
-                                    order_by, entity_models, entity_updated_after);
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, memberClause, dont_include_hashed_keys, entity_models);
             return query;
         }
-        
+
+        public static Query GetQueryUnionFind(FieldElement id)
+        {
+            string[] entity_models = new[] { GetModelName<evolute_duel_UnionFind>() };
+            var memberClause = new MemberClause(
+                GetModelName<evolute_duel_UnionFind>(),
+                "board_id",
+                dojo.ComparisonOperator.Eq,
+                new MemberValue(new Primitive { Felt252 = id })
+            );
+            
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, memberClause, dont_include_hashed_keys, entity_models);
+            return query;
+        }
+
         /// <summary>
         /// Gets a query to fetch a game board and all its dependencies (city nodes, road nodes)
         /// </summary>
@@ -207,9 +233,8 @@ namespace TerritoryWars.Dojo
                 dojo.LogicalOperator.Or,
                 new[] { (Clause)boardIdClause, cityNodeClause, roadNodeClause }
             );
-            
-            Query query = new Query(limit, offset, compositeClause, dont_include_hashed_keys, 
-                                    order_by, entity_models, entity_updated_after);
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, compositeClause, dont_include_hashed_keys, entity_models);
             return query;
         }
         /// <summary>
@@ -230,9 +255,8 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = id })
             );
-            
-            Query query = new Query(limit, offset, moveClause, dont_include_hashed_keys, 
-                order_by, entity_models, entity_updated_after);
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, moveClause, dont_include_hashed_keys, entity_models);
             return query;
         }
 
@@ -249,9 +273,8 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = id })
             );
-            
-            Query query = new Query(limit, offset, moveClause, dont_include_hashed_keys, 
-                order_by, entity_models, entity_updated_after);
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, moveClause, dont_include_hashed_keys, entity_models);
             return query;
         }
         
@@ -272,9 +295,8 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.In, 
                 new MemberValue(idValues) 
             );
-            
-            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys, 
-                                    order_by, entity_models, entity_updated_after);
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, memberClause, dont_include_hashed_keys, entity_models);
             return query;
         }
         
@@ -293,8 +315,8 @@ namespace TerritoryWars.Dojo
                 new MemberValue("Created")
             );
             
-            Query query = new Query(limit, offset, statusClause, dont_include_hashed_keys, 
-                                    order_by, entity_models, entity_updated_after);
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, statusClause, dont_include_hashed_keys, entity_models);
             return query;
         }
         
@@ -313,9 +335,8 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.Eq,
                 new MemberValue(new Primitive { Felt252 = playerAddress })
             );
-            
-            Query query = new Query(limit, offset, statusClause, dont_include_hashed_keys, 
-                                    order_by, entity_models, entity_updated_after);
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, statusClause, dont_include_hashed_keys, entity_models);
             return query;
         }
         
@@ -333,9 +354,8 @@ namespace TerritoryWars.Dojo
                 dojo.ComparisonOperator.In, 
                 new MemberValue(snapshotValues) 
             );
-            
-            Query query = new Query(limit, offset, memberClause, dont_include_hashed_keys, 
-                                    order_by, entity_models, entity_updated_after);
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, memberClause, dont_include_hashed_keys, entity_models);
             return query;
         }
 

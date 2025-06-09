@@ -1352,6 +1352,90 @@ PolygonCollider2D:
       - {x: 0, y: -0.25}
       - {x: 0.5, y: 0}
   m_UseDelaunayMesh: 0
+--- !u!114 &110566315 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1121909718998667797, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+  m_PrefabInstance: {fileID: 1261502053}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &110566316 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6943568270974491141, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+  m_PrefabInstance: {fileID: 1261502053}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &110566317 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4459966728173603739, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+  m_PrefabInstance: {fileID: 1261502053}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa2fb40dcb0933642a019f27c5faaf41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &110566318 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7457628411262252524, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+  m_PrefabInstance: {fileID: 1261502053}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &110566319 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5466662348339702542, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+  m_PrefabInstance: {fileID: 1261502053}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &110566320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110566319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3dd2ac052e427fa9a3b074aadd45292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TurnText: {fileID: 110566318}
+  TimerText: {fileID: 110566316}
+  SkipText: {fileID: 110566315}
+  LocalPlayerTurnText: Your turn now
+  OpponentPlayerTurnText: Waiting for opponent's turn
+  PassingTurnText: Passing the turn
+  SpriteAnimator: {fileID: 110566317}
+  IdleAnimationSprites:
+  - {fileID: 1046857716878299626, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  - {fileID: 704694767170280467, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  - {fileID: -3208277577886824792, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  - {fileID: 689740310950076884, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  - {fileID: -7462361531415890022, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  - {fileID: 8347239604913921469, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  - {fileID: -865441132166308843, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  - {fileID: -8287474855559688952, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  IdleAnimationDuration: 1
+  RotationAnimationSprites:
+  - {fileID: 6405886353336040251, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  - {fileID: -1317421925859679065, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  - {fileID: 2976416689233105051, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  - {fileID: -6235145408938448629, guid: 830898a19af23c667b3606bb9ae2e8f1, type: 3}
+  RotationAnimationDuration: 0.5
 --- !u!1 &114866565
 GameObject:
   m_ObjectHideFlags: 0
@@ -3075,6 +3159,7 @@ MonoBehaviour:
   SaveSnapshotText: {fileID: 897750885}
   tilePreview: {fileID: 1558212604}
   tilePreviewUITileJokerAnimator: {fileID: 605219370}
+  _sessionManager: {fileID: 1143477215}
   arrowAnimations: {fileID: 742295723}
 --- !u!4 &288063304
 Transform:
@@ -4620,6 +4705,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2403509818276302944, guid: 774b7ce5654b64e70a908d11e8fec69e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2684594945425436323, guid: 774b7ce5654b64e70a908d11e8fec69e, type: 3}
       propertyPath: loop
       value: 0
@@ -4802,6 +4891,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4595436739884098153, guid: 774b7ce5654b64e70a908d11e8fec69e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 47799110}
+    - targetCorrespondingSourceObject: {fileID: 4595436739884098153, guid: 774b7ce5654b64e70a908d11e8fec69e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1067150310}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1282971855922823901, guid: 774b7ce5654b64e70a908d11e8fec69e, type: 3}
       insertIndex: -1
@@ -12153,8 +12245,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2464af4682ee44d65b7f8c4173f9c41a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 10
-  height: 10
+  CloudsController: {fileID: 1530375628}
   tilePrefab: {fileID: 1282971855922823901, guid: 774b7ce5654b64e70a908d11e8fec69e, type: 3}
 --- !u!4 &989829361
 Transform:
@@ -14032,6 +14123,93 @@ PolygonCollider2D:
       - {x: 0, y: -0.25}
       - {x: 0.5, y: 0}
   m_UseDelaunayMesh: 0
+--- !u!1 &1067150309
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1067150310}
+  - component: {fileID: 1067150311}
+  m_Layer: 0
+  m_Name: Grass (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1067150310
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1067150309}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.54, y: 1.54, z: 1.54}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 1558212603}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &1067150311
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1067150309}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 34a3f25a46f982d13b92d3558afe8733, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 9
+  m_Sprite: {fileID: 88771283, guid: 232b7ebf7178dec579e877a9d2709a40, type: 3}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.72156864}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 0.5}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
 --- !u!1 &1072112330
 GameObject:
   m_ObjectHideFlags: 0
@@ -15033,6 +15211,119 @@ PolygonCollider2D:
       - {x: 0, y: -0.25}
       - {x: 0.5, y: 0}
   m_UseDelaunayMesh: 0
+--- !u!1 &1143477214
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1143477216}
+  - component: {fileID: 1143477215}
+  m_Layer: 0
+  m_Name: SessionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1143477215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1143477214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75cbc7e6fe08458db4592be704d4e13a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsLocalPlayerHost: 1
+  SessionContext:
+    LocalPlayerAddress: 
+    Game:
+      Player: 
+      Status: 0
+      BoardId: 
+      Snapshot_id: 
+    Board:
+      Id: 
+      InitialEdgeState: 
+      AvailableTilesInDeck: []
+      TopTile: 
+      Player1:
+        PlayerId: 
+        Username: 
+        PlayerSide: 0
+        JokerCount: 0
+        Score:
+          CityScore: 0
+          RoadScore: 0
+        ActiveSkin: 0
+      Player2:
+        PlayerId: 
+        Username: 
+        PlayerSide: 0
+        JokerCount: 0
+        Score:
+          CityScore: 0
+          RoadScore: 0
+        ActiveSkin: 0
+      LastMoveId: 
+      GameState: 0
+      MovesDone: 0
+      LastUpdateTimestamp: 0
+    UnionFind:
+      BoardId: 
+    PlayersData:
+    - PlayerId: 
+      Username: 
+      PlayerSide: 0
+      JokerCount: 0
+      Score:
+        CityScore: 0
+        RoadScore: 0
+      ActiveSkin: 0
+    - PlayerId: 
+      Username: 
+      PlayerSide: 0
+      JokerCount: 0
+      Score:
+        CityScore: 0
+        RoadScore: 0
+      ActiveSkin: 0
+    Players:
+    - {fileID: 0}
+    - {fileID: 0}
+    LocalPlayer: {fileID: 0}
+    RemotePlayer: {fileID: 0}
+    CurrentTurnPlayer: {fileID: 0}
+    IsGameWithBot: 0
+    IsGameWithBotAsPlayer: 0
+    SpawnPoints:
+    - {x: -8.939, y: 5.196, z: 0}
+    - {x: 8.939, y: 5.196, z: 0}
+  IsInitialized: 0
+  BoardManager: {fileID: 989829360}
+  TileSelector: {fileID: 1530375626}
+  StructureHoverManager: {fileID: 766226767}
+--- !u!4 &1143477216
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1143477214}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.83566, y: 2.72257, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1144640735
 GameObject:
   m_ObjectHideFlags: 0
@@ -16563,7 +16854,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2234279028462412426, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.000086784
+      value: -0.00008773804
       objectReference: {fileID: 0}
     - target: {fileID: 2241875194486103627, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -16779,7 +17070,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4552170253178752077, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.0001955
+      value: -0.00019454956
       objectReference: {fileID: 0}
     - target: {fileID: 4654722435839202276, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -16861,6 +17152,10 @@ PrefabInstance:
       propertyPath: DeckCountText
       value: 
       objectReference: {fileID: 656554515}
+    - target: {fileID: 6656283264602794713, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+      propertyPath: _sessionManager
+      value: 
+      objectReference: {fileID: 1143477215}
     - target: {fileID: 6656283264602794713, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       propertyPath: JokerAvailableColor.a
       value: 1
@@ -16961,7 +17256,8 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8789522931451654825, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
     m_RemovedGameObjects:
     - {fileID: 2019122110055769353, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
     - {fileID: 1571011880784806386, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
@@ -17000,6 +17296,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8829883660292326065, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1261502060}
+    - targetCorrespondingSourceObject: {fileID: 5466662348339702542, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 110566320}
   m_SourcePrefab: {fileID: 100100000, guid: e34a56c3d804a0948b0d29badd4dc8f3, type: 3}
 --- !u!114 &1261502054 stripped
 MonoBehaviour:
@@ -20720,7 +21019,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1530375623}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ceb61e15842d642d1902b2d819824fb9, type: 3}
   m_Name: 
@@ -20729,7 +21028,6 @@ MonoBehaviour:
   Board: {fileID: 989829360}
   gameUI: {fileID: 288063303}
   sessionUI: {fileID: 579849686}
-  deckManager: {fileID: 1317628979}
   CloudsController: {fileID: 1530375628}
   TileSelector: {fileID: 1530375626}
   StructureHoverManager: {fileID: 766226767}
@@ -20737,6 +21035,7 @@ MonoBehaviour:
   - {x: -8.939, y: 5.196, z: 0}
   - {x: 8.939, y: 5.196, z: 0}
   Players: []
+  isPlayerMakeMove: 0
 --- !u!4 &1530375625
 Transform:
   m_ObjectHideFlags: 0
@@ -20781,9 +21080,6 @@ MonoBehaviour:
   normalHighlightColor: {r: 1, g: 1, b: 1, a: 0.3}
   selectedHighlightColor: {r: 0, g: 1, b: 0.10640597, a: 0.3}
   invalidHighlightColor: {r: 1, g: 0, b: 0, a: 0.3}
-  OnTilePlaced:
-    m_PersistentCalls:
-      m_Calls: []
   OnTurnStarted:
     m_PersistentCalls:
       m_Calls: []
@@ -31046,6 +31342,7 @@ SceneRoots:
   - {fileID: 989829361}
   - {fileID: 1724246506}
   - {fileID: 1841077510}
+  - {fileID: 1143477216}
   - {fileID: 1530375625}
   - {fileID: 1212783733}
   - {fileID: 1261502053}

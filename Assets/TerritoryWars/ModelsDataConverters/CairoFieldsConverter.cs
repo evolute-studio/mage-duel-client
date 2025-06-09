@@ -66,5 +66,19 @@ namespace TerritoryWars.ModelsDataConverters
             
             return new FieldElement(hexString);
         }
+        
+        public static int GetIntFromHex(string hex)
+        {
+            if (string.IsNullOrEmpty(hex) || hex == "0x0")
+                return 0;
+
+            if (hex.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+                hex = hex.Substring(2);
+
+            if (hex.Length % 2 != 0)
+                hex = "0" + hex;
+
+            return Convert.ToInt32(hex, 16);
+        }
     }
 }

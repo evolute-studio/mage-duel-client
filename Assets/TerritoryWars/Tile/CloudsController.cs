@@ -57,13 +57,12 @@ namespace TerritoryWars.Tile
             _spawnClouds = false;
         }
         
-        public void SetMountains(List<GameObject> mountains)
+        public void AddMountain(Vector3 mountain)
         {
-            for(int i = 0; i < mountains.Count; i++)
+            if (!mountains.Contains(mountain))
             {
-                this.mountains.Add(mountains[i].transform.position);
+                mountains.Add(mountain);
             }
-            _spawnClouds = true;
         }
     }
 }

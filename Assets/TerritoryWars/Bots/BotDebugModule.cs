@@ -101,9 +101,9 @@ namespace TerritoryWars.Bots
             if (!Bot.IsDebug || _allMoves == null) return;
             foreach (var move in _allMoves)
             {
-                Board board = Bot.DataCollectorModule.Board;
+                BoardManager board = Bot.DataCollectorModule.Board;
                 var placement = move.Key;
-                Vector3 worldTilePosition = Board.GetTilePosition(placement.x, placement.y);
+                Vector3 worldTilePosition = BoardManager.GetTilePosition(placement.x, placement.y);
                 Vector3 screenTilePosition = Camera.main.WorldToScreenPoint(worldTilePosition);
                 
                 GUI.Label(new Rect(screenTilePosition.x, Screen.height - screenTilePosition.y, 100, 100), move.Value.ToString());

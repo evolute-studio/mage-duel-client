@@ -1,5 +1,6 @@
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.Tile;
 using UnityEngine;
 
@@ -23,7 +24,7 @@ namespace TerritoryWars.Bots
         
         private void MoveReceivedHandler(string playerAddress, TileData tile, Vector2Int position, int rotation, bool isJoker)
         {
-            if (playerAddress == Bot.Account.Address.Hex() || playerAddress != SessionManager.Instance.LocalPlayer.Address.Hex())
+            if (playerAddress == Bot.Account.Address.Hex() || playerAddress != SessionManager.Instance.SessionContext.LocalPlayer.PlayerId)
             {
                 return;
             }

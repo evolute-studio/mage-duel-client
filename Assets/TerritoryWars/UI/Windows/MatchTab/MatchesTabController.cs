@@ -1,6 +1,8 @@
 using System;
 using Dojo;
 using Dojo.Starknet;
+using TerritoryWars.ConnectorLayers.Dojo;
+using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
@@ -81,11 +83,11 @@ namespace TerritoryWars.UI.Windows.MatchTab
                 foreach (var game in games)
                 {
                     if (!game.TryGetComponent(out evolute_duel_Game gameModel)) return;
-                    evolute_duel_Player player = DojoGameManager.Instance.GetPlayerProfileByAddress(gameModel.player.Hex());
-                    if(IsMatchListItemExists(player.player_id.Hex())) continue;
+                    PlayerProfile player = await DojoLayer.Instance.GetPlayerProfile(gameModel.player.Hex());
+                    if(IsMatchListItemExists(player.PlayerId)) continue;
                     
-                    string playerName = CairoFieldsConverter.GetStringFromFieldElement(player.username);
-                    int evoluteBalance = player.balance;
+                    string playerName = player.Username;
+                    uint evoluteBalance = player.Balance;
                     FieldElement snapshotId = gameModel.snapshot_id switch
                     {
                         Option<FieldElement>.Some some => some.value,
@@ -110,7 +112,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
                     MatchListItem matchListItem = CreateListItem<MatchListItem>();
                     if( status == "Created")
                     {
-                        matchListItem.UpdateItem(playerName, evoluteBalance, status, player.player_id.Hex(), moveNumber,() =>
+                        matchListItem.UpdateItem(playerName, evoluteBalance, status, player.PlayerId, moveNumber,() =>
                         {
                             SetActivePanel(false);
                             DojoConnector.JoinGame(DojoGameManager.Instance.LocalAccount, gameModel.player);

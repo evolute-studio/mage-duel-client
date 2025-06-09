@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using TerritoryWars.DataModels;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using UnityEngine;
@@ -11,116 +12,100 @@ namespace TerritoryWars.Tile
     [System.Serializable]
     public class TileData
     {
-        public Structure CityStructure;
-        public Structure RoadStructure;
-        public string id;
-        public char[] sides;
-        public int rotationIndex = 0;
-        public int OwnerId = -1;
+        public string RotatedConfig => GetRotatedConfig();
+        public string Type { get; private set; } = "FFFF";
+        public Vector2Int Position { get; private set; } = new Vector2Int(-1, -1);
+        public int Rotation { get; private set; } = 0;
+        public int PlayerSide { get; private set; } = -1;
+        
+        //public string id;
+        //public char[] sides;
+        //public int rotationIndex = 0;
+        //public int OwnerId = -1;
         
         public List<Sprite> HouseSprites = new List<Sprite>();
-        
 
-        public TileData(string tileCode)
+        public TileData()
         {
-            sides = tileCode.ToCharArray();
-            UpdateId();
+            Type = "FFFF"; // Default tile type, can be changed later
+            Position = new Vector2Int(-1, -1); // Default position, can be set later
+            Rotation = 0; // Default rotation
+            PlayerSide = -1; // No owner by default
+        }
+        public TileData(TileModel tile)
+        {
+            Type = tile.Type;
+            Position = tile.Position;
+            Rotation = tile.Rotation;
+            PlayerSide = tile.PlayerSide;
         }
 
-        public void UpdateId()
+        public TileData(string rotatedConfig, Vector2Int position, int playerSide)
         {
-            
-            char[] rotatedSides = new char[4];
-            for (int i = 0; i < 4; i++)
-            {
-                
-                // Top(0) -> Right(1)
-                // Right(1) -> Bottom(2)
-                // Bottom(2) -> Left(3)
-                // Left(3) -> Top(0)
-                int sourceIndex = (i - rotationIndex + 4) % 4;
-                rotatedSides[i] = sides[sourceIndex];
-            }
-            id = new string(rotatedSides);
+            UpdateData(rotatedConfig, position, playerSide);
+        }
+
+        public void UpdateData(string rotatedConfig, Vector2Int position = default, int playerSide = -2)
+        {
+            (byte type, byte rotation) = OnChainBoardDataConverter.GetTypeAndRotation(rotatedConfig);
+            Type = GameConfiguration.GetTileType(type);
+            Rotation = rotation;
+            Position = position != default ? position : Position;
+            PlayerSide = playerSide != -2 ? playerSide : PlayerSide;
+        }
+        
+        public void SetOwner(int playerSide)
+        {
+            PlayerSide = playerSide;
         }
 
         public void Rotate(int times = 1)
         {
-           
-            rotationIndex = (rotationIndex + times) % 4;
-            UpdateId();
+            Rotation = (Rotation + times) % 4;
         }
 
         public LandscapeType GetSide(Side side)
         {
-          
-            int index = ((int)side - rotationIndex + 4) % 4;
-            return CharToLandscape(sides[index]);
+            return CharToLandscape(RotatedConfig[(int)side]);
         }
         
-        public void SetCityStructure(Structure structure)
-        {
-            this.CityStructure = structure;
-            CityStructure.OwnerId = structure.OwnerId;
-        }
-        
-        public void SetRoadStructure(Structure structure)
-        {
-            this.RoadStructure = structure;
-        }
-        
-        public void SetCityOwner(int playerId)
-        {
-            OwnerId = playerId;
-            
-        }
-
-        public string GetConfig()
-        {
-            return id;
-        }
         
         public List<Side> GetRoadSides()
         {
             List<Side> roadSides = new List<Side>();
             for (int i = 0; i < 4; i++)
             {
-                if (sides[i] == 'R')
+                if (RotatedConfig[i] == 'R')
                 {
-                    roadSides.Add((Side)((i + rotationIndex) % 4));
+                    roadSides.Add((Side)i);
                 }
             }
             return roadSides;
         }
-        
-        public string GetConfigWithoutRotation()
-        {
-            return id;
-        }
 
-        public void SetConfig(string config)
-        {
-            id = config;
-            byte type;
-            (type, rotationIndex) = OnChainBoardDataConverter.GetTypeAndRotation(config);
-            sides = OnChainBoardDataConverter.TileTypes[type].ToCharArray();
-        }
+        // public void SetConfig(string config)
+        // {
+        //     id = config;
+        //     byte type;
+        //     (type, rotationIndex) = OnChainBoardDataConverter.GetTypeAndRotation(config);
+        //     sides = OnChainBoardDataConverter.TileTypes[type].ToCharArray();
+        // }
         
         public bool IsCityParallel()
         {
-            int cityCount = id.Count(c => c == 'C');
+            int cityCount = RotatedConfig.Count(c => c == 'C');
             if (cityCount != 2) return false;
-            if ( (id[0] == 'C' && id[2] == 'C') || (id[1] == 'C' && id[3] == 'C')) return true;
+            if ( (RotatedConfig[0] == 'C' && RotatedConfig[2] == 'C') || (RotatedConfig[1] == 'C' && RotatedConfig[3] == 'C')) return true;
             return false;
         }
 
-        public static string GetRotatedConfig(string config, int times = 1)
+        public string GetRotatedConfig()
         {
-            char[] sides = config.ToCharArray();
+            char[] sides = Type.ToCharArray();
             char[] rotatedSides = new char[4];
             for (int i = 0; i < 4; i++)
             {
-                int sourceIndex = (i - times + 4) % 4;
+                int sourceIndex = (i - Rotation + 4) % 4;
                 rotatedSides[i] = sides[sourceIndex];
             }
             return new string(rotatedSides);
@@ -140,12 +125,12 @@ namespace TerritoryWars.Tile
         public bool IsCity()
         {
             // check in Id if there is C
-            return id.Contains('C');
+            return Type.Contains('C');
         }
 
         public bool IsRoad()
         {
-            return id.Contains('R');
+            return Type.Contains('R');
         }
     }
 }

@@ -15,10 +15,6 @@ namespace Dojo
     public class SynchronizationMaster : MonoBehaviour
     {
         public WorldManager worldManager;
-
-        // Maximum number of entities to synchronize
-        public uint limit = 100;
-
         // Handle entities that get synchronized
         private ModelInstance[] _models;
         // Returns all of the model definitions
@@ -28,6 +24,8 @@ namespace Dojo
         public UnityEvent<GameObject> OnEntitySpawned;
         public UnityEvent<ModelInstance> OnModelUpdated;
         public UnityEvent<ModelInstance> OnEventMessage;
+        public UnityEvent<TokenBalance> OnTokenBalanceUpdated;
+        public UnityEvent<Token> OnTokenUpdated;
 
         // Awake is called when the script instance is being loaded.
         void Awake()
@@ -56,13 +54,13 @@ namespace Dojo
 #endif
 
             var entityGameObjects = new List<GameObject>();
-            foreach (var entity in entities)
+            foreach (var entity in entities.items)
             {
                 entityGameObjects.Add(SpawnEntity(entity.HashedKeys, entity.Models.Values.ToArray()));
             }
 
             OnSynchronized?.Invoke(entityGameObjects);
-            return entities.Count;
+            return entities.items.Length;
         }
 
         // Spawn an Entity game object from a dojo.Entity
@@ -170,9 +168,27 @@ namespace Dojo
         // Register event message callbacks
         public void RegisterEventMessageCallbacks()
         {
-            Debug.Log("Registering event message callbacks");
             ToriiEvents.Instance.OnEventMessageUpdated += HandleEventMessage;
         }
+
+        // Register token callbacks
+        public void RegisterTokenCallbacks()
+        {
+            ToriiEvents.Instance.OnTokenUpdated += (token) =>
+            {
+                OnTokenUpdated?.Invoke(token);
+            };
+        }
+
+        // Register token balance callbacks
+        public void RegisterTokenBalanceCallbacks()
+        {
+            ToriiEvents.Instance.OnTokenBalanceUpdated += (tokenBalance) =>
+            {
+                OnTokenBalanceUpdated?.Invoke(tokenBalance);
+            };
+        }
+
 
         private ModelInstance[] LoadModels()
         {

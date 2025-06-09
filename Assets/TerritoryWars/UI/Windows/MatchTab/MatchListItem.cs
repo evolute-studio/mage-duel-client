@@ -10,7 +10,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
     {
         public GameObject ListItem;
         public string PlayerName;
-        public int EvoluteCount;
+        public uint EvoluteCount;
         public string HostPlayer;
 
         public TextMeshProUGUI PlayerNameText;
@@ -20,7 +20,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
         public TextMeshProUGUI MoveNumberText;
         public Button PlayButton;
         
-        public void UpdateItem(string playerName, int evoluteBalance, string status, string hostPlayer, int moveNumber = 0, UnityAction onJoin = null)
+        public void UpdateItem(string playerName, uint evoluteBalance, string status, string hostPlayer, int moveNumber = 0, UnityAction onJoin = null)
         {
             PlayerName = playerName;
             EvoluteCount = evoluteBalance;

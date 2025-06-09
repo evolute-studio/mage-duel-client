@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TerritoryWars.General;
+using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace TerritoryWars.Carts
 {
     public class CartsSystem : MonoBehaviour
     {
-        public Board board;
+        public BoardManager board;
 
         public static float CartsSpeed = 0.1f;
         public GameObject PlayerCartPrefab;
@@ -54,7 +55,7 @@ namespace TerritoryWars.Carts
 
         public void OnTilePlaced(TileData tileData, int x, int y)
         {
-            if (!tileData.id.Contains('R'))
+            if (!tileData.Type.Contains('R'))
             {
                 return;
             }
@@ -62,7 +63,7 @@ namespace TerritoryWars.Carts
             GameObject tileObject = board.GetTileObject(x, y);
             //Transform cartsPath = tileObject.GetComponent<TileGenerator>().RoadPath.transform; // TileGenerator is not have RoadPath 
             Transform cartsPath = tileObject.transform;
-            int playerId = SessionManager.Instance.CurrentTurnPlayer.SideId;
+            int playerId = SessionManager.Instance.SessionContext.CurrentTurnPlayer.PlayerSide;
             RoadTile roadTile = new RoadTile(playerId, tileObject, tileData, cartsPath);
             
             //int cartsCount = tileData.id.Count(c => c == 'R');

@@ -13,6 +13,7 @@ namespace TerritoryWars.UI.CharacterSelector
         public GameObject EquippedIconObject;
         public GameObject LockedIconObject;
         public CanvasGroup canvasGroup;
+        public CursorOnHover CursorHover;
 
         public CharacterSelectorItem Initialize(Character character)
         {

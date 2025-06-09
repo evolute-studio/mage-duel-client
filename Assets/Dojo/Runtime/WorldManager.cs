@@ -3,6 +3,7 @@ using dojo_bindings;
 using UnityEngine;
 using Dojo.Torii;
 using System;
+using System.Collections.Generic;
 using Dojo.Starknet;
 using System.Threading.Tasks;
 
@@ -11,8 +12,11 @@ namespace Dojo
     public class WorldManager : MonoBehaviour
     {
         public SynchronizationMaster synchronizationMaster;
-        public ToriiClient toriiClient;
+#if UNITY_WEBGL && !UNITY_EDITOR
         public ToriiWasmClient wasmClient;
+#else
+        public ToriiClient toriiClient;
+#endif
         [SerializeField] public WorldManagerData dojoConfig;
 
         public async void Initialize(string rpcUrl = null, string toriiUrl = null, string worldAddress = null)
@@ -88,6 +92,71 @@ namespace Dojo
                 .Select(t => t.gameObject)
                 .Where(g => g.GetComponent<T>() != null)
                 .ToArray();
+        }
+        
+        public T[] EntityModels<T>() where T : ModelInstance
+        {
+            return transform.Cast<Transform>()
+                .Select(t => t.gameObject)
+                .Select(g => g.GetComponent<T>())
+                .Where(c => c != null)
+                .ToArray();
+        }
+        
+        public T EntityModel<T>(string fieldName = null, object value = null) where T : ModelInstance
+        {
+            if (fieldName == null && value == null)
+            {
+                return transform.Cast<Transform>()
+                    .Select(t => t.gameObject)
+                    .Select(g => g.GetComponent<T>())
+                    .FirstOrDefault();
+            }
+            return EntityModel<T>(new Dictionary<string, object>{ { fieldName, value } });
+        }
+        
+        public T EntityModel<T>(Dictionary<string, object> filters) where T : ModelInstance
+        {
+            return transform.Cast<Transform>()
+                .Select(t => t.gameObject)
+                .Select(g => g.GetComponent<T>())
+                .Where(c => c != null)
+                .FirstOrDefault(c => 
+                {
+                    foreach (var filter in filters)
+                    {
+                        var field = c.GetType().GetField(filter.Key);
+                        if (field == null)
+                        {
+                            Debug.LogWarning($"Field {filter.Key} not found in component {typeof(T).Name}");
+                            return false;
+                        }
+
+                        var value = field.GetValue(c);
+                        if (value == null)
+                        {
+                            Debug.LogWarning($"Field {filter.Key} has null value in component {typeof(T).Name}");
+                            return false;
+                        }
+
+                        var filterValue = filter.Value;
+                        if (value is FieldElement fieldElement)
+                        {
+                            value = fieldElement.Hex();
+                            if (filterValue is FieldElement filterFieldElement)
+                            {
+                                filterValue = filterFieldElement.Hex();
+                            }
+                        }
+
+                        if (value.Equals(filterValue))
+                        {
+                            return true;
+                        }
+                        Debug.LogWarning($"Field {filter.Key} with value {value} does not match filter value {filterValue} in component {typeof(T).Name}");
+                    }
+                    return false;
+                });
         }
 
         // Add a new entity game object as a child of the WorldManager game object.

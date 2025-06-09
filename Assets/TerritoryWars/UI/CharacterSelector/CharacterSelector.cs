@@ -32,7 +32,7 @@ namespace TerritoryWars.UI.CharacterSelector
         private int _currentSelectedCharacterId = 1;
         private int _currentCharacterId = 1;
         private List<int> _unlockedCharacters = new List<int>();
-        private int _playerBalance => MenuUIController.Instance.NamePanelController.EvoluteBalance;
+        private uint _playerBalance => MenuUIController.Instance.NamePanelController.EvoluteBalance;
 
         // public void Start()
         // {
@@ -155,6 +155,7 @@ namespace TerritoryWars.UI.CharacterSelector
             CharacterShadow.sprite = character.ShadowSprite;
             CharacterShadow.GetComponent<RectTransform>().anchoredPosition =
                 character.CharacterShadowPosition;
+            
         }
 
         public void ShiftCharacters(bool isRight)
@@ -194,10 +195,17 @@ namespace TerritoryWars.UI.CharacterSelector
             {
                 for (int i = 0; i < CharacterItems.Count; i++)
                 {
-                    if(i == 0 || i == 4)
+                    if (i == 0 || i == 4)
+                    {
                         CharacterItems[i].canvasGroup.alpha = 0;
+                        CharacterItems[i].CursorHover.enabled = false;
+                    }
                     else
+                    {
                         CharacterItems[i].canvasGroup.alpha = 1;
+                        CharacterItems[i].CursorHover.enabled = true;
+                    }
+
                     CharacterItems[i].rectTransform.anchoredPosition = CharacterItemsPositions[i];
                 }
                 InitializeCharacters();

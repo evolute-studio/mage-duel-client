@@ -6,6 +6,8 @@ using TerritoryWars.Tools;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Linq;
+using TerritoryWars.Managers;
+using TerritoryWars.Managers.SessionComponents;
 
 namespace TerritoryWars.General
 {
@@ -15,58 +17,66 @@ namespace TerritoryWars.General
         public static string CurrentBoardId;
         public static List<string> AllowedBoards = new List<string>();
         public static List<string> AllowedPlayers = new List<string>();
-        
+
+        private static SessionContext _sessionContext => SessionManager.Instance?.SessionContext;
+
         public static UnityEvent<ModelInstance> OnModelPassed = new UnityEvent<ModelInstance>();
-        
+
         public static void SetLocalPlayerId(string localPlayerId)
         {
             LocalPlayerId = localPlayerId;
         }
-        
+
         public static void SetSessionCurrentBoardId(string currentBoardId)
         {
             CurrentBoardId = currentBoardId;
-            
-            if(!AllowedPlayers.Contains(LocalPlayerId))
+
+            if (!AllowedPlayers.Contains(LocalPlayerId))
                 AllowedPlayers.Add(LocalPlayerId);
         }
-        
+
         public static void SetSessionAllowedBoards(List<string> allowedBoards)
         {
             AllowedBoards = allowedBoards;
-            if(!AllowedPlayers.Contains(LocalPlayerId))
+            if (!AllowedPlayers.Contains(LocalPlayerId))
                 AllowedPlayers.Add(LocalPlayerId);
         }
-        
+
         public static void AddBoardToAllowedBoards(string boardId)
         {
-            if(!AllowedBoards.Contains(boardId))
+            if (!AllowedBoards.Contains(boardId))
                 AllowedBoards.Add(boardId);
         }
-        
+
         public static void AddPlayerToAllowedPlayers(string playerId)
         {
-            if(!AllowedPlayers.Contains(playerId))
+            if (!AllowedPlayers.Contains(playerId))
                 AllowedPlayers.Add(playerId);
         }
-        
+
         public static void AddRangePlayersToAllowedPlayers(List<string> playerIds)
         {
             foreach (var playerId in playerIds)
             {
-                if(!AllowedPlayers.Contains(playerId))
+                if (!AllowedPlayers.Contains(playerId))
                     AllowedPlayers.Add(playerId);
             }
         }
-        
+
         public static void SetSessionPlayers(List<string> currentPlayersInSession)
         {
             AllowedPlayers = currentPlayersInSession;
         }
-        
+
 
         public static void FilterModels(ModelInstance model)
         {
+            if (SessionManager.Instance == null || SessionManager.Instance.SessionContext == null)
+            {
+                CustomLogger.LogFiltering("SessionManager or SessionContext is null. Skipping model filtering.");
+                return;
+            }
+            
             switch (ApplicationState.CurrentState)
             {
                 case ApplicationStates.Menu:
@@ -107,10 +117,10 @@ namespace TerritoryWars.General
             }
             OnModelPassed.Invoke(model);
         }
-        
+
         public static void DestroyModel(ModelInstance model)
         {
-            if(model == null || model.gameObject == null) return;
+            if (model == null || model.gameObject == null) return;
             CustomLogger.LogFiltering($"Filter Mode: [{ApplicationState.CurrentState}] Destroying model. Model type: {model.GetType().Name} GameObject name: {model.gameObject.name}");
             GameObject gameObject = model.gameObject;
             Component[] components = model.gameObject.GetComponents<Component>();
@@ -119,49 +129,49 @@ namespace TerritoryWars.General
             {
                 s += component.GetType().Name + ", ";
             }
-            
+
             s += " | ";
-            
-            
+
+
             model.OnUpdated.RemoveAllListeners();
             //DojoGameManager.Instance.WorldManager.RemoveEntity(model.gameObject.name);
             Object.DestroyImmediate(model);
             CustomLogger.LogFiltering("Model destroyed");
-            
+
             s += "After: Components in game object: ";
             foreach (var component in components)
             {
                 s += component.GetType().Name + ", ";
             }
-            
+
             CustomLogger.LogFiltering(s);
-            if(components.Length == 2)
+            if (components.Length == 2)
             {
                 CustomLogger.LogFiltering("Destroying game object");
                 Object.DestroyImmediate(gameObject);
             }
         }
-        
+
         private static void LogComponents(string stage, GameObject gameObject)
         {
             if (gameObject == null) return;
-            
+
             var components = gameObject.GetComponents<Component>();
             var componentNames = components
                 .Where(c => c != null)
                 .Select(c => c.GetType().Name)
                 .ToList();
-            
+
             CustomLogger.LogFiltering($"{stage}: GameObject {gameObject.name} has components: {string.Join(", ", componentNames)}");
         }
-        
+
         public static bool MenuFilter(ModelInstance model)
         {
             var type = model.GetType();
             switch (type.Name)
             {
                 // Have condition
-                case nameof(evolute_duel_Game): 
+                case nameof(evolute_duel_Game):
                     evolute_duel_Game game = (evolute_duel_Game)model;
                     bool isCreated = game.status switch
                     {
@@ -169,23 +179,23 @@ namespace TerritoryWars.General
                         _ => false
                     };
                     return isCreated;
-                case nameof(evolute_duel_Snapshot): 
+                case nameof(evolute_duel_Snapshot):
                     evolute_duel_Snapshot snapshot = (evolute_duel_Snapshot)model;
-                    if(snapshot.player.Hex() == LocalPlayerId)
+                    if (snapshot.player.Hex() == LocalPlayerId)
                         return true;
                     return false;
                 case nameof(evolute_duel_Player):
                     evolute_duel_Player player = (evolute_duel_Player)model;
-                    if(player.player_id.Hex() == LocalPlayerId)
+                    if (player.player_id.Hex() == LocalPlayerId)
                         return true;
                     return false;
-                
+
                 // Always allow
                 case nameof(evolute_duel_Rules):
                     return true;
                 case nameof(evolute_duel_Shop):
                     return true;
-                
+
                 // Always deny
                 case nameof(evolute_duel_Board):
                     return false;
@@ -199,20 +209,20 @@ namespace TerritoryWars.General
                     return false;
                 case nameof(evolute_duel_RoadNode):
                     return false;
-                
+
                 default:
                     CustomLogger.LogWarning($"Unknown model type {type.Name}. Filtering out.");
                     return true;
             }
         }
-        
+
         public static bool MatchTabFilter(ModelInstance model)
         {
             var type = model.GetType();
             switch (type.Name)
             {
                 // Have condition
-                case nameof(evolute_duel_Game): 
+                case nameof(evolute_duel_Game):
                     evolute_duel_Game game = (evolute_duel_Game)model;
                     bool isCreated = game.status switch
                     {
@@ -221,14 +231,14 @@ namespace TerritoryWars.General
                         _ => false
                     };
                     return isCreated;
-                case nameof(evolute_duel_Snapshot): 
+                case nameof(evolute_duel_Snapshot):
                     evolute_duel_Snapshot snapshot = (evolute_duel_Snapshot)model;
                     bool isLocalPlayer = snapshot.player.Hex() == LocalPlayerId;
                     bool isAllowedPlayer = AllowedPlayers.Contains(snapshot.player.Hex());
-                    if(isLocalPlayer || isAllowedPlayer)
+                    if (isLocalPlayer || isAllowedPlayer)
                         return true;
                     return false;
-                
+
                 // Always allow
                 case nameof(evolute_duel_Rules):
                     return true;
@@ -236,7 +246,7 @@ namespace TerritoryWars.General
                     return true;
                 case nameof(evolute_duel_Player):
                     return true;
-                
+
                 // Always deny
                 case nameof(evolute_duel_Board):
                     return false;
@@ -250,8 +260,8 @@ namespace TerritoryWars.General
                     return false;
                 case nameof(evolute_duel_RoadNode):
                     return false;
-                
-                
+
+
                 default:
                     CustomLogger.LogWarning($"Unknown model type {type.Name}. Filtering out.");
                     return true;
@@ -266,63 +276,54 @@ namespace TerritoryWars.General
                 // Have condition
                 case nameof(evolute_duel_Board):
                     evolute_duel_Board board = (evolute_duel_Board)model;
-                    if(board.id == null)
+                    if (board.id == null) return true;
+
+                    if (_sessionContext.IsSessionBoard(board.id.Hex()))
                     {
-                        if (GameObject.Find(model.gameObject.name) != null)
-                        {
-                            CustomLogger.LogWarning("Board id is null, But client has the board. Allowing.");
-                            return true;
-                        }
-                        else
-                        {
-                            CustomLogger.LogWarning("Board id is null, And client doesn't have the board. Denying.");
-                            return false;
-                        }
-                        
-                    }
-                    CustomLogger.LogFiltering($"Checking board {board.id.Hex()}");
-                    CustomLogger.LogFiltering($"Allowed boards: {AllowedBoards.Count}");
-                    bool isBoardAllowed = AllowedBoards.Contains(board.id.Hex());
-                    bool isBoardHasLocalPlayer = board.player1.Item1.Hex() == LocalPlayerId || board.player2.Item1.Hex() == LocalPlayerId;
-                    if(isBoardHasLocalPlayer) AddBoardToAllowedBoards(board.id.Hex());
-                    if(isBoardAllowed || isBoardHasLocalPlayer)
+                        CustomLogger.LogFiltering($"Board {board.id.Hex()} is session board. Allowing.");
                         return true;
+                    }
+                    return false;
+                case nameof(evolute_duel_UnionFind):
+                    evolute_duel_UnionFind unionFind = (evolute_duel_UnionFind)model;
+                    if (unionFind.board_id == null) return true;
+                    
+                    if (_sessionContext.IsSessionBoard(unionFind.board_id.Hex()))
+                    {
+                        CustomLogger.LogFiltering($"UnionFind {unionFind.board_id.Hex()} is session board. Allowing.");
+                        return true;
+                    }
                     return false;
                 case nameof(evolute_duel_Move):
                     evolute_duel_Move move = (evolute_duel_Move)model;
-                    CustomLogger.LogFiltering($"Checking move board first id {move.first_board_id.Hex()}");
-                    bool isAllowed = AllowedBoards.Contains(move.first_board_id.Hex());
-                    CustomLogger.LogFiltering($"Is move allowed: {isAllowed}");
-                    if(AllowedBoards.Contains(move.first_board_id.Hex()))
+                    if (_sessionContext.IsSessionMove(move.id.Hex(), move.first_board_id.Hex()))
+                    {
+                        CustomLogger.LogFiltering($"Move {move.id.Hex()} is session move. Allowing.");
                         return true;
-                    return false;
-                case nameof(evolute_duel_CityNode):
-                    evolute_duel_CityNode cityNode = (evolute_duel_CityNode)model;
-                    if(AllowedBoards.Contains(cityNode.board_id.Hex()))
-                        return true;
-                    return false;
-                case nameof(evolute_duel_RoadNode):
-                    evolute_duel_RoadNode roadNode = (evolute_duel_RoadNode)model;
-                    if(AllowedBoards.Contains(roadNode.board_id.Hex()))
-                        return true;
+                    }
                     return false;
                 case nameof(evolute_duel_Player):
                     evolute_duel_Player player = (evolute_duel_Player)model;
-                    if(AllowedPlayers.Contains(player.player_id.Hex()))
+                    if (_sessionContext.IsPlayerInSession(player.player_id.Hex()))
+                    {
+                        CustomLogger.LogFiltering($"Player {player.player_id.Hex()} is session player. Allowing.");
                         return true;
+                    }
                     return false;
-                case nameof(evolute_duel_Game): 
+                case nameof(evolute_duel_Game):
                     evolute_duel_Game game = (evolute_duel_Game)model;
-                    if(game.player.Hex() == LocalPlayerId)
+                    if (game.player.Hex() == LocalPlayerId)
                         return true;
                     return false;
-                
+
+                // TODO: Add UnionFindModel
+
                 // Always allow
                 case nameof(evolute_duel_Rules):
                     return true;
                 case nameof(evolute_duel_Shop):
                     return true;
-                
+
                 // Always deny
                 case nameof(evolute_duel_Snapshot):
                     return false;
@@ -330,28 +331,28 @@ namespace TerritoryWars.General
                     return false;
                 case nameof(evolute_duel_PotentialRoadContests):
                     return false;
-                
+
                 default:
                     CustomLogger.LogWarning($"Unknown model type {type.Name}. Filtering out.");
                     return true;
             }
         }
-        
-        
+
+
         public static bool SnapshotFilter(ModelInstance model)
         {
             var type = model.GetType();
             switch (type.Name)
             {
                 // Have condition
-                case nameof(evolute_duel_Snapshot): 
+                case nameof(evolute_duel_Snapshot):
                     evolute_duel_Snapshot snapshot = (evolute_duel_Snapshot)model;
-                    if(snapshot.player.Hex() == LocalPlayerId)
+                    if (snapshot.player.Hex() == LocalPlayerId)
                         return true;
                     return false;
                 case nameof(evolute_duel_Board):
                     evolute_duel_Board board = (evolute_duel_Board)model;
-                    if(board.id == null)
+                    if (board.id == null)
                     {
                         if (GameObject.Find(model.gameObject.name) != null)
                         {
@@ -363,11 +364,11 @@ namespace TerritoryWars.General
                             CustomLogger.LogWarning("Board id is null, And client doesn't have the board. Denying.");
                             return false;
                         }
-                        
+
                     }
                     CustomLogger.LogFiltering($"Checking board {board.id.Hex()}");
                     CustomLogger.LogFiltering($"Allowed boards: {AllowedBoards.Count}");
-                    if(AllowedBoards.Contains(board.id.Hex()))
+                    if (AllowedBoards.Contains(board.id.Hex()))
                         return true;
                     return false;
                 case nameof(evolute_duel_Move):
@@ -375,55 +376,55 @@ namespace TerritoryWars.General
                     CustomLogger.LogFiltering($"Checking move board first id {move.first_board_id.Hex()}");
                     bool isAllowed = AllowedBoards.Contains(move.first_board_id.Hex());
                     CustomLogger.LogFiltering($"Is move allowed: {isAllowed}");
-                    if(AllowedBoards.Contains(move.first_board_id.Hex()))
+                    if (AllowedBoards.Contains(move.first_board_id.Hex()))
                         return true;
                     return false;
                 case nameof(evolute_duel_CityNode):
                     evolute_duel_CityNode cityNode = (evolute_duel_CityNode)model;
-                    if(AllowedBoards.Contains(cityNode.board_id.Hex()))
+                    if (AllowedBoards.Contains(cityNode.board_id.Hex()))
                         return true;
                     return false;
                 case nameof(evolute_duel_RoadNode):
                     evolute_duel_RoadNode roadNode = (evolute_duel_RoadNode)model;
-                    if(AllowedBoards.Contains(roadNode.board_id.Hex()))
+                    if (AllowedBoards.Contains(roadNode.board_id.Hex()))
                         return true;
                     return false;
                 case nameof(evolute_duel_Player):
                     evolute_duel_Player player = (evolute_duel_Player)model;
-                    if(AllowedPlayers.Contains(player.player_id.Hex()))
+                    if (AllowedPlayers.Contains(player.player_id.Hex()))
                         return true;
                     return false;
-                case nameof(evolute_duel_Game): 
+                case nameof(evolute_duel_Game):
                     evolute_duel_Game game = (evolute_duel_Game)model;
-                    if(game.player.Hex() == LocalPlayerId)
+                    if (game.player.Hex() == LocalPlayerId)
                         return true;
                     return false;
-                
+
                 // Always allow
                 case nameof(evolute_duel_Rules):
                     return true;
                 case nameof(evolute_duel_Shop):
                     return true;
-                
+
                 // Always deny
                 case nameof(evolute_duel_PotentialCityContests):
                     return false;
                 case nameof(evolute_duel_PotentialRoadContests):
                     return false;
-                
+
                 default:
                     CustomLogger.LogWarning($"Unknown model type {type.Name}. Filtering out.");
                     return true;
             }
         }
-        
+
         public static bool LeaderboardFilter(ModelInstance model)
         {
             var type = model.GetType();
             switch (type.Name)
             {
                 // Have condition
-                
+
                 // Always allow
                 case nameof(evolute_duel_Player):
                     return true;
@@ -431,11 +432,11 @@ namespace TerritoryWars.General
                     return true;
                 case nameof(evolute_duel_Shop):
                     return true;
-                
+
                 // Always deny
                 case nameof(evolute_duel_Game):
                     return false;
-                case nameof(evolute_duel_Snapshot): 
+                case nameof(evolute_duel_Snapshot):
                     return false;
                 case nameof(evolute_duel_Board):
                     return false;
@@ -449,13 +450,13 @@ namespace TerritoryWars.General
                     return false;
                 case nameof(evolute_duel_RoadNode):
                     return false;
-                
+
                 default:
                     CustomLogger.LogWarning($"Unknown model type {type.Name}. Filtering out.");
                     return true;
             }
         }
     }
-    
-    
+
+
 }

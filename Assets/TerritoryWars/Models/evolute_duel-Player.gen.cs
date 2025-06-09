@@ -18,7 +18,7 @@ public class evolute_duel_Player : ModelInstance {
         public FieldElement username;
 
         [ModelField("balance")]
-        public ushort balance;
+        public uint balance;
 
         [ModelField("games_played")]
         public FieldElement games_played;

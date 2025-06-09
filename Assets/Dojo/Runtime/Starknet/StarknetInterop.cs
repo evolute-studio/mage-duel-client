@@ -1,3 +1,4 @@
+#if UNITY_WEBGL && !UNITY_EDITOR
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -207,10 +208,13 @@ namespace Dojo.Starknet
         }
 
         [DllImport("__Internal")]
-        public static extern string NewSigningKey();
+        public static extern string RandomSigningKey();
 
         [DllImport("__Internal")]
         public static extern string Sign(CString privateKey, CString hash);
+        
+        [DllImport("__Internal")]
+        public static extern string DeriveVerifyingKey(CString privateKey);
 
         [DllImport("__Internal")]
         public static extern string NewVerifyingKey(CString privateKey);
@@ -243,3 +247,4 @@ namespace Dojo.Starknet
         }
     }
 }
+#endif // UNITY_WEBGL

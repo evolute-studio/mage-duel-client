@@ -12,6 +12,16 @@ using BigInteger = System.Numerics.BigInteger;
 public abstract record GameState() : Enum {
     public record InProgress() : GameState;
     public record Finished() : GameState;
+    
+    public int Unwrap()
+    {
+        return this switch
+        {
+            InProgress => 0,
+            Finished => 1,
+            _ => throw new Exception("Unexpected case in Unwrap")
+        };
+    }
 }
 
 // Type definition for `evolute_duel::packing::PlayerSide` enum
@@ -92,6 +102,12 @@ public class evolute_duel_Board : ModelInstance {
 
         [ModelField("game_state")]
         public GameState game_state;
+        
+        [ModelField("moves_done")]
+        public byte moves_done;
+
+        [ModelField("last_update_timestamp")]
+        public ulong last_update_timestamp;
 
     // Start is called before the first frame update
     void Start() {
