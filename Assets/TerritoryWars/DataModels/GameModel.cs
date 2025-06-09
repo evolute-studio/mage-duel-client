@@ -29,5 +29,6 @@ namespace TerritoryWars.DataModels
         Created = 1,
         Canceled = 2,
         InProgress = 3,
+        None = 4
     }
 }

@@ -199,6 +199,26 @@ namespace TerritoryWars.ConnectorLayers.Dojo
             GameModel gameModel = new GameModel().SetData(game);
             return gameModel;
         }
+        
+        public async Task<GameModel> GetGameByBoardId(string boardId)
+        {
+            Dictionary<string, object> filters = new Dictionary<string, object>()
+            {
+                { "board_id", new FieldElement(boardId) }
+            };
+            evolute_duel_Game game = WorldManager.EntityModel<evolute_duel_Game>(filters);
+            if (game == null)
+            {
+                await SynchronizationMaster.SyncGameByBoardId(new FieldElement(boardId));
+                game = WorldManager.EntityModel<evolute_duel_Game>(filters);
+            }
+            if (game == null)
+            {
+                return default;
+            }
+            GameModel gameModel = new GameModel().SetData(game);
+            return gameModel;
+        }
 
         public void OnDestroy()
         {

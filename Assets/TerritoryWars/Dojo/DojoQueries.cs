@@ -126,6 +126,22 @@ namespace TerritoryWars.Dojo
             return query;
         }
         
+        public static Query GetQueryGameByBoardId(FieldElement boardId)
+        {
+            string[] entity_models = new[] { GetModelName<evolute_duel_Game>() };
+            
+            var boardIdClause = new MemberClause(
+                GetModelName<evolute_duel_Game>(),
+                "board_id",
+                dojo.ComparisonOperator.Eq,
+                new MemberValue(new Primitive { Felt252 = boardId })
+            );
+            
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, boardIdClause, dont_include_hashed_keys, entity_models);
+            return query;
+        }
+        
         /// <summary>
         /// Gets a query to fetch general game models including Rules and Shop
         /// </summary>

@@ -104,6 +104,7 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Starting SetupData");
             SessionContext.LocalPlayerAddress = DojoGameManager.Instance.LocalAccount.Address.Hex();
+            //GameModel fromGlobalContext = DojoGameManager.Instance.GlobalContext.GameInProgress;
             GameModel game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
             if (game.IsNull || game.BoardId == null)
             {

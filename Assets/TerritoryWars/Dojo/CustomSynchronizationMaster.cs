@@ -55,6 +55,15 @@ namespace TerritoryWars.Dojo
             CustomLogger.LogDojoLoop($"Synced {count} InProgress games with player address {address.Hex()}");
             return count;
         }
+        
+        public async Task<int> SyncGameByBoardId(FieldElement board_id)
+        {
+            int count = await SyncConstruction(
+                DojoQueries.GetQueryGameByBoardId(board_id),
+                nameof(SyncGameByBoardId));
+            CustomLogger.LogDojoLoop($"Synced {count} games with board id {board_id.Hex()}");
+            return count;
+        }
 
         public async Task<int> SyncGeneralModels()
         {
