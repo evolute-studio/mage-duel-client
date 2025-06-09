@@ -27,7 +27,7 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             ContestProcessor.AddModel(new ContestInformation(contest.Position, contest.Side, contest.Type,() =>
             {
-                ContestAnimation(contest, RecolorStructures);
+                ContestAnimation(contest, () => {RecolorStructure(contest.Position, contest.Side);});
             }));
         }
         
@@ -144,6 +144,75 @@ namespace TerritoryWars.Managers.SessionComponents
                     }
                     
                 }
+        }
+        
+        public void RecolorStructure(Vector2Int nodePosition, Side nodeSide)
+        {
+            UnionFind unionFind = _managerContext.SessionContext.UnionFind;
+            
+            Structure? structureOption = unionFind.GetStructureByNode(nodePosition, nodeSide);
+            if (!structureOption.HasValue)
+            {
+                Debug.LogWarning($"No structure found for node at {nodePosition} on side {nodeSide}");
+                return;
+            }
+            Structure structure = structureOption.Value;
+            bool isContested = structure.Contested;
+                    foreach (var node in structure.Nodes)
+                    {
+                        var position = node.Position;
+                        if(_managerContext.BoardManager.GetTileObject(position.x, position.y) == null)
+                        {
+                            continue;
+                        }
+                        
+                        TileGenerator tileGenerator = _managerContext.BoardManager.GetTileObject(position.x, position.y).GetComponent<TileGenerator>();
+                        TileData tileData = _managerContext.BoardManager.GetTileData(position.x, position.y);
+                        int playerOwner;
+                        if (isContested)
+                        {
+                            if (structure.Points[0] == structure.Points[1])
+                            {
+                                playerOwner = 3;
+                            }
+                            else
+                            {
+                                playerOwner = structure.Points[0] > structure.Points[1] ? 0 : 1;
+                            }
+                        }
+                        else
+                        {
+                            playerOwner = _managerContext.SessionContext.Board.Tiles[position].PlayerSide;
+                        }
+                        if(node.Type == StructureType.City)
+                        {
+                            tileGenerator.RecolorHouses(playerOwner, isContested, (byte)tileData.Rotation);
+
+                            if (isContested)
+                            {
+                                tileGenerator.ChangeEnvironmentForContest();
+                                tileGenerator.tileParts.SetActiveWoodenArcs(false);
+                                tileGenerator.tileParts.SetActiveWoodenBorderWall(false);
+                            }
+                        }
+                        else if (node.Type == StructureType.Road)
+                        {
+                            tileGenerator.RecolorPinOnSide(playerOwner, (int)node.Side, isContested);
+                            if (isContested)
+                            {
+                                TileParts tileParts = tileGenerator.CurrentTileGO.GetComponent<TileParts>();
+                                tileParts.RoadRenderers[(int)node.Side].sprite =
+                                    PrefabsManager.Instance.TileAssetsObject.GetContestedRoadByReference(tileParts.RoadRenderers[(int)node.Side].sprite);
+                            }
+                            
+                        }
+                        
+                        
+                        bool isCityContest = node.Type == StructureType.City && isContested;
+                        bool isRoadContest = node.Type == StructureType.Road && isContested;
+                        _managerContext.BoardManager.CheckAndConnectEdgeStructure(playerOwner, position.x, position.y,
+                            structure.Type, isCityContest, isRoadContest);
+                    }
         }
         
         private ClashAnimation CreateContestAnimation()
