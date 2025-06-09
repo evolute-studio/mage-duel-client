@@ -872,6 +872,38 @@ namespace TerritoryWars.General
 
             return false;
         }
+        
+        public void CloseCityStructure(Vector2Int position)
+        {
+            var structureOption =
+                SessionManager.Instance.SessionContext.UnionFind.GetStructureByPosition(position,
+                    StructureType.City);
+            if (!structureOption.HasValue) return;
+            var structure = structureOption.Value;
+            foreach (var city in structure.Nodes)
+            {
+                GameObject tile = GetTileObject(city.Position.x, city.Position.y);
+                if (tile == null || !tile.TryGetComponent(out TileGenerator tileGenerator)) continue;
+                List<Side> sides = CheckCityTileSidesToEmpty(position.x, position.y);
+                tileGenerator.FencePlacerForCloserToBorderCity(sides);
+            }
+        }
+
+        public void RecolourPinsForFinishGame(Vector2Int position, Side side, int winnerId)
+        {
+            var structureOption =
+                SessionManager.Instance.SessionContext.UnionFind.GetStructureByNode(position, side,
+                    StructureType.Road);
+            if (!structureOption.HasValue) return;
+            var structure = structureOption.Value;
+            foreach (var road in structure.Nodes)
+            {
+                GameObject tile = GetTileObject(road.Position.x, road.Position.y);
+                if (tile == null || !tile.TryGetComponent(out TileGenerator tileGenerator)) continue;
+                tileGenerator.RecolorPinOnSide(winnerId, (int)side, true);
+            }
+        }
+        
 
         public List<int> GetValidRotations(TileData tile, int x, int y)
         {

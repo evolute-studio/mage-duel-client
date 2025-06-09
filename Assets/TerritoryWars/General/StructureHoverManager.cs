@@ -194,6 +194,71 @@ namespace TerritoryWars.General
                 isCity = false;
             }
         }
+        
+        public HashSet<(TileParts, Side)> GetRoadTilePartsForHighlight(Vector2Int position, Side side)
+        {
+            BoardManager board = SessionManager.Instance.BoardManager;
+            HashSet<(TileParts, Side)> results = new HashSet<(TileParts, Side)>();
+            
+            if (board.IsEdgeTile(position.x, position.y))
+            {
+                (position, side) = board.GetNeighborPositionAndSideToEdgeTile(position.x, position.y);
+            }
+            if(position == new Vector2Int(-1, -1)) return results;
+            
+            var structureOption = SessionManager.Instance.SessionContext.UnionFind.GetStructureByNode(position, side, StructureType.Road);
+            if (!structureOption.HasValue) return results;
+            var structure = structureOption.Value;
+            foreach (var road in structure.Nodes)
+            {
+                TileParts roadTilePart = board.GetTileObject(road.Position.x, road.Position.y).GetComponentInChildren<TileParts>();
+                var item = (roadTilePart, road.Side);
+                if (results.Contains(item)) continue;
+                
+                results.Add(item);
+                
+                Vector2Int edgeTile = board.GetEdgeNeighbors(road.Position.x, road.Position.y, road.Side);
+                if(edgeTile == new Vector2Int(-1, -1)) continue;
+                TileParts edgeTileParts = board.GetTileObject(edgeTile.x, edgeTile.y).GetComponentInChildren<TileParts>();
+                item = (edgeTileParts, board.GetOppositeSide(road.Side));
+                if (results.Contains(item)) continue;
+                results.Add(item);
+            }
+            return results;
+        }
+        
+        public List<TileParts> GetCityTilePartsForHighlight(Vector2Int position)
+        {
+            BoardManager board = SessionManager.Instance.BoardManager;
+            List<TileParts> results = new List<TileParts>();
+            
+            if(board.IsEdgeTile(position.x, position.y))
+            {
+                (position, _) = board.GetNeighborPositionAndSideToEdgeTile(position.x, position.y);
+            }
+            if(position == new Vector2Int(-1, -1)) return results;
+            //var cityDict = DojoGameManager.Instance.DojoSessionManager.GetCityByPosition(tilePosition);
+            var structureOption =
+                SessionManager.Instance.SessionContext.UnionFind.GetStructureByPosition(position,
+                    StructureType.City);
+            if (!structureOption.HasValue) return results;
+            var structure = structureOption.Value;
+            foreach (var city in structure.Nodes)
+            {
+                TileParts cityTileParts = board.GetTileObject(city.Position.x, city.Position.y).GetComponentInChildren<TileParts>();
+                TileParts item = cityTileParts;
+                if (results.Contains(item)) continue;
+                
+                results.Add(item);
+                Vector2Int edgeTile = board.GetEdgeNeighbors(city.Position.x, city.Position.y, city.Side);
+                if(edgeTile == new Vector2Int(-1, -1)) continue;
+                TileParts edgeTileParts = board.GetTileObject(edgeTile.x, edgeTile.y).GetComponentInChildren<TileParts>();
+                item = edgeTileParts;
+                if (results.Contains(item)) continue;
+                results.Add(item);
+            }
+            return results;
+        }
 
         private void HoverEnter(RaycastHit2D[] hits)
         {

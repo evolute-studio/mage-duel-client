@@ -61,6 +61,9 @@ namespace TerritoryWars.Managers.SessionComponents
 
         public void ShowPlayers()
         {
+            int localIndex = SetLocalPlayerData.GetLocalIndex(0);
+            int guestPlayerIndex = SetLocalPlayerData.GetLocalIndex(1);
+            
             Vector3[] leftCharacterPath = new Vector3[3];
             leftCharacterPath[0] = new Vector3(SpawnPoints[0].x, SpawnPoints[0].y + 15, 0);
             leftCharacterPath[1] = new Vector3(SpawnPoints[0].x - 5, SpawnPoints[0].y + 7, 0);
@@ -73,23 +76,21 @@ namespace TerritoryWars.Managers.SessionComponents
             rightCharacterPath[2] = SpawnPoints[1];
 
             PlayerInfoUI playerInfoUI = GameUI.Instance.playerInfoUI;
-            Players[0]
-                .SetAnimatorController(playerInfoUI.charactersObject.GetAnimatorController(Players[0].ActiveSkin));
-            Players[1]
-                .SetAnimatorController(playerInfoUI.charactersObject.GetAnimatorController(Players[1].ActiveSkin));
+            Players[localIndex]
+                .SetAnimatorController(playerInfoUI.charactersObject.GetAnimatorController(Players[localIndex].ActiveSkin));
+            Players[guestPlayerIndex]
+                .SetAnimatorController(playerInfoUI.charactersObject.GetAnimatorController(Players[guestPlayerIndex].ActiveSkin));
 
-            //int hostIndex = SetLocalPlayerData.GetLocalIndex(0);
-            //int guestPlayerIndex = SetLocalPlayerData.GetLocalIndex(1);
             
-            Players[0].transform.localScale = new Vector3(-0.7f, 0.7f, 1f);
-            Players[0].transform.position = leftCharacterPath[0];
-            Players[1].transform.position = rightCharacterPath[0];
+            Players[localIndex].transform.localScale = new Vector3(-0.7f, 0.7f, 1f);
+            Players[localIndex].transform.position = leftCharacterPath[0];
+            Players[guestPlayerIndex].transform.position = rightCharacterPath[0];
             
-            Players[0].transform
+            Players[localIndex].transform
                 .DOPath(leftCharacterPath, 2f, PathType.CatmullRom)
                 .SetEase(Ease.OutQuad);
 
-            Players[1].transform
+            Players[guestPlayerIndex].transform
                 .DOPath(rightCharacterPath, 2f, PathType.CatmullRom)
                 .SetEase(Ease.OutQuad);
 
