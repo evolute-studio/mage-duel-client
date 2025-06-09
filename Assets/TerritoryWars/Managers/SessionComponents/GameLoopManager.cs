@@ -139,6 +139,11 @@ namespace TerritoryWars.Managers.SessionComponents
 
             if (_sessionContext.IsGameWithBot || _sessionContext.IsGameWithBotAsPlayer)
             {
+                if (_managerContext.SessionManager.IsBotSkipping)
+                {
+                    DojoGameManager.Instance.LocalBot.LogicModule.SkipMove();
+                    return;
+                }
                 DojoGameManager.Instance.LocalBot.MakeMove();
             }
         }

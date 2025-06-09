@@ -48,6 +48,9 @@ namespace TerritoryWars.Managers.SessionComponents
         public BoardManager BoardManager;
         public TileSelector TileSelector;
         public StructureHoverManager StructureHoverManager;
+        
+        //for debug
+        [SerializeField] public bool IsBotSkipping = false;
 
 
         private async void Start()
