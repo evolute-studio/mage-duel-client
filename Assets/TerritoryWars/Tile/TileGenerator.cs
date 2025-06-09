@@ -237,7 +237,7 @@ namespace TerritoryWars.Tile
             
             tileParts.SpawnTileObjects();
 
-            if (SessionManager.Instance.TileSelector.selectedPosition != null && _isTilePlacing)
+            if (_isTilePlacing)
             {
                 FencePlacerForCloserToBorderCity(SessionManager.Instance.BoardManager.CheckCityTileSidesToBorder(
                     _tileData.Position.x,
