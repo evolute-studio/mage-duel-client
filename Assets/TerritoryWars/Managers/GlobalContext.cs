@@ -11,11 +11,9 @@ namespace TerritoryWars.Managers
         public Shop Shop;
         public PlayerProfile PlayerProfile;
         public GameModel GameInProgress;
-        public Board Board;
+        public Board BoardForLoad; // used just for loading board, not used in game
         public SessionContext SessionContext;
-
-
-        public bool IsJustLoadedSession = false;
+        
         public bool HasGameInProgress => !GameInProgress.IsNull;
     }
 }
