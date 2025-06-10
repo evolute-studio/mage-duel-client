@@ -11,6 +11,9 @@ using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using UnityEngine;
 using System.Linq;
+using System.Numerics;
+using System.Security.Cryptography;
+using Dojo.Starknet;
 
 namespace TerritoryWars.Managers.SessionComponents
 {
@@ -175,15 +178,79 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             Board board = SessionContext.Board;
             int tilesCount = board.AvailableTilesInDeck.Length;
+            CommitmentsData commitmentsData = new CommitmentsData(tilesCount);
+            
+            
             // fill list with 0, 1, 2, ..., tilesCount - 1
-            List<byte> permutations = new List<byte>();
+            commitmentsData.Permutations = new byte[tilesCount];
             for (byte i = 0; i < tilesCount; i++)
             {
-                permutations.Add(i);
+                commitmentsData.Permutations[i] = i;
             }
-            permutations.Shuffle();
+            commitmentsData.Permutations.Shuffle();
             
+            commitmentsData.Nonce = new FieldElement[tilesCount];
+            for (int i = 0; i < tilesCount; i++)
+            {
+                commitmentsData.Nonce[i] = new FieldElement(Felt252Generator.GenerateFelt252());
+            }
+            
+            commitmentsData.GenerateHashes();
         }
+        [Serializable]
+        public struct CommitmentsData
+        {
+            public byte[] Permutations;
+            public FieldElement[] Nonce;
+            public List<uint[]> Hashes;
+
+            private SHA256 sha256;
+
+            public CommitmentsData(int lenght)
+            {
+                Permutations = new byte[lenght];
+                Nonce = new FieldElement[lenght];
+                Hashes = new List<uint[]>(lenght);
+                
+                sha256 = SHA256.Create();
+            }
+            
+            public void GenerateHashes()
+            {
+                Hashes = Enumerable.Range(0, Permutations.Length)
+                    .Select(GetHash)
+                    .ToList();
+            }
+
+            public uint[] GetHash(int index)
+            {
+                byte tileIndex = (byte)index;
+                FieldElement nonce = Nonce[tileIndex];
+                byte c = Permutations[tileIndex];
+                
+                byte[] bytes = new byte[34];
+                bytes[0] = tileIndex;
+                for( int i = 1; i < 33; i++)
+                {
+                    bytes[i] = nonce.Inner.data[i - 1];
+                }
+                bytes[33] = c;
+                
+                byte[] hash = sha256.ComputeHash(bytes);
+                uint[] result = new uint[8];
+
+                for (int i = 0; i < 8; i++)
+                {
+                    for (int j = 3; j >= 0; j--)
+                    {
+                        result[i] += (uint)hash[i * 4 + j] << (j * 8);
+                    }
+                }
+                
+                return result;
+            }
+        }
+        
 
         private void OnDestroy()
         {

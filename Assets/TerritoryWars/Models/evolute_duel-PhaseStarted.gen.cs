@@ -15,6 +15,15 @@ public class evolute_duel_PhaseStarted : ModelInstance {
     [ModelField("phase")]
     public byte phase; // 0 - creating, 1 - reveal, 2 - move
     
+    [ModelField("top_tile")]
+    public Option<byte> top_tile;
+    
+    [ModelField("commited_tile")]
+    public Option<byte> commited_tile;
+    
+    [ModelField("started_at")]
+    public ulong started_at;
+    
     // Start is called before the first frame update
     void Start() { }
 

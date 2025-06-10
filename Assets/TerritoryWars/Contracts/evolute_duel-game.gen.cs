@@ -11,14 +11,18 @@ using Enum = Dojo.Starknet.Enum;
 using BigInteger = System.Numerics.BigInteger;
 
 // System definitions for `evolute_duel-game` contract
-public class Game : MonoBehaviour {
+public class Game : MonoBehaviour
+{
     // The address of this contract
     public string contractAddress;
 
-    public async Task<FieldElement> commit_tiles(Account account, FieldElement[] commitments) {
+    // Call the `commit_tiles` system with the specified Account and calldata
+    // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
+    public async Task<FieldElement> commit_tiles(Account account, uint[] commitments)
+    {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
         calldata.Add(new FieldElement(commitments.Length).Inner);
-        calldata.AddRange(commitments.SelectMany(commitmentsItem => new [] { commitmentsItem.Inner }));
+        calldata.AddRange(commitments.SelectMany(commitmentsItem => new[] { new FieldElement(commitmentsItem).Inner }));
 
         return await account.ExecuteRaw(new dojo.Call[] {
             new dojo.Call{
@@ -28,12 +32,13 @@ public class Game : MonoBehaviour {
             }
         });
     }
-            
 
-    
+
+
     // Call the `reveal_tile` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
-    public async Task<FieldElement> reveal_tile(Account account, byte tile_index, FieldElement nonce, byte c) {
+    public async Task<FieldElement> reveal_tile(Account account, byte tile_index, FieldElement nonce, byte c)
+    {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
         calldata.Add(new FieldElement(tile_index).Inner);
         calldata.Add(nonce.Inner);
@@ -47,12 +52,13 @@ public class Game : MonoBehaviour {
             }
         });
     }
-    
+
     // Call the `create_game` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
-    public async Task<FieldElement> create_game(Account account) {
+    public async Task<FieldElement> create_game(Account account)
+    {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
-        
+
 
         return await account.ExecuteRaw(new dojo.Call[] {
             new dojo.Call{
@@ -62,14 +68,15 @@ public class Game : MonoBehaviour {
             }
         });
     }
-            
 
-    
+
+
     // Call the `cancel_game` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
-    public async Task<FieldElement> cancel_game(Account account) {
+    public async Task<FieldElement> cancel_game(Account account)
+    {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
-        
+
 
         return await account.ExecuteRaw(new dojo.Call[] {
             new dojo.Call{
@@ -79,12 +86,13 @@ public class Game : MonoBehaviour {
             }
         });
     }
-            
 
-    
+
+
     // Call the `join_game` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
-    public async Task<FieldElement> join_game(Account account, FieldElement host_player) {
+    public async Task<FieldElement> join_game(Account account, FieldElement host_player)
+    {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
         calldata.Add(host_player.Inner);
 
@@ -96,18 +104,19 @@ public class Game : MonoBehaviour {
             }
         });
     }
-            
 
-    
+
+
     // Call the `make_move` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
-    public async Task<FieldElement> make_move(Account account, Option<byte> joker_tile, byte rotation, byte col, byte row) {
+    public async Task<FieldElement> make_move(Account account, Option<byte> joker_tile, byte rotation, byte col, byte row)
+    {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
         calldata.Add(new FieldElement(Enum.GetIndex(joker_tile)).Inner);
-		if (joker_tile is Option<byte>.Some) calldata.Add(new FieldElement(((Option<byte>.Some)joker_tile).value).Inner);
-		calldata.Add(new FieldElement(rotation).Inner);
-		calldata.Add(new FieldElement(col).Inner);
-		calldata.Add(new FieldElement(row).Inner);
+        if (joker_tile is Option<byte>.Some) calldata.Add(new FieldElement(((Option<byte>.Some)joker_tile).value).Inner);
+        calldata.Add(new FieldElement(rotation).Inner);
+        calldata.Add(new FieldElement(col).Inner);
+        calldata.Add(new FieldElement(row).Inner);
 
         return await account.ExecuteRaw(new dojo.Call[] {
             new dojo.Call{
@@ -117,14 +126,15 @@ public class Game : MonoBehaviour {
             }
         });
     }
-            
 
-    
+
+
     // Call the `skip_move` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
-    public async Task<FieldElement> skip_move(Account account) {
+    public async Task<FieldElement> skip_move(Account account)
+    {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
-        
+
 
         return await account.ExecuteRaw(new dojo.Call[] {
             new dojo.Call{
@@ -134,15 +144,16 @@ public class Game : MonoBehaviour {
             }
         });
     }
-            
 
-    
+
+
     // Call the `create_snapshot` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
-    public async Task<FieldElement> create_snapshot(Account account, FieldElement board_id, byte move_number) {
+    public async Task<FieldElement> create_snapshot(Account account, FieldElement board_id, byte move_number)
+    {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
         calldata.Add(board_id.Inner);
-		calldata.Add(new FieldElement(move_number).Inner);
+        calldata.Add(new FieldElement(move_number).Inner);
 
         return await account.ExecuteRaw(new dojo.Call[] {
             new dojo.Call{
@@ -152,12 +163,13 @@ public class Game : MonoBehaviour {
             }
         });
     }
-            
 
-    
+
+
     // Call the `create_game_from_snapshot` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
-    public async Task<FieldElement> create_game_from_snapshot(Account account, FieldElement snapshot_id) {
+    public async Task<FieldElement> create_game_from_snapshot(Account account, FieldElement snapshot_id)
+    {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
         calldata.Add(snapshot_id.Inner);
 
@@ -169,10 +181,11 @@ public class Game : MonoBehaviour {
             }
         });
     }
-    
+
     // Call the `finish_game` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
-    public async Task<FieldElement> finish_game(Account account, FieldElement board_id) {
+    public async Task<FieldElement> finish_game(Account account, FieldElement board_id)
+    {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
         calldata.Add(board_id.Inner);
 
@@ -184,12 +197,13 @@ public class Game : MonoBehaviour {
             }
         });
     }
-            
 
-    
+
+
     // Call the `upgrade` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
-    public async Task<FieldElement> upgrade(Account account, FieldElement new_class_hash) {
+    public async Task<FieldElement> upgrade(Account account, FieldElement new_class_hash)
+    {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
         calldata.Add(new_class_hash.Inner);
 
@@ -201,6 +215,5 @@ public class Game : MonoBehaviour {
             }
         });
     }
-            
+
 }
-        
