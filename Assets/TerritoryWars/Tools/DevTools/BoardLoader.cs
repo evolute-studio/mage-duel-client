@@ -20,15 +20,15 @@ namespace TerritoryWars.Tools.DevTools
 
         public async void LoadBoard(string boardId)
         {
-            GameModel game = await DojoLayer.Instance.GetGameByBoardId(boardId);
-            if (game.IsNull)
+            Board board = await DojoLayer.Instance.GetBoard(boardId);
+            if (board.IsNull)
             {
-                CustomLogger.LogError("Game is null");
+                CustomLogger.LogError("Board is null");
                 return;
             }
 
-            //DojoGameManager.Instance.GlobalContext.GameInProgress = game;
-            //DojoGameManager.Instance.LoadGame();
+            DojoGameManager.Instance.GlobalContext.BoardForLoad = board;
+            DojoGameManager.Instance.LoadSession();
         }
     }
 }

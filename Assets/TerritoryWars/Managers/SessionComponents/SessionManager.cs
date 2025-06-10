@@ -108,21 +108,30 @@ namespace TerritoryWars.Managers.SessionComponents
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Starting SetupData");
             SessionContext.LocalPlayerAddress = DojoGameManager.Instance.LocalAccount.Address.Hex();
             //GameModel fromGlobalContext = DojoGameManager.Instance.GlobalContext.GameInProgress;
-            GameModel game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
-            if (game.IsNull || game.BoardId == null)
+            Board boardForLoad = DojoGameManager.Instance.GlobalContext.BoardForLoad;
+            if (boardForLoad.IsNull)
             {
-                CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game is null or BoardId is null. Retrying...");
-                await Coroutines.CoroutineAsync(() => { }, 1f);
-                game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
-                if (game.BoardId == null)
+                GameModel game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
+                if (game.IsNull || game.BoardId == null)
                 {
-                    CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game is still null or BoardId is null after retry. Redirecting to menu.");
-                    CustomSceneManager.Instance.ForceLoadScene(CustomSceneManager.Instance.Menu);
+                    CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game is null or BoardId is null. Retrying...");
+                    await Coroutines.CoroutineAsync(() => { }, 1f);
+                    game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
+                    if (game.BoardId == null)
+                    {
+                        CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game is still null or BoardId is null after retry. Redirecting to menu.");
+                        CustomSceneManager.Instance.ForceLoadScene(CustomSceneManager.Instance.Menu);
+                    }
                 }
+                SessionContext.Game = game;
             }
-            SessionContext.Game = game;
+            else
+            {
+                DojoGameManager.Instance.GlobalContext.BoardForLoad = default;
+            }
+            
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game retrieved successfully");
-            Board board = await DojoLayer.Instance.GetBoard(SessionContext.Game.BoardId);
+            Board board = boardForLoad.IsNull ? await DojoLayer.Instance.GetBoard(SessionContext.Game.BoardId) : boardForLoad;
             //IncomingModelsFilter.AllowedBoards.Add("0x0000000000000000000000000000000000000000000000000000000000000038");
             //Board board = await DojoLayer.Instance.GetBoard("0x0000000000000000000000000000000000000000000000000000000000000038");
             if (board.IsNull)
