@@ -350,7 +350,7 @@ namespace TerritoryWars.Managers.SessionComponents
             ulong lastTimestamp = board.LastUpdateTimestamp;
             if (!String.IsNullOrEmpty(board.LastMoveId))
             {
-                Move lastMove = await DojoLayer.Instance.GetMove(lastMoveId);
+                Move lastMove = await DojoModels.GetMove(lastMoveId);
                 lastSide = lastMove.PlayerSide;
                 lastTimestamp = lastMove.Timestamp;
             }

@@ -177,14 +177,14 @@ namespace TerritoryWars.Dojo
         public async Task SyncInitialModels()
         {
             int count = 0;
-            (Rules rules, Shop shop) = await DojoLayer.Instance.GetGeneralModels();
+            (Rules rules, Shop shop) = await DojoModels.GetGeneralModels();
             GlobalContext.Rules = rules;
             GlobalContext.Shop = shop;
             
-            PlayerProfile playerProfile = await DojoLayer.Instance.GetPlayerProfile(LocalAccount.Address.Hex());
+            PlayerProfile playerProfile = await DojoModels.GetPlayerProfile(LocalAccount.Address.Hex());
             GlobalContext.PlayerProfile = playerProfile;
             
-            GameModel game = await DojoLayer.Instance.GetGameInProgress(LocalAccount.Address.Hex());
+            GameModel game = await DojoModels.GetGameInProgress(LocalAccount.Address.Hex());
             GlobalContext.GameInProgress = game;
         }
 

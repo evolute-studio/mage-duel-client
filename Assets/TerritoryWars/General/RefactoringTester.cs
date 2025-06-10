@@ -18,7 +18,7 @@ namespace TerritoryWars.General
         public async Task GetGame()
         {
             ApplicationState.CurrentState = ApplicationStates.Initializing;
-            gameModel = await DojoLayer.Instance.GetGameInProgress(PlayerId);
+            gameModel = await DojoModels.GetGameInProgress(PlayerId);
         }
     }
 }
