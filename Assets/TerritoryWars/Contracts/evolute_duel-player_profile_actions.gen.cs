@@ -14,7 +14,72 @@ using BigInteger = System.Numerics.BigInteger;
 public class Player_profile_actions : MonoBehaviour {
     // The address of this contract
     public string contractAddress;
+    
+    // Call the `transfer_ownership` system with the specified Account and calldata
+    // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
+    public async Task<FieldElement> transfer_ownership(Account account, FieldElement new_owner) {
+        List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
+        calldata.Add(new_owner.Inner);
 
+        return await account.ExecuteRaw(new dojo.Call[] {
+            new dojo.Call{
+                to = new FieldElement(contractAddress).Inner,
+                selector = "transfer_ownership",
+                calldata = calldata.ToArray()
+            }
+        });
+    }
+            
+
+    
+    // Call the `renounce_ownership` system with the specified Account and calldata
+    // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
+    public async Task<FieldElement> renounce_ownership(Account account) {
+        List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
+        
+
+        return await account.ExecuteRaw(new dojo.Call[] {
+            new dojo.Call{
+                to = new FieldElement(contractAddress).Inner,
+                selector = "renounce_ownership",
+                calldata = calldata.ToArray()
+            }
+        });
+    }
+            
+
+    
+    // Call the `transferOwnership` system with the specified Account and calldata
+    // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
+    public async Task<FieldElement> transferOwnership(Account account, FieldElement newOwner) {
+        List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
+        calldata.Add(newOwner.Inner);
+
+        return await account.ExecuteRaw(new dojo.Call[] {
+            new dojo.Call{
+                to = new FieldElement(contractAddress).Inner,
+                selector = "transferOwnership",
+                calldata = calldata.ToArray()
+            }
+        });
+    }
+            
+
+    
+    // Call the `renounceOwnership` system with the specified Account and calldata
+    // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
+    public async Task<FieldElement> renounceOwnership(Account account) {
+        List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
+        
+
+        return await account.ExecuteRaw(new dojo.Call[] {
+            new dojo.Call{
+                to = new FieldElement(contractAddress).Inner,
+                selector = "renounceOwnership",
+                calldata = calldata.ToArray()
+            }
+        });
+    }
     
     // Call the `upgrade` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.

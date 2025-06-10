@@ -15,6 +15,38 @@ public class Game : MonoBehaviour {
     // The address of this contract
     public string contractAddress;
 
+    public async Task<FieldElement> commit_tiles(Account account, FieldElement[] commitments) {
+        List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
+        calldata.Add(new FieldElement(commitments.Length).Inner);
+        calldata.AddRange(commitments.SelectMany(commitmentsItem => new [] { commitmentsItem.Inner }));
+
+        return await account.ExecuteRaw(new dojo.Call[] {
+            new dojo.Call{
+                to = new FieldElement(contractAddress).Inner,
+                selector = "commit_tiles",
+                calldata = calldata.ToArray()
+            }
+        });
+    }
+            
+
+    
+    // Call the `reveal_tile` system with the specified Account and calldata
+    // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
+    public async Task<FieldElement> reveal_tile(Account account, byte tile_index, FieldElement nonce, byte c) {
+        List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
+        calldata.Add(new FieldElement(tile_index).Inner);
+        calldata.Add(nonce.Inner);
+        calldata.Add(new FieldElement(c).Inner);
+
+        return await account.ExecuteRaw(new dojo.Call[] {
+            new dojo.Call{
+                to = new FieldElement(contractAddress).Inner,
+                selector = "reveal_tile",
+                calldata = calldata.ToArray()
+            }
+        });
+    }
     
     // Call the `create_game` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.

@@ -108,6 +108,12 @@ public class evolute_duel_Board : ModelInstance {
 
         [ModelField("last_update_timestamp")]
         public ulong last_update_timestamp;
+        
+        [ModelField("commited_tile")]
+        public Option<byte> commited_tile;
+
+        [ModelField("phase_started_at")]
+        public ulong phase_started_at;
 
     // Start is called before the first frame update
     void Start() {
