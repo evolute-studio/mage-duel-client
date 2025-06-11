@@ -162,7 +162,7 @@ public class TileParts : MonoBehaviour
         if (HangingGrass.sprite == null && HangingGrass != null)
         {
             HangingGrass.sprite = PrefabsManager.Instance.TileAssetsObject.GetHangingGrass();
-            HangingGrass.material = HangingGrassMaterial;
+            // HangingGrass.material = HangingGrassMaterial;
         }
     }
 
@@ -195,6 +195,7 @@ public class TileParts : MonoBehaviour
 
     public void SetActiveWoodenBorderWall(bool isActive)
     {
+        return;
         Transform borderFences = transform.Find("BorderFence");
         borderFences.gameObject.SetActive(isActive);
     }
@@ -212,6 +213,7 @@ public class TileParts : MonoBehaviour
 
     public void PlaceContestedWalls(int rotation)
     {
+        return;
         WallParent.SetActive(true);
         WallPlacer?.gameObject.SetActive(false);
 
@@ -229,6 +231,7 @@ public class TileParts : MonoBehaviour
 
     public void SetContestedBorderWalls(List<Side> sides)
     {
+        return;
         foreach (var side in sides)
         {
             CompletedBorderWalls[(int)side].SetActive(true);
@@ -238,6 +241,7 @@ public class TileParts : MonoBehaviour
     
     private void PlaceBorderContestedWalls()
     {
+        return;
         WallParent.transform.Find("BorderWalls").gameObject.SetActive(true);
     }
     

@@ -46,6 +46,7 @@ namespace TerritoryWars.Tile
         [ContextMenu("Place Fence")]
         public void PlaceTerritory(bool isContested)
         {
+            return;
             if (fencePrefab == null || lineRenderer == null || lineRenderer.positionCount < 2)
             {
                 return;

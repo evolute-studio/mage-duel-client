@@ -31,6 +31,7 @@ namespace TerritoryWars.Tile
         
         public void PlaceWall(bool isContested)
         {
+            return;
             if (!enabled) return;
             SetPillars();
             
@@ -84,6 +85,7 @@ namespace TerritoryWars.Tile
 
         private void SetPillars()
         {
+            return;
             // get all children of this object with name containing "Pillar"
             Transform[] allPillars = GetComponentsInChildren<Transform>();
             List<Transform> filteredPillars = new List<Transform>();
