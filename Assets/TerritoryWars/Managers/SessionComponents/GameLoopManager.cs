@@ -88,7 +88,8 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void OnGameCreationPhase()
         {
-            EventBus.Publish(new TimerEvent(TimerEventType.GameCreation, GetPhaseStart()));
+            EventBus.Publish(new TimerEvent(TimerEventType.GameCreation, TimerProgressType.Started, GetPhaseStart()));
+            
             CommitmentsData commitmentsData = _sessionContext.Commitments;
             uint[] hashes = commitmentsData.GetAllHashes();
             DojoConnector.CommitTiles(DojoGameManager.Instance.LocalAccount, hashes);
@@ -104,6 +105,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void OnRevealPhase(PhaseStarted phaseData)
         {
+            EventBus.Publish(new TimerEvent(TimerEventType.Revealing, TimerProgressType.Started, GetPhaseStart()));
             // if local player turn - reveal tile
             // if remote player turn - wait for remote player to reveal tile
             if (!_sessionContext.IsLocalPlayerTurn)
@@ -125,6 +127,8 @@ namespace TerritoryWars.Managers.SessionComponents
         
         private void OnRequestPhase(PhaseStarted phaseData)
         {
+            EventBus.Publish(new TimerEvent(TimerEventType.Requesting, TimerProgressType.Started, GetPhaseStart()));
+            
             // if local player turn - wait for remote player to request tile
             // if remote player turn - request tile
             if (_sessionContext.IsLocalPlayerTurn)
@@ -146,7 +150,8 @@ namespace TerritoryWars.Managers.SessionComponents
         
         private void OnMovePhase()
         {
-            StartTurn();
+            EventBus.Publish(new TimerEvent(TimerEventType.Moving, TimerProgressType.Started, GetPhaseStart()));
+            StartMoving();
         }
 
         
@@ -156,7 +161,7 @@ namespace TerritoryWars.Managers.SessionComponents
             DojoConnector.FinishGame(DojoGameManager.Instance.LocalAccount, new FieldElement(_sessionContext.Board.Id));
         }
 
-        private void StartTurn()
+        private void StartMoving()
         {
             if (!IsGameStillActual())
             {
@@ -165,7 +170,6 @@ namespace TerritoryWars.Managers.SessionComponents
             }
 
             CustomLogger.LogDojoLoop("StartTurn");
-            EventBus.Publish(new TimerEvent(TimerEventType.Started, GetTimerTimestamp()));
 
             string currentTile = _sessionContext.Board.TopTile;
             TileData tileData = new TileData(currentTile, Vector2Int.zero, _currentPlayer.PlayerSide);
@@ -308,14 +312,15 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void OnTimerEvent(TimerEvent timerEvent)
         {
-            if (timerEvent.Type == TimerEventType.TurnTimeElapsed && _sessionContext.IsLocalPlayerTurn)
+            if (timerEvent.Type == TimerEventType.Moving && timerEvent.ProgressType == TimerProgressType.Elapsed 
+                                                         && _sessionContext.IsLocalPlayerTurn)
             {
                 SkipLocalTurn();
             }
-            else if (timerEvent.Type == TimerEventType.PassingTimeElapsed && !_sessionContext.IsLocalPlayerTurn)
-            {
-                SkipOpponentTurnLocally();
-            }
+            // else if (timerEvent.Type == TimerEventType.PassingTimeElapsed && !_sessionContext.IsLocalPlayerTurn)
+            // {
+            //     SkipOpponentTurnLocally();
+            // }
         }
 
         private void FinishLocalTurn()

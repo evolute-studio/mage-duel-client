@@ -55,10 +55,7 @@ namespace TerritoryWars.UI.Session
         private void OnTimerEvent(TimerEvent timerEvent)
         {
             _timerType = timerEvent.Type;
-            if (timerEvent.Type == TimerEventType.Started)
-            {
-                StartTimer(timerEvent.StartTimestamp);
-            }            
+            StartTimer(timerEvent.StartTimestamp);
         }
 
         public void StartTimer(ulong timestamp)
@@ -83,17 +80,16 @@ namespace TerritoryWars.UI.Session
                 yield return new WaitForSeconds(0.5f);
             }
             ResetUI();
-            EventBus.Publish(new TimerEvent(TimerEventType.TurnTimeElapsed));
+            EventBus.Publish(new TimerEvent(TimerEventType.Moving, TimerProgressType.Elapsed));
 
             // passing turn
             float reducer = !_isLocalPlayerTurn ? _opponentReducedTime : 0;
             while (_timeGone < TurnDuration + PassingTurnDuration - reducer)
             {
-                UpdateTurnText(PassingTurnText);
+                UpdateTurnText(GetTimerText());
                 yield return null;
             }
             ResetUI();
-            EventBus.Publish(new TimerEvent(TimerEventType.PassingTimeElapsed));
         }
 
         private void UpdateMainLoopTimer()
@@ -105,7 +101,7 @@ namespace TerritoryWars.UI.Session
 
             else
                 TimerText.color = Color.white; // Default color
-            UpdateTurnText(_isLocalPlayerTurn ? LocalPlayerTurnText : OpponentPlayerTurnText);
+            UpdateTurnText(GetTimerText());
         }
 
         private float GetTurnTime()
@@ -124,12 +120,29 @@ namespace TerritoryWars.UI.Session
                     SpriteAnimator.Play(IdleAnimationSprites);
                 });
         }
+        
+        private string GetTimerText()
+        {
+            switch (_timerType)
+            {
+                case TimerEventType.GameCreation:
+                    return GameCreationText;
+                case TimerEventType.Revealing:
+                    return GameRevealingText;
+                case TimerEventType.Requesting:
+                    return GameRequestText;
+                case TimerEventType.Moving:
+                    return _isLocalPlayerTurn ? LocalPlayerTurnText : OpponentPlayerTurnText;
+                default:
+                    return "";
+            }
+        }
 
         private void UpdateTurnText(string baseText)
         {
             int visibleDots = 3 - ((int)(_timeGone % 3));
             string dots = string.Join("", new string[3].Select((_, index) =>
-                $"<color=#{(index < visibleDots ? "FFFFFFFF" : "FFFFFF00")}>.</color>"));
+                $"<color=#{(index < visibleDots ? "FFFFFF" : "FFFF00")}>.</color>"));
 
             TurnText.text = baseText + dots;
         }
