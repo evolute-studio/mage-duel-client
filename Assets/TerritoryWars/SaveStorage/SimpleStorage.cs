@@ -1,9 +1,53 @@
+using Newtonsoft.Json;
+using TerritoryWars.DataModels;
 using UnityEngine;
 
-namespace TerritoryWars
+namespace TerritoryWars.SaveStorage
 {
     public static class SimpleStorage
     {
+        public static SessionSave SessionSave;
+        
+        public static void Initialize()
+        {
+            LoadSessionSave();
+        }
+        
+        public static void SaveSessionSave()
+        {
+            string json = JsonConvert.SerializeObject(SessionSave, Formatting.None);
+            PlayerPrefs.SetString("SessionSave", json);
+        }
+        
+        public static SessionSave LoadSessionSave()
+        {
+            string json = PlayerPrefs.GetString("SessionSave", null);
+            if (string.IsNullOrEmpty(json))
+            {
+                return new SessionSave();
+            }
+            SessionSave = JsonConvert.DeserializeObject<SessionSave>(json);
+            return SessionSave;
+        }
+        
+        public static void SaveCommitments(CommitmentsData commitments)
+        {
+            string json = JsonConvert.SerializeObject(commitments, Formatting.None);
+            PlayerPrefs.SetString("Commitments", json);
+        }
+        
+        public static CommitmentsData? LoadCommitments()
+        {
+            string json = PlayerPrefs.GetString("Commitments", null);
+            if (string.IsNullOrEmpty(json))
+            {
+                return null;
+            }
+            return JsonConvert.DeserializeObject<CommitmentsData>(json);
+        }
+        
+        
+        
         public static void SetDataVersion(int version)
         {
             PlayerPrefs.SetInt("DataVersion", version);

@@ -14,6 +14,7 @@ using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
 using Dojo.Starknet;
+using TerritoryWars.SaveStorage;
 
 namespace TerritoryWars.Managers.SessionComponents
 {
@@ -62,6 +63,8 @@ namespace TerritoryWars.Managers.SessionComponents
             ApplicationState.CurrentState = ApplicationStates.Initializing;
             Initialize();
             await SetupData();
+            SetupCommitments();
+            SaveSessionData();
             ManagerContext.PlayersManager.Initialize(ManagerContext);
             ManagerContext.ContestManager.Initialize(ManagerContext);
             InitializeBoard();
@@ -167,19 +170,68 @@ namespace TerritoryWars.Managers.SessionComponents
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - SessionContext initialized successfully");
         }
 
+        private void SaveSessionData()
+        {
+            new SessionSave(
+                SessionContext.Board.Id,
+                DojoGameManager.Instance.DojoSessionManager.IsGameWithBot,
+                SessionContext.Commitments,
+                SessionContext.BotCommitments
+            ).Save();
+        }
+
         private void InitializeBoard()
         {
             var board = SessionContext.Board;
             BoardManager.Initialize(board);
             ManagerContext.ContestManager.RecolorStructures();
         }
+
+        private void SetupCommitments()
+        {
+            byte[] permutations = null;
+            string s = "";
+            if (!SimpleStorage.SessionSave.IsNull && SessionContext.Board.Id == SimpleStorage.SessionSave.BoardId)
+            {
+                CustomLogger.LogDojoLoop($"[SessionManager.SetupCommitments] - BoardId: {SessionContext.Board.Id} matches SessionSave BoardId: {SimpleStorage.SessionSave.BoardId}");
+                SessionContext.Commitments = SimpleStorage.SessionSave.Commitments;
+                SessionContext.BotCommitments = SimpleStorage.SessionSave.BotCommitments;
+                CustomLogger.LogDojoLoop("[SessionManager.SetupCommitments] - Commitments loaded from SessionSave");
+                permutations = SessionContext.Commitments.Permutations;
+                s = "restored permutations: ";
+                for(int i = 0; i < permutations.Length; i++)
+                {
+                    s += $"{permutations[i]} ";
+                }
+                CustomLogger.LogDojoLoop($"[SessionManager.SetupCommitments] - {s}");
+                return;
+            }
+            
+            CommitmentsData playersCommitments = GenerateCommitments();
+            SessionContext.Commitments = playersCommitments;
+            
+            permutations = SessionContext.Commitments.Permutations;
+            s = "permutations: ";
+            for(int i = 0; i < permutations.Length; i++)
+            {
+                s += $"{permutations[i]} ";
+            }
+            CustomLogger.LogDojoLoop($"[SessionManager.SetupCommitments] - {s}");
+            
+            if(DojoGameManager.Instance.DojoSessionManager.IsGameWithBot)
+            {
+                CommitmentsData botCommitments = GenerateCommitments();
+                SessionContext.BotCommitments = botCommitments;
+            }
+            
+            CustomLogger.LogObject(SimpleStorage.SessionSave, "SessionSave", saveInFile: true);
+        }
         
-        private void GeneratePermutations()
+        private CommitmentsData GenerateCommitments()
         {
             Board board = SessionContext.Board;
             int tilesCount = board.AvailableTilesInDeck.Length;
             CommitmentsData commitmentsData = new CommitmentsData(tilesCount);
-            
             
             // fill list with 0, 1, 2, ..., tilesCount - 1
             commitmentsData.Permutations = new byte[tilesCount];
@@ -196,59 +248,7 @@ namespace TerritoryWars.Managers.SessionComponents
             }
             
             commitmentsData.GenerateHashes();
-        }
-        [Serializable]
-        public struct CommitmentsData
-        {
-            public byte[] Permutations;
-            public FieldElement[] Nonce;
-            public List<uint[]> Hashes;
-
-            private SHA256 sha256;
-
-            public CommitmentsData(int lenght)
-            {
-                Permutations = new byte[lenght];
-                Nonce = new FieldElement[lenght];
-                Hashes = new List<uint[]>(lenght);
-                
-                sha256 = SHA256.Create();
-            }
-            
-            public void GenerateHashes()
-            {
-                Hashes = Enumerable.Range(0, Permutations.Length)
-                    .Select(GetHash)
-                    .ToList();
-            }
-
-            public uint[] GetHash(int index)
-            {
-                byte tileIndex = (byte)index;
-                FieldElement nonce = Nonce[tileIndex];
-                byte c = Permutations[tileIndex];
-                
-                byte[] bytes = new byte[34];
-                bytes[0] = tileIndex;
-                for( int i = 1; i < 33; i++)
-                {
-                    bytes[i] = nonce.Inner.data[i - 1];
-                }
-                bytes[33] = c;
-                
-                byte[] hash = sha256.ComputeHash(bytes);
-                uint[] result = new uint[8];
-
-                for (int i = 0; i < 8; i++)
-                {
-                    for (int j = 3; j >= 0; j--)
-                    {
-                        result[i] += (uint)hash[i * 4 + j] << (j * 8);
-                    }
-                }
-                
-                return result;
-            }
+            return commitmentsData;
         }
         
 
