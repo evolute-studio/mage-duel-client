@@ -19,6 +19,11 @@ namespace TerritoryWars.UI.Session
         public TextMeshProUGUI TurnText;
         public TextMeshProUGUI TimerText;
         public TextMeshProUGUI SkipText;
+        
+        public string GameCreationText = "Game is being created";
+        public string GameRevealingText = "Revealing tile";
+        public string GameRequestText = "Requesting tile";
+        
         public string LocalPlayerTurnText = "Your turn now";
         public string OpponentPlayerTurnText = "Waiting for opponent's turn";
         public string PassingTurnText = "Passing the turn";
@@ -34,6 +39,7 @@ namespace TerritoryWars.UI.Session
         public float TurnDuration => GameConfiguration.TurnDuration;
         public float PassingTurnDuration => GameConfiguration.PassingTurnDuration;
         private float _opponentReducedTime = 0.25f;
+        private TimerEventType _timerType;
 
         // Local variables
         private bool _isLocalPlayerTurn => SessionManager.Instance.SessionContext.IsLocalPlayerTurn;
@@ -48,6 +54,7 @@ namespace TerritoryWars.UI.Session
 
         private void OnTimerEvent(TimerEvent timerEvent)
         {
+            _timerType = timerEvent.Type;
             if (timerEvent.Type == TimerEventType.Started)
             {
                 StartTimer(timerEvent.StartTimestamp);

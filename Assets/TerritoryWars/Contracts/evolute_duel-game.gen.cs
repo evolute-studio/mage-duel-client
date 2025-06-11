@@ -18,11 +18,10 @@ public class Game : MonoBehaviour
 
     // Call the `commit_tiles` system with the specified Account and calldata
     // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
-    public async Task<FieldElement> commit_tiles(Account account, uint[] commitments)
-    {
+    public async Task<FieldElement> commit_tiles(Account account, uint[] commitments) {
         List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
         calldata.Add(new FieldElement(commitments.Length).Inner);
-        calldata.AddRange(commitments.SelectMany(commitmentsItem => new[] { new FieldElement(commitmentsItem).Inner }));
+        calldata.AddRange(commitments.SelectMany(commitmentsItem => new [] { new FieldElement(commitmentsItem).Inner }));
 
         return await account.ExecuteRaw(new dojo.Call[] {
             new dojo.Call{
@@ -48,6 +47,23 @@ public class Game : MonoBehaviour
             new dojo.Call{
                 to = new FieldElement(contractAddress).Inner,
                 selector = "reveal_tile",
+                calldata = calldata.ToArray()
+            }
+        });
+    }
+    
+    // Call the `request_next_tile` system with the specified Account and calldata
+    // Returns the transaction hash. Use `WaitForTransaction` to wait for the transaction to be confirmed.
+    public async Task<FieldElement> request_next_tile(Account account, byte tile_index, FieldElement nonce, byte c) {
+        List<dojo.FieldElement> calldata = new List<dojo.FieldElement>();
+        calldata.Add(new FieldElement(tile_index).Inner);
+        calldata.Add(nonce.Inner);
+        calldata.Add(new FieldElement(c).Inner);
+
+        return await account.ExecuteRaw(new dojo.Call[] {
+            new dojo.Call{
+                to = new FieldElement(contractAddress).Inner,
+                selector = "request_next_tile",
                 calldata = calldata.ToArray()
             }
         });

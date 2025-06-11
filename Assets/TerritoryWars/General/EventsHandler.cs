@@ -204,6 +204,15 @@ namespace TerritoryWars.General
                     CustomLogger.LogEventsLocal($"[EventHandler] | {canceled.Model.Name} ");
                     EventBus.Publish(gameCanceled);
                     break;
+                case evolute_duel_PhaseStarted phaseStarted:
+                    if (!_globalContext.SessionContext.IsSessionBoard(phaseStarted.board_id.Hex()))
+                    {
+                        return;
+                    }
+                    PhaseStarted phaseStartedEvent = new PhaseStarted().SetData(phaseStarted);
+                    CustomLogger.LogEventsLocal($"[EventHandler] | {phaseStarted.Model.Name} ");
+                    EventBus.Publish(phaseStartedEvent);
+                    break;
             }
         }
 

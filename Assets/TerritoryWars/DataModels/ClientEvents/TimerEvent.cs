@@ -17,5 +17,10 @@ namespace TerritoryWars.DataModels.ClientEvents
         Started,
         TurnTimeElapsed,
         PassingTimeElapsed,
+        
+        GameCreation,
+        Revealing,
+        Requesting,
+        Moving,
     }
 }

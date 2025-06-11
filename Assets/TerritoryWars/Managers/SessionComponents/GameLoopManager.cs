@@ -45,29 +45,111 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Subscribe<GameFinished>(OnEndGame);
             EventBus.Subscribe<ErrorOccured>(OnError);
             EventBus.Subscribe<GameCanceled>(OnGameCanceled);
+            EventBus.Subscribe<PhaseStarted>(OnPhaseStarted);
             EventBus.Subscribe<TurnEndData>(OnTurnEnd);
         }
 
         public async void StartGame()
         {
-            Board board = _sessionContext.Board;
-            if (board.IsNull)
-            {
-                CustomLogger.LogError("GameLoopManager: Board is null or not initialized.");
-                return;
-            }
             byte whoseTurnSide = await WhoseTurn();
             //byte convertedSide = (byte)SetLocalPlayerData.GetLocalIndex(whoseTurnSide);
             _currentPlayer = _sessionContext.Players[whoseTurnSide];
 
-            if (!CheckGameStatus())
+            if (!IsGameStillActual())
             {
                 FinishGame();
                 return;
             }
 
+            PhaseStarted phaseStarted = new PhaseStarted().SetData(_sessionContext.Board);
+            OnPhaseStarted(phaseStarted);
+        }
+        
+        private void OnPhaseStarted(PhaseStarted phaseStarted)
+        {
+            switch (phaseStarted.Phase)
+            {
+                case SessionPhase.Creating:
+                    OnGameCreationPhase();
+                    break;
+                case SessionPhase.Reveal:
+                    OnRevealPhase(phaseStarted);
+                    break;
+                case SessionPhase.Request:
+                    OnRequestPhase(phaseStarted);
+                    break;
+                case SessionPhase.Move:
+                    OnMovePhase();
+                    break;
+                case SessionPhase.Finished:
+                    break;
+            }
+        }
+
+        private void OnGameCreationPhase()
+        {
+            EventBus.Publish(new TimerEvent(TimerEventType.GameCreation, GetPhaseStart()));
+            CommitmentsData commitmentsData = _sessionContext.Commitments;
+            uint[] hashes = commitmentsData.GetAllHashes();
+            DojoConnector.CommitTiles(DojoGameManager.Instance.LocalAccount, hashes);
+            CustomLogger.LogDojoLoop("OnGameCreationPhase: Local player - sending commitments to server.");
+            if (_sessionContext.IsGameWithBot)
+            {
+                commitmentsData = _sessionContext.BotCommitments;
+                hashes = commitmentsData.GetAllHashes();
+                DojoConnector.CommitTiles(DojoGameManager.Instance.LocalBot.Account, hashes);
+                CustomLogger.LogDojoLoop("OnGameCreationPhase: Bot player - sending commitments to server.");
+            }
+        }
+
+        private void OnRevealPhase(PhaseStarted phaseData)
+        {
+            // if local player turn - reveal tile
+            // if remote player turn - wait for remote player to reveal tile
+            if (!_sessionContext.IsLocalPlayerTurn)
+            {
+                return;
+            }
+            
+            if (!phaseData.CommitedTileIndex.HasValue)
+            {
+                CustomLogger.LogError("GameLoopManager: CommitedTileIndex is null in OnRevealPhase.");
+                return;
+            }
+            
+            byte commitedTileIndex = phaseData.CommitedTileIndex.Value;
+            FieldElement nonce = _sessionContext.Commitments.Nonce[commitedTileIndex];
+            byte c = _sessionContext.Commitments.Permutations[commitedTileIndex];
+            DojoConnector.RevealTile(DojoGameManager.Instance.LocalAccount, commitedTileIndex, nonce, c);
+        }
+        
+        private void OnRequestPhase(PhaseStarted phaseData)
+        {
+            // if local player turn - wait for remote player to request tile
+            // if remote player turn - request tile
+            if (_sessionContext.IsLocalPlayerTurn)
+            {
+                return;
+            }
+            
+            if (!phaseData.CommitedTileIndex.HasValue)
+            {
+                CustomLogger.LogError("GameLoopManager: CommitedTileIndex is null in OnRevealPhase.");
+                return;
+            }
+            
+            byte commitedTileIndex = phaseData.CommitedTileIndex.Value;
+            FieldElement nonce = _sessionContext.Commitments.Nonce[commitedTileIndex];
+            byte c = _sessionContext.Commitments.Permutations[commitedTileIndex];
+            DojoConnector.RequestNextTile(DojoGameManager.Instance.LocalAccount, commitedTileIndex, nonce, c);
+        }
+        
+        private void OnMovePhase()
+        {
             StartTurn();
         }
+
+        
 
         private void FinishGame()
         {
@@ -76,7 +158,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void StartTurn()
         {
-            if (!CheckGameStatus())
+            if (!IsGameStillActual())
             {
                 FinishGame();
                 return;
@@ -276,7 +358,6 @@ namespace TerritoryWars.Managers.SessionComponents
             _turnEndData.Reset();
             byte nextTurnSide = (byte)((_currentPlayer.PlayerSide + 1) % 2);
             _currentPlayer = _sessionContext.Players[nextTurnSide];
-            StartTurn();
         }
 
         public void OnEndGame(GameFinished gameFinished)
@@ -311,6 +392,8 @@ namespace TerritoryWars.Managers.SessionComponents
             SimpleStorage.ClearCurrentBoardId();
             PopupManager.Instance.ShowOpponentCancelGame();
         }
+        
+        
 
         private IEnumerator GameFinishedDelayed()
         {
@@ -320,27 +403,24 @@ namespace TerritoryWars.Managers.SessionComponents
         }
         
 
-        private bool CheckGameStatus()
+        private bool IsGameStillActual()
         {
-            int turns = GetTurnGoneCount();
-            if (turns >= 2)
+            Board board = _sessionContext.Board;
+            int phaseDuration = GameConfiguration.GetPhaseDuration(board.Phase);
+            ulong phaseStartedAt = board.PhaseStartedAt;
+            ulong currentTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            if (phaseStartedAt == 0 || currentTimestamp < phaseStartedAt)
             {
+                CustomLogger.LogError("GameLoopManager: Phase started at is not set or in the past.");
+                return false;
+            }
+            int elapsedTime = (int)currentTimestamp - (int)phaseStartedAt;
+            if (elapsedTime > phaseDuration)
+            {
+                FinishGame();
                 return false;
             }
             return true;
-        }
-
-        private int GetTurnGoneCount()
-        {
-            Board board = _sessionContext.Board;
-            if (board.LastUpdateTimestamp == 0)
-            {
-                return 0;
-            }
-            ulong currentTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-            ulong elapsedTime = currentTimestamp - board.LastUpdateTimestamp;
-            ulong turnDuration = (ulong)GameConfiguration.TurnDuration + GameConfiguration.PassingTurnDuration;
-            return (int)(elapsedTime / turnDuration);
         }
 
         private async Task<byte> WhoseTurn()
@@ -348,15 +428,12 @@ namespace TerritoryWars.Managers.SessionComponents
             Board board = _sessionContext.Board;
             string lastMoveId = board.LastMoveId;
             byte lastSide = 1;
-            ulong lastTimestamp = board.LastUpdateTimestamp;
             if (!String.IsNullOrEmpty(board.LastMoveId))
             {
                 Move lastMove = await DojoModels.GetMove(lastMoveId);
                 lastSide = lastMove.PlayerSide;
-                lastTimestamp = lastMove.Timestamp;
             }
-            ushort turnCountElapsed = GetTurnCount(lastTimestamp);
-            byte currentTurnSide = (byte)((lastSide + turnCountElapsed + 1) % 2);
+            byte currentTurnSide = (byte)((lastSide + 1) % 2);
             return currentTurnSide;
         }
 
@@ -369,17 +446,8 @@ namespace TerritoryWars.Managers.SessionComponents
             return lastTimestamp + wholeTurnDuration * (delta / wholeTurnDuration);
         }
 
-        private ushort GetTurnCount(ulong lastTimestamp)
-        {
-            ushort moveDuration = GameConfiguration.TurnDuration;
-            ulong currentTimestamp = (ulong)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
-            if (lastTimestamp == 0)
-            {
-                return 0;
-            }
-            ulong elapsedTime = currentTimestamp - lastTimestamp;
-            return (ushort)(elapsedTime / moveDuration);
-        }
+        private ulong GetPhaseStart() => _sessionContext.Board.PhaseStartedAt;
+        
 
         public void Dispose()
         {
@@ -392,6 +460,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Unsubscribe<TimerEvent>(OnTimerEvent);
             EventBus.Unsubscribe<GameFinished>(OnEndGame);
             EventBus.Unsubscribe<ErrorOccured>(OnError);
+            EventBus.Unsubscribe<GameCanceled>(OnGameCanceled);
         }
     }
 

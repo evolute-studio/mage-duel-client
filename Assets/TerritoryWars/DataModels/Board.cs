@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dojo.Starknet;
 using TerritoryWars.DataModels.Events;
 using TerritoryWars.Tools;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TerritoryWars.DataModels
 {
@@ -20,10 +22,12 @@ namespace TerritoryWars.DataModels
         public SessionPlayer Player1;
         public SessionPlayer Player2;
         public string LastMoveId; // Maybe better store Move struct
-        public BoardState GameState;
         public byte MovesDone;
         public int MovesCount => GetOnlyMovesCount();
         public ulong LastUpdateTimestamp;
+        public byte? CommitedTileIndex;
+        public SessionPhase Phase;
+        public ulong PhaseStartedAt;
 
         public Board SetData(evolute_duel_Board board)
         {
@@ -31,7 +35,8 @@ namespace TerritoryWars.DataModels
             InitialEdgeState = GameConfiguration.GetInitialEdgeState(board.initial_edge_state);
             AvailableTilesInDeck = board.available_tiles_in_deck.ToList()
                 .Select(x => GameConfiguration.GetTileType(x)).ToArray();
-            TopTile = GameConfiguration.GetTileType(board.top_tile.Unwrap());
+            byte? topTileType = board.top_tile.UnwrapByte();
+            TopTile = topTileType.HasValue ? GameConfiguration.GetTileType(topTileType.Value) : null;
             Tiles = new Dictionary<Vector2Int, TileModel>();
             AddEdgeTiles(Tiles, board.initial_edge_state);
             for (int i = 0; i < board.state.Length; i++)
@@ -73,9 +78,16 @@ namespace TerritoryWars.DataModels
                 }
             };
             LastMoveId = board.last_move_id.Unwrap()?.Hex();
-            GameState = (BoardState)board.game_state.Unwrap();
             MovesDone = board.moves_done;
             LastUpdateTimestamp = board.last_update_timestamp;
+
+            CommitedTileIndex = board.commited_tile switch
+            {
+                Option<byte>.Some some => some.value,
+                Option<byte>.None _ => null
+            };
+            Phase = board.game_state.Unwrap();
+            PhaseStartedAt = board.phase_started_at;
             return this;
         }
 
@@ -96,7 +108,7 @@ namespace TerritoryWars.DataModels
             Player1.Update(data.Player1);
             Player2.Update(data.Player2);
             LastMoveId = data.LastMoveId;
-            GameState = data.GameState;
+            Phase = data.GameState;
 
             return this;
         }
@@ -252,11 +264,5 @@ namespace TerritoryWars.DataModels
                 }
             }
         }
-    }
-
-    public enum BoardState
-    {
-        InProgress,
-        Finished
     }
 }

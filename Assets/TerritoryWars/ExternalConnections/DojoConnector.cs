@@ -148,6 +148,68 @@ namespace TerritoryWars.ExternalConnections
             }
         }
         
+        public static async void CommitTiles(GeneralAccount account,  uint[] commitments)
+        {
+            ExecuteConfig executeConfig = new ExecuteConfig()
+                .WithMessage($"DojoCall: [{nameof(CommitTiles)}] " +
+                             $"\n Account: {account.Address.Hex()} ");
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.commit_tiles(commitments), executeConfig);
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.commit_tiles(account.Account, commitments),
+                    executeConfig
+                );
+            }
+        }
+        
+        public static async void RevealTile(GeneralAccount account, byte tile_index, FieldElement nonce, byte c)
+        {
+            ExecuteConfig executeConfig = new ExecuteConfig()
+                .WithMessage($"DojoCall: [{nameof(RevealTile)}] " +
+                             $"\n Account: {account.Address.Hex()} " +
+                             $"\n TileIndex: {tile_index} Nonce: {nonce.Hex()} C: {c}");
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.reveal_tile(tile_index, nonce, c), executeConfig);
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.reveal_tile(account.Account, tile_index, nonce, c),
+                    executeConfig
+                );
+            }
+        }
+        
+        public static async void RequestNextTile(GeneralAccount account, byte tile_index, FieldElement nonce, byte c)
+        {
+            ExecuteConfig executeConfig = new ExecuteConfig()
+                .WithMessage($"DojoCall: [{nameof(RequestNextTile)}] " +
+                             $"\n Account: {account.Address.Hex()} " +
+                             $"\n TileIndex: {tile_index} Nonce: {nonce.Hex()} C: {c}");
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.request_next_tile(tile_index, nonce, c), executeConfig);
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.request_next_tile(account.Account, tile_index, nonce, c),
+                    executeConfig
+                );
+            }
+        }
+        
         public static async void MakeMove(GeneralAccount account, Option<byte> joker_tile, byte rotation, byte col, byte row)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()

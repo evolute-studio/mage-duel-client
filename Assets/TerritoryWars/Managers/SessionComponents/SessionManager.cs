@@ -233,7 +233,6 @@ namespace TerritoryWars.Managers.SessionComponents
             int tilesCount = board.AvailableTilesInDeck.Length;
             CommitmentsData commitmentsData = new CommitmentsData(tilesCount);
             
-            // fill list with 0, 1, 2, ..., tilesCount - 1
             commitmentsData.Permutations = new byte[tilesCount];
             for (byte i = 0; i < tilesCount; i++)
             {

@@ -29,11 +29,11 @@ namespace TerritoryWars.DataModels
         public void GenerateHashes()
         {
             Hashes = Enumerable.Range(0, Permutations.Length)
-                .Select(GetHash)
+                .Select(ComputeHash)
                 .ToList();
         }
 
-        public uint[] GetHash(int index)
+        public uint[] ComputeHash(int index)
         {
             byte tileIndex = (byte)index;
             FieldElement nonce = Nonce[tileIndex];
@@ -59,6 +59,15 @@ namespace TerritoryWars.DataModels
             }
                 
             return result;
+        }
+        
+        public uint[] GetAllHashes()
+        {
+            if (Hashes == null || Hashes.Count == 0)
+            {
+                return new uint[0];
+            }
+            return Hashes.SelectMany(hash => hash).ToArray();
         }
     }
 }

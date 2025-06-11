@@ -5,30 +5,39 @@ using Dojo.Starknet;
 using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
+using TerritoryWars.DataModels.Events;
 using Enum = Dojo.Starknet.Enum;
 using BigInteger = System.Numerics.BigInteger;
 
 // Type definition for `evolute_duel::packing::GameState` enum
-public abstract record GameState() : Enum {
-    public record InProgress() : GameState;
+public abstract record GameState() : Enum
+{
+    public record Creating() : GameState;
+    public record Reveal() : GameState;
+    public record Request() : GameState;
+    public record Move() : GameState;
     public record Finished() : GameState;
-    
-    public int Unwrap()
+
+    public SessionPhase Unwrap()
     {
         return this switch
         {
-            InProgress => 0,
-            Finished => 1,
+            Creating => SessionPhase.Creating,
+            Reveal => SessionPhase.Reveal,
+            Request => SessionPhase.Request,
+            Move => SessionPhase.Move,
+            Finished => SessionPhase.Finished,
             _ => throw new Exception("Unexpected case in Unwrap")
         };
     }
 }
 
 // Type definition for `evolute_duel::packing::PlayerSide` enum
-public abstract record PlayerSide() : Enum {
+public abstract record PlayerSide() : Enum
+{
     public record Blue() : PlayerSide;
     public record Red() : PlayerSide;
-    
+
     public int Unwrap()
     {
         return this switch
@@ -38,7 +47,7 @@ public abstract record PlayerSide() : Enum {
             _ => throw new Exception("Unexpected case in Unwrap")
         };
     }
-    
+
     public static PlayerSide FromInt(int value)
     {
         return value switch
@@ -51,85 +60,107 @@ public abstract record PlayerSide() : Enum {
 }
 
 // Type definition for `core::option::Option::<core::integer::u8>` enum
-public abstract record Option<A>() : Enum {
-    
+public abstract record Option<A>() : Enum
+{
+
     public record Some(A value) : Option<A>;
     public record None() : Option<A>;
-    
+
     public A Unwrap()
     {
         return this switch
         {
             Some some => some.value,
             None => default,
-            _ => throw new Exception("Unexpected case in Unwrap")
+            _ => throw new Exception("Unexpected case in UnwrapA")
         };
     }
+    
+    public byte? UnwrapByte()
+    {
+        byte? defaultValue = this switch{
+            Some some => some.value switch
+            {
+                byte value => value,
+                _ => null // Handle case where value is not a byte
+            },
+            None => null,
+            _ => throw new Exception("Unexpected case in UnwrapByte")
+        };
+        return defaultValue;
+    }
+
+
 }
 
 
 // Model definition for `evolute_duel::models::Board` model
-public class evolute_duel_Board : ModelInstance {
+public class evolute_duel_Board : ModelInstance
+{
     [ModelField("id")]
-        public FieldElement id;
+    public FieldElement id;
 
-        [ModelField("initial_edge_state")]
-        public byte[] initial_edge_state;
+    [ModelField("initial_edge_state")]
+    public byte[] initial_edge_state;
 
-        [ModelField("available_tiles_in_deck")]
-        public byte[] available_tiles_in_deck;
+    [ModelField("available_tiles_in_deck")]
+    public byte[] available_tiles_in_deck;
 
-        [ModelField("top_tile")]
-        public Option<byte> top_tile;
+    [ModelField("top_tile")]
+    public Option<byte> top_tile;
 
-        [ModelField("state")]
-        public (byte, byte, byte)[] state; // type, rotation, player side
+    [ModelField("state")]
+    public (byte, byte, byte)[] state; // type, rotation, player side
 
-        [ModelField("player1")]
-        public (FieldElement, PlayerSide, byte) player1;
+    [ModelField("player1")]
+    public (FieldElement, PlayerSide, byte) player1;
 
-        [ModelField("player2")]
-        public (FieldElement, PlayerSide, byte) player2;
+    [ModelField("player2")]
+    public (FieldElement, PlayerSide, byte) player2;
 
-        [ModelField("blue_score")]
-        public (ushort, ushort) blue_score;
+    [ModelField("blue_score")]
+    public (ushort, ushort) blue_score;
 
-        [ModelField("red_score")]
-        public (ushort, ushort) red_score;
+    [ModelField("red_score")]
+    public (ushort, ushort) red_score;
 
-        [ModelField("last_move_id")]
-        public Option<FieldElement> last_move_id;
+    [ModelField("last_move_id")]
+    public Option<FieldElement> last_move_id;
 
-        [ModelField("game_state")]
-        public GameState game_state;
-        
-        [ModelField("moves_done")]
-        public byte moves_done;
+    [ModelField("game_state")]
+    public GameState game_state;
 
-        [ModelField("last_update_timestamp")]
-        public ulong last_update_timestamp;
-        
-        [ModelField("commited_tile")]
-        public Option<byte> commited_tile;
+    [ModelField("moves_done")]
+    public byte moves_done;
 
-        [ModelField("phase_started_at")]
-        public ulong phase_started_at;
+    [ModelField("last_update_timestamp")]
+    public ulong last_update_timestamp;
+
+    [ModelField("commited_tile")]
+    public Option<byte> commited_tile;
+
+
+    [ModelField("phase_started_at")]
+    public ulong phase_started_at;
 
     // Start is called before the first frame update
-    void Start() {
+    void Start()
+    {
     }
 
     // Update is called once per frame
-    void Update() {
+    void Update()
+    {
     }
 
-    public int GetJokerCountPlayer1() {
+    public int GetJokerCountPlayer1()
+    {
         return player1.Item3;
     }
-    
-    public int GetJokerCountPlayer2() {
+
+    public int GetJokerCountPlayer2()
+    {
         return player2.Item3;
     }
 }
 
-        

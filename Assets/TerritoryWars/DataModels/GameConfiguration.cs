@@ -1,4 +1,5 @@
 using System;
+using TerritoryWars.DataModels.Events;
 using UnityEngine;
 
 namespace TerritoryWars.DataModels
@@ -13,6 +14,11 @@ namespace TerritoryWars.DataModels
         public static byte ClientRotationOffset = 3;
         public static Vector2Int ClientBoardSize = new Vector2Int(10, 10);
         public static Vector2Int ServerBoardSize = new Vector2Int(8, 8);
+        
+        public static ushort GameCreationDuration = 65; // seconds
+        public static ushort RevealDuration = 65; // seconds
+        public static ushort RequestDuration = 65; // seconds
+        
         public static ushort TurnDuration = 60; // seconds
         public static ushort PassingTurnDuration = 5; // TurnDuration includ
 
@@ -72,6 +78,25 @@ namespace TerritoryWars.DataModels
         {
             char[] charArray = Array.ConvertAll(initialEdgeState, c => EdgeTypes[(int)c]);
             return charArray;
+        }
+
+        public static int GetPhaseDuration(SessionPhase phase)
+        {
+            switch (phase)
+            {
+                case SessionPhase.Creating:
+                    return GameCreationDuration;
+                case SessionPhase.Reveal:
+                    return RevealDuration;
+                case SessionPhase.Request:
+                    return RequestDuration;
+                case SessionPhase.Move:
+                    return TurnDuration;
+                case SessionPhase.Finished:
+                    return 0;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(phase), phase, null);
+            }
         }
     }
 }
