@@ -74,6 +74,18 @@ namespace TerritoryWars.DataModels
             return TileTypes[index];
         }
 
+        public static int GetTileTypeIndex(string type)
+        {
+            for (int i = 0; i < TileTypes.Length; i++)
+            {
+                if (TileTypes[i] == type)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
         public static char[] GetInitialEdgeState(byte[] initialEdgeState)
         {
             char[] charArray = Array.ConvertAll(initialEdgeState, c => EdgeTypes[(int)c]);

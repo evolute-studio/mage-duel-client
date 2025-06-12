@@ -178,6 +178,7 @@ namespace TerritoryWars.Managers.SessionComponents
                 SessionContext.Commitments,
                 SessionContext.BotCommitments
             ).Save();
+            CustomLogger.LogObject(SimpleStorage.SessionSave, "SessionSave", saveInFile: true);
         }
 
         private void InitializeBoard()
@@ -223,8 +224,6 @@ namespace TerritoryWars.Managers.SessionComponents
                 CommitmentsData botCommitments = GenerateCommitments();
                 SessionContext.BotCommitments = botCommitments;
             }
-            
-            CustomLogger.LogObject(SimpleStorage.SessionSave, "SessionSave", saveInFile: true);
         }
         
         private CommitmentsData GenerateCommitments()

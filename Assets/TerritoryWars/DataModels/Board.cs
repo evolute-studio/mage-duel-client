@@ -17,7 +17,8 @@ namespace TerritoryWars.DataModels
         public string Id;
         public char[] InitialEdgeState;
         public string[] AvailableTilesInDeck;
-        public string TopTile;
+        public byte? TopTileIndex;
+        public string TopTile => AvailableTilesInDeck[TopTileIndex ?? 0];
         public Dictionary<Vector2Int, TileModel> Tiles; // key: (x, y) position, value: Tile struct
         public SessionPlayer Player1;
         public SessionPlayer Player2;
@@ -35,8 +36,7 @@ namespace TerritoryWars.DataModels
             InitialEdgeState = GameConfiguration.GetInitialEdgeState(board.initial_edge_state);
             AvailableTilesInDeck = board.available_tiles_in_deck.ToList()
                 .Select(x => GameConfiguration.GetTileType(x)).ToArray();
-            byte? topTileType = board.top_tile.UnwrapByte();
-            TopTile = topTileType.HasValue ? GameConfiguration.GetTileType(topTileType.Value) : null;
+            TopTileIndex = board.top_tile.UnwrapByte();
             Tiles = new Dictionary<Vector2Int, TileModel>();
             AddEdgeTiles(Tiles, board.initial_edge_state);
             for (int i = 0; i < board.state.Length; i++)
@@ -100,7 +100,7 @@ namespace TerritoryWars.DataModels
             }
 
             AvailableTilesInDeck = data.AvailableTilesInDeck;
-            TopTile = data.TopTile;
+            TopTileIndex = data.TopTileIndex;
             foreach (var eventTile in data.Tiles)
             {
                 Tiles[eventTile.Key] = eventTile.Value;

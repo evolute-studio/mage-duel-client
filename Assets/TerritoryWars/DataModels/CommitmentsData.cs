@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Security.Cryptography;
 using Dojo.Starknet;
+using TerritoryWars.Tools;
 
 namespace TerritoryWars.DataModels
 {
@@ -14,8 +16,10 @@ namespace TerritoryWars.DataModels
         public byte[] Permutations;
         public FieldElement[] Nonce;
         public List<uint[]> Hashes;
+        public List<int> ProcessedIndexes;
 
         private SHA256 sha256;
+         
 
         public CommitmentsData(int lenght)
         {
@@ -24,6 +28,7 @@ namespace TerritoryWars.DataModels
             Hashes = new List<uint[]>(lenght);
                 
             sha256 = SHA256.Create();
+            ProcessedIndexes = new List<int>();
         }
             
         public void GenerateHashes()
@@ -37,15 +42,11 @@ namespace TerritoryWars.DataModels
         {
             byte tileIndex = (byte)index;
             FieldElement nonce = Nonce[tileIndex];
+            BigInteger nonceBigInt = new BigInteger(nonce.Inner.data, isUnsigned: true, isBigEndian: true);
             byte c = Permutations[tileIndex];
                 
-            byte[] bytes = new byte[34];
-            bytes[0] = tileIndex;
-            for( int i = 1; i < 33; i++)
-            {
-                bytes[i] = nonce.Inner.data[i - 1];
-            }
-            bytes[33] = c;
+            string data = tileIndex.ToString() + nonceBigInt + c;
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(data);
                 
             byte[] hash = sha256.ComputeHash(bytes);
             uint[] result = new uint[8];
@@ -54,7 +55,7 @@ namespace TerritoryWars.DataModels
             {
                 for (int j = 3; j >= 0; j--)
                 {
-                    result[i] += (uint)hash[i * 4 + j] << (j * 8);
+                    result[i] += (uint)hash[i * 4 + j] << ((3 - j) * 8);
                 }
             }
                 
@@ -67,7 +68,25 @@ namespace TerritoryWars.DataModels
             {
                 return new uint[0];
             }
-            return Hashes.SelectMany(hash => hash).ToArray();
+            uint[] allHashes = Hashes.SelectMany(hash => hash).ToArray();
+            CustomLogger.LogObject(allHashes, "All Hashes");
+            return allHashes;
+        }
+
+        public byte GetIndex(byte c)
+        {
+            for (byte i = 0; i < Permutations.Length; i++)
+            {
+                if (Permutations[i] == c)
+                {
+                    if (!ProcessedIndexes.Contains(i))
+                    {
+                        ProcessedIndexes.Add(i);
+                        return i; // Return the first unprocessed index with the given permutation
+                    }
+                }
+            }
+            return 255; // Not found
         }
     }
 }

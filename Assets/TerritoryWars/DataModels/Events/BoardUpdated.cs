@@ -14,7 +14,9 @@ namespace TerritoryWars.DataModels.Events
         public string Id;
         //public ushort MoveCount;
         public string[] AvailableTilesInDeck;
-        public string TopTile;
+        public byte? TopTileIndex;
+        public string TopTile => AvailableTilesInDeck[TopTileIndex ?? 0];
+        
         public Dictionary<Vector2Int, TileModel> Tiles; // key: (x, y) position, value: Tile struct
         public SessionPlayer Player1;
         public SessionPlayer Player2;
@@ -26,8 +28,7 @@ namespace TerritoryWars.DataModels.Events
             Id = boardUpdated.board_id.Hex();
             AvailableTilesInDeck = boardUpdated.available_tiles_in_deck.ToList()
                 .Select(x => GameConfiguration.GetTileType(x)).ToArray();
-            byte? topTile = boardUpdated.top_tile.UnwrapByte();
-            TopTile = topTile.HasValue ? GameConfiguration.GetTileType(topTile.Value) : null;
+            TopTileIndex = boardUpdated.top_tile.UnwrapByte();
             Tiles = new Dictionary<Vector2Int, TileModel>();
             for(int i = 0; i < boardUpdated.state.Length; i++)
             {
@@ -73,7 +74,7 @@ namespace TerritoryWars.DataModels.Events
         {
             Id = board.Id;
             AvailableTilesInDeck = board.AvailableTilesInDeck;
-            TopTile = board.TopTile;
+            TopTileIndex = board.TopTileIndex;
             Tiles = board.Tiles;
             Player1 = board.Player1;
             Player2 = board.Player2;

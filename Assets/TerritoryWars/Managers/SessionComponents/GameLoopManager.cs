@@ -64,9 +64,10 @@ namespace TerritoryWars.Managers.SessionComponents
             PhaseStarted phaseStarted = new PhaseStarted().SetData(_sessionContext.Board);
             OnPhaseStarted(phaseStarted);
         }
-        
+
         private void OnPhaseStarted(PhaseStarted phaseStarted)
         {
+            CustomLogger.LogObject(phaseStarted, "PhaseStarted");
             switch (phaseStarted.Phase)
             {
                 case SessionPhase.Creating:
@@ -89,11 +90,12 @@ namespace TerritoryWars.Managers.SessionComponents
         private void OnGameCreationPhase()
         {
             EventBus.Publish(new TimerEvent(TimerEventType.GameCreation, TimerProgressType.Started, GetPhaseStart()));
-            
+
             CommitmentsData commitmentsData = _sessionContext.Commitments;
             uint[] hashes = commitmentsData.GetAllHashes();
             DojoConnector.CommitTiles(DojoGameManager.Instance.LocalAccount, hashes);
             CustomLogger.LogDojoLoop("OnGameCreationPhase: Local player - sending commitments to server.");
+
             if (_sessionContext.IsGameWithBot)
             {
                 commitmentsData = _sessionContext.BotCommitments;
@@ -106,51 +108,99 @@ namespace TerritoryWars.Managers.SessionComponents
         private void OnRevealPhase(PhaseStarted phaseData)
         {
             EventBus.Publish(new TimerEvent(TimerEventType.Revealing, TimerProgressType.Started, GetPhaseStart()));
-            // if local player turn - reveal tile
-            // if remote player turn - wait for remote player to reveal tile
-            if (!_sessionContext.IsLocalPlayerTurn)
+
+            CommitmentsData commitments;
+            GeneralAccount account;
+            if (_sessionContext.IsGameWithBot)
             {
-                return;
+                if (_sessionContext.IsLocalPlayerTurn)
+                {
+                    commitments = _sessionContext.Commitments;
+                    account = DojoGameManager.Instance.LocalAccount;
+                }
+                else
+                {
+                    commitments = _sessionContext.BotCommitments;
+                    account = DojoGameManager.Instance.LocalBot.Account;
+                }
             }
-            
-            if (!phaseData.CommitedTileIndex.HasValue)
+            else
+            {
+                if (_sessionContext.IsLocalPlayerTurn)
+                {
+                    commitments = _sessionContext.Commitments;
+                    account = DojoGameManager.Instance.LocalAccount;
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            if (!phaseData.CommitedTile.HasValue)
             {
                 CustomLogger.LogError("GameLoopManager: CommitedTileIndex is null in OnRevealPhase.");
                 return;
             }
             
-            byte commitedTileIndex = phaseData.CommitedTileIndex.Value;
-            FieldElement nonce = _sessionContext.Commitments.Nonce[commitedTileIndex];
-            byte c = _sessionContext.Commitments.Permutations[commitedTileIndex];
-            DojoConnector.RevealTile(DojoGameManager.Instance.LocalAccount, commitedTileIndex, nonce, c);
+            byte commitedTileIndex = commitments.GetIndex(phaseData.CommitedTile.Value);
+            FieldElement nonce = commitments.Nonce[commitedTileIndex];
+            byte c = commitments.Permutations[commitedTileIndex];
+            CustomLogger.LogDojoLoop($"CommitedTile: {phaseData.CommitedTile.Value} Index: {commitedTileIndex}, NonceHex: {nonce.Hex()}, C: {c}");
+            DojoConnector.RevealTile(account, commitedTileIndex, nonce, c);
         }
-        
-        private void OnRequestPhase(PhaseStarted phaseData)
+
+    private void OnRequestPhase(PhaseStarted phaseData)
         {
             EventBus.Publish(new TimerEvent(TimerEventType.Requesting, TimerProgressType.Started, GetPhaseStart()));
             
             // if local player turn - wait for remote player to request tile
             // if remote player turn - request tile
-            if (_sessionContext.IsLocalPlayerTurn)
+            
+            CommitmentsData commitments;
+            GeneralAccount account;
+            if (_sessionContext.IsGameWithBot)
             {
-                return;
+                if (_sessionContext.IsLocalPlayerTurn)
+                {
+                    commitments = _sessionContext.BotCommitments;
+                    account = DojoGameManager.Instance.LocalBot.Account;
+                }
+                else
+                {
+                    commitments = _sessionContext.Commitments;
+                    account = DojoGameManager.Instance.LocalAccount;
+                }
+            }
+            else
+            {
+                if (_sessionContext.IsLocalPlayerTurn)
+                {
+                    return;
+                }
+                else
+                {
+                    commitments = _sessionContext.Commitments;
+                    account = DojoGameManager.Instance.LocalAccount;
+                }
             }
             
-            if (!phaseData.CommitedTileIndex.HasValue)
+            if (!phaseData.TopTileIndex.HasValue)
             {
-                CustomLogger.LogError("GameLoopManager: CommitedTileIndex is null in OnRevealPhase.");
+                CustomLogger.LogError("GameLoopManager: CommitedTileIndex is null in OnRequestPhase.");
                 return;
             }
-            
-            byte commitedTileIndex = phaseData.CommitedTileIndex.Value;
-            FieldElement nonce = _sessionContext.Commitments.Nonce[commitedTileIndex];
-            byte c = _sessionContext.Commitments.Permutations[commitedTileIndex];
-            DojoConnector.RequestNextTile(DojoGameManager.Instance.LocalAccount, commitedTileIndex, nonce, c);
+
+            byte commitedTileIndex = phaseData.TopTileIndex.Value;
+            FieldElement nonce = commitments.Nonce[commitedTileIndex];
+            byte c = commitments.Permutations[commitedTileIndex];
+            CustomLogger.LogDojoLoop($"Requesting tile: {phaseData.TopTileIndex}, Index: {commitedTileIndex}, NonceHex: {nonce.Hex()}, C: {c}");
+            DojoConnector.RequestNextTile(account, commitedTileIndex, nonce, c);
         }
         
         private void OnMovePhase(PhaseStarted phaseStarted)
         {
-            _sessionContext.Board.TopTile = phaseStarted.TopTile;
+            _sessionContext.Board.TopTileIndex = phaseStarted.TopTileIndex;
             
             EventBus.Publish(new TimerEvent(TimerEventType.Moving, TimerProgressType.Started, GetPhaseStart()));
             StartMoving();
