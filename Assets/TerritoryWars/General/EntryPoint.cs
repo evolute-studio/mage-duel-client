@@ -164,7 +164,7 @@ namespace TerritoryWars.General
                 
                 // 1. Setup Account
                 CustomLogger.LogDojoLoop("Setting up account");
-                await SetupAccountAsync();
+                await SetupAccountAsync(connection);
                 
                 // 2. Create Burners
                 CustomLogger.LogDojoLoop("Creating burner accounts");
