@@ -79,7 +79,7 @@ namespace TerritoryWars.Managers.SessionComponents
                     OnRequestPhase(phaseStarted);
                     break;
                 case SessionPhase.Move:
-                    OnMovePhase();
+                    OnMovePhase(phaseStarted);
                     break;
                 case SessionPhase.Finished:
                     break;
@@ -148,8 +148,10 @@ namespace TerritoryWars.Managers.SessionComponents
             DojoConnector.RequestNextTile(DojoGameManager.Instance.LocalAccount, commitedTileIndex, nonce, c);
         }
         
-        private void OnMovePhase()
+        private void OnMovePhase(PhaseStarted phaseStarted)
         {
+            _sessionContext.Board.TopTile = phaseStarted.TopTile;
+            
             EventBus.Publish(new TimerEvent(TimerEventType.Moving, TimerProgressType.Started, GetPhaseStart()));
             StartMoving();
         }
