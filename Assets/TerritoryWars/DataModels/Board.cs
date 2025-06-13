@@ -113,6 +113,22 @@ namespace TerritoryWars.DataModels
             return this;
         }
         
+        public Board SetData(PhaseStarted phaseStarted)
+        {
+            if (Id != phaseStarted.BoardId)
+            {
+                CustomLogger.LogError($"[Board] | SetData: Board ID mismatch. Expected: {Id}, Received: {phaseStarted.BoardId}");
+                return this;
+            }
+
+            Phase = phaseStarted.Phase;
+            TopTileIndex = phaseStarted.TopTileIndex;
+            CommitedTileIndex = phaseStarted.CommitedTile;
+            PhaseStartedAt = phaseStarted.StartedAt;
+
+            return this;
+        }
+        
         public void UpdateTimestamp(ulong timestamp)
         {
             LastUpdateTimestamp = timestamp;

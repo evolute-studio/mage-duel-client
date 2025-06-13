@@ -230,6 +230,7 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             Board board = SessionContext.Board;
             int tilesCount = board.AvailableTilesInDeck.Length;
+            CustomLogger.LogDojoLoop($"[SessionManager.GenerateCommitments] - tilesCount: {tilesCount}");
             CommitmentsData commitmentsData = new CommitmentsData(tilesCount);
             
             commitmentsData.Permutations = new byte[tilesCount];

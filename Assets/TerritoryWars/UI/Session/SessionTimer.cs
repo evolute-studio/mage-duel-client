@@ -55,7 +55,8 @@ namespace TerritoryWars.UI.Session
         private void OnTimerEvent(TimerEvent timerEvent)
         {
             _timerType = timerEvent.Type;
-            StartTimer(timerEvent.StartTimestamp);
+            if(timerEvent.ProgressType == TimerProgressType.Started)
+                StartTimer(timerEvent.StartTimestamp);
         }
 
         public void StartTimer(ulong timestamp)
@@ -80,7 +81,7 @@ namespace TerritoryWars.UI.Session
                 yield return new WaitForSeconds(0.5f);
             }
             ResetUI();
-            EventBus.Publish(new TimerEvent(TimerEventType.Moving, TimerProgressType.Elapsed));
+            EventBus.Publish(new TimerEvent(_timerType, TimerProgressType.Elapsed));
 
             // passing turn
             float reducer = !_isLocalPlayerTurn ? _opponentReducedTime : 0;

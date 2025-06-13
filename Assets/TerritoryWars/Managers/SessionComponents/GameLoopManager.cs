@@ -33,6 +33,8 @@ namespace TerritoryWars.Managers.SessionComponents
         private Player _localPlayer => _sessionContext.LocalPlayer;
         private Player _remotePlayer => _sessionContext.RemotePlayer;
 
+        private PhaseStarted _currentPhase;
+
         public void Initialize(SessionManagerContext managerContext)
         {
             _managerContext = managerContext;
@@ -52,7 +54,6 @@ namespace TerritoryWars.Managers.SessionComponents
         public async void StartGame()
         {
             byte whoseTurnSide = await WhoseTurn();
-            //byte convertedSide = (byte)SetLocalPlayerData.GetLocalIndex(whoseTurnSide);
             _currentPlayer = _sessionContext.Players[whoseTurnSide];
 
             if (!IsGameStillActual())
@@ -68,13 +69,29 @@ namespace TerritoryWars.Managers.SessionComponents
         private void OnPhaseStarted(PhaseStarted phaseStarted)
         {
             CustomLogger.LogObject(phaseStarted, "PhaseStarted");
+
+            if (phaseStarted.Phase == SessionPhase.Reveal)
+            {
+                // if it's session start or game creation - invoke reveal action here
+                if (_currentPhase.IsNull || _currentPhase.Phase == SessionPhase.Creating)
+                {
+                    OnRevealPhase(phaseStarted);
+                    _sessionContext.Board.SetData(_currentPhase);
+                    _currentPhase = phaseStarted;
+                }
+                else
+                {
+                    // in this case the reveal phase started is move phase ended and this phase a part of turn end
+                    _turnEndData.OnPhaseStarted(ref phaseStarted);
+                    _currentPhase = phaseStarted;
+                }
+                return;
+            }
+            
             switch (phaseStarted.Phase)
             {
                 case SessionPhase.Creating:
                     OnGameCreationPhase();
-                    break;
-                case SessionPhase.Reveal:
-                    OnRevealPhase(phaseStarted);
                     break;
                 case SessionPhase.Request:
                     OnRequestPhase(phaseStarted);
@@ -85,6 +102,8 @@ namespace TerritoryWars.Managers.SessionComponents
                 case SessionPhase.Finished:
                     break;
             }
+            _currentPhase = phaseStarted;
+            _sessionContext.Board.SetData(_currentPhase);
         }
 
         private void OnGameCreationPhase()
@@ -412,9 +431,21 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             CustomLogger.LogDojoLoop("OnTurnEnd");
             _currentPlayer.EndTurnAnimation();
-            _turnEndData.Reset();
             byte nextTurnSide = (byte)((_currentPlayer.PlayerSide + 1) % 2);
             _currentPlayer = _sessionContext.Players[nextTurnSide];
+
+            PhaseStarted phaseStarted = _turnEndData.RevealPhaseStarted;
+            turnEndData.Reset();
+            CustomLogger.LogObject(phaseStarted, "PhaseStarted");
+
+            if (!phaseStarted.IsNull && phaseStarted.Phase == SessionPhase.Reveal)
+            {
+                OnRevealPhase(phaseStarted);
+                _sessionContext.Board.SetData(phaseStarted);
+            }
+            else
+                CustomLogger.LogError($"GameLoopManager: PhaseStarted is null {phaseStarted.IsNull} or not Reveal phase " +
+                                      $"in OnTurnEnd {phaseStarted.Phase != SessionPhase.Reveal}.");
         }
 
         public void OnEndGame(GameFinished gameFinished)
@@ -526,6 +557,7 @@ namespace TerritoryWars.Managers.SessionComponents
         public BoardUpdated BoardUpdated;
         public Moved Moved;
         public Skipped Skipped;
+        public PhaseStarted RevealPhaseStarted;
 
         public bool IsMoveDone;
         public void SetBoardUpdated(ref BoardUpdated boardUpdated)
@@ -545,6 +577,12 @@ namespace TerritoryWars.Managers.SessionComponents
             IsMoveDone = true;
             IsTurnEnded();
         }
+        
+        public void OnPhaseStarted(ref PhaseStarted phaseStarted)
+        {
+            RevealPhaseStarted = phaseStarted;
+            IsTurnEnded();
+        }
 
         public void SetSkipped(ref Skipped skipped)
         {
@@ -558,6 +596,7 @@ namespace TerritoryWars.Managers.SessionComponents
             Moved = default;
             Skipped = default;
             IsMoveDone = false;
+            RevealPhaseStarted = default;
         }
 
         public void IsTurnEnded()
@@ -566,10 +605,10 @@ namespace TerritoryWars.Managers.SessionComponents
             bool isMoved = !Moved.IsNull;
             bool isSkipped = !Skipped.IsNull;
             bool isTilePlaced = isMoved && IsMoveDone;
-            if (isBoardUpdated && (isSkipped || isTilePlaced))
+            bool isPhaseStarted = !RevealPhaseStarted.IsNull;
+            if (isBoardUpdated && isPhaseStarted && (isSkipped || isTilePlaced))
             {
                 EventBus.Publish(this);
-                Reset();
             }
         }
     }
