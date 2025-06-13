@@ -68,8 +68,6 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void OnPhaseStarted(PhaseStarted phaseStarted)
         {
-            CustomLogger.LogObject(phaseStarted, "PhaseStarted");
-
             if (phaseStarted.Phase == SessionPhase.Reveal)
             {
                 // if it's session start or game creation - invoke reveal action here

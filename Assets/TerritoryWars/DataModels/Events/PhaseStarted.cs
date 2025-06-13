@@ -14,8 +14,6 @@ namespace TerritoryWars.DataModels.Events
         public byte? CommitedTile;
         public ulong StartedAt;
 
-        public ulong RecievedAt;
-
         public PhaseStarted SetData(evolute_duel_PhaseStarted phaseStarted)
         {
             BoardId = phaseStarted.board_id.Hex();
@@ -23,8 +21,6 @@ namespace TerritoryWars.DataModels.Events
             TopTileIndex = phaseStarted.top_tile.UnwrapByte();
             CommitedTile = phaseStarted.commited_tile.UnwrapByte();
             StartedAt = phaseStarted.started_at;
-            
-            RecievedAt = (ulong)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
             return this;
         }
         

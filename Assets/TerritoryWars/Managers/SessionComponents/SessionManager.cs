@@ -230,7 +230,6 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             Board board = SessionContext.Board;
             int tilesCount = board.AvailableTilesInDeck.Length;
-            CustomLogger.LogDojoLoop($"[SessionManager.GenerateCommitments] - tilesCount: {tilesCount}");
             CommitmentsData commitmentsData = new CommitmentsData(tilesCount);
             
             commitmentsData.Permutations = new byte[tilesCount];
@@ -245,6 +244,9 @@ namespace TerritoryWars.Managers.SessionComponents
             {
                 commitmentsData.Nonce[i] = new FieldElement(Felt252Generator.GenerateFelt252());
             }
+
+            CustomLogger.LogImportant(commitmentsData.Nonce.Length.ToString());
+            CustomLogger.LogObject(commitmentsData.Nonce);
             
             commitmentsData.GenerateHashes();
             return commitmentsData;

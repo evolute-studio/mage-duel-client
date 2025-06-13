@@ -61,7 +61,6 @@ namespace TerritoryWars.UI.Session
 
         public void StartTimer(ulong timestamp)
         {
-            CustomLogger.LogImportant($"[SessionTimer] Starting timer at {timestamp} for local player: {_isLocalPlayerTurn}");
             _startTurnTimestamp = timestamp;
 
             RotateHourglass();
