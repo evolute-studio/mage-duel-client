@@ -250,13 +250,13 @@ namespace TerritoryWars.Dojo
         public void LoadGame()
         {
             if (GlobalContext.HasGameInProgress)
-                RestoreGame();
+                LoadSession();
             else
                 LoadMenu();
             
         }
 
-        private void RestoreGame()
+        public void LoadSession()
         {
             DojoSessionManager?.OnDestroy();
             DojoSessionManager = new DojoSessionManager(this);

@@ -10,7 +10,7 @@ namespace TerritoryWars.Tools.DevTools
     public class DevToolsManager : MonoBehaviour
     {
         private List<IDevTool> tools;
-        private bool isPanelExpanded = true;
+        private bool isPanelExpanded = false;
         private readonly float panelWidth = 250f;
         private readonly float collapseButtonSize = 30f;
         private GUIStyle buttonStyle;
