@@ -179,6 +179,9 @@ namespace TerritoryWars.UI
             {
                 jokerModeIndicator.SetActive(_sessionManager.ManagerContext.JokerManager.IsJokerActive);
             }
+            
+            SessionManager.Instance.ManagerContext.JokerManager.SetJokersCount(0, SessionManager.Instance.SessionContext.Board.Player1.JokerCount);
+            SessionManager.Instance.ManagerContext.JokerManager.SetJokersCount(1, SessionManager.Instance.SessionContext.Board.Player2.JokerCount);
         }
 
         private void OnEndTurnClicked()
