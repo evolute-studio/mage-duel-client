@@ -20700,6 +20700,7 @@ GameObject:
   - component: {fileID: 2566344623472433853}
   - component: {fileID: 4856772474567375715}
   - component: {fileID: 4155596210293785928}
+  - component: {fileID: 8746950702300287808}
   m_Layer: 5
   m_Name: EnterName
   m_TagString: Untagged
@@ -20707,6 +20708,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &8746950702300287808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8746950702300287807}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a43edcbda0334476b440977c0127c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorType: pointer
+  onEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &8819480654152453271
 PrefabInstance:
   m_ObjectHideFlags: 0
