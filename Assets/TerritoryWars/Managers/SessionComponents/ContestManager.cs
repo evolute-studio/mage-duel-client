@@ -27,7 +27,7 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             ContestProcessor.AddModel(new ContestInformation(contest.Position, contest.Side, contest.Type,() =>
             {
-                ContestAnimation(contest, () => {RecolorStructure(contest.Position, contest.Side);});
+                ContestAnimation(contest, () => {RecolorStructure(contest.Position, contest.Side, contest.Type);});
             }));
         }
         
@@ -146,11 +146,11 @@ namespace TerritoryWars.Managers.SessionComponents
                 }
         }
         
-        public void RecolorStructure(Vector2Int nodePosition, Side nodeSide)
+        public void RecolorStructure(Vector2Int nodePosition, Side nodeSide, StructureType structureType)
         {
             UnionFind unionFind = _managerContext.SessionContext.UnionFind;
             
-            Structure? structureOption = unionFind.GetStructureByNode(nodePosition, nodeSide);
+            Structure? structureOption = unionFind.GetStructureByNode(nodePosition, nodeSide, structureType);
             if (!structureOption.HasValue)
             {
                 Debug.LogWarning($"No structure found for node at {nodePosition} on side {nodeSide}");
