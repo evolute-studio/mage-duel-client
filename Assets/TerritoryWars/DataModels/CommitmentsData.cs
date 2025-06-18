@@ -73,17 +73,25 @@ namespace TerritoryWars.DataModels
             return allHashes;
         }
 
-        public byte GetIndex(byte c)
+        public byte GetIndex(byte c, bool addToProcessed = true)
         {
             for (byte i = 0; i < Permutations.Length; i++)
             {
                 if (Permutations[i] == c)
                 {
-                    if (!ProcessedIndexes.Contains(i))
+                    if (addToProcessed)
                     {
-                        ProcessedIndexes.Add(i);
-                        return i; // Return the first unprocessed index with the given permutation
+                        if (!ProcessedIndexes.Contains(i))
+                        {
+                            ProcessedIndexes.Add(i);
+                            return i; // Return the first unprocessed index with the given permutation
+                        }
                     }
+                    else
+                    {
+                        return i; // Return the first index with the given permutation without adding to processed
+                    }
+                    
                 }
             }
             return 255; // Not found

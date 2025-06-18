@@ -68,6 +68,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void OnPhaseStarted(PhaseStarted phaseStarted)
         {
+            CustomLogger.LogObject(phaseStarted, "PhaseStarted");
             if (phaseStarted.Phase == SessionPhase.Reveal)
             {
                 // if it's session start or game creation - invoke reveal action here
@@ -221,6 +222,26 @@ namespace TerritoryWars.Managers.SessionComponents
             
             EventBus.Publish(new TimerEvent(TimerEventType.Moving, TimerProgressType.Started, GetPhaseStart()));
             StartMoving();
+
+            if (!_sessionContext.IsLocalPlayerTurn)
+            {
+                if (!phaseStarted.CommitedTile.HasValue)
+                {
+                    CustomLogger.LogError("GameLoopManager: CommitedTileIndex is null in OnMovePhase.");
+                    return;
+                }
+
+                byte commitedTile = _sessionContext.Commitments.GetIndex(phaseStarted.CommitedTile.Value, false);
+                byte c = _sessionContext.Commitments.Permutations[commitedTile];
+                string tileType = _sessionContext.Board.AvailableTilesInDeck[commitedTile];
+                TileData tileData = new TileData(tileType, Vector2Int.zero, _localPlayer.PlayerSide);
+                _managerContext.TileSelector.nextTilePreviewUI.SetActive(true);
+                _managerContext.TileSelector.nextTilePreviewUI.UpdatePreview(tileData);
+            }
+            else
+            {
+                _managerContext.TileSelector.nextTilePreviewUI.SetActive(false);
+            }
         }
 
         
@@ -434,7 +455,6 @@ namespace TerritoryWars.Managers.SessionComponents
 
             PhaseStarted phaseStarted = _turnEndData.RevealPhaseStarted;
             turnEndData.Reset();
-            CustomLogger.LogObject(phaseStarted, "PhaseStarted");
 
             if (!phaseStarted.IsNull && phaseStarted.Phase == SessionPhase.Reveal)
             {
