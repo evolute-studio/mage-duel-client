@@ -27,7 +27,7 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             ContestProcessor.AddModel(new ContestInformation(contest.Position, contest.Side, contest.Type,() =>
             {
-                ContestAnimation(contest, () => {RecolorStructure(contest.Position, contest.Side);});
+                ContestAnimation(contest, () => {RecolorStructure(contest.Position, contest.Side, contest.Type);});
             }));
         }
         
@@ -146,16 +146,18 @@ namespace TerritoryWars.Managers.SessionComponents
                 }
         }
         
-        public void RecolorStructure(Vector2Int nodePosition, Side nodeSide)
+        public void RecolorStructure(Vector2Int nodePosition, Side nodeSide, StructureType structureType)
         {
             UnionFind unionFind = _managerContext.SessionContext.UnionFind;
-            
-            Structure? structureOption = unionFind.GetStructureByNode(nodePosition, nodeSide);
+
+            CustomLogger.LogExecution($"[RECOLOR_CONTEST] | Needs {nodePosition} | {nodeSide} | {structureType}");
+            Structure? structureOption = unionFind.GetStructureByNode(nodePosition, nodeSide, structureType);
             if (!structureOption.HasValue)
             {
                 Debug.LogWarning($"No structure found for node at {nodePosition} on side {nodeSide}");
                 return;
             }
+            CustomLogger.LogExecution($"[RECOLOR_CONTEST] | Structure {structureOption.Value.Position}| {structureOption.Value.Side} | {structureOption.Value.Type}");
             Structure structure = structureOption.Value;
             bool isContested = structure.Contested;
                     foreach (var node in structure.Nodes)
