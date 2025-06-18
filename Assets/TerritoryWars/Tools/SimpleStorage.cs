@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TerritoryWars
+namespace TerritoryWars.Tools
 {
     public static class SimpleStorage
     {

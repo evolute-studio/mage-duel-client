@@ -158,6 +158,10 @@ namespace TerritoryWars.Managers.SessionComponents
                 return;
             }
             CustomLogger.LogExecution($"[RECOLOR_CONTEST] | Structure {structureOption.Value.Position}| {structureOption.Value.Side} | {structureOption.Value.Type}");
+            if (structureOption.Value.Type != structureType)
+            {
+                structureOption = unionFind.GetStructureByNode(nodePosition, nodeSide, structureType);
+            }
             Structure structure = structureOption.Value;
             bool isContested = structure.Contested;
                     foreach (var node in structure.Nodes)
