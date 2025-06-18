@@ -42,7 +42,7 @@ namespace TerritoryWars.General
             if (Players[CurrentTurnPlayer.PlayerSide].JokerCount > 0)
             {
                 isJokerActive = true;
-                Players[CurrentTurnPlayer.PlayerSide].JokerCount--;
+                // Players[CurrentTurnPlayer.PlayerSide].JokerCount--;
                 _sessionManagerOld.TileSelector.StartJokerPlacement();
             }
         }
@@ -50,7 +50,7 @@ namespace TerritoryWars.General
         public void DeactivateJoker()
         {
             isJokerActive = false;
-            Players[CurrentTurnPlayer.PlayerSide].JokerCount++;
+            // Players[CurrentTurnPlayer.PlayerSide].JokerCount++;
             GameUI.Instance.UpdateUI();
         }
         

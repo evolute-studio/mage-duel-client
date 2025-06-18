@@ -165,6 +165,8 @@ namespace TerritoryWars.Managers.SessionComponents
 
             SessionContext.IsGameWithBot = DojoGameManager.Instance.DojoSessionManager.IsGameWithBot;
             SessionContext.IsGameWithBotAsPlayer = DojoGameManager.Instance.DojoSessionManager.IsGameWithBotAsPlayer;
+            
+            IsLocalPlayerHost = SessionContext.LocalPlayerAddress == board.Player1.PlayerId;
 
             DojoGameManager.Instance.GlobalContext.SessionContext = SessionContext;
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - SessionContext initialized successfully");

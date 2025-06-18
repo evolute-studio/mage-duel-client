@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace TerritoryWars
+namespace TerritoryWars.Tools
 {
     public class GridDrawer : MonoBehaviour
     {

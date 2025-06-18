@@ -91,7 +91,7 @@ namespace TerritoryWars.DataModels
             foreach (var structure in Structures)
             {
                 if(structure.Value.ContainsNode(position, side) && 
-                   (type == default || structure.Value.Type == type))
+                   structure.Key.Item2 == side && (type == default || structure.Value.Type == type))
                 {
                     return structure.Value;
                 }

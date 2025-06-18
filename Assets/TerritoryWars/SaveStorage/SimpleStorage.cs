@@ -2,7 +2,11 @@ using Newtonsoft.Json;
 using TerritoryWars.DataModels;
 using UnityEngine;
 
+<<<<<<<< HEAD:Assets/TerritoryWars/SaveStorage/SimpleStorage.cs
 namespace TerritoryWars.SaveStorage
+========
+namespace TerritoryWars.Tools
+>>>>>>>> development:Assets/TerritoryWars/Tools/SimpleStorage.cs
 {
     public static class SimpleStorage
     {

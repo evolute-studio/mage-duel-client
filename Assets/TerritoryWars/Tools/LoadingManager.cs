@@ -4,10 +4,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+
 namespace TerritoryWars.Tools
 {
-
-
 public class LoadingManager : MonoBehaviour
 {
     public static LoadingManager Instance;

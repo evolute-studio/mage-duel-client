@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TerritoryWars
+namespace TerritoryWars.UI
 {
     public class Locker : MonoBehaviour
     {

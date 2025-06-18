@@ -337,6 +337,8 @@ namespace TerritoryWars.Managers.SessionComponents
             GameUI.Instance.playerInfoUI.UpdateData(_sessionContext.PlayersData);
             GameUI.Instance.playerInfoUI.SetDeckCount(_sessionContext.Board.AvailableTilesInDeck.Length);
             _turnEndData.SetBoardUpdated(ref data);
+            _managerContext.JokerManager.SetJokersCount(0, SessionManager.Instance.SessionContext.Board.Player1.JokerCount);
+            _managerContext.JokerManager.SetJokersCount(1, SessionManager.Instance.SessionContext.Board.Player2.JokerCount);
         }
 
         private void OnMoved(Moved data)
