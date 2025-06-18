@@ -22,7 +22,7 @@ namespace TerritoryWars.Managers.SessionComponents
         private Dictionary<(int, int, int), string[]> _cachedCombinations = new Dictionary<(int, int, int), string[]>();
         private Dictionary<(int, int), int> _currentCombinationIndex = new Dictionary<(int, int), int>();
 
-        public int UsedJokerCount = 0;
+        public int UsedJokerCount = 3;
         public void Initialize(SessionManagerContext managerContext)
         {
             _managerContext = managerContext;
@@ -46,8 +46,14 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             isJokerActive = false;
             Players[_currentTurnPlayer.PlayerSide].JokerCount++;
-            UsedJokerCount = Players[_currentTurnPlayer.PlayerSide].JokerCount;
+            UsedJokerCount = Players[_currentTurnPlayer.PlayerSide].JokerCount++;
             GameUI.Instance.UpdateUI();
+        }
+        
+        public void UpdateLocalPlayerJokerCount()
+        {
+            SetJokersCount(0, SessionManager.Instance.IsLocalPlayerHost ? UsedJokerCount : board.Player1.JokerCount);
+            SetJokersCount(1, SessionManager.Instance.IsLocalPlayerHost ? board.Player2.JokerCount : UsedJokerCount);
         }
         
         public TileData GetGenerateJokerTile(int x, int y)

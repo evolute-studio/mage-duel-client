@@ -149,13 +149,15 @@ namespace TerritoryWars.Managers.SessionComponents
         public void RecolorStructure(Vector2Int nodePosition, Side nodeSide, StructureType structureType)
         {
             UnionFind unionFind = _managerContext.SessionContext.UnionFind;
-            
+
+            CustomLogger.LogExecution($"[RECOLOR_CONTEST] | Needs {nodePosition} | {nodeSide} | {structureType}");
             Structure? structureOption = unionFind.GetStructureByNode(nodePosition, nodeSide, structureType);
             if (!structureOption.HasValue)
             {
                 Debug.LogWarning($"No structure found for node at {nodePosition} on side {nodeSide}");
                 return;
             }
+            CustomLogger.LogExecution($"[RECOLOR_CONTEST] | Structure {structureOption.Value.Position}| {structureOption.Value.Side} | {structureOption.Value.Type}");
             Structure structure = structureOption.Value;
             bool isContested = structure.Contested;
                     foreach (var node in structure.Nodes)

@@ -237,8 +237,7 @@ namespace TerritoryWars.General
             if (data.PlayerSide != SessionManager.Instance.SessionContext.LocalPlayer.PlayerSide) return;
             GameUI.Instance.playerInfoUI.AddClientCityScore(playerIndex, data.Type.Count(c => c == 'C') * 2);
             GameUI.Instance.playerInfoUI.AddClientRoadScore(playerIndex, data.Type.Count(r => r == 'R'));
-            // SessionManager.Instance.ManagerContext.JokerManager.SetJokersCount(0, SessionManager.Instance.ManagerContext.JokerManager.UsedJokerCount);
-            // SessionManager.Instance.ManagerContext.JokerManager.SetJokersCount(1, SessionManager.Instance.ManagerContext.SessionContext.Players[SessionManager.Instance.IsLocalPlayerHost? 1 : 0].JokerCount);
+            SessionManager.Instance.ManagerContext.JokerManager.UpdateLocalPlayerJokerCount();
         }
 
         public bool RevertTile(int x, int y)
