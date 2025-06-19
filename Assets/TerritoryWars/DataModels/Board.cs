@@ -18,7 +18,7 @@ namespace TerritoryWars.DataModels
         public char[] InitialEdgeState;
         public string[] AvailableTilesInDeck;
         public byte? TopTileIndex;
-        public string TopTile => AvailableTilesInDeck[TopTileIndex ?? 0];
+        public string TopTile => TopTileIndex.HasValue ? AvailableTilesInDeck[TopTileIndex.Value] : null;
         public Dictionary<Vector2Int, TileModel> Tiles; // key: (x, y) position, value: Tile struct
         public SessionPlayer Player1;
         public SessionPlayer Player2;

@@ -222,28 +222,44 @@ namespace TerritoryWars.Managers.SessionComponents
             _sessionContext.Board.TopTileIndex = phaseStarted.TopTileIndex;
             
             EventBus.Publish(new TimerEvent(TimerEventType.Moving, TimerProgressType.Started, GetPhaseStart()));
-            
 
-            if (!_sessionContext.IsLocalPlayerTurn)
+            // regular case
+            if (phaseStarted.TopTileIndex.HasValue && phaseStarted.CommitedTile.HasValue)
             {
-                if (!phaseStarted.CommitedTile.HasValue)
+                if (!_sessionContext.IsLocalPlayerTurn)
                 {
-                    CustomLogger.LogError("GameLoopManager: CommitedTileIndex is null in OnMovePhase.");
-                    return;
+                    byte commitedTile = _sessionContext.Commitments.GetIndex(phaseStarted.CommitedTile.Value, false);
+                    byte c = _sessionContext.Commitments.Permutations[commitedTile];
+                    string tileType = _sessionContext.Board.AvailableTilesInDeck[commitedTile];
+                    TileData tileData = new TileData(tileType, Vector2Int.zero, _localPlayer.PlayerSide);
+
+                    StartMoving();
+                    GameUI.Instance.ShowNextTileActive(true, null, tileData);
                 }
-
-                byte commitedTile = _sessionContext.Commitments.GetIndex(phaseStarted.CommitedTile.Value, false);
-                byte c = _sessionContext.Commitments.Permutations[commitedTile];
-                string tileType = _sessionContext.Board.AvailableTilesInDeck[commitedTile];
-                TileData tileData = new TileData(tileType, Vector2Int.zero, _localPlayer.PlayerSide);
-
-                StartMoving();
-                GameUI.Instance.ShowNextTileActive(true, null, tileData);
+                else
+                {
+                    GameUI.Instance.ShowNextTileActive(false, StartMoving);
+                }
             }
+            // case when in deck there is no tiles left, but we have top tile
+            else if (phaseStarted.TopTileIndex.HasValue)
+            {
+                StartMoving();
+            }
+            // case when there is no top tile and no commited tile. But we can still use joker or skip
             else
             {
-                GameUI.Instance.ShowNextTileActive(false, StartMoving);
+                if (!_sessionContext.IsLocalPlayerTurn)
+                {
+                    StartMoving();
+                }
+                else
+                {
+                    if(_currentPlayer.JokerCount > 0) StartMoving();
+                    else SkipLocalTurn();
+                }
             }
+            
         }
 
         
@@ -269,7 +285,12 @@ namespace TerritoryWars.Managers.SessionComponents
 
         public void ShowCurrentTile()
         {
+            _managerContext.TileSelector.tilePreview.gameObject.SetActive(true);
             string currentTile = _sessionContext.Board.TopTile;
+            if (currentTile == null)
+            {
+                _managerContext.TileSelector.tilePreview.gameObject.SetActive(false);
+            }
             TileData tileData = new TileData(currentTile, Vector2Int.zero, _currentPlayer.PlayerSide);
             _managerContext.TileSelector.tilePreview.UpdatePreview(tileData);
         }
@@ -308,6 +329,7 @@ namespace TerritoryWars.Managers.SessionComponents
                 DojoGameManager.Instance.LocalBotAsPlayer.MakeMove();
             }
         }
+        
 
         private void StartRemoteTurn()
         {
