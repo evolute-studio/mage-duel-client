@@ -2,11 +2,8 @@ using Newtonsoft.Json;
 using TerritoryWars.DataModels;
 using UnityEngine;
 
-<<<<<<<< HEAD:Assets/TerritoryWars/SaveStorage/SimpleStorage.cs
 namespace TerritoryWars.SaveStorage
-========
-namespace TerritoryWars.Tools
->>>>>>>> development:Assets/TerritoryWars/Tools/SimpleStorage.cs
+
 {
     public static class SimpleStorage
     {
@@ -32,6 +29,12 @@ namespace TerritoryWars.Tools
             }
             SessionSave = JsonConvert.DeserializeObject<SessionSave>(json);
             return SessionSave;
+        }
+
+        public static void ClearSessionSave()
+        {
+            PlayerPrefs.DeleteKey("SessionSave");
+            SessionSave = new SessionSave();
         }
         
         public static void SaveCommitments(CommitmentsData commitments)

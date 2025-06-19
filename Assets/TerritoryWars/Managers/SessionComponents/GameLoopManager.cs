@@ -569,6 +569,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Unsubscribe<GameFinished>(OnEndGame);
             EventBus.Unsubscribe<ErrorOccured>(OnError);
             EventBus.Unsubscribe<GameCanceled>(OnGameCanceled);
+            EventBus.Unsubscribe<PhaseStarted>(OnPhaseStarted);
         }
     }
 
