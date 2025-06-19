@@ -7,6 +7,7 @@ using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using TerritoryWars.UI.Session;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -24,7 +25,6 @@ namespace TerritoryWars.General
         [SerializeField] private Sprite highlightSprite;
         [SerializeField] private Sprite highlightUpperBorderSprite;
         [SerializeField] public TilePreview tilePreview;
-        [SerializeField] public TilePreviewUINext nextTilePreviewUI;
         [SerializeField] private TileJokerAnimator TileJokerAnimator;
         [SerializeField] private TileJokerAnimator TileJokerAnimatorUI;
 

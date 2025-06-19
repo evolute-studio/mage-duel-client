@@ -15,6 +15,7 @@ using System.Numerics;
 using System.Security.Cryptography;
 using Dojo.Starknet;
 using TerritoryWars.SaveStorage;
+using TerritoryWars.UI.Session;
 
 namespace TerritoryWars.Managers.SessionComponents
 {

@@ -6,17 +6,14 @@ using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.Managers.SessionComponents;
-using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
-using TerritoryWars.Tools;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using EventBus = TerritoryWars.General.EventBus;
 
-namespace TerritoryWars.UI
+namespace TerritoryWars.UI.Session
 {
     public class GameUI : MonoBehaviour
     {
@@ -75,10 +72,19 @@ namespace TerritoryWars.UI
         private Vector3 _skipButtonScale;
 
         [SerializeField] private ArrowAnimations arrowAnimations;
+        
         private bool _isJokerActive = false;
+        
+        [Header("Next tile")]
+        public TilePreviewUINext TilePreviewUINext;
+        public RectTransform NextTileCircle;
+        public CanvasGroup NextTileCircleCanvasGroup;
+        private ShowNextTileAnimation _showNextTileAnimation;
+        
 
         public void Initialize()
         {
+            _showNextTileAnimation = new ShowNextTileAnimation(NextTileCircleCanvasGroup, NextTileCircle);
             SetupButtons();
             UpdateUI();
 
@@ -232,6 +238,20 @@ namespace TerritoryWars.UI
                 jokerButton.interactable = false;
                 deckButton.interactable = false;
             }
+        }
+
+        public void ShowNextTileActive(bool active, Action callback = null, TileData tile = null)
+        {
+            if (active && tile != null)
+            {
+                TilePreviewUINext.UpdatePreview(tile);
+                _showNextTileAnimation.Show().OnComplete(callback);
+            }
+            else
+            {
+                _showNextTileAnimation.Hide().OnComplete(callback);
+            }
+            
         }
 
         public void JokerButtonPulse(bool isActive)

@@ -14,6 +14,7 @@ using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using TerritoryWars.UI.Popups;
+using TerritoryWars.UI.Session;
 using UnityEngine;
 
 namespace TerritoryWars.Managers.SessionComponents
@@ -221,7 +222,7 @@ namespace TerritoryWars.Managers.SessionComponents
             _sessionContext.Board.TopTileIndex = phaseStarted.TopTileIndex;
             
             EventBus.Publish(new TimerEvent(TimerEventType.Moving, TimerProgressType.Started, GetPhaseStart()));
-            StartMoving();
+            
 
             if (!_sessionContext.IsLocalPlayerTurn)
             {
@@ -235,12 +236,13 @@ namespace TerritoryWars.Managers.SessionComponents
                 byte c = _sessionContext.Commitments.Permutations[commitedTile];
                 string tileType = _sessionContext.Board.AvailableTilesInDeck[commitedTile];
                 TileData tileData = new TileData(tileType, Vector2Int.zero, _localPlayer.PlayerSide);
-                _managerContext.TileSelector.nextTilePreviewUI.SetActive(true);
-                _managerContext.TileSelector.nextTilePreviewUI.UpdatePreview(tileData);
+
+                StartMoving();
+                GameUI.Instance.ShowNextTileActive(true, null, tileData);
             }
             else
             {
-                _managerContext.TileSelector.nextTilePreviewUI.SetActive(false);
+                GameUI.Instance.ShowNextTileActive(false, StartMoving);
             }
         }
 
@@ -258,15 +260,18 @@ namespace TerritoryWars.Managers.SessionComponents
                 FinishGame();
                 return;
             }
-
+            ShowCurrentTile();
             CustomLogger.LogDojoLoop("StartTurn");
+            
+            if (_currentPlayer == _localPlayer) StartLocalTurn();
+            if (_currentPlayer == _remotePlayer) StartRemoteTurn();
+        }
 
+        public void ShowCurrentTile()
+        {
             string currentTile = _sessionContext.Board.TopTile;
             TileData tileData = new TileData(currentTile, Vector2Int.zero, _currentPlayer.PlayerSide);
             _managerContext.TileSelector.tilePreview.UpdatePreview(tileData);
-
-            if (_currentPlayer == _localPlayer) StartLocalTurn();
-            if (_currentPlayer == _remotePlayer) StartRemoteTurn();
         }
 
         private void StartLocalTurn()

@@ -8,10 +8,10 @@ namespace TerritoryWars.General
     {
         [SerializeField] private TileGenerator _tileGenerator;
         
-        public void SetActive(bool isActive)
-        {
-            gameObject.SetActive(isActive);
-        }
+        // public void SetActive(bool isActive)
+        // {
+        //     gameObject.SetActive(isActive);
+        // }
         
         public void UpdatePreview(TileData currentTile)
         {
