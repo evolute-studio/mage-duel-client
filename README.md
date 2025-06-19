@@ -18,9 +18,9 @@ https://docs.mageduel.evolute.network/
 
 ## Repository Links:
 
-- [Unity Client](https://github.com/evolute-studio/mage-duel-client)
+- [Client](https://github.com/evolute-studio/mage-duel-client)
 
-- [Dojo On-chain Server](https://github.com/evolute-studio/mage-duel-onchain)
+- [Server](https://github.com/evolute-studio/mage-duel-onchain)
 
 - [Wrapper Web Application](https://github.com/evolute-studio/mage-duel-webgl)
 
