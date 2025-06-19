@@ -885,7 +885,7 @@ namespace TerritoryWars.General
             {
                 GameObject tile = GetTileObject(city.Position.x, city.Position.y);
                 if (tile == null || !tile.TryGetComponent(out TileGenerator tileGenerator)) continue;
-                List<Side> sides = CheckCityTileSidesToEmpty(position.x, position.y);
+                List<Side> sides = CheckCityTileSidesToEmpty(city.Position.x, city.Position.y);
                 tileGenerator.FencePlacerForCloserToBorderCity(sides);
             }
         }
