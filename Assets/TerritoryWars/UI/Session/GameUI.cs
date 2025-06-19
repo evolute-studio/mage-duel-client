@@ -75,8 +75,9 @@ namespace TerritoryWars.UI.Session
         
         private bool _isJokerActive = false;
         
-        [Header("Next tile")]
+        [Header("Tile Deck")]
         public TilePreviewUINext TilePreviewUINext;
+        public RectTransform CurrentTileCircle;
         public RectTransform NextTileCircle;
         public CanvasGroup NextTileCircleCanvasGroup;
         private ShowNextTileAnimation _showNextTileAnimation;
@@ -84,7 +85,7 @@ namespace TerritoryWars.UI.Session
 
         public void Initialize()
         {
-            _showNextTileAnimation = new ShowNextTileAnimation(NextTileCircleCanvasGroup, NextTileCircle);
+            _showNextTileAnimation = new ShowNextTileAnimation(CurrentTileCircle, NextTileCircle,NextTileCircleCanvasGroup);
             SetupButtons();
             UpdateUI();
 
