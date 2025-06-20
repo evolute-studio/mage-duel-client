@@ -14,7 +14,6 @@ namespace TerritoryWars.General
 
         public EventsHandler(WorldManager worldManager)
         {
-            CustomLogger.LogImportant("EventsHandler initialized");
             _worldManager = worldManager;
             _worldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
             //_worldManager.synchronizationMaster.OnModelUpdated.AddListener(OnModelUpdated);
@@ -245,7 +244,6 @@ namespace TerritoryWars.General
             _worldManager.synchronizationMaster.OnEventMessage.RemoveListener(OnEventMessage);
             _worldManager.synchronizationMaster.OnModelUpdated.RemoveListener(OnModelUpdated);
             IncomingModelsFilter.OnModelPassed.RemoveListener(OnModelUpdated);
-            CustomLogger.LogImportant("EventsHandler disposed");
         }
     }
 }

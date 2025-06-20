@@ -40,7 +40,6 @@ namespace TerritoryWars.ConnectorLayers.Dojo
 
         public static async Task<Board> GetBoard(string boardId)
         {
-            CustomLogger.LogImportant($"Getting board with ID: {boardId}");
             evolute_duel_Board board = WorldManager.EntityModel<evolute_duel_Board>("id", new FieldElement(boardId));
             if (board == null)
             {

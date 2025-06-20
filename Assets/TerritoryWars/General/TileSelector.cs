@@ -422,8 +422,6 @@ namespace TerritoryWars.General
 
         public void PlaceCurrentTile()
         {
-            CustomLogger.LogImportant($"Selected position: {selectedPosition}");
-            
             if (!selectedPosition.HasValue) return;
 
             OnTurnEnding.Invoke();
@@ -440,14 +438,12 @@ namespace TerritoryWars.General
             if (!selectedPosition.HasValue) return;
             if( currentTile.Position != selectedPosition.Value)
             {
-               
-                CustomLogger.LogImportant($"Updating tile position from {currentTile.Position} to {selectedPosition.Value}");
+                
                 currentTile.UpdateData(currentTile.RotatedConfig, selectedPosition.Value, currentTile.PlayerSide);
             }
             if (board.PlaceTile(currentTile))//, selectedPosition.Value.x, selectedPosition.Value.y,SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide))
             {
                 LastMove = (currentTile, selectedPosition.Value);
-                CustomLogger.LogImportant($"Tile placed at position: {selectedPosition.Value.x}, {selectedPosition.Value.y} | Tile: {currentTile.RotatedConfig} | Player: {currentTile.PlayerSide}");
                 isPlacingTile = false;
                 if(isJokerMode) 
                 {

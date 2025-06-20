@@ -181,7 +181,6 @@ namespace TerritoryWars.Managers.SessionComponents
                 SessionContext.Commitments,
                 SessionContext.BotCommitments
             ).Save();
-            CustomLogger.LogObject(SimpleStorage.SessionSave, "SessionSave", saveInFile: true);
         }
 
         private void InitializeBoard()
@@ -247,9 +246,6 @@ namespace TerritoryWars.Managers.SessionComponents
             {
                 commitmentsData.Nonce[i] = new FieldElement(Felt252Generator.GenerateFelt252());
             }
-
-            CustomLogger.LogImportant(commitmentsData.Nonce.Length.ToString());
-            CustomLogger.LogObject(commitmentsData.Nonce);
             
             commitmentsData.GenerateHashes();
             return commitmentsData;

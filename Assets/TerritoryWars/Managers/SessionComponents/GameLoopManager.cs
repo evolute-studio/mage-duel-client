@@ -69,7 +69,6 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void OnPhaseStarted(PhaseStarted phaseStarted)
         {
-            CustomLogger.LogObject(phaseStarted, "PhaseStarted");
             if (phaseStarted.Phase == SessionPhase.Reveal)
             {
                 // if it's session start or game creation - invoke reveal action here
@@ -434,7 +433,6 @@ namespace TerritoryWars.Managers.SessionComponents
         private IEnumerator HandleOpponentMoveCoroutine(TileData tile)
         {
             _managerContext.TileSelector.SetCurrentTile(tile);
-            CustomLogger.LogImportant("HandleOpponentMoveCoroutine: Placing tile ");
             _managerContext.TileSelector.tilePreview.SetPosition(tile.Position);
             yield return new WaitForSeconds(0.3f);
             _managerContext.TileSelector.tilePreview.PlaceTile(tile, () =>

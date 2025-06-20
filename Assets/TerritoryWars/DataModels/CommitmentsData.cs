@@ -69,7 +69,6 @@ namespace TerritoryWars.DataModels
                 return new uint[0];
             }
             uint[] allHashes = Hashes.SelectMany(hash => hash).ToArray();
-            CustomLogger.LogObject(allHashes, "All Hashes");
             return allHashes;
         }
 

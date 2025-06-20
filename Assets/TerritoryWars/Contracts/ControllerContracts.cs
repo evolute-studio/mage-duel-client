@@ -90,11 +90,17 @@ namespace TerritoryWars.Contracts
 
         public static string commit_tiles(uint[] commitments)
         {
+            string[] callData = new string[commitments.Length + 1];
+            callData[0] = commitments.Length.ToString();
+            for (int i = 0; i < commitments.Length; i++)
+            {
+                callData[i + 1] = commitments[i].ToString();
+            }
             Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
                 entrypoint = "commit_tiles",
-                calldata = commitments.Select(c => c.ToString()).ToArray()
+                calldata = callData,
             };
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
             return json;
