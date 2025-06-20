@@ -76,7 +76,7 @@ namespace TerritoryWars.Managers.SessionComponents
             GameUI.Instance.Initialize();
             GameUI.Instance.playerInfoUI.Initialize();
             GameUI.Instance.playerInfoUI.UpdateData(SessionContext.PlayersData);
-            GameUI.Instance.playerInfoUI.SetDeckCount(SessionContext.Board.AvailableTilesInDeck.Length);
+            GameUI.Instance.playerInfoUI.SetDeckCount(SessionContext.Board.GetTilesInDeck());
 
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
 

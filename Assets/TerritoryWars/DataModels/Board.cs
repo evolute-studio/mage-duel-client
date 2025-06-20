@@ -137,13 +137,20 @@ namespace TerritoryWars.DataModels
         public int GetOnlyMovesCount()
         {
             // 32 tiles is border tiles, so we can skip them
-            int count = -32;
+            int count = -36;
             foreach (var tile in Tiles.Values)
             {
                 if (tile.IsNull) continue;
                 count++;
             }
             return count;
+        }
+
+        public int GetTilesInDeck()
+        {
+            int tilesOnBoard = GetOnlyMovesCount();
+            int usedJokers = (GameConfiguration.JokerCount - Player1.JokerCount) + (GameConfiguration.JokerCount - Player2.JokerCount);
+            return GameConfiguration.TilesInDeck - tilesOnBoard - usedJokers - 1;
         }
 
 

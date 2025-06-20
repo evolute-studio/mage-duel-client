@@ -87,6 +87,23 @@ namespace TerritoryWars.Managers.SessionComponents
                 }
                 return;
             }
+            else if (phaseStarted.Phase == SessionPhase.Move)
+            {
+                // if it's session start or game creation - invoke reveal action here
+                if (_currentPhase.IsNull || _currentPhase.Phase == SessionPhase.Move)
+                {
+                    _turnEndData.OnPhaseStarted(ref phaseStarted);
+                    _currentPhase = phaseStarted;
+                }
+                else
+                {
+                    // in this case the reveal phase started is move phase ended and this phase a part of turn end
+                    OnMovePhase(phaseStarted);
+                    _sessionContext.Board.SetData(_currentPhase);
+                    _currentPhase = phaseStarted;
+                }
+                return;
+            }
             
             switch (phaseStarted.Phase)
             {
@@ -244,7 +261,15 @@ namespace TerritoryWars.Managers.SessionComponents
             // case when in deck there is no tiles left, but we have top tile
             else if (phaseStarted.TopTileIndex.HasValue)
             {
-                StartMoving();
+                if (_sessionContext.IsLocalPlayerTurn)
+                {
+                    GameUI.Instance.ShowNextTileActive(false, StartMoving);
+                }
+                else
+                {
+                    StartMoving();
+                }
+                
             }
             // case when there is no top tile and no commited tile. But we can still use joker or skip
             else
@@ -285,14 +310,19 @@ namespace TerritoryWars.Managers.SessionComponents
 
         public void ShowCurrentTile()
         {
-            _managerContext.TileSelector.tilePreview.gameObject.SetActive(true);
+            _managerContext.TileSelector.tilePreview.SetActivePreview(true);
             string currentTile = _sessionContext.Board.TopTile;
             if (currentTile == null)
             {
-                _managerContext.TileSelector.tilePreview.gameObject.SetActive(false);
+                 _managerContext.TileSelector.tilePreview.SetActivePreview(_sessionContext.IsLocalPlayerTurn);
+                 //_managerContext.TileSelector.tilePreview.UpdatePreview(null);
             }
-            TileData tileData = new TileData(currentTile, Vector2Int.zero, _currentPlayer.PlayerSide);
-            _managerContext.TileSelector.tilePreview.UpdatePreview(tileData);
+            else
+            {
+                TileData tileData = new TileData(currentTile, Vector2Int.zero, _currentPlayer.PlayerSide);
+                _managerContext.TileSelector.tilePreview.UpdatePreview(tileData);
+            }
+            
         }
 
         private void StartLocalTurn()
@@ -300,19 +330,39 @@ namespace TerritoryWars.Managers.SessionComponents
             CustomLogger.LogDojoLoop("StartLocalTurn");
             _localPlayer.StartSelectingAnimation();
             string currentTile = _sessionContext.Board.TopTile;
-            TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
-            _managerContext.TileSelector.StartTilePlacement(tileData);
+            if (currentTile == null)
+            {
+                TryJoker();
+            }
+            else
+            {
+                TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
+                _managerContext.TileSelector.StartTilePlacement(tileData);
+                
+                if (_managerContext.TileSelector.IsExistValidPlacement(tileData))
+                {
+                    _managerContext.TileSelector.StartTilePlacement(tileData);
+                }
+                else
+                {
+                    TryJoker();
+                }
+
+                if (_sessionContext.IsGameWithBotAsPlayer)
+                {
+                    DojoGameManager.Instance.LocalBotAsPlayer.MakeMove();
+                }
+            }
+            
 
             GameUI.Instance.SetEndTurnButtonActive(false);
             GameUI.Instance.SetRotateButtonActive(false);
             GameUI.Instance.SetSkipTurnButtonActive(true);
             GameUI.Instance.SetActiveDeckContainer(true);
+
             
-            if (_managerContext.TileSelector.IsExistValidPlacement(tileData))
-            {
-                _managerContext.TileSelector.StartTilePlacement(tileData);
-            }
-            else
+
+            void TryJoker()
             {
                 if (_currentPlayer.JokerCount > 0)
                 {
@@ -323,12 +373,7 @@ namespace TerritoryWars.Managers.SessionComponents
                     GameUI.Instance.SetActiveSkipButtonPulse(true);
                 }
             }
-
-            if (_sessionContext.IsGameWithBotAsPlayer)
-            {
-                DojoGameManager.Instance.LocalBotAsPlayer.MakeMove();
-            }
-        }
+    }
         
 
         private void StartRemoteTurn()
@@ -362,7 +407,7 @@ namespace TerritoryWars.Managers.SessionComponents
             _sessionContext.Players[0].SetData(_sessionContext.Board.Player1);
             _sessionContext.Players[1].SetData(_sessionContext.Board.Player2);
             GameUI.Instance.playerInfoUI.UpdateData(_sessionContext.PlayersData);
-            GameUI.Instance.playerInfoUI.SetDeckCount(_sessionContext.Board.AvailableTilesInDeck.Length);
+            GameUI.Instance.playerInfoUI.SetDeckCount(_sessionContext.Board.GetTilesInDeck());
             _turnEndData.SetBoardUpdated(ref data);
             _managerContext.JokerManager.SetJokersCount(0, SessionManager.Instance.SessionContext.Board.Player1.JokerCount);
             _managerContext.JokerManager.SetJokersCount(1, SessionManager.Instance.SessionContext.Board.Player2.JokerCount);
@@ -482,12 +527,17 @@ namespace TerritoryWars.Managers.SessionComponents
             byte nextTurnSide = (byte)((_currentPlayer.PlayerSide + 1) % 2);
             _currentPlayer = _sessionContext.Players[nextTurnSide];
 
-            PhaseStarted phaseStarted = _turnEndData.RevealPhaseStarted;
+            PhaseStarted phaseStarted = _turnEndData.PhaseStarted;
             turnEndData.Reset();
 
             if (!phaseStarted.IsNull && phaseStarted.Phase == SessionPhase.Reveal)
             {
                 OnRevealPhase(phaseStarted);
+                _sessionContext.Board.SetData(phaseStarted);
+            }
+            else if (!phaseStarted.IsNull && phaseStarted.Phase == SessionPhase.Move)
+            {
+                OnMovePhase(phaseStarted);
                 _sessionContext.Board.SetData(phaseStarted);
             }
             else
@@ -605,7 +655,7 @@ namespace TerritoryWars.Managers.SessionComponents
         public BoardUpdated BoardUpdated;
         public Moved Moved;
         public Skipped Skipped;
-        public PhaseStarted RevealPhaseStarted;
+        public PhaseStarted PhaseStarted;
 
         public bool IsMoveDone;
         public void SetBoardUpdated(ref BoardUpdated boardUpdated)
@@ -628,7 +678,7 @@ namespace TerritoryWars.Managers.SessionComponents
         
         public void OnPhaseStarted(ref PhaseStarted phaseStarted)
         {
-            RevealPhaseStarted = phaseStarted;
+            PhaseStarted = phaseStarted;
             IsTurnEnded();
         }
 
@@ -644,7 +694,7 @@ namespace TerritoryWars.Managers.SessionComponents
             Moved = default;
             Skipped = default;
             IsMoveDone = false;
-            RevealPhaseStarted = default;
+            PhaseStarted = default;
         }
 
         public void IsTurnEnded()
@@ -653,7 +703,7 @@ namespace TerritoryWars.Managers.SessionComponents
             bool isMoved = !Moved.IsNull;
             bool isSkipped = !Skipped.IsNull;
             bool isTilePlaced = isMoved && IsMoveDone;
-            bool isPhaseStarted = !RevealPhaseStarted.IsNull;
+            bool isPhaseStarted = !PhaseStarted.IsNull;
             if (isBoardUpdated && isPhaseStarted && (isSkipped || isTilePlaced))
             {
                 EventBus.Publish(this);

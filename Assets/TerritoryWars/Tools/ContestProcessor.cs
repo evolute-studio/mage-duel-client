@@ -22,7 +22,7 @@ namespace TerritoryWars.Tools
 
             try
             {
-                await CoroutineAsync(() => { }, 0.1f);
+                await CoroutineAsync(() => { }, 2f);
 
                 if (IsGameFinished)
                 {
@@ -41,6 +41,7 @@ namespace TerritoryWars.Tools
                     }
                 }
             }
+            
             finally
             {
                 _isProcessing = false;

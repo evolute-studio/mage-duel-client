@@ -21,6 +21,10 @@ namespace TerritoryWars.DataModels
         
         public static ushort TurnDuration = 60; // seconds
         public static ushort PassingTurnDuration = 5; // TurnDuration includ
+        
+        
+        public static ushort TilesInDeck = 64; // Number of jokers per player
+        public static ushort JokerCount = 3; // Number of jokers per player
 
         public static string[] TileTypes =
         {
