@@ -90,9 +90,6 @@ namespace TerritoryWars.Contracts
 
         public static string commit_tiles(uint[] commitments)
         {
-            List<string> calldata = new List<string>();
-            calldata.Add(commitments.Length.ToString());
-            //calldata.AddRange(commitments.SelectMany(commitmentsItem => new[] { new FieldElement(commitmentsItem).Inner }));
             Transaction tx = new Transaction
             {
                 contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
