@@ -479,6 +479,10 @@ namespace TerritoryWars.Managers.SessionComponents
             {
                 SkipLocalTurn();
             }
+            else
+            {
+                FinishGame();
+            }
             // else if (timerEvent.Type == TimerEventType.PassingTimeElapsed && !_sessionContext.IsLocalPlayerTurn)
             // {
             //     SkipOpponentTurnLocally();
