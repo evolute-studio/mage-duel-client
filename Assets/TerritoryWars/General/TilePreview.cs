@@ -11,6 +11,7 @@ using TerritoryWars.Dojo;
 using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using UnityEngine.U2D;
 using Random = UnityEngine.Random;
 
 namespace TerritoryWars.General
@@ -141,7 +142,7 @@ namespace TerritoryWars.General
                     {
                         Transform territoryPlacer = tileParts
                             .TileTerritoryFiller.transform;
-                        territoryPlacer.GetComponentInChildren<SpriteMask>().frontSortingLayerID
+                        territoryPlacer.GetComponentInChildren<SpriteShapeRenderer>().sortingLayerID
                             = SortingLayer.NameToID("Preview");
                     }
                     
@@ -282,10 +283,8 @@ namespace TerritoryWars.General
                     Transform territoryPlacer = tileParts
                         .TileTerritoryFiller.transform;
                     
-                    territoryPlacer.GetComponentInChildren<SpriteMask>().frontSortingLayerID
+                    territoryPlacer.GetComponentInChildren<SpriteShapeRenderer>().sortingLayerID
                         = SortingLayer.NameToID("Default");
-                    
-                    territoryPlacer.GetComponentInChildren<SpriteRenderer>().sortingLayerName = "Default";
                 }
 
                 List<SpriteRenderer> groundRenderers = new List<SpriteRenderer>();

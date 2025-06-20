@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TerritoryWars.ScriptablesObjects;
 using TerritoryWars.UI;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -39,6 +40,9 @@ namespace TerritoryWars.General
         public GameObject CloudPrefab;
         public GameObject[] MountainsGO;
         public GameObject[] SnowMountainsGO;
+        public SpriteShape MudSpriteShape;
+        public SpriteShape ContestedSpriteShape;
+        
         [Header("Houses")]
         public ContestedHousesGameObject FirstPlayerContestedHouses;
         public ContestedHousesGameObject SecondPlayerContestedHouses;
