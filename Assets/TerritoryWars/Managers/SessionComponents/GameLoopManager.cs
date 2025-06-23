@@ -89,7 +89,7 @@ namespace TerritoryWars.Managers.SessionComponents
             else if (phaseStarted.Phase == SessionPhase.Move)
             {
                 // if it's session start or game creation - invoke reveal action here
-                if (_currentPhase.IsNull || _currentPhase.Phase == SessionPhase.Move)
+                if (!_currentPhase.IsNull && _currentPhase.Phase == SessionPhase.Move)
                 {
                     _turnEndData.OnPhaseStarted(ref phaseStarted);
                     _currentPhase = phaseStarted;
@@ -478,6 +478,10 @@ namespace TerritoryWars.Managers.SessionComponents
                                                          && _sessionContext.IsLocalPlayerTurn)
             {
                 SkipLocalTurn();
+            }
+            else if (timerEvent.ProgressType == TimerProgressType.Elapsed)
+            {
+                FinishGame();
             }
             // else if (timerEvent.Type == TimerEventType.PassingTimeElapsed && !_sessionContext.IsLocalPlayerTurn)
             // {
