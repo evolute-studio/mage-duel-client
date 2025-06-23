@@ -238,7 +238,6 @@ namespace TerritoryWars.General
                 evolute_duel_UnionFind unionFindModel = modelInstance as evolute_duel_UnionFind;
                 if (unionFindModel == null || unionFindModel.board_id == null)
                 {
-                    CustomLogger.LogError($"[EventHandler] | {unionFindModel} is null");
                     return;
                 }
                 if (_globalContext.SessionContext.IsSessionBoard(unionFindModel.board_id?.Hex()) == false)

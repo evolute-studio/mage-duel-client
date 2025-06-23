@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace TerritoryWars.UI.Session
@@ -40,6 +41,13 @@ namespace TerritoryWars.UI.Session
 
         public ShowNextTileAnimation Hide(Action callback = null)
         {
+            if (IsDefaultState())
+            {
+                _callback = callback;
+                _callback?.Invoke();
+                _callback = null;
+                return this;
+            }
             Hide_Start();
             return this;
         }
@@ -51,6 +59,11 @@ namespace TerritoryWars.UI.Session
             
             // next tile
             _nextTileRect.anchoredPosition = new Vector2(-184.2f, 142.9f);
+        }
+        
+        private bool IsDefaultState()
+        {
+            return _currentTileRect.anchoredPosition == new Vector2(-244.2f, 142.9f);
         }
 
         private void ShowNextTile()

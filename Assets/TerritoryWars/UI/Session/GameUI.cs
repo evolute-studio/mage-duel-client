@@ -250,7 +250,7 @@ namespace TerritoryWars.UI.Session
             }
             else
             {
-                _showNextTileAnimation.Hide().OnComplete(callback);
+                _showNextTileAnimation.Hide(callback).OnComplete(callback);
             }
             
         }
