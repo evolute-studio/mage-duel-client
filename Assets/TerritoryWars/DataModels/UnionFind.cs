@@ -90,8 +90,8 @@ namespace TerritoryWars.DataModels
         {
             foreach (var structure in Structures)
             {
-                if(structure.Value.ContainsNode(position, side) && 
-                   structure.Key.Item2 == side && (type == default || structure.Value.Type == type))
+                if(structure.Value.TryGetNode(position, out var node, side) && 
+                   node.Side == side && (type == default || structure.Value.Type == type))
                 {
                     return structure.Value;
                 }
@@ -104,7 +104,7 @@ namespace TerritoryWars.DataModels
         {
             foreach (var structure in Structures)
             {
-                if(structure.Value.ContainsNode(position) && (structure.Value.Type == structureType || structureType == StructureType.None))
+                if(structure.Value.TryGetNode(position, out var node) && (structure.Value.Type == structureType || structureType == StructureType.None))
                 {
                     return structure.Value;
                 }
@@ -157,15 +157,17 @@ namespace TerritoryWars.DataModels
             Nodes.Add(node);
         }
 
-        public bool ContainsNode(Vector2Int position, Side side = default)
+        public bool TryGetNode(Vector2Int position, out StructureNode result, Side side = default)
         {
             foreach (var node in Nodes)
             {
                 if (node.Position == position && (node.Side == side || side == default))
                 {
+                    result = node;
                     return true;
                 }
             }
+            result = default;
             return false;
         }
     }
