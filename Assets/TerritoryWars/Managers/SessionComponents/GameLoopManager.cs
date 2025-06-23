@@ -248,9 +248,14 @@ namespace TerritoryWars.Managers.SessionComponents
                     byte c = _sessionContext.Commitments.Permutations[commitedTile];
                     string tileType = _sessionContext.Board.AvailableTilesInDeck[commitedTile];
                     TileData tileData = new TileData(tileType, Vector2Int.zero, _localPlayer.PlayerSide);
-
-                    StartMoving();
-                    GameUI.Instance.ShowNextTileActive(true, null, tileData);
+                    
+                    GameUI.Instance.ShowNextTileAnimation.DropCurrentTile( () =>
+                    {
+                        GameUI.Instance.ShowNextTileActive(true, null, tileData);
+                        StartMoving();
+                    });
+                    
+                    
                 }
                 else
                 {
@@ -309,8 +314,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         public void ShowCurrentTile()
         {
-            _managerContext.TileSelector.tilePreview.SetActivePreview(true);
-            string currentTile = _sessionContext.Board.TopTile;
+            TileData currentTile = GetCurrentTile();
             if (currentTile == null)
             {
                  _managerContext.TileSelector.tilePreview.SetActivePreview(_sessionContext.IsLocalPlayerTurn);
@@ -318,10 +322,23 @@ namespace TerritoryWars.Managers.SessionComponents
             }
             else
             {
-                TileData tileData = new TileData(currentTile, Vector2Int.zero, _currentPlayer.PlayerSide);
-                _managerContext.TileSelector.tilePreview.UpdatePreview(tileData);
+                _managerContext.TileSelector.tilePreview.UpdatePreview(currentTile);
             }
-            
+        }
+
+        public TileData GetCurrentTile()
+        {
+            _managerContext.TileSelector.tilePreview.SetActivePreview(true);
+            string currentTile = _sessionContext.Board.TopTile;
+            if (currentTile == null)
+            {
+                return null;
+            }
+            else
+            {
+                TileData tileData = new TileData(currentTile, Vector2Int.zero, _currentPlayer.PlayerSide);
+                return tileData;
+            }
         }
 
         private void StartLocalTurn()

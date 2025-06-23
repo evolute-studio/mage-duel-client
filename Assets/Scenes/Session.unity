@@ -1328,7 +1328,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 7492286443729640015, guid: 90672dc93b4facc488fee4786ab1d66e, type: 3}
+  m_Sprite: {fileID: 903765363149663105, guid: 90672dc93b4facc488fee4786ab1d66e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3607,7 +3607,7 @@ MonoBehaviour:
   playerInfoUI: {fileID: 579849686}
   SaveSnapshotButton: {fileID: 2065015180}
   SaveSnapshotText: {fileID: 897750885}
-  tilePreview: {fileID: 1558212604}
+  TilePreview: {fileID: 1558212604}
   tilePreviewUITileJokerAnimator: {fileID: 605219370}
   _sessionManager: {fileID: 1143477215}
   arrowAnimations: {fileID: 742295723}
@@ -3615,6 +3615,13 @@ MonoBehaviour:
   CurrentTileCircle: {fileID: 81638377}
   NextTileCircle: {fileID: 83813159}
   NextTileCircleCanvasGroup: {fileID: 83813160}
+  TileDeckContext:
+    CurrentTileImage: {fileID: 655485719}
+    NextTileImage: {fileID: 83813161}
+    CurrentTileRect: {fileID: 81638377}
+    NextTileRect: {fileID: 83813159}
+    ActiveBackgroundSprite: {fileID: 903765363149663105, guid: 90672dc93b4facc488fee4786ab1d66e, type: 3}
+    InactiveBackgroundSprite: {fileID: 7492286443729640015, guid: 90672dc93b4facc488fee4786ab1d66e, type: 3}
 --- !u!4 &288063304
 Transform:
   m_ObjectHideFlags: 0
@@ -22357,8 +22364,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 276154e985bf485da7c526933451d1c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Instance: {fileID: 0}
-  _mainTileMap: {fileID: 210394927}
 --- !u!1001 &1539316122
 PrefabInstance:
   m_ObjectHideFlags: 0
