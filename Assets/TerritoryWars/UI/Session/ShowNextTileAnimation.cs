@@ -34,13 +34,13 @@ namespace TerritoryWars.UI.Session
 
         public ShowNextTileAnimation Show(Action callback = null)
         {
-            ShowNextTile(callback);
+            ShowNextTile();
             return this;
         }
 
         public ShowNextTileAnimation Hide(Action callback = null)
         {
-            Hide_Start(callback);
+            Hide_Start();
             return this;
         }
 
@@ -50,70 +50,34 @@ namespace TerritoryWars.UI.Session
             _currentTileRect.anchoredPosition = new Vector2(-244.2f, 142.9f);
             
             // next tile
-            _nextTileRect.anchoredPosition = new Vector2(-184.995f, 142.9f);
-            _nextTileRect.localScale = new Vector2(0.75f, 0.75f);
-            _nextTileCanvasGroup.alpha = 0;
-            
-            // layering
-            _currentTileRect.SetAsLastSibling();
+            _nextTileRect.anchoredPosition = new Vector2(-184.2f, 142.9f);
         }
 
-        private void ShowNextTile(Action callback = null)
+        private void ShowNextTile()
         {
             float duration = 0.5f;
             
             //current tile (main)
-            Vector2 currentTile_Pos = new Vector2(-338f, 142.9f);
+            Vector2 currentTile_Pos = new Vector2(-393.1f, 142.9f);
 
-            _currentTileRect.DOAnchorPos(currentTile_Pos, duration).SetEase(Ease.OutBack);
-            
-            // next tile
-            Vector2 nextTile_Pos = new Vector2(-143f, 142.9f);
-            float nextTile_Scale = 0.5f;
-            
-            _nextTileCanvasGroup.alpha = 1;
-            _nextTileRect.DOAnchorPos(nextTile_Pos, duration).SetEase(Ease.OutBack);
-            _nextTileRect.DOScale(nextTile_Scale, duration).SetEase(Ease.OutBack).OnComplete(() =>
+            _currentTileRect.DOAnchorPos(currentTile_Pos, duration).SetEase(Ease.OutBack).OnComplete(() =>
             {
                 _callback?.Invoke();
                 _callback = null;
             });
         }
 
-        private void Hide_Start(Action callback = null)
+        private void Hide_Start()
         {
             float duration = 0.5f;
-            Vector2 nextTile_Pos = new Vector2(-87f, 142.9f);
+            Vector2 currentTile_Pos = new Vector2(-393.1f, -198.7f);
             
-            _nextTileRect.DOAnchorPos(nextTile_Pos, duration).SetEase(Ease.InBack).OnComplete(() =>
+            _currentTileRect.DOAnchorPos(currentTile_Pos, duration).SetEase(Ease.InBack).OnComplete(() =>
                 {
-                    _nextTileRect.SetAsLastSibling();
-                    Hide_Finish(callback);
+                    Reset();
+                    _callback?.Invoke();
+                    _callback = null;
                 });
-        }
-
-        private void Hide_Finish(Action callback = null)
-        {
-            float allDuration = 0.5f;
-            
-            // current tile (main)
-            Vector2 currentTile_Pos = new Vector2(-244.2f, 142.9f);
-            
-            _currentTileRect.DOAnchorPos(currentTile_Pos, allDuration).SetEase(Ease.InBack);
-            
-            // next tile
-            Vector2 nextTile_Pos = new Vector2(-184.995f, 142.9f);
-            float nextTile_Scale = 0.75f;
-            float nextTile_Alpha = 0.01f;
-            float opacityDuration = 0.3f;
-            _nextTileCanvasGroup.DOFade(nextTile_Alpha, opacityDuration).SetEase(Ease.InBack);
-            _nextTileRect.DOAnchorPos(nextTile_Pos, allDuration).SetEase(Ease.InBack);
-            _nextTileRect.DOScale(nextTile_Scale, allDuration).SetEase(Ease.InBack).OnComplete(() =>
-            {
-                _currentTileRect.SetAsLastSibling();
-                _callback?.Invoke();
-                _callback = null;
-            });
         }
 
 
