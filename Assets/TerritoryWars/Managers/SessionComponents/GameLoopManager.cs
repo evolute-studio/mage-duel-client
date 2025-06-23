@@ -479,10 +479,6 @@ namespace TerritoryWars.Managers.SessionComponents
             {
                 SkipLocalTurn();
             }
-            else
-            {
-                FinishGame();
-            }
             // else if (timerEvent.Type == TimerEventType.PassingTimeElapsed && !_sessionContext.IsLocalPlayerTurn)
             // {
             //     SkipOpponentTurnLocally();
@@ -604,7 +600,6 @@ namespace TerritoryWars.Managers.SessionComponents
             int elapsedTime = (int)currentTimestamp - (int)phaseStartedAt;
             if (elapsedTime > phaseDuration)
             {
-                FinishGame();
                 return false;
             }
             return true;
