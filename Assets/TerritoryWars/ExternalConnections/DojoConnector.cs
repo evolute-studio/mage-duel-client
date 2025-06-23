@@ -101,7 +101,7 @@ namespace TerritoryWars.ExternalConnections
                 CustomSceneManager.Instance.LoadLobby();
         }
         
-        public static async void CancelGame(GeneralAccount account)
+        public static async Task CancelGame(GeneralAccount account)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(CancelGame)}] " +

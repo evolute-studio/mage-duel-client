@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using TerritoryWars.Bots;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
+using TerritoryWars.DataModels.Events;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Managers;
@@ -113,6 +114,11 @@ namespace TerritoryWars.Dojo
                 return board;
             }
             set => _boardInProgress = value;
+        }
+
+        public void Start()
+        {
+            EventBus.Subscribe<ErrorOccured>(OnGameJoinFailed);
         }
 
 
@@ -416,7 +422,7 @@ namespace TerritoryWars.Dojo
 
         public async void CreateGameWithBots()
         {
-            EventBus.Subscribe<GameCreated>(BotJoinToPlayer);
+            EventBus.Subscribe<GameUpdated>(BotJoinToPlayer);
             
             CustomLogger.LogDojoLoop("CreateGameWithBots");
             LocalBot ??= await GetBotForGame(false);
@@ -431,16 +437,16 @@ namespace TerritoryWars.Dojo
                new FieldElement(LocalBot.AccountModule.GetDefaultUsername(), true));
             CustomLogger.LogDojoLoop("Bot username changed");
             await DojoConnector.CreateGame(LocalAccount);
-            CustomLogger.LogDojoLoop("Game created"); 
-            
+            CustomLogger.LogDojoLoop("Game created");
+
         }
 
-        private async void BotJoinToPlayer(GameCreated gameCreated)
+        private async void BotJoinToPlayer(GameUpdated gameUpdated)
         {
-            if(gameCreated.PlayerId != LocalAccount.Address.Hex()) return;
+            if(gameUpdated.PlayerId != LocalAccount.Address.Hex() || gameUpdated.Status != GameModelStatus.Created) return;
             await DojoConnector.JoinGame(LocalBot.Account, LocalAccount.Address);
             CustomLogger.LogDojoLoop("Bot joined game");
-            EventBus.Unsubscribe<GameCreated>(BotJoinToPlayer);
+            EventBus.Unsubscribe<GameUpdated>(BotJoinToPlayer);
         }
         
         [ContextMenu("Create game between bots")]
@@ -489,6 +495,27 @@ namespace TerritoryWars.Dojo
             bot.Initialize(botAccount);
             DojoConnector.BecameBot(botAccount);
             return bot;
+        }
+
+        public void OnGameJoinFailed(ErrorOccured error)
+        {
+            EventBus.Subscribe<GameUpdated>(TryToRecreateMatch);
+            DojoConnector.CancelGame(LocalAccount);
+        }
+
+        private async void TryToRecreateMatch(GameUpdated updated)
+        {
+            if(updated.Status != GameModelStatus.Canceled) return;
+            if (SimpleStorage.LoadIsGameWithBot())
+            {
+                CreateGameWithBots();
+            }
+            else
+            {
+                await DojoConnector.CreateGame(LocalAccount);
+            }
+            
+            EventBus.Unsubscribe<GameUpdated>(TryToRecreateMatch);
         }
         
 
@@ -715,6 +742,7 @@ namespace TerritoryWars.Dojo
                 WorldManager.synchronizationMaster.OnEntitySpawned.RemoveListener(SpawnEntity);
                 //WorldManager.synchronizationMaster.OnModelUpdated.RemoveListener(ModelUpdated);
             }
+            EventBus.Unsubscribe<ErrorOccured>(OnGameJoinFailed);
         }
     }
 }

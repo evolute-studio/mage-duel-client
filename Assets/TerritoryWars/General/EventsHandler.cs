@@ -67,9 +67,25 @@ namespace TerritoryWars.General
             switch (modelInstance)
             {
                 case evolute_duel_GameCreated gameCreated:
-                    GameCreated created = new GameCreated().SetData(gameCreated);
+                    GameUpdated updated = new GameUpdated().SetData(gameCreated);
                     CustomLogger.LogEventsLocal($"[EventHandler] | {gameCreated.Model.Name} ");
-                    EventBus.Publish(created);
+                    EventBus.Publish(updated);
+                    break;
+                case evolute_duel_GameCanceled gameCanceled:
+                    GameUpdated canceled = new GameUpdated().SetData(gameCanceled);
+                    CustomLogger.LogEventsLocal($"[EventHandler] | {gameCanceled.Model.Name} ");
+                    EventBus.Publish(canceled);
+                    break;
+                case evolute_duel_GameJoinFailed joinFailed:
+                    string localPLayerAddress = DojoGameManager.Instance.LocalAccount.Address.Hex();
+                    if (localPLayerAddress != joinFailed.host_player.Hex() &&
+                        localPLayerAddress != joinFailed.guest_player.Hex())
+                    {
+                        return;
+                    }
+                    ErrorOccured errorOccured = new ErrorOccured().SetData(joinFailed);
+                    CustomLogger.LogEventsLocal($"[EventHandler] | {joinFailed.Model.Name} ");
+                    EventBus.Publish(errorOccured);
                     break;
             }
         }

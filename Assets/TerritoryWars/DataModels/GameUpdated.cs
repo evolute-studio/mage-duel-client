@@ -3,15 +3,22 @@ using System;
 namespace TerritoryWars.DataModels
 {
     [Serializable]
-    public struct GameCreated
+    public struct GameUpdated
     {
         public string PlayerId;
         public GameModelStatus Status;
 
-        public GameCreated SetData(evolute_duel_GameCreated gameCreated)
+        public GameUpdated SetData(evolute_duel_GameCreated gameCreated)
         {
             PlayerId = gameCreated.host_player.Hex();
             Status = (GameModelStatus)gameCreated.status.Unwrap();
+            return this;
+        }
+
+        public GameUpdated SetData(evolute_duel_GameCanceled gameCanceled)
+        {
+            PlayerId = gameCanceled.host_player.Hex();
+            Status = GameModelStatus.Canceled;
             return this;
         }
     }

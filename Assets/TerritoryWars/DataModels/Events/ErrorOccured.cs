@@ -27,12 +27,20 @@ namespace TerritoryWars.DataModels.Events
             board_id = notYourTurn.board_id.Hex();
             return this;
         }
+
+        public ErrorOccured SetData(evolute_duel_GameJoinFailed joinFailed)
+        {
+            Player = joinFailed.host_player.Hex();
+            ErrorType = ServerErrorType.GameJoinFailed;
+            return this;
+        }
     }
     
     [Serializable]
     public enum ServerErrorType
     {
         InvalidMove,
-        NotYourTurn
+        NotYourTurn,
+        GameJoinFailed,
     }
 }
