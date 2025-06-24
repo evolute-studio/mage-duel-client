@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using DG.Tweening;
 using Dojo.Starknet;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
@@ -49,6 +50,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Subscribe<ErrorOccured>(OnError);
             EventBus.Subscribe<GameCanceled>(OnGameCanceled);
             EventBus.Subscribe<PhaseStarted>(OnPhaseStarted);
+            EventBus.Subscribe<TilePlaced>(OnTilePlaced);
             EventBus.Subscribe<TurnEndData>(OnTurnEnd);
         }
 
@@ -248,18 +250,28 @@ namespace TerritoryWars.Managers.SessionComponents
                     byte c = _sessionContext.Commitments.Permutations[commitedTile];
                     string tileType = _sessionContext.Board.AvailableTilesInDeck[commitedTile];
                     TileData tileData = new TileData(tileType, Vector2Int.zero, _localPlayer.PlayerSide);
-                    
-                    GameUI.Instance.ShowNextTileAnimation.DropCurrentTile( () =>
-                    {
-                        GameUI.Instance.ShowNextTileActive(true, null, tileData);
-                        StartMoving();
+
+                    GameUI.Instance.ShowNextTileAnimation.DropCurrentTile(() => { 
+                        ShowCurrentTile();
+                        GameUI.Instance.ShowNextTileAnimation.NextTileFogReveal(() =>
+                        {
+                            StartMoving();
+                            GameUI.Instance.ShowNextTileActive(true, null, tileData);
+                        });
+                        
                     });
-                    
                     
                 }
                 else
                 {
-                    GameUI.Instance.ShowNextTileActive(false, StartMoving);
+                    GameUI.Instance.ShowNextTileAnimation.DropCurrentTile(() =>
+                    {
+                        GameUI.Instance.ShowNextTileActive(false, () =>
+                        {
+                            GameUI.Instance.ShowNextTileAnimation.ActivateBackground(true, false);
+                            StartMoving();
+                        });
+                    });
                 }
             }
             // case when in deck there is no tiles left, but we have top tile
@@ -300,6 +312,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void StartMoving()
         {
+            GameUI.Instance.InitialDeckContainerActivation();
             if (!IsGameStillActual())
             {
                 FinishGame();
@@ -445,6 +458,11 @@ namespace TerritoryWars.Managers.SessionComponents
 
             _sessionContext.Board.UpdateTimestamp(data.Timestamp);
             _turnEndData.SetMoved(ref data);
+        }
+
+        private void OnTilePlaced(TilePlaced data)
+        {
+            GameUI.Instance.ShowNextTileAnimation.ShiftCurrentTile();
         }
         
         private IEnumerator HandleOpponentMoveCoroutine(TileData tile)
@@ -665,6 +683,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Unsubscribe<ErrorOccured>(OnError);
             EventBus.Unsubscribe<GameCanceled>(OnGameCanceled);
             EventBus.Unsubscribe<PhaseStarted>(OnPhaseStarted);
+            EventBus.Unsubscribe<TilePlaced>(OnTilePlaced);
         }
     }
 

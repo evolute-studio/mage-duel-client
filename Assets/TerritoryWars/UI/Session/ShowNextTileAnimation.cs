@@ -6,6 +6,7 @@ using TerritoryWars.Tile;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using Sequence = DG.Tweening.Sequence;
 
 namespace TerritoryWars.UI.Session
 {
@@ -24,6 +25,7 @@ namespace TerritoryWars.UI.Session
         private Action _callback;
         private bool _isShown = false;
         
+        
 
         public ShowNextTileAnimation(ShowNextTileAnimationContext context)
         {
@@ -32,9 +34,10 @@ namespace TerritoryWars.UI.Session
             Reset();
         }
 
-        public ShowNextTileAnimation Show(Action callback = null)
+        public ShowNextTileAnimation Show(Action callback = null, float delay = 0f)
         {
-            ShowNextTile();
+            ActivateBackground(false, true);
+            ShowNextTile(null, delay);
             return this;
         }
 
@@ -58,13 +61,13 @@ namespace TerritoryWars.UI.Session
             
             // next tile
             _context.NextTileRect.anchoredPosition = new Vector2(-184.2f, 142.9f);
-            ActivateBackground(true);
+            ActivateBackground(false, false);
         }
 
-        public void ActivateBackground(bool isCurrent)
+        public void ActivateBackground(bool current, bool next)
         {
-            _context.CurrentTileImage.sprite = isCurrent ? _context.ActiveBackgroundSprite : _context.InactiveBackgroundSprite;
-            _context.NextTileImage.sprite = isCurrent ? _context.InactiveBackgroundSprite : _context.ActiveBackgroundSprite;
+            _context.CurrentTileImage.sprite = _context.ActiveBackgroundSprite;
+            _context.NextTileImage.sprite = _context.InactiveBackgroundSprite;
         }
         
         private bool IsDefaultState()
@@ -74,9 +77,6 @@ namespace TerritoryWars.UI.Session
 
         public void DropCurrentTile(Action callback = null)
         {
-            TileData tileData = SessionManager.Instance.ManagerContext.GameLoopManager.GetCurrentTile(); 
-            GameUI.Instance.TilePreviewUINext.UpdatePreview(tileData);
-            GameUI.Instance.ShowNextTileAnimation.ActivateBackground(true);
             
             float duration = 0.5f;
             Vector2 currentTile_Pos = new Vector2(_context.CurrentTileRect.anchoredPosition.x, -198.7f);
@@ -84,28 +84,46 @@ namespace TerritoryWars.UI.Session
             _context.CurrentTileRect.DOAnchorPos(currentTile_Pos, duration).SetEase(Ease.InBack).OnComplete(() =>
             {
                 Reset();
-                GameUI.Instance.TilePreview.UpdatePreview(tileData);
                 callback?.Invoke();
             });
         }
-
-        private void ShowNextTile()
+        
+        public void ShiftCurrentTile(Action callback = null)
         {
-            ActivateBackground(true);
+            //TileData tileData = SessionManager.Instance.ManagerContext.GameLoopManager.GetCurrentTile();
+            GameUI.Instance.TilePreviewUINext.UpdatePreview(new TileData());
+            GameUI.Instance.ShowNextTileAnimation.ActivateBackground(false, false);
+            _context.NextTileFogCanvasGroup.alpha = 1f;
+            float duration = 0.5f;
             
+            void action ()
+            {
+                //Reset();
+                //GameUI.Instance.TilePreview.UpdatePreview(tileData);
+                callback?.Invoke();
+            }
+            
+            ShowNextTile(callback);
+            ActivateBackground(true, false);
+        }
+
+        private void ShowNextTile(Action callback = null, float delay = 0)
+        {
             float duration = 0.5f;
             
             //current tile (main)
             Vector2 currentTile_Pos = new Vector2(-393.1f, 142.9f);
-
-            _context.CurrentTileRect.DOAnchorPos(currentTile_Pos, duration).SetEase(Ease.OutBack).OnComplete(() =>
+            
+            Sequence sequence = DOTween.Sequence();
+            sequence.AppendInterval(delay);
+            sequence.Append(_context.CurrentTileRect.DOAnchorPos(currentTile_Pos, duration).SetEase(Ease.OutBack).OnComplete(() =>
             {
-                _callback?.Invoke();
-                _callback = null;
-            });
+                callback?.Invoke();
+                callback = null;
+            }));
         }
 
-        private void Hide_Start()
+        private void Hide_Start(Action callback = null)
         {
             float duration = 0.5f;
             Vector2 currentTile_Pos = new Vector2(-393.1f, -198.7f);
@@ -113,17 +131,23 @@ namespace TerritoryWars.UI.Session
             _context.CurrentTileRect.DOAnchorPos(currentTile_Pos, duration).SetEase(Ease.InBack).OnComplete(() =>
                 {
                     Reset();
-                    _callback?.Invoke();
-                    _callback = null;
+                    callback?.Invoke();
+                    callback = null;
                     _context.CurrentTileImage.sprite = _context.ActiveBackgroundSprite;
                 });
         }
 
-
-        public ShowNextTileAnimation OnComplete(Action onComplete)
+        public void NextTileFogReveal(Action callback = null)
         {
-            _callback = onComplete;
-            return this;
+            float targetAlpha = 0f;
+
+            _context.NextTileFogCanvasGroup.alpha = 0f;
+            _context.CurrentFogCanvasGroup.alpha = 1f;
+            
+            _context.CurrentFogCanvasGroup.DOFade(targetAlpha, 0.5f).OnComplete(() =>
+            {
+                callback?.Invoke();
+            });
         }
     }
     
@@ -134,6 +158,8 @@ namespace TerritoryWars.UI.Session
         public Image NextTileImage;
         public RectTransform CurrentTileRect;
         public RectTransform NextTileRect;
+        public CanvasGroup CurrentFogCanvasGroup;
+        public CanvasGroup NextTileFogCanvasGroup;
 
         public Sprite ActiveBackgroundSprite;
         public Sprite InactiveBackgroundSprite;
