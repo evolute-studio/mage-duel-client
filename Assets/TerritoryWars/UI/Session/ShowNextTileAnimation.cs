@@ -1,15 +1,18 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using TerritoryWars.Managers.SessionComponents;
+using TerritoryWars.Tile;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
+using Sequence = DG.Tweening.Sequence;
 
 namespace TerritoryWars.UI.Session
 {
     public class ShowNextTileAnimation
     {
-        private readonly RectTransform _currentTileRect;
-        private readonly RectTransform _nextTileRect;
-        private readonly CanvasGroup _nextTileCanvasGroup;
+        private readonly ShowNextTileAnimationContext _context;
         
 
         private Vector2Int _leftPosition = new Vector2Int(-215, 0);
@@ -22,105 +25,143 @@ namespace TerritoryWars.UI.Session
         private Action _callback;
         private bool _isShown = false;
         
+        
 
-        public ShowNextTileAnimation(RectTransform currentTileRect, RectTransform nextTileRect, CanvasGroup nextTileCanvasGroup)
+        public ShowNextTileAnimation(ShowNextTileAnimationContext context)
         {
-            _currentTileRect = currentTileRect;
-            _nextTileRect = nextTileRect;
-            _nextTileCanvasGroup = nextTileCanvasGroup;
+            _context = context;
             
             Reset();
         }
 
-        public ShowNextTileAnimation Show(Action callback = null)
+        public ShowNextTileAnimation Show(Action callback = null, float delay = 0f)
         {
-            ShowNextTile(callback);
+            ActivateBackground(false, true);
+            ShowNextTile(null, delay);
             return this;
         }
 
         public ShowNextTileAnimation Hide(Action callback = null)
         {
-            Hide_Start(callback);
+            if (IsDefaultState())
+            {
+                _callback = callback;
+                _callback?.Invoke();
+                _callback = null;
+                return this;
+            }
+            Hide_Start();
             return this;
         }
 
-        private void Reset()
+        public void Reset()
         {
             // current tile (main)
-            _currentTileRect.anchoredPosition = new Vector2(-244.2f, 142.9f);
+            _context.CurrentTileRect.anchoredPosition = new Vector2(-244.2f, 142.9f);
             
             // next tile
-            _nextTileRect.anchoredPosition = new Vector2(-184.995f, 142.9f);
-            _nextTileRect.localScale = new Vector2(0.75f, 0.75f);
-            _nextTileCanvasGroup.alpha = 0;
-            
-            // layering
-            _currentTileRect.SetAsLastSibling();
+            _context.NextTileRect.anchoredPosition = new Vector2(-184.2f, 142.9f);
+            ActivateBackground(false, false);
         }
 
-        private void ShowNextTile(Action callback = null)
+        public void ActivateBackground(bool current, bool next)
+        {
+            _context.CurrentTileImage.sprite = _context.ActiveBackgroundSprite;
+            _context.NextTileImage.sprite = _context.InactiveBackgroundSprite;
+        }
+        
+        private bool IsDefaultState()
+        {
+            return _context.CurrentTileRect.anchoredPosition == new Vector2(-244.2f, 142.9f);
+        }
+
+        public void DropCurrentTile(Action callback = null)
+        {
+            
+            float duration = 0.5f;
+            Vector2 currentTile_Pos = new Vector2(_context.CurrentTileRect.anchoredPosition.x, -198.7f);
+            
+            _context.CurrentTileRect.DOAnchorPos(currentTile_Pos, duration).SetEase(Ease.InBack).OnComplete(() =>
+            {
+                Reset();
+                callback?.Invoke();
+            });
+        }
+        
+        public void ShiftCurrentTile(Action callback = null)
+        {
+            //TileData tileData = SessionManager.Instance.ManagerContext.GameLoopManager.GetCurrentTile();
+            GameUI.Instance.TilePreviewUINext.UpdatePreview(new TileData());
+            GameUI.Instance.ShowNextTileAnimation.ActivateBackground(false, false);
+            _context.NextTileFogCanvasGroup.alpha = 1f;
+            float duration = 0.5f;
+            
+            void action ()
+            {
+                //Reset();
+                //GameUI.Instance.TilePreview.UpdatePreview(tileData);
+                callback?.Invoke();
+            }
+            
+            ShowNextTile(callback);
+            ActivateBackground(true, false);
+        }
+
+        private void ShowNextTile(Action callback = null, float delay = 0)
         {
             float duration = 0.5f;
             
             //current tile (main)
-            Vector2 currentTile_Pos = new Vector2(-338f, 142.9f);
-
-            _currentTileRect.DOAnchorPos(currentTile_Pos, duration).SetEase(Ease.OutBack);
+            Vector2 currentTile_Pos = new Vector2(-393.1f, 142.9f);
             
-            // next tile
-            Vector2 nextTile_Pos = new Vector2(-143f, 142.9f);
-            float nextTile_Scale = 0.5f;
-            
-            _nextTileCanvasGroup.alpha = 1;
-            _nextTileRect.DOAnchorPos(nextTile_Pos, duration).SetEase(Ease.OutBack);
-            _nextTileRect.DOScale(nextTile_Scale, duration).SetEase(Ease.OutBack).OnComplete(() =>
+            Sequence sequence = DOTween.Sequence();
+            sequence.AppendInterval(delay);
+            sequence.Append(_context.CurrentTileRect.DOAnchorPos(currentTile_Pos, duration).SetEase(Ease.OutBack).OnComplete(() =>
             {
-                _callback?.Invoke();
-                _callback = null;
-            });
+                callback?.Invoke();
+                callback = null;
+            }));
         }
 
         private void Hide_Start(Action callback = null)
         {
             float duration = 0.5f;
-            Vector2 nextTile_Pos = new Vector2(-87f, 142.9f);
+            Vector2 currentTile_Pos = new Vector2(-393.1f, -198.7f);
             
-            _nextTileRect.DOAnchorPos(nextTile_Pos, duration).SetEase(Ease.InBack).OnComplete(() =>
+            _context.CurrentTileRect.DOAnchorPos(currentTile_Pos, duration).SetEase(Ease.InBack).OnComplete(() =>
                 {
-                    _nextTileRect.SetAsLastSibling();
-                    Hide_Finish(callback);
+                    Reset();
+                    callback?.Invoke();
+                    callback = null;
+                    _context.CurrentTileImage.sprite = _context.ActiveBackgroundSprite;
                 });
         }
 
-        private void Hide_Finish(Action callback = null)
+        public void NextTileFogReveal(Action callback = null)
         {
-            float allDuration = 0.5f;
+            float targetAlpha = 0f;
+
+            _context.NextTileFogCanvasGroup.alpha = 0f;
+            _context.CurrentFogCanvasGroup.alpha = 1f;
             
-            // current tile (main)
-            Vector2 currentTile_Pos = new Vector2(-244.2f, 142.9f);
-            
-            _currentTileRect.DOAnchorPos(currentTile_Pos, allDuration).SetEase(Ease.InBack);
-            
-            // next tile
-            Vector2 nextTile_Pos = new Vector2(-184.995f, 142.9f);
-            float nextTile_Scale = 0.75f;
-            float nextTile_Alpha = 0.01f;
-            float opacityDuration = 0.3f;
-            _nextTileCanvasGroup.DOFade(nextTile_Alpha, opacityDuration).SetEase(Ease.InBack);
-            _nextTileRect.DOAnchorPos(nextTile_Pos, allDuration).SetEase(Ease.InBack);
-            _nextTileRect.DOScale(nextTile_Scale, allDuration).SetEase(Ease.InBack).OnComplete(() =>
+            _context.CurrentFogCanvasGroup.DOFade(targetAlpha, 0.5f).OnComplete(() =>
             {
-                _currentTileRect.SetAsLastSibling();
-                _callback?.Invoke();
-                _callback = null;
+                callback?.Invoke();
             });
         }
+    }
+    
+    [Serializable]
+    public struct ShowNextTileAnimationContext
+    {
+        public Image CurrentTileImage;
+        public Image NextTileImage;
+        public RectTransform CurrentTileRect;
+        public RectTransform NextTileRect;
+        public CanvasGroup CurrentFogCanvasGroup;
+        public CanvasGroup NextTileFogCanvasGroup;
 
-
-        public ShowNextTileAnimation OnComplete(Action onComplete)
-        {
-            _callback = onComplete;
-            return this;
-        }
+        public Sprite ActiveBackgroundSprite;
+        public Sprite InactiveBackgroundSprite;
     }
 }

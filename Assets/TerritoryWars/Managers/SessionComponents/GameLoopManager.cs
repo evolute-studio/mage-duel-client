@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using DG.Tweening;
 using Dojo.Starknet;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
@@ -49,6 +50,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Subscribe<ErrorOccured>(OnError);
             EventBus.Subscribe<GameCanceled>(OnGameCanceled);
             EventBus.Subscribe<PhaseStarted>(OnPhaseStarted);
+            EventBus.Subscribe<TilePlaced>(OnTilePlaced);
             EventBus.Subscribe<TurnEndData>(OnTurnEnd);
         }
 
@@ -89,7 +91,7 @@ namespace TerritoryWars.Managers.SessionComponents
             else if (phaseStarted.Phase == SessionPhase.Move)
             {
                 // if it's session start or game creation - invoke reveal action here
-                if (_currentPhase.IsNull || _currentPhase.Phase == SessionPhase.Move)
+                if (!_currentPhase.IsNull && _currentPhase.Phase == SessionPhase.Move)
                 {
                     _turnEndData.OnPhaseStarted(ref phaseStarted);
                     _currentPhase = phaseStarted;
@@ -249,12 +251,27 @@ namespace TerritoryWars.Managers.SessionComponents
                     string tileType = _sessionContext.Board.AvailableTilesInDeck[commitedTile];
                     TileData tileData = new TileData(tileType, Vector2Int.zero, _localPlayer.PlayerSide);
 
-                    StartMoving();
-                    GameUI.Instance.ShowNextTileActive(true, null, tileData);
+                    GameUI.Instance.ShowNextTileAnimation.DropCurrentTile(() => { 
+                        ShowCurrentTile();
+                        GameUI.Instance.ShowNextTileAnimation.NextTileFogReveal(() =>
+                        {
+                            StartMoving();
+                            GameUI.Instance.ShowNextTileActive(true, null, tileData);
+                        });
+                        
+                    });
+                    
                 }
                 else
                 {
-                    GameUI.Instance.ShowNextTileActive(false, StartMoving);
+                    GameUI.Instance.ShowNextTileAnimation.DropCurrentTile(() =>
+                    {
+                        GameUI.Instance.ShowNextTileActive(false, () =>
+                        {
+                            GameUI.Instance.ShowNextTileAnimation.ActivateBackground(true, false);
+                            StartMoving();
+                        });
+                    });
                 }
             }
             // case when in deck there is no tiles left, but we have top tile
@@ -295,6 +312,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void StartMoving()
         {
+            GameUI.Instance.InitialDeckContainerActivation();
             if (!IsGameStillActual())
             {
                 FinishGame();
@@ -309,8 +327,7 @@ namespace TerritoryWars.Managers.SessionComponents
 
         public void ShowCurrentTile()
         {
-            _managerContext.TileSelector.tilePreview.SetActivePreview(true);
-            string currentTile = _sessionContext.Board.TopTile;
+            TileData currentTile = GetCurrentTile();
             if (currentTile == null)
             {
                  _managerContext.TileSelector.tilePreview.SetActivePreview(_sessionContext.IsLocalPlayerTurn);
@@ -318,10 +335,23 @@ namespace TerritoryWars.Managers.SessionComponents
             }
             else
             {
-                TileData tileData = new TileData(currentTile, Vector2Int.zero, _currentPlayer.PlayerSide);
-                _managerContext.TileSelector.tilePreview.UpdatePreview(tileData);
+                _managerContext.TileSelector.tilePreview.UpdatePreview(currentTile);
             }
-            
+        }
+
+        public TileData GetCurrentTile()
+        {
+            _managerContext.TileSelector.tilePreview.SetActivePreview(true);
+            string currentTile = _sessionContext.Board.TopTile;
+            if (currentTile == null)
+            {
+                return null;
+            }
+            else
+            {
+                TileData tileData = new TileData(currentTile, Vector2Int.zero, _currentPlayer.PlayerSide);
+                return tileData;
+            }
         }
 
         private void StartLocalTurn()
@@ -429,6 +459,11 @@ namespace TerritoryWars.Managers.SessionComponents
             _sessionContext.Board.UpdateTimestamp(data.Timestamp);
             _turnEndData.SetMoved(ref data);
         }
+
+        private void OnTilePlaced(TilePlaced data)
+        {
+            GameUI.Instance.ShowNextTileAnimation.ShiftCurrentTile();
+        }
         
         private IEnumerator HandleOpponentMoveCoroutine(TileData tile)
         {
@@ -478,6 +513,10 @@ namespace TerritoryWars.Managers.SessionComponents
                                                          && _sessionContext.IsLocalPlayerTurn)
             {
                 SkipLocalTurn();
+            }
+            else if (timerEvent.ProgressType == TimerProgressType.Elapsed)
+            {
+                FinishGame();
             }
             // else if (timerEvent.Type == TimerEventType.PassingTimeElapsed && !_sessionContext.IsLocalPlayerTurn)
             // {
@@ -644,6 +683,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Unsubscribe<ErrorOccured>(OnError);
             EventBus.Unsubscribe<GameCanceled>(OnGameCanceled);
             EventBus.Unsubscribe<PhaseStarted>(OnPhaseStarted);
+            EventBus.Unsubscribe<TilePlaced>(OnTilePlaced);
         }
     }
 

@@ -47,6 +47,8 @@ namespace TerritoryWars.UI.Session
         [SerializeField] private GameObject _toggleJokerButton;
         [SerializeField] private GameObject[] _toggleJokerInfoGameObjects;
         [SerializeField] private CanvasGroup _deckContainerCanvasGroup;
+        [SerializeField] private CanvasGroup _deckButton1CanvasGroup;
+        [SerializeField] private CanvasGroup _deckButton2CanvasGroup;
         [SerializeField] private GameMenuView _gameMenuView;
 
         public float disabledDeckAlpha = 0.5f;
@@ -59,8 +61,8 @@ namespace TerritoryWars.UI.Session
         [SerializeField] private Button SaveSnapshotButton;
         [SerializeField] private TextMeshProUGUI SaveSnapshotText;
 
-        [Header("Tile Preview")] [SerializeField]
-        private TilePreview tilePreview;
+        [Header("Tile Preview")]
+        public TilePreview TilePreview;
 
         [SerializeField] private TileJokerAnimator tilePreviewUITileJokerAnimator;
 
@@ -80,12 +82,15 @@ namespace TerritoryWars.UI.Session
         public RectTransform CurrentTileCircle;
         public RectTransform NextTileCircle;
         public CanvasGroup NextTileCircleCanvasGroup;
-        private ShowNextTileAnimation _showNextTileAnimation;
+        
+        public ShowNextTileAnimationContext TileDeckContext;
+        
+        public ShowNextTileAnimation ShowNextTileAnimation { get; private set; }
         
 
         public void Initialize()
         {
-            _showNextTileAnimation = new ShowNextTileAnimation(CurrentTileCircle, NextTileCircle,NextTileCircleCanvasGroup);
+            ShowNextTileAnimation = new ShowNextTileAnimation(TileDeckContext);
             SetupButtons();
             UpdateUI();
 
@@ -170,9 +175,9 @@ namespace TerritoryWars.UI.Session
 
         public void UpdateUI()
         {
-            if (tilePreview != null)
+            if (TilePreview != null)
             {
-                tilePreview.UpdatePreview(_sessionManager.TileSelector.CurrentTile);
+                TilePreview.UpdatePreview(_sessionManager.TileSelector.CurrentTile);
             }
 
 
@@ -215,6 +220,11 @@ namespace TerritoryWars.UI.Session
             }
         }
 
+        public void InitialDeckContainerActivation()
+        {
+            _deckContainerCanvasGroup.DOFade(1, 0.5f);
+        }
+
         public void SetActiveDeckContainer(bool active)
         {
             if (active)
@@ -224,7 +234,8 @@ namespace TerritoryWars.UI.Session
                 // _togglersCanvasGroup[1].alpha = 0.5f;
                 // _togglersCanvasGroup[1].DOFade(1, 0.5f);
                 //_deckContainerCanvasGroup.alpha = disabledDeckAlpha;
-                _deckContainerCanvasGroup.DOFade(1, 0.5f);
+                _deckButton1CanvasGroup.DOFade(1, 0.5f);
+                _deckButton2CanvasGroup.DOFade(1, 0.5f);
                 jokerButton.interactable = true;
                 deckButton.interactable = true;
             }
@@ -235,24 +246,24 @@ namespace TerritoryWars.UI.Session
                 // _togglersCanvasGroup[1].alpha = 1f;
                 // _togglersCanvasGroup[1].DOFade(0.5f, 0.5f);
                 //_deckContainerCanvasGroup.alpha = 1;
-                _deckContainerCanvasGroup.DOFade(disabledDeckAlpha, 0.5f);
+                _deckButton1CanvasGroup.DOFade(disabledDeckAlpha, 0.5f);
+                _deckButton2CanvasGroup.DOFade(disabledDeckAlpha, 0.5f);
                 jokerButton.interactable = false;
                 deckButton.interactable = false;
             }
         }
 
-        public void ShowNextTileActive(bool active, Action callback = null, TileData tile = null)
+        public void ShowNextTileActive(bool active, Action callback = null, TileData tile = null, float delay = 0.5f)
         {
             if (active && tile != null)
             {
                 TilePreviewUINext.UpdatePreview(tile);
-                _showNextTileAnimation.Show().OnComplete(callback);
+                ShowNextTileAnimation.Show(callback, delay);
             }
             else
             {
-                _showNextTileAnimation.Hide().OnComplete(callback);
+                ShowNextTileAnimation.Hide(callback);
             }
-            
         }
 
         public void JokerButtonPulse(bool isActive)
@@ -314,7 +325,7 @@ namespace TerritoryWars.UI.Session
 
                 _sessionManager.ManagerContext.JokerManager.ActivateJoker();
 
-                tilePreview._tileJokerAnimator.ShowIdleJokerAnimation();
+                TilePreview._tileJokerAnimator.ShowIdleJokerAnimation();
                 tilePreviewUITileJokerAnimator.ShowIdleJokerAnimation();
                 UpdateUI();
             }
@@ -323,7 +334,7 @@ namespace TerritoryWars.UI.Session
                 _toggleGameObjects[1].SetActive(false);
                 _toggleGameObjects[0].SetActive(true);
                 _sessionManager.ManagerContext.JokerManager.DeactivateJoker();
-                tilePreview._tileJokerAnimator.StopIdleJokerAnimation();
+                TilePreview._tileJokerAnimator.StopIdleJokerAnimation();
                 tilePreviewUITileJokerAnimator.StopIdleJokerAnimation();
                 SessionManager.Instance.TileSelector.CancelJokerMode();
                 UpdateUI();
@@ -376,7 +387,8 @@ namespace TerritoryWars.UI.Session
         public void SetFinishGameUI(bool isActive)
         {
             SetSkipTurnButtonActive(isActive);
-            _deckContainerCanvasGroup.gameObject.SetActive(isActive);
+            _deckButton1CanvasGroup.gameObject.SetActive(isActive);
+            _deckButton2CanvasGroup.gameObject.SetActive(isActive);
             SaveSnapshotButton.gameObject.SetActive(isActive);
             //_sessionManager.sessionUI.SessionTimerUI.SetActiveTimer(isActive);
         }
