@@ -7,6 +7,7 @@ using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using TerritoryWars.UI.Session;
 using UnityEngine;
 using Random = UnityEngine.Random;
 

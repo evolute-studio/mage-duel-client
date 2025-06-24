@@ -50,6 +50,16 @@ namespace TerritoryWars.General
 
             tileGeneratorForUI.gameObject.SetActive(false);
         }
+        
+        public void SetActivePreview(bool active)
+        {
+            gameObject.SetActive(active);
+            tileGeneratorForUI.gameObject.SetActive(active);
+            if (active)
+            {
+                SetInitialPosition();
+            }
+        }
 
         private void SetInitialPosition()
         {
@@ -115,6 +125,7 @@ namespace TerritoryWars.General
 
         public void UpdatePreview(TileData currentTile)
         {
+            if(currentTile == null) SetActivePreview(false);
             tileGeneratorForUI.gameObject.SetActive(true);
             if (currentTile != null)
             {

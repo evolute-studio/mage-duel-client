@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dojo.Starknet;
 using TerritoryWars.DataModels.Events;
 using TerritoryWars.Tools;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TerritoryWars.DataModels
 {
@@ -15,15 +17,18 @@ namespace TerritoryWars.DataModels
         public string Id;
         public char[] InitialEdgeState;
         public string[] AvailableTilesInDeck;
-        public string TopTile;
+        public byte? TopTileIndex;
+        public string TopTile => TopTileIndex.HasValue ? AvailableTilesInDeck[TopTileIndex.Value] : null;
         public Dictionary<Vector2Int, TileModel> Tiles; // key: (x, y) position, value: Tile struct
         public SessionPlayer Player1;
         public SessionPlayer Player2;
         public string LastMoveId; // Maybe better store Move struct
-        public BoardState GameState;
         public byte MovesDone;
         public int MovesCount => GetOnlyMovesCount();
         public ulong LastUpdateTimestamp;
+        public byte? CommitedTileIndex;
+        public SessionPhase Phase;
+        public ulong PhaseStartedAt;
 
         public Board SetData(evolute_duel_Board board)
         {
@@ -31,7 +36,7 @@ namespace TerritoryWars.DataModels
             InitialEdgeState = GameConfiguration.GetInitialEdgeState(board.initial_edge_state);
             AvailableTilesInDeck = board.available_tiles_in_deck.ToList()
                 .Select(x => GameConfiguration.GetTileType(x)).ToArray();
-            TopTile = GameConfiguration.GetTileType(board.top_tile.Unwrap());
+            TopTileIndex = board.top_tile.UnwrapByte();
             Tiles = new Dictionary<Vector2Int, TileModel>();
             AddEdgeTiles(Tiles, board.initial_edge_state);
             for (int i = 0; i < board.state.Length; i++)
@@ -73,9 +78,16 @@ namespace TerritoryWars.DataModels
                 }
             };
             LastMoveId = board.last_move_id.Unwrap()?.Hex();
-            GameState = (BoardState)board.game_state.Unwrap();
             MovesDone = board.moves_done;
             LastUpdateTimestamp = board.last_update_timestamp;
+
+            CommitedTileIndex = board.commited_tile switch
+            {
+                Option<byte>.Some some => some.value,
+                Option<byte>.None _ => null
+            };
+            Phase = board.game_state.Unwrap();
+            PhaseStartedAt = board.phase_started_at;
             return this;
         }
 
@@ -88,7 +100,7 @@ namespace TerritoryWars.DataModels
             }
 
             AvailableTilesInDeck = data.AvailableTilesInDeck;
-            TopTile = data.TopTile;
+            TopTileIndex = data.TopTileIndex;
             foreach (var eventTile in data.Tiles)
             {
                 Tiles[eventTile.Key] = eventTile.Value;
@@ -96,7 +108,23 @@ namespace TerritoryWars.DataModels
             Player1.Update(data.Player1);
             Player2.Update(data.Player2);
             LastMoveId = data.LastMoveId;
-            GameState = data.GameState;
+            Phase = data.GameState;
+
+            return this;
+        }
+        
+        public Board SetData(PhaseStarted phaseStarted)
+        {
+            if (Id != phaseStarted.BoardId)
+            {
+                CustomLogger.LogError($"[Board] | SetData: Board ID mismatch. Expected: {Id}, Received: {phaseStarted.BoardId}");
+                return this;
+            }
+
+            Phase = phaseStarted.Phase;
+            TopTileIndex = phaseStarted.TopTileIndex;
+            CommitedTileIndex = phaseStarted.CommitedTile;
+            PhaseStartedAt = phaseStarted.StartedAt;
 
             return this;
         }
@@ -109,13 +137,20 @@ namespace TerritoryWars.DataModels
         public int GetOnlyMovesCount()
         {
             // 32 tiles is border tiles, so we can skip them
-            int count = -32;
+            int count = -36;
             foreach (var tile in Tiles.Values)
             {
                 if (tile.IsNull) continue;
                 count++;
             }
             return count;
+        }
+
+        public int GetTilesInDeck()
+        {
+            int tilesOnBoard = GetOnlyMovesCount();
+            int usedJokers = (GameConfiguration.JokerCount - Player1.JokerCount) + (GameConfiguration.JokerCount - Player2.JokerCount);
+            return GameConfiguration.TilesInDeck - tilesOnBoard - usedJokers - 1;
         }
 
 
@@ -252,11 +287,5 @@ namespace TerritoryWars.DataModels
                 }
             }
         }
-    }
-
-    public enum BoardState
-    {
-        InProgress,
-        Finished
     }
 }

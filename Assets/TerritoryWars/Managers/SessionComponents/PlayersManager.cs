@@ -6,6 +6,7 @@ using TerritoryWars.DataModels;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.UI;
+using TerritoryWars.UI.Session;
 using UnityEngine;
 
 namespace TerritoryWars.Managers.SessionComponents

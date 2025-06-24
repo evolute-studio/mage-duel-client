@@ -12,10 +12,12 @@ using System.Threading.Tasks;
 using TerritoryWars.Bots;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
+using TerritoryWars.DataModels.Events;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.Managers;
 using TerritoryWars.ModelsDataConverters;
+using TerritoryWars.SaveStorage;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using UnityEngine.Events;
@@ -114,6 +116,11 @@ namespace TerritoryWars.Dojo
             set => _boardInProgress = value;
         }
 
+        public void Start()
+        {
+            EventBus.Subscribe<ErrorOccured>(OnGameJoinFailed);
+        }
+
 
         public void SetupMasterAccount(Action callback, WrapperConnectorCalls.ConnectionData connection = default)
         {
@@ -177,14 +184,14 @@ namespace TerritoryWars.Dojo
         public async Task SyncInitialModels()
         {
             int count = 0;
-            (Rules rules, Shop shop) = await DojoLayer.Instance.GetGeneralModels();
+            (Rules rules, Shop shop) = await DojoModels.GetGeneralModels();
             GlobalContext.Rules = rules;
             GlobalContext.Shop = shop;
             
-            PlayerProfile playerProfile = await DojoLayer.Instance.GetPlayerProfile(LocalAccount.Address.Hex());
+            PlayerProfile playerProfile = await DojoModels.GetPlayerProfile(LocalAccount.Address.Hex());
             GlobalContext.PlayerProfile = playerProfile;
             
-            GameModel game = await DojoLayer.Instance.GetGameInProgress(LocalAccount.Address.Hex());
+            GameModel game = await DojoModels.GetGameInProgress(LocalAccount.Address.Hex());
             GlobalContext.GameInProgress = game;
         }
 
@@ -415,7 +422,7 @@ namespace TerritoryWars.Dojo
 
         public async void CreateGameWithBots()
         {
-            EventBus.Subscribe<GameCreated>(BotJoinToPlayer);
+            EventBus.Subscribe<GameUpdated>(BotJoinToPlayer);
             
             CustomLogger.LogDojoLoop("CreateGameWithBots");
             LocalBot ??= await GetBotForGame(false);
@@ -430,16 +437,16 @@ namespace TerritoryWars.Dojo
                new FieldElement(LocalBot.AccountModule.GetDefaultUsername(), true));
             CustomLogger.LogDojoLoop("Bot username changed");
             await DojoConnector.CreateGame(LocalAccount);
-            CustomLogger.LogDojoLoop("Game created"); 
-            
+            CustomLogger.LogDojoLoop("Game created");
+
         }
 
-        private async void BotJoinToPlayer(GameCreated gameCreated)
+        private async void BotJoinToPlayer(GameUpdated gameUpdated)
         {
-            if(gameCreated.PlayerId != LocalAccount.Address.Hex()) return;
+            if(gameUpdated.PlayerId != LocalAccount.Address.Hex() || gameUpdated.Status != GameModelStatus.Created) return;
             await DojoConnector.JoinGame(LocalBot.Account, LocalAccount.Address);
             CustomLogger.LogDojoLoop("Bot joined game");
-            EventBus.Unsubscribe<GameCreated>(BotJoinToPlayer);
+            EventBus.Unsubscribe<GameUpdated>(BotJoinToPlayer);
         }
         
         [ContextMenu("Create game between bots")]
@@ -488,6 +495,27 @@ namespace TerritoryWars.Dojo
             bot.Initialize(botAccount);
             DojoConnector.BecameBot(botAccount);
             return bot;
+        }
+
+        public void OnGameJoinFailed(ErrorOccured error)
+        {
+            EventBus.Subscribe<GameUpdated>(TryToRecreateMatch);
+            DojoConnector.CancelGame(LocalAccount);
+        }
+
+        private async void TryToRecreateMatch(GameUpdated updated)
+        {
+            if(updated.Status != GameModelStatus.Canceled) return;
+            if (SimpleStorage.LoadIsGameWithBot())
+            {
+                CreateGameWithBots();
+            }
+            else
+            {
+                await DojoConnector.CreateGame(LocalAccount);
+            }
+            
+            EventBus.Unsubscribe<GameUpdated>(TryToRecreateMatch);
         }
         
 
@@ -714,6 +742,7 @@ namespace TerritoryWars.Dojo
                 WorldManager.synchronizationMaster.OnEntitySpawned.RemoveListener(SpawnEntity);
                 //WorldManager.synchronizationMaster.OnModelUpdated.RemoveListener(ModelUpdated);
             }
+            EventBus.Unsubscribe<ErrorOccured>(OnGameJoinFailed);
         }
     }
 }

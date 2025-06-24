@@ -7,6 +7,7 @@ using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
+using TerritoryWars.SaveStorage;
 using TerritoryWars.Tools;
 using UnityEngine;
 using UnityEngine.UI;
@@ -83,7 +84,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
                 foreach (var game in games)
                 {
                     if (!game.TryGetComponent(out evolute_duel_Game gameModel)) return;
-                    PlayerProfile player = await DojoLayer.Instance.GetPlayerProfile(gameModel.player.Hex());
+                    PlayerProfile player = await DojoModels.GetPlayerProfile(gameModel.player.Hex());
                     if(IsMatchListItemExists(player.PlayerId)) continue;
                     
                     string playerName = player.Username;

@@ -4,6 +4,7 @@ using TerritoryWars.DataModels;
 using TerritoryWars.General;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using TerritoryWars.UI.Session;
 using UnityEngine;
 using UnityEngine.Serialization;
 

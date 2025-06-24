@@ -14,7 +14,6 @@ namespace TerritoryWars.General
 
         public EventsHandler(WorldManager worldManager)
         {
-            CustomLogger.LogImportant("EventsHandler initialized");
             _worldManager = worldManager;
             _worldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
             //_worldManager.synchronizationMaster.OnModelUpdated.AddListener(OnModelUpdated);
@@ -68,9 +67,25 @@ namespace TerritoryWars.General
             switch (modelInstance)
             {
                 case evolute_duel_GameCreated gameCreated:
-                    GameCreated created = new GameCreated().SetData(gameCreated);
+                    GameUpdated updated = new GameUpdated().SetData(gameCreated);
                     CustomLogger.LogEventsLocal($"[EventHandler] | {gameCreated.Model.Name} ");
-                    EventBus.Publish(created);
+                    EventBus.Publish(updated);
+                    break;
+                case evolute_duel_GameCanceled gameCanceled:
+                    GameUpdated canceled = new GameUpdated().SetData(gameCanceled);
+                    CustomLogger.LogEventsLocal($"[EventHandler] | {gameCanceled.Model.Name} ");
+                    EventBus.Publish(canceled);
+                    break;
+                case evolute_duel_GameJoinFailed joinFailed:
+                    string localPLayerAddress = DojoGameManager.Instance.LocalAccount.Address.Hex();
+                    if (localPLayerAddress != joinFailed.host_player.Hex() &&
+                        localPLayerAddress != joinFailed.guest_player.Hex())
+                    {
+                        return;
+                    }
+                    ErrorOccured errorOccured = new ErrorOccured().SetData(joinFailed);
+                    CustomLogger.LogEventsLocal($"[EventHandler] | {joinFailed.Model.Name} ");
+                    EventBus.Publish(errorOccured);
                     break;
             }
         }
@@ -204,6 +219,15 @@ namespace TerritoryWars.General
                     CustomLogger.LogEventsLocal($"[EventHandler] | {canceled.Model.Name} ");
                     EventBus.Publish(gameCanceled);
                     break;
+                case evolute_duel_PhaseStarted phaseStarted:
+                    if (!_globalContext.SessionContext.IsSessionBoard(phaseStarted.board_id.Hex()))
+                    {
+                        return;
+                    }
+                    PhaseStarted phaseStartedEvent = new PhaseStarted().SetData(phaseStarted);
+                    CustomLogger.LogEventsLocal($"[EventHandler] | {phaseStarted.Model.Name} ");
+                    EventBus.Publish(phaseStartedEvent);
+                    break;
             }
         }
 
@@ -214,7 +238,6 @@ namespace TerritoryWars.General
                 evolute_duel_UnionFind unionFindModel = modelInstance as evolute_duel_UnionFind;
                 if (unionFindModel == null || unionFindModel.board_id == null)
                 {
-                    CustomLogger.LogError($"[EventHandler] | {unionFindModel} is null");
                     return;
                 }
                 if (_globalContext.SessionContext.IsSessionBoard(unionFindModel.board_id?.Hex()) == false)
@@ -236,7 +259,6 @@ namespace TerritoryWars.General
             _worldManager.synchronizationMaster.OnEventMessage.RemoveListener(OnEventMessage);
             _worldManager.synchronizationMaster.OnModelUpdated.RemoveListener(OnModelUpdated);
             IncomingModelsFilter.OnModelPassed.RemoveListener(OnModelUpdated);
-            CustomLogger.LogImportant("EventsHandler disposed");
         }
     }
 }

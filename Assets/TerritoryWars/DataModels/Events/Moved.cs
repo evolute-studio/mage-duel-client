@@ -1,4 +1,5 @@
 using System;
+using Dojo.Starknet;
 using TerritoryWars.Managers.SessionComponents;
 
 namespace TerritoryWars.DataModels.Events

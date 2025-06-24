@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dojo.Starknet;
 using UnityEngine;
 
 namespace TerritoryWars.DataModels.Events
@@ -13,19 +14,21 @@ namespace TerritoryWars.DataModels.Events
         public string Id;
         //public ushort MoveCount;
         public string[] AvailableTilesInDeck;
-        public string TopTile;
+        public byte? TopTileIndex;
+        public string TopTile => AvailableTilesInDeck[TopTileIndex ?? 0];
+        
         public Dictionary<Vector2Int, TileModel> Tiles; // key: (x, y) position, value: Tile struct
         public SessionPlayer Player1;
         public SessionPlayer Player2;
         public string LastMoveId; // Maybe better store Move struct
-        public BoardState GameState;
+        public SessionPhase GameState;
         
         public BoardUpdated SetData(evolute_duel_BoardUpdated boardUpdated)
         {
             Id = boardUpdated.board_id.Hex();
             AvailableTilesInDeck = boardUpdated.available_tiles_in_deck.ToList()
                 .Select(x => GameConfiguration.GetTileType(x)).ToArray();
-            TopTile = GameConfiguration.GetTileType(boardUpdated.top_tile.Unwrap());
+            TopTileIndex = boardUpdated.top_tile.UnwrapByte();
             Tiles = new Dictionary<Vector2Int, TileModel>();
             for(int i = 0; i < boardUpdated.state.Length; i++)
             {
@@ -63,7 +66,7 @@ namespace TerritoryWars.DataModels.Events
                 }
             };
             LastMoveId = boardUpdated.last_move_id.Unwrap()?.Hex();
-            GameState = (BoardState)boardUpdated.game_state.Unwrap();
+            GameState = boardUpdated.game_state.Unwrap();
             return this;
         }
 
@@ -71,12 +74,12 @@ namespace TerritoryWars.DataModels.Events
         {
             Id = board.Id;
             AvailableTilesInDeck = board.AvailableTilesInDeck;
-            TopTile = board.TopTile;
+            TopTileIndex = board.TopTileIndex;
             Tiles = board.Tiles;
             Player1 = board.Player1;
             Player2 = board.Player2;
             LastMoveId = board.LastMoveId;
-            GameState = board.GameState;
+            GameState = board.Phase;
             return this;
             
         }

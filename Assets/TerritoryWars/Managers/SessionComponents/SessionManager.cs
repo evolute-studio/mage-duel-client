@@ -10,6 +10,12 @@ using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using UnityEngine;
+using System.Linq;
+using System.Numerics;
+using System.Security.Cryptography;
+using Dojo.Starknet;
+using TerritoryWars.SaveStorage;
+using TerritoryWars.UI.Session;
 
 namespace TerritoryWars.Managers.SessionComponents
 {
@@ -58,6 +64,8 @@ namespace TerritoryWars.Managers.SessionComponents
             ApplicationState.CurrentState = ApplicationStates.Initializing;
             Initialize();
             await SetupData();
+            SetupCommitments();
+            SaveSessionData();
             ManagerContext.PlayersManager.Initialize(ManagerContext);
             ManagerContext.ContestManager.Initialize(ManagerContext);
             InitializeBoard();
@@ -68,7 +76,7 @@ namespace TerritoryWars.Managers.SessionComponents
             GameUI.Instance.Initialize();
             GameUI.Instance.playerInfoUI.Initialize();
             GameUI.Instance.playerInfoUI.UpdateData(SessionContext.PlayersData);
-            GameUI.Instance.playerInfoUI.SetDeckCount(SessionContext.Board.AvailableTilesInDeck.Length);
+            GameUI.Instance.playerInfoUI.SetDeckCount(SessionContext.Board.GetTilesInDeck());
 
             CustomSceneManager.Instance.LoadingScreen.SetActive(false);
 
@@ -111,12 +119,12 @@ namespace TerritoryWars.Managers.SessionComponents
             Board boardForLoad = DojoGameManager.Instance.GlobalContext.BoardForLoad;
             if (boardForLoad.IsNull)
             {
-                GameModel game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
+                GameModel game = await DojoModels.GetGameInProgress(SessionContext.LocalPlayerAddress);
                 if (game.IsNull || game.BoardId == null)
                 {
                     CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game is null or BoardId is null. Retrying...");
                     await Coroutines.CoroutineAsync(() => { }, 1f);
-                    game = await DojoLayer.Instance.GetGameInProgress(SessionContext.LocalPlayerAddress);
+                    game = await DojoModels.GetGameInProgress(SessionContext.LocalPlayerAddress);
                     if (game.BoardId == null)
                     {
                         CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game is still null or BoardId is null after retry. Redirecting to menu.");
@@ -131,7 +139,7 @@ namespace TerritoryWars.Managers.SessionComponents
             }
             
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game retrieved successfully");
-            Board board = boardForLoad.IsNull ? await DojoLayer.Instance.GetBoard(SessionContext.Game.BoardId) : boardForLoad;
+            Board board = boardForLoad.IsNull ? await DojoModels.GetBoard(SessionContext.Game.BoardId) : boardForLoad;
             //IncomingModelsFilter.AllowedBoards.Add("0x0000000000000000000000000000000000000000000000000000000000000038");
             //Board board = await DojoLayer.Instance.GetBoard("0x0000000000000000000000000000000000000000000000000000000000000038");
             if (board.IsNull)
@@ -141,7 +149,7 @@ namespace TerritoryWars.Managers.SessionComponents
                 return;
             }
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Board retrieved successfully");
-            UnionFind unionFind = await DojoLayer.Instance.GetUnionFind(board.Id);
+            UnionFind unionFind = await DojoModels.GetUnionFind(board.Id);
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Union Find retrieved successfully");
 
             SessionContext.Board = board;
@@ -149,9 +157,9 @@ namespace TerritoryWars.Managers.SessionComponents
             SimpleStorage.SaveCurrentBoardId(board.Id);
             SessionContext.PlayersData[0] = board.Player1;
             SessionContext.PlayersData[1] = board.Player2;
-            PlayerProfile player1 = await DojoLayer.Instance.GetPlayerProfile(board.Player1.PlayerId);
+            PlayerProfile player1 = await DojoModels.GetPlayerProfile(board.Player1.PlayerId);
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Player 1 retrieved successfully");
-            PlayerProfile player2 = await DojoLayer.Instance.GetPlayerProfile(board.Player2.PlayerId);
+            PlayerProfile player2 = await DojoModels.GetPlayerProfile(board.Player2.PlayerId);
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Player 2 retrieved successfully");
             SessionContext.PlayersData[0].SetData(player1);
             SessionContext.PlayersData[1].SetData(player2);
@@ -165,12 +173,84 @@ namespace TerritoryWars.Managers.SessionComponents
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - SessionContext initialized successfully");
         }
 
+        private void SaveSessionData()
+        {
+            new SessionSave(
+                SessionContext.Board.Id,
+                DojoGameManager.Instance.DojoSessionManager.IsGameWithBot,
+                SessionContext.Commitments,
+                SessionContext.BotCommitments
+            ).Save();
+        }
+
         private void InitializeBoard()
         {
             var board = SessionContext.Board;
             BoardManager.Initialize(board);
             ManagerContext.ContestManager.RecolorStructures();
         }
+
+        private void SetupCommitments()
+        {
+            byte[] permutations = null;
+            string s = "";
+            if (!SimpleStorage.SessionSave.IsNull && SessionContext.Board.Id == SimpleStorage.SessionSave.BoardId)
+            {
+                CustomLogger.LogDojoLoop($"[SessionManager.SetupCommitments] - BoardId: {SessionContext.Board.Id} matches SessionSave BoardId: {SimpleStorage.SessionSave.BoardId}");
+                SessionContext.Commitments = SimpleStorage.SessionSave.Commitments;
+                SessionContext.BotCommitments = SimpleStorage.SessionSave.BotCommitments;
+                CustomLogger.LogDojoLoop("[SessionManager.SetupCommitments] - Commitments loaded from SessionSave");
+                permutations = SessionContext.Commitments.Permutations;
+                s = "restored permutations: ";
+                for(int i = 0; i < permutations.Length; i++)
+                {
+                    s += $"{permutations[i]} ";
+                }
+                CustomLogger.LogDojoLoop($"[SessionManager.SetupCommitments] - {s}");
+                return;
+            }
+            
+            CommitmentsData playersCommitments = GenerateCommitments();
+            SessionContext.Commitments = playersCommitments;
+            
+            permutations = SessionContext.Commitments.Permutations;
+            s = "permutations: ";
+            for(int i = 0; i < permutations.Length; i++)
+            {
+                s += $"{permutations[i]} ";
+            }
+            CustomLogger.LogDojoLoop($"[SessionManager.SetupCommitments] - {s}");
+            
+            if(DojoGameManager.Instance.DojoSessionManager.IsGameWithBot)
+            {
+                CommitmentsData botCommitments = GenerateCommitments();
+                SessionContext.BotCommitments = botCommitments;
+            }
+        }
+        
+        private CommitmentsData GenerateCommitments()
+        {
+            Board board = SessionContext.Board;
+            int tilesCount = board.AvailableTilesInDeck.Length;
+            CommitmentsData commitmentsData = new CommitmentsData(tilesCount);
+            
+            commitmentsData.Permutations = new byte[tilesCount];
+            for (byte i = 0; i < tilesCount; i++)
+            {
+                commitmentsData.Permutations[i] = i;
+            }
+            commitmentsData.Permutations.Shuffle();
+            
+            commitmentsData.Nonce = new FieldElement[tilesCount];
+            for (int i = 0; i < tilesCount; i++)
+            {
+                commitmentsData.Nonce[i] = new FieldElement(Felt252Generator.GenerateFelt252());
+            }
+            
+            commitmentsData.GenerateHashes();
+            return commitmentsData;
+        }
+        
 
         private void OnDestroy()
         {

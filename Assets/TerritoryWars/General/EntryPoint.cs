@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Security.Cryptography;
 using Dojo;
 using Dojo.Starknet;
 using TerritoryWars.Dojo;
@@ -9,6 +11,7 @@ using UnityEngine;
 using System.Threading.Tasks;
 using TerritoryWars.Contracts;
 using TerritoryWars.ExternalConnections;
+using TerritoryWars.SaveStorage;
 
 namespace TerritoryWars.General
 {
@@ -29,7 +32,7 @@ namespace TerritoryWars.General
     public class EntryPoint : MonoBehaviour
     {
         public static EntryPoint Instance { get; private set; }
-        
+
         private void Awake()
         {
             if (Instance == null)
@@ -41,21 +44,23 @@ namespace TerritoryWars.General
                 Destroy(gameObject);
             }
         }
-        
+
         public WorldManager WorldManager;
         public DojoGameManager DojoGameManager;
         public DojoGameController DojoGameGUIController;
         public bool UseDojoGUIController = false;
-        
+
         public WrapperConnectorCalls.ConnectionData connection;
         public Game game_contract;
         public Player_profile_actions player_profile_actions;
-        
+
         private float startConenctionTime;
         public WorldManagerData dojoConfig;
+        
 
-        public void Start()
-        {
+    public void Start()
+    {
+            SimpleStorage.Initialize();
             #if !UNITY_EDITOR && UNITY_WEBGL
             connection = WrapperConnectorCalls.GetConnectionData();
             //CustomLogger.LogImportant($"[Connection] rpcUrl {connection.rpcUrl} toriiUrl {connection.toriiUrl} gameAddress {connection.gameAddress} playerProfileActionsAddress {connection.playerProfileActionsAddress}");

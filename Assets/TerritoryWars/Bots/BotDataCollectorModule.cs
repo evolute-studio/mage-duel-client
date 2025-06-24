@@ -50,8 +50,10 @@ namespace TerritoryWars.Bots
 
         public void CollectData()
         {
-            CurrentTile = new TileData(_sessionContext.Board.TopTile, new Vector2Int(-1, -1), _botPlayerSide);
-            CurrentValidPlacements = Board.GetValidPlacements(CurrentTile);
+            CurrentTile = _sessionContext.Board.TopTile != null
+                ? new TileData(_sessionContext.Board.TopTile, new Vector2Int(-1, -1), _botPlayerSide)
+                : null;
+            CurrentValidPlacements = CurrentTile != null ? Board.GetValidPlacements(CurrentTile) : new List<ValidPlacement>();
             //SessionManager.Instance.TileSelector.ShowPossiblePlacements(CurrentValidPlacements);
         }
 

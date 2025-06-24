@@ -6,6 +6,7 @@ using TerritoryWars.Contracts;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
+using TerritoryWars.SaveStorage;
 using TerritoryWars.Tools;
 using UnityEngine;
 
@@ -100,7 +101,7 @@ namespace TerritoryWars.ExternalConnections
                 CustomSceneManager.Instance.LoadLobby();
         }
         
-        public static async void CancelGame(GeneralAccount account)
+        public static async Task CancelGame(GeneralAccount account)
         {
             ExecuteConfig executeConfig = new ExecuteConfig()
                 .WithMessage($"DojoCall: [{nameof(CancelGame)}] " +
@@ -142,6 +143,68 @@ namespace TerritoryWars.ExternalConnections
                 await TryExecuteAction(
                     account.Account,
                     () => GameContract.finish_game(account.Account, boardId),
+                    executeConfig
+                );
+            }
+        }
+        
+        public static async void CommitTiles(GeneralAccount account,  uint[] commitments)
+        {
+            ExecuteConfig executeConfig = new ExecuteConfig()
+                .WithMessage($"DojoCall: [{nameof(CommitTiles)}] " +
+                             $"\n Account: {account.Address.Hex()} ");
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.commit_tiles(commitments), executeConfig);
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.commit_tiles(account.Account, commitments),
+                    executeConfig
+                );
+            }
+        }
+        
+        public static async void RevealTile(GeneralAccount account, byte tile_index, FieldElement nonce, byte c)
+        {
+            ExecuteConfig executeConfig = new ExecuteConfig()
+                .WithMessage($"DojoCall: [{nameof(RevealTile)}] " +
+                             $"\n Account: {account.Address.Hex()} " +
+                             $"\n TileIndex: {tile_index} Nonce: {nonce.Hex()} C: {c}");
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.reveal_tile(tile_index, nonce, c), executeConfig);
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.reveal_tile(account.Account, tile_index, nonce, c),
+                    executeConfig
+                );
+            }
+        }
+        
+        public static async void RequestNextTile(GeneralAccount account, byte tile_index, FieldElement nonce, byte c)
+        {
+            ExecuteConfig executeConfig = new ExecuteConfig()
+                .WithMessage($"DojoCall: [{nameof(RequestNextTile)}] " +
+                             $"\n Account: {account.Address.Hex()} " +
+                             $"\n TileIndex: {tile_index} Nonce: {nonce.Hex()} C: {c}");
+            
+            if (account.IsController)
+            {
+                ExecuteController(ControllerContracts.request_next_tile(tile_index, nonce, c), executeConfig);
+            }
+            else
+            {
+                await TryExecuteAction(
+                    account.Account,
+                    () => GameContract.request_next_tile(account.Account, tile_index, nonce, c),
                     executeConfig
                 );
             }

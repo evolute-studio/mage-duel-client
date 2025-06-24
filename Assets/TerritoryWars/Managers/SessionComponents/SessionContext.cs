@@ -13,6 +13,9 @@ namespace TerritoryWars.Managers.SessionComponents
         public Board Board;
         public UnionFind UnionFind;
         public SessionPlayer[] PlayersData = new SessionPlayer[2];
+        
+        public CommitmentsData Commitments;
+        public CommitmentsData BotCommitments;
 
         public ulong LastUpdateTimestamp => Board.LastUpdateTimestamp;
 
