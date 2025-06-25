@@ -16,15 +16,17 @@ MonoBehaviour:
   rpcUrl: https://api.cartridge.gg/x/evolute-duel/katana
   relayUrl: 
   relayWebrtcUrl: 
-  gameAddress: 0x00313745d6c27cc77e9943b4ae18bc48cfd97b67d26dd376f52670da1fbcdcef
-  playerProfileActionsAddress: 0x07d946710da9ccc6fa1a1f6362c77fa329fa8e74557eb81dcf6b27161ab5c298
+  gameAddress: 0x04202a9fbb17db7d04a92f3182cef8dd339a7aff995a9fd5fa04afd087cb69d6
+  playerProfileActionsAddress: 0x04a1dc47e42dd54e5fbf54d7fe016900ebcfde4df06910457f7b6e15112707f3
   worldAddress:
     hex: 0x06a4d87ac4a224fbc633b46ec896545f8783cfc6d87ce8a4ef8c5630a3c17711
   query:
-    limit: 1000
-    offset: 0
-    dont_include_hashed_keys: 0
-    order_by: []
-    entity_models: []
-    entity_updated_after: 0
+    pagination:
+      limit: 0
+      cursor: 
+      order_by: []
+      direction: 0
+    no_hashed_keys: 0
+    models: []
+    historical: 0
   SlotDataVersion: 18
