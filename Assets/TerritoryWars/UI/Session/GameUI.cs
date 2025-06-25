@@ -82,6 +82,12 @@ namespace TerritoryWars.UI.Session
         public RectTransform CurrentTileCircle;
         public RectTransform NextTileCircle;
         public CanvasGroup NextTileCircleCanvasGroup;
+        public Image[] DeckButtons;
+        
+        public Sprite TopActiveButtonSprite;
+        public Sprite TopInactiveButtonSprite;
+        public Sprite BottomActiveButtonSprite;
+        public Sprite BottomInactiveButtonSprite;
         
         public ShowNextTileAnimationContext TileDeckContext;
         
@@ -320,9 +326,8 @@ namespace TerritoryWars.UI.Session
             _isJokerActive = active;
             if (active)
             {
-                _toggleGameObjects[1].SetActive(true);
-                _toggleGameObjects[0].SetActive(false);
-
+                ActivateDeckButton(true);
+                
                 _sessionManager.ManagerContext.JokerManager.ActivateJoker();
 
                 TilePreview._tileJokerAnimator.ShowIdleJokerAnimation();
@@ -331,14 +336,33 @@ namespace TerritoryWars.UI.Session
             }
             else
             {
-                _toggleGameObjects[1].SetActive(false);
-                _toggleGameObjects[0].SetActive(true);
+                ActivateDeckButton(false);
+                
                 _sessionManager.ManagerContext.JokerManager.DeactivateJoker();
                 TilePreview._tileJokerAnimator.StopIdleJokerAnimation();
                 tilePreviewUITileJokerAnimator.StopIdleJokerAnimation();
                 SessionManager.Instance.TileSelector.CancelJokerMode();
                 UpdateUI();
             }
+        }
+
+        private void ActivateDeckButton(bool isTop)
+        {
+            if (isTop)
+            {
+                DeckButtons[0].transform.SetAsLastSibling();
+                DeckButtons[1].transform.SetAsFirstSibling();
+                DeckButtons[0].sprite = TopActiveButtonSprite;
+                DeckButtons[1].sprite = BottomInactiveButtonSprite;
+            }
+            else
+            {
+                DeckButtons[0].transform.SetAsFirstSibling();
+                DeckButtons[1].transform.SetAsLastSibling();
+                DeckButtons[0].sprite = TopInactiveButtonSprite;
+                DeckButtons[1].sprite = BottomActiveButtonSprite;
+            }
+            
         }
 
         private void OnSaveSnapshotButtonClicked()
