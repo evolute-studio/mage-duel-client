@@ -744,7 +744,6 @@ namespace TerritoryWars.Dojo
                 //WorldManager.synchronizationMaster.OnModelUpdated.RemoveListener(ModelUpdated);
             }
             EventBus.Unsubscribe<ErrorOccured>(OnGameJoinFailed);
-            WebSocketClient.Dispose();
         }
     }
 }

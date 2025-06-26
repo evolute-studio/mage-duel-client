@@ -4,6 +4,9 @@ using TerritoryWars.DataModels.Events;
 using TerritoryWars.Dojo;
 using TerritoryWars.Managers;
 using TerritoryWars.Tools;
+using TerritoryWars.ConnectorLayers.WebSocketLayer;
+using TerritoryWars.DataModels.WebSocketEvents;
+using UnityEngine;
 
 namespace TerritoryWars.General
 {
@@ -18,6 +21,7 @@ namespace TerritoryWars.General
             _worldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
             //_worldManager.synchronizationMaster.OnModelUpdated.AddListener(OnModelUpdated);
             IncomingModelsFilter.OnModelPassed.AddListener(OnModelUpdated);
+            EventBus.Subscribe<WebSocketClient.IncomingMessage>(OnWebSocketMessageReceived);
         }
 
         private void OnEventMessage(ModelInstance modelInstance)
@@ -58,6 +62,17 @@ namespace TerritoryWars.General
                     SessionModelsHandler(modelInstance);
                     break;
                 case ApplicationStates.SnapshotTab:
+                    break;
+            }
+        }
+        
+        private void OnWebSocketMessageReceived(WebSocketClient.IncomingMessage message)
+        {
+            switch (message.channel)
+            {
+                case nameof(WSChannels.Ping):
+                    PingEvent pingEvent = JsonUtility.FromJson<PingEvent>(message.payload);
+                    EventBus.Publish(pingEvent);
                     break;
             }
         }
@@ -251,6 +266,17 @@ namespace TerritoryWars.General
                     
             }
 
+        }
+
+        public void MatchTabWebsocketHandler(WebSocketClient.IncomingMessage msg)
+        {
+            switch (msg.channel)
+            {
+                case nameof(WSChannels.Ping):
+                    PingEvent pingEvent = JsonUtility.FromJson<PingEvent>(msg.payload);
+                    EventBus.Publish(pingEvent);
+                    break;
+            }
         }
 
 

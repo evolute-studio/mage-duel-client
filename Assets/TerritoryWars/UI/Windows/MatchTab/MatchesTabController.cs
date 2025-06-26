@@ -3,6 +3,7 @@ using Dojo;
 using Dojo.Starknet;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
+using TerritoryWars.DataModels.WebSocketEvents;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
@@ -74,6 +75,22 @@ namespace TerritoryWars.UI.Windows.MatchTab
                     break;
             }
         }
+
+        protected override void OnPingEvent(PingEvent ping)
+        {
+            base.OnPingEvent(ping);
+            string address = ping.Address;
+            foreach (var item in listItems)
+            {
+                MatchListItem listItem = (MatchListItem)item;
+                if (listItem.HostPlayer == address)
+                {
+                    listItem.UpdateOnline();
+                    return;
+                }
+            }
+        }
+
         protected override async void FetchData()
         {
             try

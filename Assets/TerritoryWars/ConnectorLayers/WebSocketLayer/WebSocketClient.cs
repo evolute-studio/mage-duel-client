@@ -1,18 +1,21 @@
-
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using NativeWebSocket;
+using TerritoryWars.Dojo;
+using TerritoryWars.General;
 using UnityEngine;
 
-namespace TerritoryWars.ConnectorLayers
+namespace TerritoryWars.ConnectorLayers.WebSocketLayer
 {
 
 
 public static class WebSocketClient
 {
     private static WebSocket websocket;
+    public static WebSocketConfiguration Configuration { get; private set; } = new WebSocketConfiguration();
+    
+    private static float _lastPingTime = 0f;
 
     [Serializable]
     private class Message
@@ -23,7 +26,7 @@ public static class WebSocketClient
     }
 
     [Serializable]
-    private class IncomingMessage
+    public class IncomingMessage
     {
         public string channel;
         public string payload;
@@ -31,11 +34,12 @@ public static class WebSocketClient
 
     public static async void Initialize()
     {
-        websocket = new WebSocket("ws://165.227.140.139:8080");
+        websocket = new WebSocket(Configuration.SocketUrl);
 
         websocket.OnOpen += () =>
         {
             Debug.Log("WebSocket opened");
+            Subscribe(nameof(WSChannels.Ping));
             Subscribe("chat");
         };
 
@@ -54,6 +58,7 @@ public static class WebSocketClient
             var json = Encoding.UTF8.GetString(bytes);
             var msg = JsonUtility.FromJson<IncomingMessage>(json);
             Debug.Log($"Channel: '{msg.channel}': {msg.payload}");
+            EventBus.Publish(msg);
         };
 
         await websocket.Connect();
@@ -86,7 +91,7 @@ public static class WebSocketClient
         }
     }
 
-    private static async void Update()
+    public static async void Update()
     {
 #if !UNITY_WEBGL || UNITY_EDITOR
         websocket?.DispatchMessageQueue();
@@ -96,6 +101,18 @@ public static class WebSocketClient
         {
             Publish("chat", "{\"text\":\"Test!\"}");
         }
+        
+        
+    }
+    
+    private static void PingEvent()
+    {
+        string accountAddress = DojoGameManager.Instance?.LocalAccount?.Address?.Hex();
+        if (string.IsNullOrEmpty(accountAddress))
+        {
+            return;
+        }
+        Publish("ping", "{\"address\":\"Ping!\"}");
     }
 
     public static async void Dispose()

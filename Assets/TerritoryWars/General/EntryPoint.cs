@@ -62,7 +62,6 @@ namespace TerritoryWars.General
     public void Start()
     {
             SimpleStorage.Initialize();
-            WebSocketClient.Initialize();
             #if !UNITY_EDITOR && UNITY_WEBGL
             connection = WrapperConnectorCalls.GetConnectionData();
             //CustomLogger.LogImportant($"[Connection] rpcUrl {connection.rpcUrl} toriiUrl {connection.toriiUrl} gameAddress {connection.gameAddress} playerProfileActionsAddress {connection.playerProfileActionsAddress}");
