@@ -10,6 +10,7 @@ using UnityEngine;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using TerritoryWars.Bots;
+using TerritoryWars.ConnectorLayers;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.DataModels;
 using TerritoryWars.DataModels.Events;
@@ -743,6 +744,7 @@ namespace TerritoryWars.Dojo
                 //WorldManager.synchronizationMaster.OnModelUpdated.RemoveListener(ModelUpdated);
             }
             EventBus.Unsubscribe<ErrorOccured>(OnGameJoinFailed);
+            WebSocketClient.Dispose();
         }
     }
 }

@@ -9,6 +9,7 @@ using TerritoryWars.Dojo;
 using TerritoryWars.Tools;
 using UnityEngine;
 using System.Threading.Tasks;
+using TerritoryWars.ConnectorLayers;
 using TerritoryWars.Contracts;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.SaveStorage;
@@ -61,6 +62,7 @@ namespace TerritoryWars.General
     public void Start()
     {
             SimpleStorage.Initialize();
+            WebSocketClient.Initialize();
             #if !UNITY_EDITOR && UNITY_WEBGL
             connection = WrapperConnectorCalls.GetConnectionData();
             //CustomLogger.LogImportant($"[Connection] rpcUrl {connection.rpcUrl} toriiUrl {connection.toriiUrl} gameAddress {connection.gameAddress} playerProfileActionsAddress {connection.playerProfileActionsAddress}");
