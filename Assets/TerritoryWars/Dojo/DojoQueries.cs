@@ -125,6 +125,22 @@ namespace TerritoryWars.Dojo
             Query query = new Query(pagination, compositeClause, dont_include_hashed_keys, entity_models);
             return query;
         }
+
+        public static Query GetQueryAllGameInProgress()
+        {
+            string[] entity_models = new[] { GetModelName<evolute_duel_Game>() };
+
+            var statusClause = new MemberClause(
+                GetModelName<evolute_duel_Game>(),
+                "status",
+                dojo.ComparisonOperator.Eq,
+                new MemberValue("InProgress")
+            );
+            
+            Pagination pagination = new Pagination(limit);
+            Query query = new Query(pagination, statusClause, dont_include_hashed_keys, entity_models);
+            return query;
+        }
         
         public static Query GetQueryGameByBoardId(FieldElement boardId)
         {
