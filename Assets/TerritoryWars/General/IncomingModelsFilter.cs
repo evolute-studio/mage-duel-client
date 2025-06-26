@@ -338,6 +338,64 @@ namespace TerritoryWars.General
             }
         }
 
+        public static bool SpectatorTabFilter(ModelInstance model)
+        {
+            var type = model.GetType();
+            switch (type.Name)
+            {
+                case nameof(evolute_duel_Game):
+                    evolute_duel_Game game = (evolute_duel_Game)model;
+                    bool isGameInProgress = game.status switch
+                    {
+                        GameStatus.InProgress => true,
+                        GameStatus.Finished => true,
+                        _ => false
+                    };
+                    return isGameInProgress;
+                
+                // Always allow
+                case nameof(evolute_duel_Rules):
+                    return true;
+                case nameof(evolute_duel_Shop):
+                    return true;
+                case nameof(evolute_duel_Player):
+                    return true;
+                
+                // Always deny
+                case nameof(evolute_duel_Board):
+                    return false;
+                case nameof(evolute_duel_Move):
+                    return false;
+                case nameof(evolute_duel_PotentialCityContests):
+                    return false;
+                case nameof(evolute_duel_CityNode):
+                    return false;
+                case nameof(evolute_duel_PotentialRoadContests):
+                    return false;
+                case nameof(evolute_duel_RoadNode):
+                    return false;
+                
+                default:
+                    CustomLogger.LogWarning($"Unknown model type {type.Name}. Filtering out.");
+                    return true;
+            }
+        }
+
+        public static bool SpectatingFilter(ModelInstance model)
+        {
+            var type = model.GetType();
+            switch (type.Name)
+            {
+                
+                
+                
+                
+                default:
+                    CustomLogger.LogWarning($"Unknown model type {type.Name}. Filtering out.");
+                    return true;
+            }
+        }
+
 
         public static bool SnapshotFilter(ModelInstance model)
         {
