@@ -15,5 +15,6 @@ namespace TerritoryWars.ConnectorLayers.WebSocketLayer
     public enum WSChannels
     {
         Ping,
+        Session,
     }
 }

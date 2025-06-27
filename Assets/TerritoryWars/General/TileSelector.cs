@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using TerritoryWars.ConnectorLayers.WebSocketLayer;
+using TerritoryWars.DataModels;
 using TerritoryWars.DataModels.ClientEvents;
+using TerritoryWars.DataModels.WebSocketEvents;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.Managers.SessionComponents;
@@ -53,6 +56,8 @@ namespace TerritoryWars.General
         [SerializeField] private float highlightYOffset = -0.08f;
         public (TileData, Vector2Int) LastMove { get; private set; }
 
+        private MoveSneakPeek _moveSneakPeek;
+
         private void Awake()
         {
             highlightedTiles = new GameObject("HighlightedTiles");
@@ -62,6 +67,7 @@ namespace TerritoryWars.General
         public void Start()
         {
             EventBus.Subscribe<ClientInput>(OnClientInput);
+            EventBus.Subscribe<MoveSneakPeek>(OnMoveSneakPeek);
         }
 
         private void OnClientInput(ClientInput input)
@@ -219,10 +225,22 @@ namespace TerritoryWars.General
             action();
         }
 
+        private void OnMoveSneakPeek(MoveSneakPeek moveSneakPeek)
+        {
+            TileModel tileModel = new TileModel(moveSneakPeek.Type, moveSneakPeek.Rotation, moveSneakPeek.Position,
+                SessionManager.Instance.SessionContext.CurrentTurnPlayer.PlayerSide);
+            TileData tile = new TileData(tileModel);
+            SetCurrentTile(tile);
+            EventBus.Publish(new TileSelected(moveSneakPeek.Position));
+        }
+
         public void OnTileClicked(int x, int y)
         {
+            _moveSneakPeek = new MoveSneakPeek();
+            _moveSneakPeek.Address = SessionManager.Instance.SessionContext.LocalPlayerAddress;
             if (isJokerMode)
             {
+                _moveSneakPeek.IsJokerMode = true;
                 if (IsValidJokerPosition(x, y))
                 {
                     
@@ -249,7 +267,11 @@ namespace TerritoryWars.General
                 }
                 return;
             }
-
+            else
+            {
+                _moveSneakPeek.IsJokerMode = false;
+            }
+            
             if (!isPlacingTile) return;
 
                 if (selectedPosition.HasValue && selectedPosition.Value == new Vector2Int(x, y) && !IsPossiblePosition(x,y))
@@ -310,6 +332,10 @@ namespace TerritoryWars.General
                 RotateToFirstValidRotation();
                 
                 EventBus.Publish(new TileSelected(x, y));
+                _moveSneakPeek.Type = currentTile.Type;
+                _moveSneakPeek.Position = new Vector2Int(x, y);
+                _moveSneakPeek.Rotation = currentTile.Rotation;
+                WSLayer.Instance.SendMovePreview(_moveSneakPeek);
                 gameUI.SetRotateButtonActive(currentValidRotations.Count > 1);
                 gameUI.SetEndTurnButtonActive(true);
             
@@ -377,6 +403,8 @@ namespace TerritoryWars.General
 
         public void RotateCurrentTile()
         {
+            _moveSneakPeek = new MoveSneakPeek();
+            _moveSneakPeek.Address = SessionManager.Instance.SessionContext.LocalPlayerAddress;
             if (isJokerMode)
             {
                 if (!selectedPosition.HasValue) return;
@@ -416,6 +444,10 @@ namespace TerritoryWars.General
                 }
 
                 gameUI.UpdateUI();
+                _moveSneakPeek.Type = currentTile.Type;
+                _moveSneakPeek.Position = selectedPosition.Value;
+                _moveSneakPeek.Rotation = currentTile.Rotation;
+                WSLayer.Instance.SendMovePreview(_moveSneakPeek);
             }
             
         }
@@ -505,6 +537,7 @@ namespace TerritoryWars.General
             gameUI.SetEndTurnButtonActive(false);
             gameUI.SetRotateButtonActive(false);
             gameUI.UpdateUI();
+            
         }
 
         private void ShowJokerPlacements()
@@ -593,6 +626,11 @@ namespace TerritoryWars.General
                 Debug.LogError(currentTile);
                 Debug.LogError($"Error in StartJokerTilePlacement: {e}");
             }
+
+            _moveSneakPeek.Type = tile.Type;
+            _moveSneakPeek.Position = new Vector2Int(x, y);
+            _moveSneakPeek.Rotation = tile.Rotation;
+            WSLayer.Instance.SendMovePreview(_moveSneakPeek);
         }
 
         public void CancelJokerMode()
@@ -617,6 +655,7 @@ namespace TerritoryWars.General
         public void OnDestroy()
         {
             EventBus.Unsubscribe<ClientInput>(OnClientInput);
+            EventBus.Unsubscribe<MoveSneakPeek>(OnMoveSneakPeek);
             ClearHighlights();
             Destroy(highlightedTiles);
             highlightedTiles = null;

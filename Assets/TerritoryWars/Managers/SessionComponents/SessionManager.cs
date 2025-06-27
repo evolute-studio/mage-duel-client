@@ -14,6 +14,7 @@ using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
 using Dojo.Starknet;
+using TerritoryWars.ConnectorLayers.WebSocketLayer;
 using TerritoryWars.SaveStorage;
 using TerritoryWars.UI.Session;
 
@@ -140,6 +141,7 @@ namespace TerritoryWars.Managers.SessionComponents
             
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game retrieved successfully");
             Board board = boardForLoad.IsNull ? await DojoModels.GetBoard(SessionContext.Game.BoardId) : boardForLoad;
+            WSLayer.Instance.SubscribeSessionChannel(board.Id);
             //IncomingModelsFilter.AllowedBoards.Add("0x0000000000000000000000000000000000000000000000000000000000000038");
             //Board board = await DojoLayer.Instance.GetBoard("0x0000000000000000000000000000000000000000000000000000000000000038");
             if (board.IsNull)
@@ -257,6 +259,7 @@ namespace TerritoryWars.Managers.SessionComponents
             DojoGameManager.Instance.GlobalContext.SessionContext = null;
             foreach (var component in _components)
                 component.Dispose();
+            WSLayer.Instance.UnsubscribeSessionChannel();
         }
     }
 }

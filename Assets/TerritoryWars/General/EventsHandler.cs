@@ -6,6 +6,7 @@ using TerritoryWars.Managers;
 using TerritoryWars.Tools;
 using TerritoryWars.ConnectorLayers.WebSocketLayer;
 using TerritoryWars.DataModels.WebSocketEvents;
+using TerritoryWars.Managers.SessionComponents;
 using UnityEngine;
 
 namespace TerritoryWars.General
@@ -68,12 +69,19 @@ namespace TerritoryWars.General
         
         private void OnWebSocketMessageReceived(WebSocketClient.IncomingMessage message)
         {
-            switch (message.channel)
+            if (message.channel == nameof(WSChannels.Ping))
             {
-                case nameof(WSChannels.Ping):
-                    PingEvent pingEvent = JsonUtility.FromJson<PingEvent>(message.payload);
-                    EventBus.Publish(pingEvent);
-                    break;
+                PingEvent pingEvent = JsonUtility.FromJson<PingEvent>(message.payload);
+                EventBus.Publish(pingEvent);
+            }
+            else if (message.channel == nameof(WSChannels.Session) + "_" + SessionManager.Instance?.SessionContext?.Board.Id)
+            {
+                MoveSneakPeek moveSneakPeek = JsonUtility.FromJson<MoveSneakPeek>(message.payload);
+                if (moveSneakPeek.Address == SessionManager.Instance?.SessionContext?.LocalPlayerAddress)
+                {
+                    return;
+                }
+                EventBus.Publish(moveSneakPeek);
             }
         }
 

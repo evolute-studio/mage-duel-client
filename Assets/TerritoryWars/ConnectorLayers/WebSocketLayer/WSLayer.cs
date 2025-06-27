@@ -1,4 +1,5 @@
 using System;
+using TerritoryWars.DataModels.WebSocketEvents;
 using UnityEngine;
 
 namespace TerritoryWars.ConnectorLayers.WebSocketLayer
@@ -6,6 +7,9 @@ namespace TerritoryWars.ConnectorLayers.WebSocketLayer
     public class WSLayer: MonoBehaviour
     {
         public static WSLayer Instance { get; private set; }
+        
+        private string _currentSessionChannel = string.Empty;
+        
         private void Awake()
         {
             if (Instance == null)
@@ -18,7 +22,7 @@ namespace TerritoryWars.ConnectorLayers.WebSocketLayer
                 Destroy(gameObject);
             }
         }
-
+        
         private Pinger _pinger = new Pinger();
 
         public void Start()
@@ -30,6 +34,23 @@ namespace TerritoryWars.ConnectorLayers.WebSocketLayer
         public void Update()
         {
             WebSocketClient.Update();
+        }
+
+        public void SubscribeSessionChannel(string boardId)
+        {
+            _currentSessionChannel = nameof(WSChannels.Session) + "_" + boardId;
+            WebSocketClient.Subscribe(_currentSessionChannel);
+        }
+
+        public void UnsubscribeSessionChannel()
+        {
+            WebSocketClient.Unsubscribe(_currentSessionChannel);
+            _currentSessionChannel = string.Empty;
+        }
+
+        public void SendMovePreview(MoveSneakPeek moveSneakPeek)
+        {
+            WebSocketClient.Publish(_currentSessionChannel, JsonUtility.ToJson(moveSneakPeek));
         }
 
         public void OnDestroy()

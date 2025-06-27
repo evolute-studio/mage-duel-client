@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DG.Tweening;
 using Dojo.Starknet;
 using TerritoryWars.ConnectorLayers.Dojo;
+using TerritoryWars.ConnectorLayers.WebSocketLayer;
 using TerritoryWars.DataModels;
 using TerritoryWars.DataModels.ClientEvents;
 using TerritoryWars.DataModels.Events;
@@ -308,6 +309,7 @@ namespace TerritoryWars.Managers.SessionComponents
         private void FinishGame()
         {
             DojoConnector.FinishGame(DojoGameManager.Instance.LocalAccount, new FieldElement(_sessionContext.Board.Id));
+            WSLayer.Instance.UnsubscribeSessionChannel();
         }
 
         private void StartMoving()

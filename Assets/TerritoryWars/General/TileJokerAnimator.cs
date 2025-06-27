@@ -30,6 +30,8 @@ namespace TerritoryWars.General
         [SerializeField] private GameObject tileForLightning;
         public event Action OnDisappearAnimationComplete;
         public event Action OnShardsDisappearAnimationComplete;
+        
+        public TileData TileData;
 
         private Coroutine ShardEffectCoroutine;
 
@@ -243,10 +245,10 @@ namespace TerritoryWars.General
                     {
                         if (SessionManager.Instance != null && !_isAnimating) return;
                         
-                        var jokerTile = SessionManager.Instance.ManagerContext.JokerManager.GetGenerateJokerTile(x, y);
-                        if (jokerTile != null)
+                        TileData = SessionManager.Instance.ManagerContext.JokerManager.GetGenerateJokerTile(x, y);
+                        if (TileData != null)
                         {
-                            SessionManager.Instance.TileSelector.StartJokerTilePlacement(jokerTile, x, y);
+                            SessionManager.Instance.TileSelector.StartJokerTilePlacement(TileData, x, y);
                         }
                     }
                     catch (Exception e)

@@ -209,7 +209,7 @@ namespace TerritoryWars.Tile
             {
                 currentGoTileRotator.LineRenderers.Add(area.lineRenderer);
             }
-
+            
             currentGoTileRotator.RotateTile(_tileData.Rotation);
             Transform[] pins = tileParts.PinsPositions;
             
