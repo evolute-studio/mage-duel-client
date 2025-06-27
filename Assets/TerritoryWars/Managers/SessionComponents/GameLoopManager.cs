@@ -631,9 +631,9 @@ namespace TerritoryWars.Managers.SessionComponents
             int phaseDuration = GameConfiguration.GetPhaseDuration(board.Phase);
             ulong phaseStartedAt = board.PhaseStartedAt;
             ulong currentTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-            if (phaseStartedAt == 0 || currentTimestamp < phaseStartedAt)
+            if (phaseStartedAt == 0)
             {
-                CustomLogger.LogError("GameLoopManager: Phase started at is not set or in the past.");
+                CustomLogger.LogError("GameLoopManager: Phase started at is not set");
                 return false;
             }
             int elapsedTime = (int)currentTimestamp - (int)phaseStartedAt;
