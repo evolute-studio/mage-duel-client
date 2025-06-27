@@ -315,6 +315,7 @@ namespace TerritoryWars.Managers.SessionComponents
         private void StartMoving()
         {
             GameUI.Instance.InitialDeckContainerActivation();
+            GameUI.Instance.SetJokerMode(false);
             if (!IsGameStillActual())
             {
                 FinishGame();
@@ -516,7 +517,7 @@ namespace TerritoryWars.Managers.SessionComponents
             {
                 SkipLocalTurn();
             }
-            else if (timerEvent.ProgressType == TimerProgressType.Elapsed)
+            else if (timerEvent.ProgressType == TimerProgressType.ElapsedCompletely)
             {
                 FinishGame();
             }

@@ -90,6 +90,7 @@ namespace TerritoryWars.UI.Session
                 yield return null;
             }
             ResetUI();
+            EventBus.Publish(new TimerEvent(_timerType, TimerProgressType.ElapsedCompletely));
         }
 
         private void UpdateMainLoopTimer()

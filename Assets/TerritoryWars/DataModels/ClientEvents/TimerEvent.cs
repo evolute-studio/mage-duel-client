@@ -30,5 +30,6 @@ namespace TerritoryWars.DataModels.ClientEvents
     {
         Started,
         Elapsed,
+        ElapsedCompletely,
     }
 }
