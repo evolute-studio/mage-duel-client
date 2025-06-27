@@ -230,12 +230,23 @@ namespace TerritoryWars.General
             TileModel tileModel = new TileModel(moveSneakPeek.Type, moveSneakPeek.Rotation, moveSneakPeek.Position,
                 SessionManager.Instance.SessionContext.CurrentTurnPlayer.PlayerSide);
             TileData tile = new TileData(tileModel);
-            SetCurrentTile(tile);
+            if (moveSneakPeek.IsJokerMode)
+            {
+                GameUI.Instance.SetJokerMode(true);
+                TileJokerAnimator.EvoluteTileDisappear();
+                TileJokerAnimatorUI.EvoluteTileDisappear();
+                TileJokerAnimator.JokerChangingAnimation(() => { SetCurrentTile(tile);});
+            }
+            else SetCurrentTile(tile);
             EventBus.Publish(new TileSelected(moveSneakPeek.Position));
         }
 
         public void OnTileClicked(int x, int y)
         {
+            if (!SessionManager.Instance.SessionContext.IsLocalPlayerTurn)
+            {
+                return;
+            }
             _moveSneakPeek = new MoveSneakPeek();
             _moveSneakPeek.Address = SessionManager.Instance.SessionContext.LocalPlayerAddress;
             if (isJokerMode)
@@ -261,7 +272,7 @@ namespace TerritoryWars.General
                     
                     StartCoroutine(InvokeActionWithDelay(0.8f, () =>
                     {
-                        TileJokerAnimator.JokerConfChanging(x, y);
+                        TileJokerAnimator.JokerChangingAnimation(() => TileJokerAnimator.GenerateJoker(x, y));
                     }));
                     return;
                 }
@@ -412,7 +423,7 @@ namespace TerritoryWars.General
                 try
                 {
                     
-                    TileJokerAnimator.JokerConfChanging(selectedPosition.Value.x, selectedPosition.Value.y);
+                    TileJokerAnimator.JokerChangingAnimation(() => TileJokerAnimator.GenerateJoker(selectedPosition.Value.x, selectedPosition.Value.y));
                 }
                 catch (System.Exception e)
                 {
@@ -543,6 +554,11 @@ namespace TerritoryWars.General
         private void ShowJokerPlacements()
         {
             ClearHighlights();
+            
+            if (!SessionManager.Instance.SessionContext.IsLocalPlayerTurn)
+            {
+                return;
+            }
             
             for (int x = 0; x < board.Width; x++)
             {

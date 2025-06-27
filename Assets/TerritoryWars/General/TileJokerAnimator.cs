@@ -198,19 +198,16 @@ namespace TerritoryWars.General
                 }
             }
         }
-        
-        public void JokerConfChanging(int x, int y)
+
+        public void JokerChangingAnimation(Action callback)
         {
-            
             if (_isAnimating)
             {
                 return;
             }
-            
             CleanupActiveTweens();
-            
             _isAnimating = true;
-
+            
             try
             {
                 Vector3 startPosition = new Vector3(_initialShardsParentPosition.x, -0.15f, 0);
@@ -243,13 +240,7 @@ namespace TerritoryWars.General
                 _currentSequence.AppendCallback(() => {
                     try
                     {
-                        if (SessionManager.Instance != null && !_isAnimating) return;
-                        
-                        TileData = SessionManager.Instance.ManagerContext.JokerManager.GetGenerateJokerTile(x, y);
-                        if (TileData != null)
-                        {
-                            SessionManager.Instance.TileSelector.StartJokerTilePlacement(TileData, x, y);
-                        }
+                        callback?.Invoke();
                     }
                     catch (Exception e)
                     {
@@ -300,6 +291,17 @@ namespace TerritoryWars.General
             {
                 Debug.LogError($"Error in JokerConfChanging: {e}");
                 CleanupAndReset();
+            }
+        }
+
+        public void GenerateJoker(int x, int y)
+        {
+            if (SessionManager.Instance != null && !_isAnimating) return;
+                        
+            TileData = SessionManager.Instance.ManagerContext.JokerManager.GetGenerateJokerTile(x, y);
+            if (TileData != null)
+            {
+                SessionManager.Instance.TileSelector.StartJokerTilePlacement(TileData, x, y);
             }
         }
         
