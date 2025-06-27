@@ -12,6 +12,8 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Serialization;
 using TerritoryWars.DataModels;
+using TerritoryWars.Dojo;
+using TerritoryWars.UI.General;
 using TerritoryWars.UI.Session;
 
 namespace TerritoryWars.UI
@@ -40,6 +42,7 @@ namespace TerritoryWars.UI
         public CancelGamePopup CancelGamePopUp;
 
         [Header("Players")] public List<PlayerInfo> players;
+        public OnlineStatus[] OnlineStatuses;
 
         [SerializeField] private SessionManager _sessionManager;
 
@@ -64,6 +67,12 @@ namespace TerritoryWars.UI
 
             SetPlayersAvatars(charactersObject.GetAvatar(PlayerCharactersManager.GetCurrentCharacterId()),
                 charactersObject.GetAvatar(PlayerCharactersManager.GetOpponentCurrentCharacterId()));
+            
+            OnlineStatuses[0].Initialize(_sessionManager.SessionContext.PlayersData[0].PlayerId);
+            if(!_sessionManager.SessionContext.IsGameWithBot)
+                OnlineStatuses[1].Initialize(_sessionManager.SessionContext.PlayersData[1].PlayerId);
+            else
+                OnlineStatuses[1].InitializeForce(true);
         }
 
         public void UpdateData(SessionPlayer[] players)

@@ -13,13 +13,11 @@ namespace TerritoryWars.UI.Windows
         public override void Initialize()
         {
             base.Initialize();
-            EventBus.Subscribe<PingEvent>(OnPingEvent);
         }
 
         public override void OnDestroy()
         {
             base.OnDestroy();
-            EventBus.Unsubscribe<PingEvent>(OnPingEvent);
         }
 
         protected virtual void OnPingEvent(PingEvent ping) { }

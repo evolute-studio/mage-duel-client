@@ -76,21 +76,6 @@ namespace TerritoryWars.UI.Windows.MatchTab
             }
         }
 
-        protected override void OnPingEvent(PingEvent ping)
-        {
-            base.OnPingEvent(ping);
-            string address = ping.Address;
-            foreach (var item in listItems)
-            {
-                MatchListItem listItem = (MatchListItem)item;
-                if (listItem.HostPlayer == address)
-                {
-                    listItem.UpdateOnline();
-                    return;
-                }
-            }
-        }
-
         protected override async void FetchData()
         {
             try
