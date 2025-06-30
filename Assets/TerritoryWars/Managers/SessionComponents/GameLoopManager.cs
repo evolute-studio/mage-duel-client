@@ -532,6 +532,7 @@ namespace TerritoryWars.Managers.SessionComponents
             }
             else if (timerEvent.ProgressType == TimerProgressType.ElapsedCompletely)
             {
+                CustomLogger.LogImportant("GameLoopManager: TimerEvent ElapsedCompletely");
                 FinishGame();
             }
             // else if (timerEvent.Type == TimerEventType.PassingTimeElapsed && !_sessionContext.IsLocalPlayerTurn)

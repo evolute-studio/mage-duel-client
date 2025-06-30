@@ -57,7 +57,6 @@ public static class WebSocketClient
         {
             var json = Encoding.UTF8.GetString(bytes);
             var msg = JsonUtility.FromJson<IncomingMessage>(json);
-            Debug.Log($"Channel: '{msg.channel}': {msg.payload}");
             EventBus.Publish(msg);
         };
 
