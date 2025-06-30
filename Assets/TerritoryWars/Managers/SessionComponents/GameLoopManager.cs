@@ -555,6 +555,7 @@ namespace TerritoryWars.Managers.SessionComponents
             if (_currentPlayer != _localPlayer) return;
             GameUI.Instance.SetJokerMode(false);
             _managerContext.TileSelector.EndTilePlacement();
+            _managerContext.TileSelector.tilePreview.ResetPosition();
             DojoConnector.SkipMove(DojoGameManager.Instance.LocalAccount);
         }
 

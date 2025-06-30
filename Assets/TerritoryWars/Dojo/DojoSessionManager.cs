@@ -599,7 +599,6 @@ namespace TerritoryWars.Dojo
 
         public void SkipMove()
         {
-            //if (SessionManagerOld.Instance.isPlayerMakeMove) return;
             DojoConnector.SkipMove(_localPlayerAccount);
         }
 
