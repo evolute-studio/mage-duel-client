@@ -87,14 +87,12 @@ namespace TerritoryWars.Tile
                 yield break;
             }
             
-            GameObject territory = new GameObject("Territory");
-            territory.AddComponent<Territory>();
-            currentTerritory = Instantiate(territory, transform).GetComponent<Territory>();
-            currentTerritory.transform.position = transform.position;
+            currentTerritory = Instantiate(territoryPrefab, transform).GetComponent<Territory>();
             currentTerritory.gameObject.layer = _currentMask;
             TerritorySpriteRenderer = currentTerritory.GetComponent<SpriteRenderer>();
             currentTerritory.SetLineRenderer(lineRenderer);
-            currentTerritory.GenerateTerritory();
+            currentTerritory.GenerateMask();
+            currentTerritory.SetTexture(isContested);
             
             if (arcIndex >= 0 && arcIndex < points.Length - 1 && !isArcSpawned)
             {

@@ -142,7 +142,7 @@ namespace TerritoryWars.General
                     {
                         Transform territoryPlacer = tileParts
                             .TileTerritoryFiller.transform;
-                        territoryPlacer.GetComponentInChildren<SpriteShapeRenderer>().sortingLayerID
+                        territoryPlacer.GetComponentInChildren<SpriteMask>().frontSortingLayerID 
                             = SortingLayer.NameToID("Preview");
                     }
                     
@@ -283,8 +283,10 @@ namespace TerritoryWars.General
                     Transform territoryPlacer = tileParts
                         .TileTerritoryFiller.transform;
                     
-                    territoryPlacer.GetComponentInChildren<SpriteShapeRenderer>().sortingLayerID
+                    territoryPlacer.GetComponentInChildren<SpriteMask>().frontSortingLayerID
                         = SortingLayer.NameToID("Default");
+                    
+                    territoryPlacer.GetComponentInChildren<SpriteRenderer>().sortingLayerName = "Default";
                 }
 
                 List<SpriteRenderer> groundRenderers = new List<SpriteRenderer>();
