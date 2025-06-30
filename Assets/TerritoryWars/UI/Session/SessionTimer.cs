@@ -55,8 +55,12 @@ namespace TerritoryWars.UI.Session
         private void OnTimerEvent(TimerEvent timerEvent)
         {
             _timerType = timerEvent.Type;
-            if(timerEvent.ProgressType == TimerProgressType.Started)
+            if(timerEvent.ProgressType == TimerProgressType.Started && timerEvent.Type != TimerEventType.Passing)
                 StartTimer(timerEvent.StartTimestamp);
+            else if (timerEvent.Type == TimerEventType.Passing)
+            {
+                StartPassingTimer();
+            }
         }
 
         public void StartTimer(ulong timestamp)
@@ -71,13 +75,22 @@ namespace TerritoryWars.UI.Session
             _timerCoroutine = StartCoroutine(UpdateTimer());
         }
 
+        public void StartPassingTimer()
+        {
+            if (_timerCoroutine != null)
+            {
+                StopCoroutine(_timerCoroutine);
+            }
+            _timerCoroutine = StartCoroutine(PassingTimer());
+        }
+
         private IEnumerator UpdateTimer()
         {
             // main loop for the timer
             while (_timeGone < TurnDuration)
             {
                 UpdateMainLoopTimer();
-                yield return new WaitForSeconds(0.5f);
+                yield return null;
             }
             ResetUI();
             EventBus.Publish(new TimerEvent(_timerType, TimerProgressType.Elapsed));
@@ -91,6 +104,17 @@ namespace TerritoryWars.UI.Session
             }
             ResetUI();
             EventBus.Publish(new TimerEvent(_timerType, TimerProgressType.ElapsedCompletely));
+        }
+
+        private IEnumerator PassingTimer()
+        {
+            ResetUI();
+            RotateHourglass();
+            while (true)
+            {
+                UpdateTurnText(PassingTurnText);
+                yield return null;
+            }
         }
 
         private void UpdateMainLoopTimer()
@@ -141,7 +165,7 @@ namespace TerritoryWars.UI.Session
 
         private void UpdateTurnText(string baseText)
         {
-            int visibleDots = 3 - ((int)(_timeGone % 3));
+            int visibleDots = 3 - ((int)(Time.time % 3));
             string dots = string.Join("", new string[3].Select((_, index) =>
                 $"<color=#{(index < visibleDots ? "FFFFFF" : "FFFF00")}>.</color>"));
 

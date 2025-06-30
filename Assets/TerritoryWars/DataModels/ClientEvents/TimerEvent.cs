@@ -20,10 +20,13 @@ namespace TerritoryWars.DataModels.ClientEvents
         //TurnTimeElapsed,
         //PassingTimeElapsed,
         
+        // phases
         GameCreation,
         Revealing,
         Requesting,
         Moving,
+        // client
+        Passing,
     }
 
     public enum TimerProgressType

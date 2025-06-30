@@ -11,5 +11,6 @@ namespace TerritoryWars.DataModels.WebSocketEvents
         public string Type;
         public Vector2Int Position;
         public int Rotation;
+        public bool IsPlaced;
     }
 }

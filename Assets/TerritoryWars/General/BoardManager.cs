@@ -626,6 +626,15 @@ namespace TerritoryWars.General
             return true;
         }
 
+        public bool IsTilePlaced(Vector2Int tile)
+        {
+            if (tileData[tile.x, tile.y] != null) 
+            {
+                return true;
+            }
+            return false;
+        }
+
         public void CheckConnections(TileData tile, int x, int y)
         {
             // Checking the boundaries of the field

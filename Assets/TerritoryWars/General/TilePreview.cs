@@ -208,7 +208,7 @@ namespace TerritoryWars.General
             tileGenerator.tileParts.HideForestAreas();
         }
 
-        public void SetPosition(Vector2Int currentBoardPosition)
+        public void SetPosition(Vector2Int currentBoardPosition, Action callback = null)
         {
             currentTween?.Kill();
             _currentBoardPosition = currentBoardPosition;
@@ -217,7 +217,10 @@ namespace TerritoryWars.General
 
             currentTween = transform
                 .DOMove(targetPosition, moveDuration)
-                .SetEase(moveEase);
+                .SetEase(moveEase).OnComplete(() =>
+                {
+                    callback?.Invoke();
+                });
             //previewTileView.transform.DOScale(1, 0.5f).SetEase(Ease.OutQuint);
         }
         
@@ -327,6 +330,7 @@ namespace TerritoryWars.General
                 callback?.Invoke();
                 SessionManager.Instance.ManagerContext.BoardManager.FloatingTextAnimation(currentTile);
                 SessionManager.Instance.ManagerContext.BoardManager.ScoreClientPrediction(playerIndex, currentTile);
+                ResetPosition();
             });
             sequence.Play();
 

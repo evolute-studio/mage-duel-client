@@ -470,6 +470,11 @@ namespace TerritoryWars.Managers.SessionComponents
         
         private IEnumerator HandleOpponentMoveCoroutine(TileData tile)
         {
+            if (_managerContext.BoardManager.IsTilePlaced(tile.Position))
+            {
+                _turnEndData.OnTilePlaced();
+                yield break;
+            }
             _managerContext.TileSelector.SetCurrentTile(tile);
             _managerContext.TileSelector.tilePreview.SetPosition(tile.Position);
             yield return new WaitForSeconds(0.3f);

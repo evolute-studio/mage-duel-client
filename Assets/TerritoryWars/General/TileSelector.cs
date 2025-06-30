@@ -238,7 +238,20 @@ namespace TerritoryWars.General
                 TileJokerAnimator.JokerChangingAnimation(() => { SetCurrentTile(tile);});
             }
             else SetCurrentTile(tile);
-            EventBus.Publish(new TileSelected(moveSneakPeek.Position));
+
+            if (moveSneakPeek.IsPlaced)
+            {
+                tilePreview.SetPosition(tile.Position, () => {PlaceTile(tile);});
+                EventBus.Publish(new TimerEvent(TimerEventType.Passing, TimerProgressType.Started));
+            }
+            else
+            {
+                tilePreview.SetPosition(tile.Position);
+            }
+                
+            
+            
+            //EventBus.Publish(new TileSelected(moveSneakPeek.Position));
         }
 
         public void OnTileClicked(int x, int y)
@@ -472,8 +485,20 @@ namespace TerritoryWars.General
             gameUI.SetRotateButtonActive(false);
             
             DojoGameManager.Instance.DojoSessionManager.MakeMove(currentTile, selectedPosition.Value.x, selectedPosition.Value.y, isJokerMode);
+            EventBus.Publish(new TimerEvent(TimerEventType.Passing, TimerProgressType.Started));
+            _moveSneakPeek.IsPlaced = true;
+            WSLayer.Instance.SendMovePreview(_moveSneakPeek);
             tilePreview.PlaceTile(currentTile, CompleteTilePlacement);
             ClearHighlights();
+        }
+
+        public void PlaceTile(TileData tile)
+        {
+            tilePreview.PlaceTile(currentTile, () =>
+            {
+                board.PlaceTile(tile);
+            });
+            
         }
 
         public void CompleteTilePlacement()
