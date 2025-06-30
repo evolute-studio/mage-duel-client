@@ -55,6 +55,16 @@ namespace TerritoryWars.UI.Session
         private void OnTimerEvent(TimerEvent timerEvent)
         {
             _timerType = timerEvent.Type;
+
+            if (timerEvent.Type == TimerEventType.Moving)
+            {
+                ActivateHourglass();
+            }
+            else
+            {
+                ResetUI();
+            }
+            
             if(timerEvent.ProgressType == TimerProgressType.Started && timerEvent.Type != TimerEventType.Passing)
                 StartTimer(timerEvent.StartTimestamp);
             else if (timerEvent.Type == TimerEventType.Passing)
@@ -66,8 +76,6 @@ namespace TerritoryWars.UI.Session
         public void StartTimer(ulong timestamp)
         {
             _startTurnTimestamp = timestamp;
-
-            RotateHourglass();
             if (_timerCoroutine != null)
             {
                 StopCoroutine(_timerCoroutine);
@@ -109,7 +117,7 @@ namespace TerritoryWars.UI.Session
         private IEnumerator PassingTimer()
         {
             ResetUI();
-            RotateHourglass();
+            ActivateHourglass();
             while (true)
             {
                 UpdateTurnText(PassingTurnText);
@@ -135,8 +143,11 @@ namespace TerritoryWars.UI.Session
             return (float)(unixTimestamp - _startTurnTimestamp);
         }
 
-        private void RotateHourglass()
+        private void ActivateHourglass()
         {
+            SpriteAnimator.gameObject.SetActive(true);
+            TimerText.gameObject.SetActive(true);
+            
             SpriteAnimator.duration = RotationAnimationDuration;
             SpriteAnimator.Play(RotationAnimationSprites).OnComplete(
                 () =>
@@ -179,7 +190,8 @@ namespace TerritoryWars.UI.Session
             SkipText.text = "";
             TimerText.color = Color.white;
             TurnText.color = Color.white;
-            //SpriteAnimator.Stop();
+            SpriteAnimator.gameObject.SetActive(false);
+            TimerText.gameObject.SetActive(false);
         }
 
         public void OnDestroy()
