@@ -312,6 +312,14 @@ namespace TerritoryWars.Managers.SessionComponents
             WSLayer.Instance.UnsubscribeSessionChannel();
         }
 
+        private void CancelGame()
+        {
+            DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount);
+            WSLayer.Instance.UnsubscribeSessionChannel();
+            SimpleStorage.ClearCurrentBoardId();
+            CustomSceneManager.Instance.LoadLobby();
+        }
+
         private void StartMoving()
         {
             GameUI.Instance.InitialDeckContainerActivation();
@@ -611,6 +619,9 @@ namespace TerritoryWars.Managers.SessionComponents
                     break;
                 case ServerErrorType.NotYourTurn:
                     PopupManager.Instance.NotYourTurnPopup();
+                    break;
+                case ServerErrorType.CantFinishGame:
+                    CancelGame();
                     break;
             }
 

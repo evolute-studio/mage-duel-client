@@ -110,6 +110,7 @@ namespace TerritoryWars.General
                     CustomLogger.LogEventsLocal($"[EventHandler] | {joinFailed.Model.Name} ");
                     EventBus.Publish(errorOccured);
                     break;
+                    
             }
         }
 
@@ -250,6 +251,15 @@ namespace TerritoryWars.General
                     PhaseStarted phaseStartedEvent = new PhaseStarted().SetData(phaseStarted);
                     CustomLogger.LogEventsLocal($"[EventHandler] | {phaseStarted.Model.Name} ");
                     EventBus.Publish(phaseStartedEvent);
+                    break;
+                case evolute_duel_CantFinishGame cantFinishGame:
+                    if (!_globalContext.SessionContext.IsSessionBoard(cantFinishGame.board_id.Hex()))
+                    {
+                        return;
+                    }
+                    ErrorOccured errorCantFinishGame = new ErrorOccured().SetData(cantFinishGame);
+                    CustomLogger.LogEventsLocal($"[EventHandler] | {cantFinishGame.Model.Name} ");
+                    EventBus.Publish(errorCantFinishGame);
                     break;
             }
         }
