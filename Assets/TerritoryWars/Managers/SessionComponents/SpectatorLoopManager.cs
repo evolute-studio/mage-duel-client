@@ -19,7 +19,7 @@ using UnityEngine;
 
 namespace TerritoryWars.Managers.SessionComponents
 {
-    public class SpectatorLoopManager : ISessionComponent
+    public class SpectatorLoopManager : LoopManager, ISessionComponent
     {
         private SessionManagerContext _managerContext;
         private SessionContext _sessionContext => _managerContext.SessionContext;
@@ -36,7 +36,7 @@ namespace TerritoryWars.Managers.SessionComponents
         
         private PhaseStarted _currentPhase;
 
-        public void Initialize(SessionManagerContext managerContext)
+        public override void Initialize(SessionManagerContext managerContext)
         {
             _managerContext = managerContext;
             EventBus.Subscribe<BoardUpdated>(OnBoardUpdate);
@@ -53,9 +53,25 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Subscribe<TurnEndData>(OnTurnEnd);
         }
         
+        public override async void StartGame()
+        {
+            byte whoseTurnSide = await WhoseTurn();
+            _currentPlayer = _sessionContext.Players[whoseTurnSide];
+
+            if (!IsGameStillActual())
+            {
+                FinishGame();
+                return;
+            }
+
+            PhaseStarted phaseStarted = new PhaseStarted().SetData(_sessionContext.Board);
+            OnPhaseStarted(phaseStarted);
+        }
+        
 
         private void OnPhaseStarted(PhaseStarted phaseStarted)
         {
+            return;
             if (phaseStarted.Phase == SessionPhase.Reveal)
             {
                 // if it's session start or game creation - invoke reveal action here

@@ -61,25 +61,24 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private async void Start()
         {
-            switch (ApplicationState.CurrentState)
+            if (DojoGameManager.Instance.GlobalContext.JoinBySpectator)
             {
-                // spectating session
-                case ApplicationStates.Spectating:
-                    ApplicationState.CurrentState = ApplicationStates.Initializing;
-                    CustomLogger.LogDojoLoop("[Initializing Spectate Session]");
-                    InitializeSpectator();
-                    await SetupSpectatorData();
-                    ManagerContext.PlayersManager.Initialize(ManagerContext);
-                    ManagerContext.ContestManager.Initialize(ManagerContext);
-                    InitializeBoard();
-                    ManagerContext.GameLoopManager.Initialize(ManagerContext);
-                    ManagerContext.JokerManager.Initialize(ManagerContext);
-                    
-                    
-                    break;
-                
-                // game session
-                default:
+                ApplicationState.CurrentState = ApplicationStates.Initializing;
+                CustomLogger.LogDojoLoop("[Initializing Spectate Session]");
+                InitializeSpectator();
+                await SetupSpectatorData();
+                ManagerContext.PlayersManager.Initialize(ManagerContext);
+                ManagerContext.ContestManager.Initialize(ManagerContext);
+                InitializeBoard();
+                ManagerContext.GameLoopManager.Initialize(ManagerContext);
+                ManagerContext.JokerManager.Initialize(ManagerContext);
+                ManagerContext.GameLoopManager.StartGame();
+                DojoGameManager.Instance.GlobalContext.JoinBySpectator = false;
+                ApplicationState.CurrentState = ApplicationStates.Spectating;
+                IsInitialized = true;
+            }
+            else
+            {
                 ApplicationState.CurrentState = ApplicationStates.Initializing;
                 CustomLogger.LogDojoLoop("[Initializing Game Session]");
                 Initialize();
@@ -105,7 +104,6 @@ namespace TerritoryWars.Managers.SessionComponents
                 ManagerContext.GameLoopManager.StartGame();
                 ApplicationState.CurrentState = ApplicationStates.Session;
                 IsInitialized = true;
-                    break;
             }
         }
 
@@ -139,7 +137,7 @@ namespace TerritoryWars.Managers.SessionComponents
             _components = new List<ISessionComponent>();
 
             var playersManager = new PlayersManager();
-            var gameManager = new GameLoopManager();
+            var spectatorManager = new SpectatorLoopManager();
             var jokerManager = new JokerManager();
             var contestManager = new ContestManager();
 
@@ -147,12 +145,12 @@ namespace TerritoryWars.Managers.SessionComponents
             ManagerContext.SessionContext = SessionContext;
             ManagerContext.SessionManager = this;
             ManagerContext.PlayersManager = playersManager;
-            ManagerContext.GameLoopManager = gameManager;
+            ManagerContext.GameLoopManager = spectatorManager;
             ManagerContext.JokerManager = jokerManager;
             ManagerContext.ContestManager = contestManager;
 
             _components.Add(playersManager);
-            _components.Add(gameManager);
+            _components.Add(spectatorManager);
             _components.Add(jokerManager);
             _components.Add(contestManager);
         }
@@ -248,6 +246,7 @@ namespace TerritoryWars.Managers.SessionComponents
             UnionFind unionFind = await DojoModels.GetUnionFind(board.Id);
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Union Find retrieved successfully");
             
+            SessionContext.IsSpectatingGame = true;
             SessionContext.LocalPlayerAddress = board.Player1.PlayerId;
 
             SessionContext.Board = board;

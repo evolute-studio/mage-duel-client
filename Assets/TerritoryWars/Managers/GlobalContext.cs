@@ -11,6 +11,7 @@ namespace TerritoryWars.Managers
         public Shop Shop;
         public PlayerProfile PlayerProfile;
         public GameModel GameInProgress;
+        public bool JoinBySpectator;
         public Board BoardForLoad; // used just for loading board, not used in game
         public SessionContext SessionContext;
         

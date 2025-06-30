@@ -29,6 +29,7 @@ namespace TerritoryWars.Tools.DevTools
             {
                 if (GUILayout.Button(boardId))
                 {
+                    DojoGameManager.Instance.GlobalContext.JoinBySpectator = true;
                     LoadBoard(boardId);
                 }
             }
