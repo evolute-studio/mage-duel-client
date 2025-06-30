@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using NativeWebSocket;
@@ -16,6 +17,12 @@ public static class WebSocketClient
     public static WebSocketConfiguration Configuration { get; private set; } = new WebSocketConfiguration();
     
     private static float _lastPingTime = 0f;
+    private static float _connectionCheckInterval = 10f; // Check connection every 10 seconds
+
+    private static List<string> subscribedChannels = new List<string>()
+    {
+        nameof(WSChannels.Ping)
+    };
 
     [Serializable]
     private class Message
@@ -39,8 +46,11 @@ public static class WebSocketClient
         websocket.OnOpen += () =>
         {
             Debug.Log("WebSocket opened");
-            Subscribe(nameof(WSChannels.Ping));
-            Subscribe("chat");
+            // Subscribe to default channels
+            foreach (var channel in subscribedChannels)
+            {
+                Subscribe(channel);
+            }
         };
 
         websocket.OnError += (e) =>
@@ -66,12 +76,14 @@ public static class WebSocketClient
     public static async void Subscribe(string channelName)
     {
         var msg = new Message { action = "subscribe", channel = channelName };
+        if(!subscribedChannels.Contains(channelName)) subscribedChannels.Add(channelName);
         await SendJson(msg);
     }
 
     public static async void Unsubscribe(string channelName)
     {
         var msg = new Message { action = "unsubscribe", channel = channelName };
+        if(subscribedChannels.Contains(channelName)) subscribedChannels.Remove(channelName);
         await SendJson(msg);
     }
 
@@ -95,23 +107,15 @@ public static class WebSocketClient
 #if !UNITY_WEBGL || UNITY_EDITOR
         websocket?.DispatchMessageQueue();
 #endif
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Publish("chat", "{\"text\":\"Test!\"}");
-        }
-        
-        
     }
-    
-    private static void PingEvent()
+
+    private static void CheckConnection()
     {
-        string accountAddress = DojoGameManager.Instance?.LocalAccount?.Address?.Hex();
-        if (string.IsNullOrEmpty(accountAddress))
+        if (websocket.State == WebSocketState.Closed || websocket.State == WebSocketState.Closing)
         {
-            return;
+            Debug.LogWarning("WebSocket is not connected, attempting to reconnect...");
+            Initialize();
         }
-        Publish("ping", "{\"address\":\"Ping!\"}");
     }
 
     public static async void Dispose()
