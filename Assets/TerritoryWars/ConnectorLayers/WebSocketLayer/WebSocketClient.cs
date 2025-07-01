@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using NativeWebSocket;
+using TerritoryWars.DataModels.WebSocketEvents;
 using TerritoryWars.Dojo;
 using TerritoryWars.General;
+using TerritoryWars.Tools;
 using UnityEngine;
 
 namespace TerritoryWars.ConnectorLayers.WebSocketLayer
@@ -24,6 +26,8 @@ public static class WebSocketClient
         nameof(WSChannels.Ping)
     };
 
+    public static OnlinePlayers OnlinePlayersData { get; private set; } = new OnlinePlayers();
+
     [Serializable]
     private class Message
     {
@@ -35,8 +39,31 @@ public static class WebSocketClient
     [Serializable]
     public class IncomingMessage
     {
+        public string action;
         public string channel;
         public string payload;
+    }
+
+    [Serializable]
+    public class OnlinePlayers
+    {
+        public PlayersListWrapper players;
+        public bool[] onlineStatus;
+        
+        public Dictionary<string, bool> ToDictionary()
+        {
+            var dict = new Dictionary<string, bool>();
+            for (int i = 0; i < players.players.Count; i++)
+            {
+                dict[players.players[i]] = onlineStatus[i];
+            }
+            return dict;
+        }
+    }
+    [Serializable]
+    public class PlayersListWrapper
+    {
+        public List<string> players;
     }
 
     public static async void Initialize()
@@ -66,7 +93,9 @@ public static class WebSocketClient
         websocket.OnMessage += (bytes) =>
         {
             var json = Encoding.UTF8.GetString(bytes);
+            CustomLogger.LogImportant($"[WebSocketClient] Received message: {json}");
             var msg = JsonUtility.FromJson<IncomingMessage>(json);
+            CustomLogger.LogImportant($"[WebSocketClient] Action: {msg.action}, Channel: {msg.channel}, Payload: {msg.payload}");
             EventBus.Publish(msg);
         };
 
@@ -90,6 +119,24 @@ public static class WebSocketClient
     public static async void Publish(string channelName, string payload)
     {
         var msg = new Message { action = "publish", channel = channelName, payload = payload };
+        await SendJson(msg);
+    }
+
+    public static async void Ping(PingEvent ping)
+    {
+        string payload = JsonUtility.ToJson(ping);
+        var msg = new Message { action = "ping", payload = payload };
+        await SendJson(msg);
+    }
+
+    public static async void CheckOnline(List<string> players)
+    {
+        CustomLogger.LogImportant($"[WebSocketClient] Checking online status for players: {string.Join(", ", players)}");
+        OnlinePlayersData.players = new PlayersListWrapper { players = players };
+    
+        var wrapper = new PlayersListWrapper { players = players };
+        string payload = JsonUtility.ToJson(wrapper);
+        var msg = new Message { action = "check_online", payload = payload };
         await SendJson(msg);
     }
 

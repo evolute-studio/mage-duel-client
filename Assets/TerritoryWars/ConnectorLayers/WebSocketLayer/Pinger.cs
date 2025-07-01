@@ -42,6 +42,7 @@ namespace TerritoryWars.ConnectorLayers.WebSocketLayer
             };
             string payload = JsonUtility.ToJson(pingEvent);
             WebSocketClient.Publish(nameof(WSChannels.Ping), payload);
+            WebSocketClient.Ping(pingEvent);
         }
     }
 

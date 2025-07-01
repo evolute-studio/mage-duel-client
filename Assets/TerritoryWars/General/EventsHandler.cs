@@ -1,3 +1,4 @@
+using System.Linq;
 using Dojo;
 using TerritoryWars.DataModels;
 using TerritoryWars.DataModels.Events;
@@ -82,6 +83,12 @@ namespace TerritoryWars.General
                     return;
                 }
                 EventBus.Publish(moveSneakPeek);
+            }
+            else if (message.action == "online_status")
+            {
+                CustomLogger.LogImportant($"[WebSocketClient] Online status received: {message.payload}");
+                WebSocketClient.OnlinePlayersData.onlineStatus = ParseBinaryStatus(message.payload);
+                EventBus.Publish(WebSocketClient.OnlinePlayersData);
             }
         }
 
@@ -295,6 +302,11 @@ namespace TerritoryWars.General
                     EventBus.Publish(pingEvent);
                     break;
             }
+        }
+        
+        private bool[] ParseBinaryStatus(string binaryString)
+        {
+            return binaryString.Select(c => c == '1').ToArray();
         }
 
 

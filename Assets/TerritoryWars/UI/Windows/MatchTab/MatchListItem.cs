@@ -15,6 +15,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
         public string PlayerName;
         public uint EvoluteCount;
         public string HostPlayer;
+        public bool IsOnline => OnlineStatus.IsOnline;
 
         public TextMeshProUGUI PlayerNameText;
         public TextMeshProUGUI AddressText;

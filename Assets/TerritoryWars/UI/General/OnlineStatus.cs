@@ -9,7 +9,7 @@ namespace TerritoryWars.UI.General
 {
     public class OnlineStatus : MonoBehaviour
     {
-        
+        public bool IsOnline => OnlineStatusImage.color == WebSocketClient.Configuration.OnlineStatusColor;
         public Image OnlineStatusImage;
 
         private string PlayerAddress;
@@ -34,6 +34,23 @@ namespace TerritoryWars.UI.General
             if (PlayerAddress == pingEvent.Address)
             {
                 UpdateOnline();
+            }
+        }
+
+        public void SetOnline(bool online)
+        {
+            if (online)
+            {
+                UpdateOnline();
+            }
+            else
+            {
+                if (_onlineStatusCoroutine != null) 
+                {
+                    StopCoroutine(_onlineStatusCoroutine);
+                    _onlineStatusCoroutine = null;
+                }
+                OnlineStatusImage.color = WebSocketClient.Configuration.OfflineStatusColor;
             }
         }
 

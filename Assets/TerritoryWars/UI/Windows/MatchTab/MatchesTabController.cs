@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using Dojo;
 using Dojo.Starknet;
 using TerritoryWars.ConnectorLayers.Dojo;
+using TerritoryWars.ConnectorLayers.WebSocketLayer;
 using TerritoryWars.DataModels;
 using TerritoryWars.DataModels.WebSocketEvents;
 using TerritoryWars.Dojo;
@@ -20,8 +22,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
         [Header("Additional References", order = 0)]
         [SerializeField] private Button createMatchButton;
         [SerializeField] private Button createBotMatchButton;
-        
-        
+        [SerializeField] private CanvasGroup itemsParentCanvasGroup;
         
         private int _createdMatchesCount = 0;
 
@@ -48,8 +49,16 @@ namespace TerritoryWars.UI.Windows.MatchTab
         {
             base.PanelActiveTrue();
             ApplicationState.SetState(ApplicationStates.MatchTab);
+            SetActiveItems(false);
+            Invoke(nameof(ActivatePanel), 2f);
             FetchData();
             DojoGameManager.Instance.WorldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
+            EventBus.Subscribe<WebSocketClient.OnlinePlayers>(OnOnlinePlayers);
+            
+            void ActivatePanel()
+            {
+                SetActiveItems(true);
+            }
         }
 
         protected override void PanelActiveFalse()
@@ -59,7 +68,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
             DojoGameManager.Instance.CustomSynchronizationMaster.DestroyPlayersExceptLocal(DojoGameManager.Instance.LocalAccount.Address);
             DojoGameManager.Instance.CustomSynchronizationMaster.DestroyAllGames();
             DojoGameManager.Instance.WorldManager.synchronizationMaster.OnEventMessage.RemoveListener(OnEventMessage);
-
+            EventBus.Unsubscribe<WebSocketClient.OnlinePlayers>(OnOnlinePlayers);
         }
         
         // Network Window Methods
@@ -76,16 +85,62 @@ namespace TerritoryWars.UI.Windows.MatchTab
             }
         }
 
+        private void OnOnlinePlayers(WebSocketClient.OnlinePlayers players)
+        {
+            Dictionary<string, bool> onlinePlayers = players.ToDictionary();
+            CustomLogger.LogImportant($"[WebSocketClient] Online players received: {onlinePlayers.Count}");
+            foreach (MatchListItem matchListItem in listItems)
+            {
+                if (onlinePlayers.TryGetValue(matchListItem.HostPlayer, out bool isOnline))
+                {
+                    matchListItem.OnlineStatus.SetOnline(isOnline);
+                }
+            }
+            listItems.Sort((a, b) => 
+                ((MatchListItem)a).IsOnline.CompareTo(((MatchListItem)b).IsOnline) * -1);
+            
+            for (int i = 0; i < listItems.Count; i++)
+            {
+                (listItems[i] as MatchListItem)?.ListItem.transform.SetSiblingIndex(i);
+            }
+            
+            SetActiveItems(true);
+        }
+
+        private void SetActiveItems(bool active)
+        {
+            itemsParentCanvasGroup.alpha = active ? 1f : 0f;
+        }
+
+        private void GetOnline(List<string> players)
+        {
+            WebSocketClient.CheckOnline(players);
+        }
+
         protected override async void FetchData()
         {
             try
             {
                 await DojoGameManager.Instance.SyncCreatedGames();
                 GameObject[] games = DojoGameManager.Instance.GetGames();
-
-                foreach (var game in games)
+                evolute_duel_Game[] gameModels = new evolute_duel_Game[games.Length];
+                List<string> players = new List<string>();
+                
+                for (int i = 0; i < games.Length; i++)
                 {
-                    if (!game.TryGetComponent(out evolute_duel_Game gameModel)) return;
+                    if (!games[i].TryGetComponent(out evolute_duel_Game gameModel))
+                    {
+                        CustomLogger.LogError("MatchesTabController. Game model not found on game object");
+                        continue;
+                    }
+                    gameModels[i] = gameModel;
+                    players.Add(gameModel.player.Hex());
+                }
+                
+                GetOnline(players);
+
+                foreach (var gameModel in gameModels)
+                {
                     PlayerProfile player = await DojoModels.GetPlayerProfile(gameModel.player.Hex());
                     if(IsMatchListItemExists(player.PlayerId)) continue;
                     
