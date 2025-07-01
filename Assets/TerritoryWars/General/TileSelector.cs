@@ -37,7 +37,7 @@ namespace TerritoryWars.General
         [SerializeField] private Color selectedHighlightColor = new Color(0f, 1f, 0f, 0.3f);
         [SerializeField] private Color invalidHighlightColor = new Color(1f, 0f, 0f, 0.3f);
 
-        private TileData currentTile;
+        [SerializeField] private TileData currentTile;
         private GameObject highlightedTiles;
         private List<int> currentValidRotations;
         public Vector2Int? selectedPosition;
@@ -146,8 +146,12 @@ namespace TerritoryWars.General
         {
             currentTile = tile;
             gameUI.UpdateUI();
+            
             tilePreview.UpdatePreview(tile);
+            CustomLogger.LogImportant($"[HousesFix]: tilePreview.HouseSprites.Count = {tilePreview.HouseSprites.Count}");
+            CustomLogger.LogImportant($"[HousesFix]: currentTIle.HouseSprites.Count = {currentTile.HouseSprites.Count}");
             currentTile.HouseSprites.AddRange(tilePreview.HouseSprites);
+            CustomLogger.LogObject(currentTile.HouseSprites, "TileSelector: SetCurrentTile - House Sprites. Count: " + currentTile.HouseSprites.Count);
         }
         public bool IsExistValidPlacement(TileData tile)
         {
@@ -158,8 +162,7 @@ namespace TerritoryWars.General
         {
             GameUI.Instance.SetEndTurnButtonActive(false);
             tilePreview.ResetPosition();
-            tilePreview.UpdatePreview(tile);
-            currentTile = tile;
+            SetCurrentTile(tile);
             initialTileConfig = tile.RotatedConfig;
             isPlacingTile = true;
             selectedPosition = null;

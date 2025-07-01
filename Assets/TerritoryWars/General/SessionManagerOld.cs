@@ -340,7 +340,6 @@ namespace TerritoryWars.General
 
             TileData currentTile = GetNextTile();
             currentTile.SetOwner(LocalPlayer.PlayerSide);
-            TileSelector.SetCurrentTile(_nextTile);
             if (TileSelector.IsExistValidPlacement(currentTile))
             {
                 TileSelector.StartTilePlacement(currentTile);
@@ -369,7 +368,6 @@ namespace TerritoryWars.General
             }
 
             UpdateTile();
-            TileSelector.SetCurrentTile(GetNextTile());
             RemotePlayer.StartSelectingAnimation();
             evolute_duel_Board board = new evolute_duel_Board();// DojoGameManager.Instance.DojoSessionManager.LocalPlayerBoard;
             Players[0].UpdateData(board.player1.Item3);
@@ -441,7 +439,6 @@ namespace TerritoryWars.General
         {
             tile.Rotate(rotation);
             tile.SetOwner(RemotePlayer.PlayerSide);
-            TileSelector.SetCurrentTile(tile);
             TileSelector.tilePreview.SetPosition(new Vector2Int(position.x + 1, position.y + 1));
             yield return new WaitForSeconds(0.3f);
             TileSelector.tilePreview.PlaceTile(tile, () =>
