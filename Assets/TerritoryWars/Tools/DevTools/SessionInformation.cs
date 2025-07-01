@@ -12,14 +12,14 @@ namespace TerritoryWars.Tools.DevTools
             {
                 GUILayout.BeginVertical();
                 GUILayout.Label($"Player 1");
-                GUILayout.Label($"{SessionManager.Instance.SessionContext.Board.Player1.Username}");
-                GUILayout.Label($"{SessionManager.Instance.SessionContext.Board.Player1.PlayerId}");
-                GUILayout.Label($"{SessionManager.Instance.SessionContext.Board.Player1.Score.TotalScore}");
+                GUILayout.Label($"{SessionManager.Instance.SessionContext.PlayersData[0].Username}");
+                GUILayout.Label($"{SessionManager.Instance.SessionContext.PlayersData[0].PlayerId}");
+                GUILayout.Label($"{SessionManager.Instance.SessionContext.PlayersData[0].Score.TotalScore}");
                 
                 GUILayout.Label("Player 2");
-                GUILayout.Label($"{SessionManager.Instance.SessionContext.Board.Player2.Username}");
-                GUILayout.Label($"{SessionManager.Instance.SessionContext.Board.Player2.PlayerId}");
-                GUILayout.Label($"{SessionManager.Instance.SessionContext.Board.Player2.Score.TotalScore}");
+                GUILayout.Label($"{SessionManager.Instance.SessionContext.PlayersData[1].Username}");
+                GUILayout.Label($"{SessionManager.Instance.SessionContext.PlayersData[1].PlayerId}");
+                GUILayout.Label($"{SessionManager.Instance.SessionContext.PlayersData[1].Score.TotalScore}");
                 
                 GUILayout.EndVertical();
             }

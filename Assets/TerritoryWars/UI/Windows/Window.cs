@@ -30,9 +30,17 @@ namespace TerritoryWars.UI.Windows
             scrollBar.SetActive(withScrollBar);
         }
         
-        protected virtual T CreateListItem<T>() where T : class
+        protected virtual T CreateListItem<T>(GameObject anotherListItemPrefab = null) where T : class
         {
-            GameObject listItem = Instantiate(listItemPrefab, listItemParent);
+            GameObject listItem;
+            if (anotherListItemPrefab != null)
+            {
+                listItem = Instantiate(anotherListItemPrefab, listItemParent);
+            }
+            else
+            {
+                listItem = Instantiate(listItemPrefab, listItemParent);
+            }
             T matchListItem = listItem.GetComponent<T>();
             listItems.Add(matchListItem);
             return matchListItem;
