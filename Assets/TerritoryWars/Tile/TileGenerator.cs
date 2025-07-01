@@ -56,6 +56,7 @@ namespace TerritoryWars.Tile
 
         public void Generate(TileData data, bool isTilePlacing = false)
         {
+            CustomLogger.LogObject(data.HouseSprites,  "TileGenerator: Generate tile data houses");
             _tileData = data;
             _isTilePlacing = isTilePlacing;
             Generate();
@@ -170,6 +171,7 @@ namespace TerritoryWars.Tile
 
             if (_housesParent != null)
             { 
+                CustomLogger.LogObject(_tileData.HouseSprites, "TileGenerator: generate houses for tile: " + _tileData.Position + " houses count: " + _housesParent.Count);
                 for (int i = 0; i < _housesParent.Count; i++)
                 {
                     int playerId = _tileData.PlayerSide;

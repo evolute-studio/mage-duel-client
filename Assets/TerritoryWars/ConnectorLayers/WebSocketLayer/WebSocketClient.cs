@@ -93,9 +93,7 @@ public static class WebSocketClient
         websocket.OnMessage += (bytes) =>
         {
             var json = Encoding.UTF8.GetString(bytes);
-            CustomLogger.LogImportant($"[WebSocketClient] Received message: {json}");
             var msg = JsonUtility.FromJson<IncomingMessage>(json);
-            CustomLogger.LogImportant($"[WebSocketClient] Action: {msg.action}, Channel: {msg.channel}, Payload: {msg.payload}");
             EventBus.Publish(msg);
         };
 

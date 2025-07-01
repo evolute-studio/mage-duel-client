@@ -86,7 +86,6 @@ namespace TerritoryWars.General
             }
             else if (message.action == "online_status")
             {
-                CustomLogger.LogImportant($"[WebSocketClient] Online status received: {message.payload}");
                 WebSocketClient.OnlinePlayersData.onlineStatus = ParseBinaryStatus(message.payload);
                 EventBus.Publish(WebSocketClient.OnlinePlayersData);
             }
