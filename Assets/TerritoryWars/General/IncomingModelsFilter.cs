@@ -228,6 +228,8 @@ namespace TerritoryWars.General
                     {
                         GameStatus.Created => true,
                         GameStatus.Canceled => true,
+                        GameStatus.InProgress => true,
+                        GameStatus.Finished => true,
                         _ => false
                     };
                     return isCreated;

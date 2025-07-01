@@ -235,7 +235,9 @@ namespace TerritoryWars.General
 
         public void ScoreClientPrediction(int playerIndex, TileData data)
         {
-            if (data.PlayerSide != SessionManager.Instance.SessionContext.LocalPlayer.PlayerSide && !SessionManager.Instance.SessionContext.IsSpectatingGame) return;
+            if(SessionManager.Instance.SessionContext.IsSpectatingGame) return;
+            
+            if (data.PlayerSide != SessionManager.Instance.SessionContext.LocalPlayer.PlayerSide) return;
             GameUI.Instance.playerInfoUI.AddClientCityScore(playerIndex, data.Type.Count(c => c == 'C') * 2);
             GameUI.Instance.playerInfoUI.AddClientRoadScore(playerIndex, data.Type.Count(r => r == 'R'));
             SessionManager.Instance.ManagerContext.JokerManager.UpdateLocalPlayerJokerCount();

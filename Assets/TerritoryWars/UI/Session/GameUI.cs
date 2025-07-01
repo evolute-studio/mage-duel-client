@@ -253,6 +253,22 @@ namespace TerritoryWars.UI.Session
             }
         }
 
+        public void SetSpectatingDeckContainer(bool active)
+        {
+            if (active)
+            {
+                _deckContainerCanvasGroup.DOFade(1, 0.5f);
+                _deckButton1CanvasGroup.alpha = 0f;
+                _deckButton2CanvasGroup.alpha = 0f;
+                jokerButton.interactable = false;
+                deckButton.interactable = false;
+            }
+            else
+            {
+                SetActiveDeckContainer(false);
+            }
+        }
+
         public void ShowNextTileActive(bool active, Action callback = null, TileData tile = null, float delay = 0.5f)
         {
             if (active && tile != null)
