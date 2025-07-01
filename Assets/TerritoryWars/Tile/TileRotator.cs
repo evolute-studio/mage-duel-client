@@ -173,7 +173,6 @@ namespace TerritoryWars.Tile
 
         public void RotateTile(int times = 1)
         {
-            Debug.Log("Rotating tile: " + times);
             if (SimpleRotationObjects != null)
             {
                 foreach (var simpleRotationObject in SimpleRotationObjects)

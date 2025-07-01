@@ -148,10 +148,7 @@ namespace TerritoryWars.General
             gameUI.UpdateUI();
             
             tilePreview.UpdatePreview(tile);
-            CustomLogger.LogImportant($"[HousesFix]: tilePreview.HouseSprites.Count = {tilePreview.HouseSprites.Count}");
-            CustomLogger.LogImportant($"[HousesFix]: currentTIle.HouseSprites.Count = {currentTile.HouseSprites.Count}");
             currentTile.HouseSprites.AddRange(tilePreview.HouseSprites);
-            CustomLogger.LogObject(currentTile.HouseSprites, "TileSelector: SetCurrentTile - House Sprites. Count: " + currentTile.HouseSprites.Count);
         }
         public bool IsExistValidPlacement(TileData tile)
         {

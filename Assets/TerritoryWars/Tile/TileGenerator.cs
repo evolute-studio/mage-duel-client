@@ -56,7 +56,6 @@ namespace TerritoryWars.Tile
 
         public void Generate(TileData data, bool isTilePlacing = false)
         {
-            CustomLogger.LogObject(data.HouseSprites,  "TileGenerator: Generate tile data houses");
             _tileData = data;
             _isTilePlacing = isTilePlacing;
             Generate();
@@ -92,10 +91,7 @@ namespace TerritoryWars.Tile
 
         public void Rotate()
         {
-            string s = "Previous config: " + _tileData.RotatedConfig;
             _tileData.Rotate();
-            s += " Rotated config: " + _tileData.RotatedConfig;
-            Debug.Log(s);
             
             InitializeTile();
             

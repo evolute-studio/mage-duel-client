@@ -1,5 +1,6 @@
 using System.Collections;
 using TerritoryWars.ConnectorLayers.WebSocketLayer;
+using TerritoryWars.DataModels.ClientEvents;
 using TerritoryWars.DataModels.WebSocketEvents;
 using TerritoryWars.General;
 using UnityEngine;
@@ -27,6 +28,7 @@ namespace TerritoryWars.UI.General
         {
             OnlineStatusImage.color = status ? WebSocketClient.Configuration.OnlineStatusColor 
                                              : WebSocketClient.Configuration.OfflineStatusColor;
+            EventBus.Publish(new OnlineStatusChanged(){Address = PlayerAddress, IsOnline = status});
         }
 
         private void OnPingEvent(PingEvent pingEvent)
@@ -51,7 +53,9 @@ namespace TerritoryWars.UI.General
                     _onlineStatusCoroutine = null;
                 }
                 OnlineStatusImage.color = WebSocketClient.Configuration.OfflineStatusColor;
+                EventBus.Publish(new OnlineStatusChanged(){Address = PlayerAddress, IsOnline = false});
             }
+            
         }
 
         public void UpdateOnline()
@@ -67,9 +71,11 @@ namespace TerritoryWars.UI.General
 
         private IEnumerator OnlineStatusCoroutine()
         {
+            EventBus.Publish(new OnlineStatusChanged(){Address = PlayerAddress, IsOnline = true});
             OnlineStatusImage.color = WebSocketClient.Configuration.OnlineStatusColor;
             yield return new WaitForSeconds(WebSocketClient.Configuration.PingInterval + 1f);
             OnlineStatusImage.color = WebSocketClient.Configuration.OfflineStatusColor;
+            EventBus.Publish(new OnlineStatusChanged(){Address = PlayerAddress, IsOnline = false});
         }
         
         private void OnDestroy()
