@@ -41,8 +41,8 @@ namespace TerritoryWars.Managers.SessionComponents
             
             Players = new Player[2];
             ref Board board = ref _managerContext.SessionContext.Board;
-            GameObject hostPrefab = PrefabsManager.Instance.GetPlayer(board.Player1.ActiveSkin);
-            GameObject guestPrefab = PrefabsManager.Instance.GetPlayer(board.Player2.ActiveSkin);
+            GameObject hostPrefab = PrefabsManager.Instance.GetPlayer(_managerContext.SessionContext.PlayersData[0].ActiveSkin);
+            GameObject guestPrefab = PrefabsManager.Instance.GetPlayer(_managerContext.SessionContext.PlayersData[1].ActiveSkin);
             GameObject hostObject = Object.Instantiate(hostPrefab, Vector3.zero, Quaternion.identity);
             GameObject guestObject = Object.Instantiate(guestPrefab, Vector3.zero, Quaternion.identity);
 
