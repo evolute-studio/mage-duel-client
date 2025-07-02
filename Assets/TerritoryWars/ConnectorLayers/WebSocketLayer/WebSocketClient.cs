@@ -140,6 +140,7 @@ public static class WebSocketClient
 
     private static async Task SendJson(object obj)
     {
+        CheckConnection();
         if (websocket.State == WebSocketState.Open)
         {
             string json = JsonUtility.ToJson(obj);
@@ -156,7 +157,7 @@ public static class WebSocketClient
 
     private static void CheckConnection()
     {
-        if (websocket.State == WebSocketState.Closed || websocket.State == WebSocketState.Closing)
+        if (websocket == null || websocket.State == WebSocketState.Closed || websocket.State == WebSocketState.Closing)
         {
             Debug.LogWarning("WebSocket is not connected, attempting to reconnect...");
             Initialize();
