@@ -4,6 +4,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace TerritoryWars.ExternalConnections
 {
@@ -95,7 +96,7 @@ namespace TerritoryWars.ExternalConnections
                 embeds = new List<Embed> { embed }
             };
 
-            string payloadJson = JsonUtility.ToJson(payload);
+            string payloadJson = JsonConvert.SerializeObject(payload);
             form.AddField("payload_json", payloadJson);
 
             if (imageData != null && !string.IsNullOrEmpty(imageFileName))

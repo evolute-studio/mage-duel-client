@@ -1,23 +1,26 @@
-using System.Collections;
-using UnityEngine;
-using System.Text;
-using TerritoryWars.Tools;
 using System.Collections.Generic;
+using System.Text;
 using Newtonsoft.Json;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
-using LogType = TerritoryWars.Tools.LogType;
+using UnityEngine;
 
-namespace TerritoryWars.Managers
+namespace TerritoryWars.Managers.Reports
 {
     public class ReportSystem : MonoBehaviour
     {
         public static ReportSystem Instance;
+        
         public string webhookUrl;
+        public ReportConfigs Configs;
+        public bool SendInEditor = true;
         private DiscordWebhook webhook;
         
         private readonly List<string> recentLogs = new List<string>();
         private const int MaxLogCount = 1000;
+        
+        public char divider = '-';
+        public int count = 50;
 
         public void Awake()
         {
@@ -33,10 +36,63 @@ namespace TerritoryWars.Managers
             
             Application.logMessageReceived += HandleLog;
         }
-
-        private void OnDestroy()
+        
+        [ContextMenu("Send Test Report")]
+        public void SendTest()
         {
-            Application.logMessageReceived -= HandleLog;
+            //SendReportTest();
+            SendReport(ReportType.Feedback, "Feedback message for testing purposes.");
+            SendReport(ReportType.Bug, "Bug message for testing purposes.");
+            SendReport(ReportType.CriticalIssue, "Critical issue message for testing purposes.");
+            SendReport(ReportType.PossibleProblem, "Possible problem message for testing purposes.");
+        }
+
+        public void SendReport(ReportType type, string message)
+        {
+            if (string.IsNullOrEmpty(webhookUrl))
+            {
+                Debug.LogError("Webhook URL is not set.");
+                return;
+            }
+            
+            var config = Configs.GetReportConfig(type);
+            
+            StartCoroutine(webhook.SendEmbed(
+                title: config.Title,
+                description: message,
+                color: ColorToDiscordInt(config.Color),
+                imageData: config.IncludeScreenshots ? GetScreenshot() : null,
+                imageFileName: config.IncludeScreenshots ? "screenshot.png" : null,
+                fileData: config.IncludeLogs ? GetLogsFile() : null,
+                fileName: config.IncludeLogs ? "logs.txt" : null,
+                content: $"{new string(divider, count)}\n" + (config.TagUsers ? config.GetUsersToTagContent() : null),
+                allowedMentionsUserIds: config.TagUsers ? config.UsersToTag : null
+            ));
+        }
+        
+        public void SendReportTest()
+        {
+            if (string.IsNullOrEmpty(webhookUrl))
+            {
+                Debug.LogError("Webhook URL is not set.");
+                return;
+            }
+            
+            var config = Configs.GetReportConfig(ReportType.Feedback);
+            
+            StartCoroutine(webhook.SendEmbed(
+                title: config.Title,
+                description: "message",
+                color: config.Color.GetHashCode(),
+                fields: new List<(string name, string value, bool inline)> { ("Field1", "Value1", true), ("Field2", "Value2", false) },
+                imageData: GetScreenshot(),
+                imageFileName: "screenshot.png",
+                fileData: GetLogsFile(),
+                fileName: "logs.txt",
+                // add divider and count to the content
+                content: $"{new string(divider, count)}\n" + config.GetUsersToTagContent(),
+                allowedMentionsUserIds: config.UsersToTag
+            ));
         }
 
         private void HandleLog(string logString, string stackTrace, UnityEngine.LogType type)
@@ -59,38 +115,7 @@ namespace TerritoryWars.Managers
             }
         }
 
-        [ContextMenu("Send Test Report")]
-        public void SendTest()
-        {
-            SendReport("Test");
-        }
         
-        private void SendReport(string message)
-        {
-            if (string.IsNullOrEmpty(webhookUrl))
-            {
-                Debug.LogError("Webhook URL is not set.");
-                return;
-            }
-
-            var fields = new List<(string name, string value, bool inline)>
-            {
-                ("Text File", "Here is a text file with some data.", true)
-            };
-
-            StartCoroutine(webhook.SendEmbed(
-                title: "Title",
-                description: "Description",
-                color: 0xFF0000,
-                fields: fields,
-                imageData: GetScreenshot(),
-                imageFileName: "screenshot.png",
-                fileData: GetLogsFile(),
-                fileName: "logs.txt",
-                content: "<@464742638738997250>",
-                allowedMentionsUserIds: new List<string> { "464742638738997250" }
-            ));
-        }
 
         private byte[] GetScreenshot()
         {
@@ -164,6 +189,17 @@ namespace TerritoryWars.Managers
             }
             
             return System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+        }
+        
+        private int ColorToDiscordInt(Color color)
+        {
+            Color32 c = color;
+            return (c.r << 16) | (c.g << 8) | c.b;
+        }
+        
+        private void OnDestroy()
+        {
+            Application.logMessageReceived -= HandleLog;
         }
     }
 }
