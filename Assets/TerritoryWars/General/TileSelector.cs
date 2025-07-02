@@ -509,7 +509,6 @@ namespace TerritoryWars.General
                 
                 currentTile.UpdateData(currentTile.RotatedConfig, selectedPosition.Value, currentTile.PlayerSide);
             }
-            CustomLogger.LogObject(currentTile.HouseSprites, "TileSelector: CompleteTilePlacement - House Sprites");
             if (board.PlaceTile(currentTile))//, selectedPosition.Value.x, selectedPosition.Value.y,SessionManagerOld.Instance.CurrentTurnPlayer.PlayerSide))
             {
                 LastMove = (currentTile, selectedPosition.Value);
