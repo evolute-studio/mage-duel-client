@@ -17,7 +17,7 @@ namespace TerritoryWars.Managers
         private DiscordWebhook webhook;
         
         private readonly List<string> recentLogs = new List<string>();
-        private const int MaxLogCount = 1000; // Зберігаємо останні 100 логів
+        private const int MaxLogCount = 1000;
 
         public void Awake()
         {
@@ -29,10 +29,8 @@ namespace TerritoryWars.Managers
             Instance = this;
             DontDestroyOnLoad(gameObject);
             
-            // Ініціалізуємо вебхук
             webhook = new DiscordWebhook(webhookUrl);
             
-            // Підписуємось на логи
             Application.logMessageReceived += HandleLog;
         }
 
@@ -43,14 +41,13 @@ namespace TerritoryWars.Managers
 
         private void HandleLog(string logString, string stackTrace, UnityEngine.LogType type)
         {
-            string formattedLog = $"[{System.DateTime.Now:HH:mm:ss}] [{type}] {logString}";
+            string formattedLog = $"[{System.DateTime.Now.ToUniversalTime():HH:mm:ss}] [{type}] {logString}";
             if (type == UnityEngine.LogType.Exception || type == UnityEngine.LogType.Error)
             {
                 formattedLog += $"\nStackTrace:\n{stackTrace}";
             }
             else if (type == UnityEngine.LogType.Warning)
                 return;
-            
             
             lock (recentLogs)
             {
@@ -82,14 +79,16 @@ namespace TerritoryWars.Managers
             };
 
             StartCoroutine(webhook.SendEmbed(
-                title: "Report",
-                description: "<@464742638738997250>",
-                color: 0xFF0000, // червоний
+                title: "Title",
+                description: "Description",
+                color: 0xFF0000,
                 fields: fields,
                 imageData: GetScreenshot(),
                 imageFileName: "screenshot.png",
                 fileData: GetLogsFile(),
-                fileName: "logs.txt"
+                fileName: "logs.txt",
+                content: "<@464742638738997250>",
+                allowedMentionsUserIds: new List<string> { "464742638738997250" }
             ));
         }
 
@@ -103,18 +102,15 @@ namespace TerritoryWars.Managers
         {
             var sb = new StringBuilder();
             
-            // Додаємо заголовок
-            sb.AppendLine("=== Territory Wars Logs ===");
-            sb.AppendLine($"Time: {(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1)))}");
+            sb.AppendLine("=== Mage Duel Logs ===");
+            sb.AppendLine($"Time: {System.DateTime.Now.ToUniversalTime()}");
             sb.AppendLine();
             
-            // Додаємо системну інформацію
             sb.AppendLine("=== System Info ===");
             sb.AppendLine($"Platform: {Application.platform}");
             sb.AppendLine($"Application Version: {Application.version}");
             sb.AppendLine();
             
-            // Account information
             sb.AppendLine("=== Account Info ===");
             if (DojoGameManager.Instance?.LocalAccount == null)
             {
@@ -128,7 +124,6 @@ namespace TerritoryWars.Managers
                 sb.AppendLine();
             }
             
-            // Session data
             sb.AppendLine("=== Session Data ===");
             if (DojoGameManager.Instance?.GlobalContext?.SessionContext == null)
             {
@@ -159,7 +154,6 @@ namespace TerritoryWars.Managers
             // }
             sb.AppendLine();
             
-            // Додаємо останні логи
             sb.AppendLine("=== Recent Logs ===");
             lock (recentLogs)
             {

@@ -44,9 +44,17 @@ namespace TerritoryWars.ExternalConnections
         }
 
         [Serializable]
+        private class AllowedMentions
+        {
+            public List<string> users;
+        }
+
+        [Serializable]
         private class Payload
         {
             public string username;
+            public string content;
+            public AllowedMentions allowed_mentions;
             public List<Embed> embeds = new List<Embed>();
         }
 
@@ -58,7 +66,9 @@ namespace TerritoryWars.ExternalConnections
             byte[] imageData = null,
             string imageFileName = null,
             byte[] fileData = null,
-            string fileName = null)
+            string fileName = null,
+            string content = null,
+            List<string> allowedMentionsUserIds = null)
         {
             WWWForm form = new WWWForm();
 
@@ -80,6 +90,8 @@ namespace TerritoryWars.ExternalConnections
             var payload = new Payload
             {
                 username = username,
+                content = content,
+                allowed_mentions = allowedMentionsUserIds != null ? new AllowedMentions { users = allowedMentionsUserIds } : null,
                 embeds = new List<Embed> { embed }
             };
 
