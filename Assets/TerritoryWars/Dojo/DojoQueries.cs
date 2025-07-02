@@ -74,7 +74,7 @@ namespace TerritoryWars.Dojo
                 GetModelName<evolute_duel_Player>(),
                 "balance",
                 dojo.ComparisonOperator.Gte,
-                new MemberValue(new Primitive { U8 = (byte)playersBalance })
+                new MemberValue(new Primitive { U32 = (byte)playersBalance })
             );
             
             OrderBy[] order_by = new[]
