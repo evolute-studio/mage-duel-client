@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Dojo.Starknet;
 using UnityEngine;
 
@@ -87,6 +88,50 @@ namespace TerritoryWars.Contracts
             return json;
         }
 
+        public static string commit_tiles(uint[] commitments)
+        {
+            string[] callData = new string[commitments.Length + 1];
+            callData[0] = commitments.Length.ToString();
+            for (int i = 0; i < commitments.Length; i++)
+            {
+                callData[i + 1] = commitments[i].ToString();
+            }
+            Transaction tx = new Transaction
+            {
+                contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
+                entrypoint = "commit_tiles",
+                calldata = callData,
+            };
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
+        }
+        
+        public static string reveal_tile(byte tileIndex, FieldElement nonce, byte c)
+        {
+            Transaction tx = new Transaction
+            {
+                contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
+                entrypoint = "reveal_tile",
+                calldata = new string[] { tileIndex.ToString(), nonce.Hex(), c.ToString() }
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
+        }
+        
+        public static string request_next_tile(byte tileIndex, FieldElement nonce, byte c)
+        {
+            Transaction tx = new Transaction
+            {
+                contractAddress = EVOLUTE_DUEL_GAME_ADDRESS,
+                entrypoint = "request_next_tile",
+                calldata = new string[] { tileIndex.ToString(), nonce.Hex(), c.ToString() }
+            };
+            
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(tx);
+            return json;
+        }
+
         public static string make_move(Option<byte> jokerTile, byte rotation, byte col, byte row)
         {
             List<string> calldata = new List<string>();
@@ -96,7 +141,7 @@ namespace TerritoryWars.Contracts
             {
                 calldata.Add("0x1");
             }
-            if (jokerTile is Option<byte>.Some) calldata.Add(jokerTile.Unwrap().ToString());
+            if (jokerTile is Option<byte>.Some) calldata.Add(jokerTile.UnwrapByte().ToString());
             calldata.Add(rotation.ToString());
             calldata.Add(col.ToString());
             calldata.Add(row.ToString());

@@ -247,9 +247,11 @@ namespace TerritoryWars.General
             {
                 TileParts cityTileParts = board.GetTileObject(city.Position.x, city.Position.y).GetComponentInChildren<TileParts>();
                 TileParts item = cityTileParts;
-                if (results.Contains(item)) continue;
+                if (!results.Contains(item))
+                {
+                    results.Add(item);
+                }
                 
-                results.Add(item);
                 Vector2Int edgeTile = board.GetEdgeNeighbors(city.Position.x, city.Position.y, city.Side);
                 if(edgeTile == new Vector2Int(-1, -1)) continue;
                 TileParts edgeTileParts = board.GetTileObject(edgeTile.x, edgeTile.y).GetComponentInChildren<TileParts>();

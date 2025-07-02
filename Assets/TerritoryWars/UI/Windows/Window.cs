@@ -112,6 +112,11 @@ namespace TerritoryWars.UI.Windows
                 objectCanvasGroup.DOFade(1, 0.25f).SetEase(Ease.OutBack);
             }
         }
+
+        public virtual void OnDestroy()
+        {
+            
+        }
         
     }
 }

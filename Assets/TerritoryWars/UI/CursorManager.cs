@@ -45,6 +45,12 @@ public class CursorManager : MonoBehaviour
         {
             _canvas = GetComponent<Canvas>();
         }
+        
+        if (SystemInfo.deviceType == DeviceType.Handheld)
+        {
+            DisableCursor();
+        }
+        
         Cursor.visible = false;
         _currentCursorSize = _baseCursorSize;
         _hotspot = defaultHotspot;
@@ -54,7 +60,7 @@ public class CursorManager : MonoBehaviour
 
     public void LateUpdate()
     {
-        if (Input.touchCount == 1 || Input.touchCount == 2 && !_isCursorDisabled)
+        if (!_isCursorDisabled && Input.touchCount == 1 || Input.touchCount == 2)
         {
             DisableCursor();
         }

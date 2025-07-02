@@ -149,13 +149,13 @@ namespace Dojo
                             }
                         }
 
-                        if (value.Equals(filterValue))
+                        if (!value.Equals(filterValue))
                         {
-                            return true;
+                            Debug.LogWarning($"Field {filter.Key} with value {value} does not match filter value {filterValue} in component {typeof(T).Name}");
+                            return false;
                         }
-                        Debug.LogWarning($"Field {filter.Key} with value {value} does not match filter value {filterValue} in component {typeof(T).Name}");
                     }
-                    return false;
+                    return true;
                 });
         }
 

@@ -1,4 +1,7 @@
+using System.Collections;
+using TerritoryWars.ConnectorLayers.WebSocketLayer;
 using TerritoryWars.Tools;
+using TerritoryWars.UI.General;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -12,6 +15,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
         public string PlayerName;
         public uint EvoluteCount;
         public string HostPlayer;
+        public bool IsOnline => OnlineStatus.IsOnline;
 
         public TextMeshProUGUI PlayerNameText;
         public TextMeshProUGUI AddressText;
@@ -19,6 +23,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
         public TextMeshProUGUI EvoluteCountText;
         public TextMeshProUGUI MoveNumberText;
         public Button PlayButton;
+        public OnlineStatus OnlineStatus;
         
         public void UpdateItem(string playerName, uint evoluteBalance, string status, string hostPlayer, int moveNumber = 0, UnityAction onJoin = null)
         {
@@ -49,7 +54,10 @@ namespace TerritoryWars.UI.Windows.MatchTab
                     PlayButton.onClick.AddListener(onJoin);
                 }
             }
+            OnlineStatus.Initialize(HostPlayer);
         }
+
+        
         
         public void SetActive(bool isActive)
         {

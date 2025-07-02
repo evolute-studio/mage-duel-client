@@ -11,6 +11,7 @@ using TerritoryWars.ScriptablesObjects;
 using TerritoryWars.Tile;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using TerritoryWars.UI.Session;
 using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
@@ -625,6 +626,15 @@ namespace TerritoryWars.General
             return true;
         }
 
+        public bool IsTilePlaced(Vector2Int tile)
+        {
+            if (tileData[tile.x, tile.y] != null) 
+            {
+                return true;
+            }
+            return false;
+        }
+
         public void CheckConnections(TileData tile, int x, int y)
         {
             // Checking the boundaries of the field
@@ -885,7 +895,7 @@ namespace TerritoryWars.General
             {
                 GameObject tile = GetTileObject(city.Position.x, city.Position.y);
                 if (tile == null || !tile.TryGetComponent(out TileGenerator tileGenerator)) continue;
-                List<Side> sides = CheckCityTileSidesToEmpty(position.x, position.y);
+                List<Side> sides = CheckCityTileSidesToEmpty(city.Position.x, city.Position.y);
                 tileGenerator.FencePlacerForCloserToBorderCity(sides);
             }
         }

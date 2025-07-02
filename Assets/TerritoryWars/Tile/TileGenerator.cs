@@ -91,10 +91,7 @@ namespace TerritoryWars.Tile
 
         public void Rotate()
         {
-            string s = "Previous config: " + _tileData.RotatedConfig;
             _tileData.Rotate();
-            s += " Rotated config: " + _tileData.RotatedConfig;
-            Debug.Log(s);
             
             InitializeTile();
             
@@ -209,7 +206,7 @@ namespace TerritoryWars.Tile
             {
                 currentGoTileRotator.LineRenderers.Add(area.lineRenderer);
             }
-
+            
             currentGoTileRotator.RotateTile(_tileData.Rotation);
             Transform[] pins = tileParts.PinsPositions;
             

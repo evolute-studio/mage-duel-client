@@ -20,7 +20,7 @@ namespace TerritoryWars.Tools.DevTools
 
         public async void LoadBoard(string boardId)
         {
-            Board board = await DojoLayer.Instance.GetBoard(boardId);
+            Board board = await DojoModels.GetBoard(boardId);
             if (board.IsNull)
             {
                 CustomLogger.LogError("Board is null");

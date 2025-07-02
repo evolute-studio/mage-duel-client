@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using TerritoryWars.ScriptablesObjects;
+using TerritoryWars.Tools;
 using TerritoryWars.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -55,6 +56,7 @@ namespace TerritoryWars.General
         
         public GameObject GetPlayer(int index)
         {
+            CustomLogger.LogImportant($"[FIX] Getting player at index {index}");
             return Players[index];
         }
         

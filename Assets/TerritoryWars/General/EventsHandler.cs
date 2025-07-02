@@ -1,9 +1,14 @@
+using System.Linq;
 using Dojo;
 using TerritoryWars.DataModels;
 using TerritoryWars.DataModels.Events;
 using TerritoryWars.Dojo;
 using TerritoryWars.Managers;
 using TerritoryWars.Tools;
+using TerritoryWars.ConnectorLayers.WebSocketLayer;
+using TerritoryWars.DataModels.WebSocketEvents;
+using TerritoryWars.Managers.SessionComponents;
+using UnityEngine;
 
 namespace TerritoryWars.General
 {
@@ -14,11 +19,11 @@ namespace TerritoryWars.General
 
         public EventsHandler(WorldManager worldManager)
         {
-            CustomLogger.LogImportant("EventsHandler initialized");
             _worldManager = worldManager;
             _worldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
             //_worldManager.synchronizationMaster.OnModelUpdated.AddListener(OnModelUpdated);
             IncomingModelsFilter.OnModelPassed.AddListener(OnModelUpdated);
+            EventBus.Subscribe<WebSocketClient.IncomingMessage>(OnWebSocketMessageReceived);
         }
 
         private void OnEventMessage(ModelInstance modelInstance)
@@ -62,16 +67,56 @@ namespace TerritoryWars.General
                     break;
             }
         }
+        
+        private void OnWebSocketMessageReceived(WebSocketClient.IncomingMessage message)
+        {
+            if (message.channel == nameof(WSChannels.Ping))
+            {
+                PingEvent pingEvent = JsonUtility.FromJson<PingEvent>(message.payload);
+                EventBus.Publish(pingEvent);
+            }
+            else if (message.channel == nameof(WSChannels.Session) + "_" + SessionManager.Instance?.SessionContext?.Board.Id)
+            {
+                MoveSneakPeek moveSneakPeek = JsonUtility.FromJson<MoveSneakPeek>(message.payload);
+                if (moveSneakPeek.Address == SessionManager.Instance?.SessionContext?.LocalPlayerAddress)
+                {
+                    return;
+                }
+                EventBus.Publish(moveSneakPeek);
+            }
+            else if (message.action == "online_status")
+            {
+                WebSocketClient.OnlinePlayersData.onlineStatus = ParseBinaryStatus(message.payload);
+                EventBus.Publish(WebSocketClient.OnlinePlayersData);
+            }
+        }
 
         private void MenuEventHandler(ModelInstance modelInstance)
         {
             switch (modelInstance)
             {
                 case evolute_duel_GameCreated gameCreated:
-                    GameCreated created = new GameCreated().SetData(gameCreated);
+                    GameUpdated updated = new GameUpdated().SetData(gameCreated);
                     CustomLogger.LogEventsLocal($"[EventHandler] | {gameCreated.Model.Name} ");
-                    EventBus.Publish(created);
+                    EventBus.Publish(updated);
                     break;
+                case evolute_duel_GameCanceled gameCanceled:
+                    GameUpdated canceled = new GameUpdated().SetData(gameCanceled);
+                    CustomLogger.LogEventsLocal($"[EventHandler] | {gameCanceled.Model.Name} ");
+                    EventBus.Publish(canceled);
+                    break;
+                case evolute_duel_GameJoinFailed joinFailed:
+                    string localPLayerAddress = DojoGameManager.Instance.LocalAccount.Address.Hex();
+                    if (localPLayerAddress != joinFailed.host_player.Hex() &&
+                        localPLayerAddress != joinFailed.guest_player.Hex())
+                    {
+                        return;
+                    }
+                    ErrorOccured errorOccured = new ErrorOccured().SetData(joinFailed);
+                    CustomLogger.LogEventsLocal($"[EventHandler] | {joinFailed.Model.Name} ");
+                    EventBus.Publish(errorOccured);
+                    break;
+                    
             }
         }
 
@@ -204,6 +249,24 @@ namespace TerritoryWars.General
                     CustomLogger.LogEventsLocal($"[EventHandler] | {canceled.Model.Name} ");
                     EventBus.Publish(gameCanceled);
                     break;
+                case evolute_duel_PhaseStarted phaseStarted:
+                    if (!_globalContext.SessionContext.IsSessionBoard(phaseStarted.board_id.Hex()))
+                    {
+                        return;
+                    }
+                    PhaseStarted phaseStartedEvent = new PhaseStarted().SetData(phaseStarted);
+                    CustomLogger.LogEventsLocal($"[EventHandler] | {phaseStarted.Model.Name} ");
+                    EventBus.Publish(phaseStartedEvent);
+                    break;
+                case evolute_duel_CantFinishGame cantFinishGame:
+                    if (!_globalContext.SessionContext.IsSessionBoard(cantFinishGame.board_id.Hex()))
+                    {
+                        return;
+                    }
+                    ErrorOccured errorCantFinishGame = new ErrorOccured().SetData(cantFinishGame);
+                    CustomLogger.LogEventsLocal($"[EventHandler] | {cantFinishGame.Model.Name} ");
+                    EventBus.Publish(errorCantFinishGame);
+                    break;
             }
         }
 
@@ -214,7 +277,6 @@ namespace TerritoryWars.General
                 evolute_duel_UnionFind unionFindModel = modelInstance as evolute_duel_UnionFind;
                 if (unionFindModel == null || unionFindModel.board_id == null)
                 {
-                    CustomLogger.LogError($"[EventHandler] | {unionFindModel} is null");
                     return;
                 }
                 if (_globalContext.SessionContext.IsSessionBoard(unionFindModel.board_id?.Hex()) == false)
@@ -230,13 +292,28 @@ namespace TerritoryWars.General
 
         }
 
+        public void MatchTabWebsocketHandler(WebSocketClient.IncomingMessage msg)
+        {
+            switch (msg.channel)
+            {
+                case nameof(WSChannels.Ping):
+                    PingEvent pingEvent = JsonUtility.FromJson<PingEvent>(msg.payload);
+                    EventBus.Publish(pingEvent);
+                    break;
+            }
+        }
+        
+        private bool[] ParseBinaryStatus(string binaryString)
+        {
+            return binaryString.Select(c => c == '1').ToArray();
+        }
+
 
         public void Dispose()
         {
             _worldManager.synchronizationMaster.OnEventMessage.RemoveListener(OnEventMessage);
             _worldManager.synchronizationMaster.OnModelUpdated.RemoveListener(OnModelUpdated);
             IncomingModelsFilter.OnModelPassed.RemoveListener(OnModelUpdated);
-            CustomLogger.LogImportant("EventsHandler disposed");
         }
     }
 }

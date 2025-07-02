@@ -6,6 +6,7 @@ using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tile;
 using TerritoryWars.UI;
+using TerritoryWars.UI.Session;
 using UnityEngine;
 
 namespace TerritoryWars.Managers.SessionComponents

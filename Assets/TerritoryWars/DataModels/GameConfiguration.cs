@@ -1,4 +1,5 @@
 using System;
+using TerritoryWars.DataModels.Events;
 using UnityEngine;
 
 namespace TerritoryWars.DataModels
@@ -13,8 +14,17 @@ namespace TerritoryWars.DataModels
         public static byte ClientRotationOffset = 3;
         public static Vector2Int ClientBoardSize = new Vector2Int(10, 10);
         public static Vector2Int ServerBoardSize = new Vector2Int(8, 8);
+        
+        public static ushort GameCreationDuration = 65; // seconds
+        public static ushort RevealDuration = 65; // seconds
+        public static ushort RequestDuration = 65; // seconds
+        
         public static ushort TurnDuration = 60; // seconds
         public static ushort PassingTurnDuration = 5; // TurnDuration includ
+        
+        
+        public static ushort TilesInDeck = 64; // Number of jokers per player
+        public static ushort JokerCount = 3; // Number of jokers per player
 
         public static string[] TileTypes =
         {
@@ -68,10 +78,41 @@ namespace TerritoryWars.DataModels
             return TileTypes[index];
         }
 
+        public static int GetTileTypeIndex(string type)
+        {
+            for (int i = 0; i < TileTypes.Length; i++)
+            {
+                if (TileTypes[i] == type)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
         public static char[] GetInitialEdgeState(byte[] initialEdgeState)
         {
             char[] charArray = Array.ConvertAll(initialEdgeState, c => EdgeTypes[(int)c]);
             return charArray;
+        }
+
+        public static int GetPhaseDuration(SessionPhase phase)
+        {
+            switch (phase)
+            {
+                case SessionPhase.Creating:
+                    return GameCreationDuration;
+                case SessionPhase.Reveal:
+                    return RevealDuration;
+                case SessionPhase.Request:
+                    return RequestDuration;
+                case SessionPhase.Move:
+                    return TurnDuration;
+                case SessionPhase.Finished:
+                    return 0;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(phase), phase, null);
+            }
         }
     }
 }

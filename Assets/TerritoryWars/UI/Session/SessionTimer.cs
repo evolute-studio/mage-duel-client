@@ -19,6 +19,11 @@ namespace TerritoryWars.UI.Session
         public TextMeshProUGUI TurnText;
         public TextMeshProUGUI TimerText;
         public TextMeshProUGUI SkipText;
+        
+        public string GameCreationText = "Game is being created";
+        public string GameRevealingText = "Revealing tile";
+        public string GameRequestText = "Requesting tile";
+        
         public string LocalPlayerTurnText = "Your turn now";
         public string OpponentPlayerTurnText = "Waiting for opponent's turn";
         public string PassingTurnText = "Passing the turn";
@@ -34,6 +39,7 @@ namespace TerritoryWars.UI.Session
         public float TurnDuration => GameConfiguration.TurnDuration;
         public float PassingTurnDuration => GameConfiguration.PassingTurnDuration;
         private float _opponentReducedTime = 0.25f;
+        private TimerEventType _timerType;
 
         // Local variables
         private bool _isLocalPlayerTurn => SessionManager.Instance.SessionContext.IsLocalPlayerTurn;
@@ -48,23 +54,42 @@ namespace TerritoryWars.UI.Session
 
         private void OnTimerEvent(TimerEvent timerEvent)
         {
-            if (timerEvent.Type == TimerEventType.Started)
+            _timerType = timerEvent.Type;
+
+            if (timerEvent.Type == TimerEventType.Moving)
             {
+                ActivateHourglass();
+            }
+            else
+            {
+                ResetUI();
+            }
+            
+            if(timerEvent.ProgressType == TimerProgressType.Started && timerEvent.Type != TimerEventType.Passing)
                 StartTimer(timerEvent.StartTimestamp);
-            }            
+            else if (timerEvent.Type == TimerEventType.Passing)
+            {
+                StartPassingTimer();
+            }
         }
 
         public void StartTimer(ulong timestamp)
         {
-            CustomLogger.LogImportant($"[SessionTimer] Starting timer at {timestamp} for local player: {_isLocalPlayerTurn}");
             _startTurnTimestamp = timestamp;
-
-            RotateHourglass();
             if (_timerCoroutine != null)
             {
                 StopCoroutine(_timerCoroutine);
             }
             _timerCoroutine = StartCoroutine(UpdateTimer());
+        }
+
+        public void StartPassingTimer()
+        {
+            if (_timerCoroutine != null)
+            {
+                StopCoroutine(_timerCoroutine);
+            }
+            _timerCoroutine = StartCoroutine(PassingTimer());
         }
 
         private IEnumerator UpdateTimer()
@@ -73,20 +98,31 @@ namespace TerritoryWars.UI.Session
             while (_timeGone < TurnDuration)
             {
                 UpdateMainLoopTimer();
-                yield return new WaitForSeconds(0.5f);
+                yield return null;
             }
             ResetUI();
-            EventBus.Publish(new TimerEvent(TimerEventType.TurnTimeElapsed));
+            EventBus.Publish(new TimerEvent(_timerType, TimerProgressType.Elapsed));
 
             // passing turn
             float reducer = !_isLocalPlayerTurn ? _opponentReducedTime : 0;
             while (_timeGone < TurnDuration + PassingTurnDuration - reducer)
             {
-                UpdateTurnText(PassingTurnText);
+                UpdateTurnText(GetTimerText());
                 yield return null;
             }
             ResetUI();
-            EventBus.Publish(new TimerEvent(TimerEventType.PassingTimeElapsed));
+            EventBus.Publish(new TimerEvent(_timerType, TimerProgressType.ElapsedCompletely));
+        }
+
+        private IEnumerator PassingTimer()
+        {
+            ResetUI();
+            ActivateHourglass();
+            while (true)
+            {
+                UpdateTurnText(PassingTurnText);
+                yield return null;
+            }
         }
 
         private void UpdateMainLoopTimer()
@@ -98,7 +134,7 @@ namespace TerritoryWars.UI.Session
 
             else
                 TimerText.color = Color.white; // Default color
-            UpdateTurnText(_isLocalPlayerTurn ? LocalPlayerTurnText : OpponentPlayerTurnText);
+            UpdateTurnText(GetTimerText());
         }
 
         private float GetTurnTime()
@@ -107,8 +143,11 @@ namespace TerritoryWars.UI.Session
             return (float)(unixTimestamp - _startTurnTimestamp);
         }
 
-        private void RotateHourglass()
+        private void ActivateHourglass()
         {
+            SpriteAnimator.gameObject.SetActive(true);
+            TimerText.gameObject.SetActive(true);
+            
             SpriteAnimator.duration = RotationAnimationDuration;
             SpriteAnimator.Play(RotationAnimationSprites).OnComplete(
                 () =>
@@ -117,12 +156,29 @@ namespace TerritoryWars.UI.Session
                     SpriteAnimator.Play(IdleAnimationSprites);
                 });
         }
+        
+        private string GetTimerText()
+        {
+            switch (_timerType)
+            {
+                case TimerEventType.GameCreation:
+                    return GameCreationText;
+                case TimerEventType.Revealing:
+                    return GameRevealingText;
+                case TimerEventType.Requesting:
+                    return GameRequestText;
+                case TimerEventType.Moving:
+                    return _isLocalPlayerTurn ? LocalPlayerTurnText : OpponentPlayerTurnText;
+                default:
+                    return "";
+            }
+        }
 
         private void UpdateTurnText(string baseText)
         {
-            int visibleDots = 3 - ((int)(_timeGone % 3));
+            int visibleDots = 3 - ((int)(Time.time % 3));
             string dots = string.Join("", new string[3].Select((_, index) =>
-                $"<color=#{(index < visibleDots ? "FFFFFFFF" : "FFFFFF00")}>.</color>"));
+                $"<color=#{(index < visibleDots ? "FFFFFF" : "FFFF00")}>.</color>"));
 
             TurnText.text = baseText + dots;
         }
@@ -134,7 +190,8 @@ namespace TerritoryWars.UI.Session
             SkipText.text = "";
             TimerText.color = Color.white;
             TurnText.color = Color.white;
-            //SpriteAnimator.Stop();
+            SpriteAnimator.gameObject.SetActive(false);
+            TimerText.gameObject.SetActive(false);
         }
 
         public void OnDestroy()

@@ -13,6 +13,7 @@ using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using TerritoryWars.UI.Session;
 using UnityEngine;
 
 public class FinishGameContests

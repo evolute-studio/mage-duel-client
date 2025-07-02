@@ -13,6 +13,7 @@ namespace TerritoryWars.Managers
         public GameModel GameInProgress;
         public Board BoardForLoad; // used just for loading board, not used in game
         public SessionContext SessionContext;
+        public bool LastCreatedGameWithBot = false;
         
         public bool HasGameInProgress => !GameInProgress.IsNull;
     }

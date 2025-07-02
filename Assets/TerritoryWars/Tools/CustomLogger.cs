@@ -42,7 +42,7 @@ namespace TerritoryWars.Tools
             {LogType.Warning, false},
             {LogType.Execution, true},
             {LogType.Error, true},
-            {LogType.Important, false},
+            {LogType.Important, true},
             {LogType.DojoLoop, true},
             {LogType.Analytics, true},
             {LogType.Filtering, false},
@@ -77,7 +77,7 @@ namespace TerritoryWars.Tools
             }
         }
         
-        public static void LogObject(object obj, string label = null)
+        public static void LogObject(object obj, string label = null, bool saveInFile = false, bool saveInFileOnOverflow = false)
         {
             if (obj == null)
             {
@@ -90,12 +90,13 @@ namespace TerritoryWars.Tools
             try
             {
                 output = JsonConvert.SerializeObject(obj, Formatting.Indented);
-                // if (output.Length > 10000)
-                // {
-                //     string objType = obj.GetType().Name;
-                //     string fileName = $"{objType}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
-                //     System.IO.File.WriteAllText(fileName, output);
-                // }
+                if (saveInFile || (output.Length > 10000 && saveInFileOnOverflow))
+                {
+                    string objType = obj.GetType().Name;
+                    string fileName = $"{objType}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+                    System.IO.File.WriteAllText(fileName, output);
+                }
+                
             }
             catch (Exception e)
             {

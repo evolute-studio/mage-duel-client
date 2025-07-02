@@ -1,12 +1,17 @@
 using System;
+using System.Collections.Generic;
 using Dojo;
 using Dojo.Starknet;
 using TerritoryWars.ConnectorLayers.Dojo;
+using TerritoryWars.ConnectorLayers.WebSocketLayer;
 using TerritoryWars.DataModels;
+using TerritoryWars.DataModels.ClientEvents;
+using TerritoryWars.DataModels.WebSocketEvents;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
+using TerritoryWars.SaveStorage;
 using TerritoryWars.Tools;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,26 +20,26 @@ namespace TerritoryWars.UI.Windows.MatchTab
 {
     public class MatchesTabController : NetworkWindow
     {
-        [Header("Additional References", order = 0)]
-        [SerializeField] private Button createMatchButton;
+        [Header("Additional References", order = 0)] [SerializeField]
+        private Button createMatchButton;
+
         [SerializeField] private Button createBotMatchButton;
-        
-        
-        
+        [SerializeField] private CanvasGroup itemsParentCanvasGroup;
+
         private int _createdMatchesCount = 0;
 
         // public GameObject PanelGameObject;
         // public GameObject MatchListItemPrefab;
         // public Transform ListItemParent;
         // public GameObject BackgroundPlaceholderGO;
-        
+
         // public CanvasGroup canvasGroup;
         // public GameObject CloseButtonGO;
         //private List<MatchListItem> _matchListItems = new List<MatchListItem>();
 
         // General Window Methods
         public void Start() => Initialize();
-        
+
         public override void Initialize()
         {
             base.Initialize();
@@ -46,20 +51,26 @@ namespace TerritoryWars.UI.Windows.MatchTab
         {
             base.PanelActiveTrue();
             ApplicationState.SetState(ApplicationStates.MatchTab);
+            SetActiveItems(false);
+            Invoke(nameof(ActivateItems), 2f);
             FetchData();
             DojoGameManager.Instance.WorldManager.synchronizationMaster.OnEventMessage.AddListener(OnEventMessage);
+            EventBus.Subscribe<WebSocketClient.OnlinePlayers>(OnOnlinePlayers);
+            EventBus.Subscribe<OnlineStatusChanged>(OnOnlineStatusChanged);
         }
 
         protected override void PanelActiveFalse()
         {
             base.PanelActiveFalse();
             ApplicationState.SetState(ApplicationStates.Menu);
-            DojoGameManager.Instance.CustomSynchronizationMaster.DestroyPlayersExceptLocal(DojoGameManager.Instance.LocalAccount.Address);
+            DojoGameManager.Instance.CustomSynchronizationMaster.DestroyPlayersExceptLocal(DojoGameManager.Instance
+                .LocalAccount.Address);
             DojoGameManager.Instance.CustomSynchronizationMaster.DestroyAllGames();
             DojoGameManager.Instance.WorldManager.synchronizationMaster.OnEventMessage.RemoveListener(OnEventMessage);
-
+            EventBus.Unsubscribe<WebSocketClient.OnlinePlayers>(OnOnlinePlayers);
+            EventBus.Unsubscribe<OnlineStatusChanged>(OnOnlineStatusChanged);
         }
-        
+
         // Network Window Methods
         protected override void OnEventMessage(ModelInstance modelInstance)
         {
@@ -73,17 +84,84 @@ namespace TerritoryWars.UI.Windows.MatchTab
                     break;
             }
         }
+
+        private void OnOnlinePlayers(WebSocketClient.OnlinePlayers players)
+        {
+            Dictionary<string, bool> onlinePlayers = players.ToDictionary();
+            CustomLogger.LogImportant($"[WebSocketClient] Online players received: {onlinePlayers.Count}");
+            foreach (MatchListItem matchListItem in listItems)
+            {
+                if (onlinePlayers.TryGetValue(matchListItem.HostPlayer, out bool isOnline))
+                {
+                    matchListItem.OnlineStatus.SetOnline(isOnline);
+                }
+            }
+
+            SortItems();
+
+            for (int i = 0; i < listItems.Count; i++)
+            {
+                (listItems[i] as MatchListItem)?.ListItem.transform.SetSiblingIndex(i);
+            }
+
+            SetActiveItems(true);
+        }
+
+        private void OnOnlineStatusChanged(OnlineStatusChanged onlineStatusChanged)
+        {
+            MatchListItem matchListItem = listItems.Find(item => ((MatchListItem)item).HostPlayer == onlineStatusChanged.Address) as MatchListItem;
+            if(onlineStatusChanged.IsOnline)
+                matchListItem?.transform.SetAsFirstSibling();
+            else
+                matchListItem?.transform.SetAsLastSibling();
+        }
+        
+        private void SortItems()
+        {
+            listItems.Sort((a, b) =>
+                ((MatchListItem)a).IsOnline.CompareTo(((MatchListItem)b).IsOnline) * -1);
+        }
+        
+        
+
+        
+        private void SetActiveItems(bool active)
+        {
+            itemsParentCanvasGroup.alpha = active ? 1f : 0f;
+        }
+
+        private void ActivateItems() => SetActiveItems(true);
+
+        private void GetOnline(List<string> players)
+        {
+            WebSocketClient.CheckOnline(players);
+        }
+
         protected override async void FetchData()
         {
             try
             {
                 await DojoGameManager.Instance.SyncCreatedGames();
                 GameObject[] games = DojoGameManager.Instance.GetGames();
-
-                foreach (var game in games)
+                evolute_duel_Game[] gameModels = new evolute_duel_Game[games.Length];
+                List<string> players = new List<string>();
+                
+                for (int i = 0; i < games.Length; i++)
                 {
-                    if (!game.TryGetComponent(out evolute_duel_Game gameModel)) return;
-                    PlayerProfile player = await DojoLayer.Instance.GetPlayerProfile(gameModel.player.Hex());
+                    if (!games[i].TryGetComponent(out evolute_duel_Game gameModel))
+                    {
+                        CustomLogger.LogError("MatchesTabController. Game model not found on game object");
+                        continue;
+                    }
+                    gameModels[i] = gameModel;
+                    players.Add(gameModel.player.Hex());
+                }
+                
+                GetOnline(players);
+
+                foreach (var gameModel in gameModels)
+                {
+                    PlayerProfile player = await DojoModels.GetPlayerProfile(gameModel.player.Hex());
                     if(IsMatchListItemExists(player.PlayerId)) continue;
                     
                     string playerName = player.Username;
@@ -150,13 +228,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
             return false;
         }
         
-        private void SortItems()
-        {
-            for (int i = 0; i < listItems.Count; i++)
-            {
-                (listItems[i] as MatchListItem)?.ListItem.transform.SetSiblingIndex(i);
-            }
-        }
+        
 
         public void CreateMatch()
         {

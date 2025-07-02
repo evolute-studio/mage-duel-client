@@ -149,6 +149,29 @@ public class TileParts : MonoBehaviour
         }
     }
 
+    public void SetAllRenderersLayer(string layerName)
+    {
+        foreach (var house in Houses)
+        {
+            house.FlagSpriteRenderer.sortingLayerName = layerName;
+            house.HouseSpriteRenderer.sortingLayerName = layerName;
+        }
+        foreach (var decoration in DecorationsRenderers)
+        {
+            decoration.sortingLayerName = layerName;
+        }
+        foreach (var arc in ArcRenderers)
+        {
+            arc.sortingLayerName = layerName;
+        }
+        if (TileTerritoryFiller != null && TileTerritoryFiller.currentTerritory != null &&
+            TileTerritoryFiller.currentTerritory._spriteRenderer != null)
+        {
+            TileTerritoryFiller.currentTerritory._spriteRenderer.sortingLayerName = layerName;
+        }
+        
+    }
+
     public void AddHouse(GameObject house)
     {
         if (house == null) return;
