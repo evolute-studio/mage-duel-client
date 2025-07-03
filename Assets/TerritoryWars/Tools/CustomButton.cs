@@ -24,6 +24,9 @@ namespace TerritoryWars.Tools
         
         [SerializeField] public Image Image;
         [SerializeField] public Image HoverImage;
+
+        public bool WithHoverAnimation = true;
+        public bool WithPressedAnimation = true;
         
         private Vector2 _defaultContentPosition;
         private Button _button;
@@ -51,7 +54,7 @@ namespace TerritoryWars.Tools
         
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if(_button != null && _button.interactable == false)
+            if(_button != null && _button.interactable == false || !WithHoverAnimation)
             {
                 return;
             }
@@ -66,6 +69,8 @@ namespace TerritoryWars.Tools
         
         public void OnPointerExit(PointerEventData eventData)
         {
+            if (!WithHoverAnimation) return;
+            
             if (HoverOutlineSprite != null && HoverImage != null)
             {
                 HoverImage.DOKill();
@@ -77,8 +82,26 @@ namespace TerritoryWars.Tools
             }
         }
 
+        public void SetPressed(bool isPressed)
+        {
+            if (isPressed)
+            {
+                _isPressed = true;
+                HoverImage.sprite = PressedHoverOutlineSprite;
+                Image.sprite = PressedSprite;
+            }
+            else
+            {
+                _isPressed = false;
+                HoverImage.sprite = HoverOutlineSprite;
+                Image.sprite = DefaultSprite;
+            }
+        }
+
         public void OnPointerDown(PointerEventData eventData)
         {
+            if (!WithPressedAnimation) return;
+            
             if (_button != null && _button.interactable == false && PressedSprite != null && Image != null)
             {
                 return;
@@ -91,6 +114,8 @@ namespace TerritoryWars.Tools
         
         public void OnPointerUp(PointerEventData eventData)
         {
+            if (!WithPressedAnimation) return;
+            
             if (_button != null && _button.interactable == false)
             {
                 return;

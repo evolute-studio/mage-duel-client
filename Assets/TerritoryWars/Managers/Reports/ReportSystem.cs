@@ -158,6 +158,7 @@ namespace TerritoryWars.Managers.Reports
             else
             {
                 sb.AppendLine("BoardId: " + DojoGameManager.Instance.GlobalContext.SessionContext.Board.Id);
+                sb.AppendLine("GameWithBot: " + DojoGameManager.Instance.GlobalContext.SessionContext.IsGameWithBot);
                 sb.AppendLine("BoardData: " +
                               JsonConvert.SerializeObject(DojoGameManager.Instance.GlobalContext.SessionContext.Board));
                 sb.AppendLine("SessionPlayer 1: " +
