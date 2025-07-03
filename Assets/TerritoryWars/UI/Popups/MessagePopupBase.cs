@@ -16,12 +16,17 @@ namespace TerritoryWars.UI.Popups
         public TextMeshProUGUI SecondOptionText;
         public Button FirstOptionButton;
         public Button SecondOptionButton;
+        public Button BackgroundButton;
         
         private Vector3 _initialPosition;
 
         public void Start()
         {
             _initialPosition = Popup.localPosition;
+            BackgroundButton.onClick.AddListener(() =>
+            {
+                SetActive(false);
+            });
         }
         
         public void SetActive(bool active)

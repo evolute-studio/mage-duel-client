@@ -1,6 +1,7 @@
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
+using TerritoryWars.Managers.Reports;
 using TerritoryWars.Tools;
 using UnityEngine;
 
@@ -25,7 +26,25 @@ namespace TerritoryWars.UI.Popups
         }
         
         public MessagePopupBase MessagePopup;
-        
+        public ReportPopup ReportPopup;
+
+
+        public void ShowReportPopup()
+        {
+            PopupConfig popupConfig = new PopupConfig
+            {
+                Text = null,
+                FirstOptionText = "Cancel",
+                FirstOptionAction = () => { },
+                SecondOptionText = "Send",
+                SecondOptionAction = () =>
+                {
+                    ReportPopup.SendReport();
+                }
+            };
+            ReportPopup.Setup(popupConfig);
+            ReportPopup.SetActive(true);
+        }
         
         public void ShowOpponentCancelGame()
         {
