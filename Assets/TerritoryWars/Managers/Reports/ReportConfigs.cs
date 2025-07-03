@@ -39,6 +39,7 @@ namespace TerritoryWars.Managers.Reports
         [HideInInspector] public string Name;
         
         public ReportType Type;
+        public string WebhookUrl;
         public string Title;
         public string Message;
         public bool TagUsers;

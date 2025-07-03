@@ -1295,7 +1295,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7330603052455128508, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 292.66
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7330603052455128508, guid: 19a0f78686c9ec90c86a779db6d01a71, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3180,9 +3180,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca55dd71705c4da8a03a0ab4f6f4f689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  webhookUrl: https://discord.com/api/webhooks/1389988143599718553/h8JSngp8olGO9lsAXLO2jNtfkbiLfwO404M491dLLXND6puAcXpJZzZQZrhT0cadnPgb
   Configs: {fileID: 11400000, guid: dee67bcc533fe4549b25ecd2e01aaaec, type: 2}
-  SendInEditor: 1
+  SendInEditor: 0
   KeywordsForAutoSend:
   - InvalidTransactionNonce
   - TransactionExecutionError
@@ -3191,7 +3190,7 @@ MonoBehaviour:
   - NotYourTurn
   - GameJoinFailed
   - CantFinishGame
-  - EditorAutoSendTest
+  - WebSocket error
   divider: 45
   count: 50
 --- !u!4 &1213897308
@@ -6263,6 +6262,10 @@ PrefabInstance:
       propertyPath: m_PixelsPerUnitMultiplier
       value: 1.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1861165185919350485, guid: 8e9b01b603d9d2cf485e33a48c2e676e, type: 3}
+      propertyPath: m_text
+      value: (Optional) Type here...
+      objectReference: {fileID: 0}
     - target: {fileID: 1887342631686080870, guid: 8e9b01b603d9d2cf485e33a48c2e676e, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -6333,6 +6336,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3197611638336446432, guid: 8e9b01b603d9d2cf485e33a48c2e676e, type: 3}
       propertyPath: m_Alpha
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3418675120658253009, guid: 8e9b01b603d9d2cf485e33a48c2e676e, type: 3}
+      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3468074716263232225, guid: 8e9b01b603d9d2cf485e33a48c2e676e, type: 3}

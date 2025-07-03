@@ -12,11 +12,12 @@ namespace TerritoryWars.Managers.Reports
     {
         public static ReportSystem Instance;
         
-        public string webhookUrl;
         public ReportConfigs Configs;
         public bool SendInEditor = true;
         public List<string> KeywordsForAutoSend;
-        private DiscordWebhook webhook;
+        //private DiscordWebhook webhook;
+
+        private Dictionary<ReportType, DiscordWebhook> webhooks = new Dictionary<ReportType, DiscordWebhook>();
         
         private readonly List<string> recentLogs = new List<string>();
         private const int MaxLogCount = 1000;
@@ -33,8 +34,12 @@ namespace TerritoryWars.Managers.Reports
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            
-            webhook = new DiscordWebhook(webhookUrl);
+
+            foreach (var config in Configs.Configs)
+            {
+                DiscordWebhook webhook = new DiscordWebhook(config.WebhookUrl);
+                webhooks[config.Type] = webhook;
+            }
             
             Application.logMessageReceived += HandleLog;
         }
@@ -44,20 +49,29 @@ namespace TerritoryWars.Managers.Reports
         {
             CustomLogger.LogImportant("EditorAutoSendTest");
             
-            //SendReportTest();
-            // SendReport(ReportType.Feedback, "Feedback message for testing purposes.");
-            // SendReport(ReportType.Bug, "Bug message for testing purposes.");
-            // SendReport(ReportType.CriticalIssue, "Critical issue message for testing purposes.");
-            // SendReport(ReportType.PossibleProblem, "Possible problem message for testing purposes.");
+            SendReport(ReportType.Feedback, "Feedback message for testing purposes.");
+            SendReport(ReportType.Bug, "Bug message for testing purposes.");
+            SendReport(ReportType.CriticalIssue, "Critical issue message for testing purposes.");
+            SendReport(ReportType.PossibleProblem, "Possible problem message for testing purposes.");
         }
 
-        public void SendReport(ReportType type, string message)
+        public async void SendReport(ReportType type, string message)
         {
-            if (string.IsNullOrEmpty(webhookUrl))
+#if UNITY_EDITOR
+            if (!SendInEditor)
             {
-                Debug.LogError("Webhook URL is not set.");
+                Debug.LogWarning("Report sending is disabled in editor mode.");
                 return;
             }
+#endif
+            
+            if (!webhooks.TryGetValue(type, out var webhook))
+            {
+                Debug.LogError("Webhook for type " + type + " not found.");
+                return;
+            }
+
+            await Coroutines.CoroutineAsync(() => { }, 1f);
             
             var config = Configs.GetReportConfig(type);
             
@@ -71,31 +85,6 @@ namespace TerritoryWars.Managers.Reports
                 fileName: config.IncludeLogs ? "logs.txt" : null,
                 content: $"{new string(divider, count)}\n" + (config.TagUsers ? config.GetUsersToTagContent() : null),
                 allowedMentionsUserIds: config.TagUsers ? config.UsersToTag : null
-            ));
-        }
-        
-        public void SendReportTest()
-        {
-            if (string.IsNullOrEmpty(webhookUrl))
-            {
-                Debug.LogError("Webhook URL is not set.");
-                return;
-            }
-            
-            var config = Configs.GetReportConfig(ReportType.Feedback);
-            
-            StartCoroutine(webhook.SendEmbed(
-                title: config.Title,
-                description: "message",
-                color: config.Color.GetHashCode(),
-                fields: new List<(string name, string value, bool inline)> { ("Field1", "Value1", true), ("Field2", "Value2", false) },
-                imageData: GetScreenshot(),
-                imageFileName: "screenshot.png",
-                fileData: GetLogsFile(),
-                fileName: "logs.txt",
-                // add divider and count to the content
-                content: $"{new string(divider, count)}\n" + config.GetUsersToTagContent(),
-                allowedMentionsUserIds: config.UsersToTag
             ));
         }
 
@@ -148,6 +137,7 @@ namespace TerritoryWars.Managers.Reports
             sb.AppendLine("=== System Info ===");
             sb.AppendLine($"Platform: {Application.platform}");
             sb.AppendLine($"Application Version: {Application.version}");
+            sb.AppendLine($"Application URL: {Application.absoluteURL}");
             sb.AppendLine();
             
             sb.AppendLine("=== Account Info ===");
