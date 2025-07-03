@@ -3,6 +3,7 @@ using System.Text;
 using Newtonsoft.Json;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
+using TerritoryWars.Tools;
 using UnityEngine;
 
 namespace TerritoryWars.Managers.Reports
@@ -14,6 +15,7 @@ namespace TerritoryWars.Managers.Reports
         public string webhookUrl;
         public ReportConfigs Configs;
         public bool SendInEditor = true;
+        public List<string> KeywordsForAutoSend;
         private DiscordWebhook webhook;
         
         private readonly List<string> recentLogs = new List<string>();
@@ -40,11 +42,13 @@ namespace TerritoryWars.Managers.Reports
         [ContextMenu("Send Test Report")]
         public void SendTest()
         {
+            CustomLogger.LogImportant("EditorAutoSendTest");
+            
             //SendReportTest();
-            SendReport(ReportType.Feedback, "Feedback message for testing purposes.");
-            SendReport(ReportType.Bug, "Bug message for testing purposes.");
-            SendReport(ReportType.CriticalIssue, "Critical issue message for testing purposes.");
-            SendReport(ReportType.PossibleProblem, "Possible problem message for testing purposes.");
+            // SendReport(ReportType.Feedback, "Feedback message for testing purposes.");
+            // SendReport(ReportType.Bug, "Bug message for testing purposes.");
+            // SendReport(ReportType.CriticalIssue, "Critical issue message for testing purposes.");
+            // SendReport(ReportType.PossibleProblem, "Possible problem message for testing purposes.");
         }
 
         public void SendReport(ReportType type, string message)
@@ -113,6 +117,16 @@ namespace TerritoryWars.Managers.Reports
                     recentLogs.RemoveAt(0);
                 }
             }
+
+            foreach (var keyword in KeywordsForAutoSend)
+            {
+                if (logString.Contains(keyword))
+                {
+                    SendReport(ReportType.PossibleProblem, $"Keyword '{keyword}' found in log: {logString}");
+                    break;
+                }
+            }
+            
         }
 
         
