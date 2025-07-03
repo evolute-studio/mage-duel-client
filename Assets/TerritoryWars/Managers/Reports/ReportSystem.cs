@@ -37,7 +37,7 @@ namespace TerritoryWars.Managers.Reports
 
             foreach (var config in Configs.Configs)
             {
-                DiscordWebhook webhook = new DiscordWebhook(config.WebhookUrl);
+                DiscordWebhook webhook = new DiscordWebhook(config.WebhookUrl, config.WebhookUsername);
                 webhooks[config.Type] = webhook;
             }
             

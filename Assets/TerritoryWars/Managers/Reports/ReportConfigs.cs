@@ -40,6 +40,7 @@ namespace TerritoryWars.Managers.Reports
         
         public ReportType Type;
         public string WebhookUrl;
+        public string WebhookUsername;
         public string Title;
         public string Message;
         public bool TagUsers;
