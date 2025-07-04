@@ -665,7 +665,7 @@ namespace TerritoryWars.Managers.SessionComponents
             return true;
         }
 
-        private async Task<byte> WhoseTurn()
+        public override async Task<byte> WhoseTurn()
         {
             Board board = _sessionContext.Board;
             string lastMoveId = board.LastMoveId;
@@ -762,6 +762,10 @@ namespace TerritoryWars.Managers.SessionComponents
             bool isSkipped = !Skipped.IsNull;
             bool isTilePlaced = isMoved && IsMoveDone;
             bool isPhaseStarted = !PhaseStarted.IsNull;
+            
+            CustomLogger.LogDojoLoop($"[TurnEndData] isBoardUpdated: {isBoardUpdated}, " + 
+                                      $"isPhaseStarted: {isPhaseStarted}, isSkipped: {isSkipped}, " +
+                                      $"isTilePlaced: {isTilePlaced}, isMoved: {isMoved}, isPhaseStarted: {isPhaseStarted}, ");
             if (isBoardUpdated && isPhaseStarted && (isSkipped || isTilePlaced))
             {
                 EventBus.Publish(this);

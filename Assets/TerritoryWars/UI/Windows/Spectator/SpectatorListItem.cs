@@ -19,25 +19,26 @@ namespace TerritoryWars.UI.Windows.Spectator
         public TextMeshProUGUI SecondPlayerNameText;
         public TextMeshProUGUI FirstPlayerScoreText;
         public TextMeshProUGUI SecondPlayerScoreText;
-        public TextMeshProUGUI FirstPlayerAddressText;
-        public TextMeshProUGUI SecondPlayerAddressText;
+        public TextMeshProUGUI FirstPlayerEvoluteCountText;
+        public TextMeshProUGUI SecondPlayerEvoluteCountText;
 
         public void UpdateItem(string firstPlayerName, string secondPlayerName, string status, uint fistPlayerScore,
-            uint secondPlayerScore, string firstPlayerAddress, string secondPlayerAddress, string boardId, UnityAction onJoin = null)
+            uint secondPlayerScore, uint firstPlayerEvoluteCount, uint secondPlayerEvoluteCount, string boardId, UnityAction onJoin = null)
         {
             FirstPlayerName = firstPlayerName;
             SecondPlayerName = secondPlayerName;
             FirstPlayerScore = fistPlayerScore;
             SecondPlayerScore = secondPlayerScore;
+            
             BoardId = boardId;
             
             FirstPlayerNameText.text = FirstPlayerName;
             SecondPlayerNameText.text = SecondPlayerName;
             FirstPlayerScoreText.text = FirstPlayerScore.ToString();
             SecondPlayerScoreText.text = SecondPlayerScore.ToString();
-            FirstPlayerAddressText.text = firstPlayerAddress;
-            SecondPlayerAddressText.text = secondPlayerAddress;
-            
+            FirstPlayerEvoluteCountText.text = firstPlayerEvoluteCount + ")";
+            SecondPlayerEvoluteCountText.text = secondPlayerEvoluteCount + ")";
+     
             WatchButton.onClick.RemoveAllListeners();
 
             if (status != "In Progress")

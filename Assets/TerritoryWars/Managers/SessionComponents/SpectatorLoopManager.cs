@@ -48,6 +48,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Subscribe<GameFinished>(OnEndGame);
             EventBus.Subscribe<ErrorOccured>(OnError);
             EventBus.Subscribe<GameCanceled>(OnGameCanceled);
+            EventBus.Subscribe<PhaseStarted>(OnPhaseStarted);
             EventBus.Subscribe<TilePlaced>(OnTilePlaced);
             EventBus.Subscribe<TurnEndData>(OnTurnEnd);
         }
@@ -56,23 +57,142 @@ namespace TerritoryWars.Managers.SessionComponents
         {
             byte whoseTurnSide = await WhoseTurn();
             _currentPlayer = _sessionContext.Players[whoseTurnSide];
-
-            if (!IsGameStillActual())
-            {
-                FinishGame();
-            }
             
             GameUI.Instance.SetEndTurnButtonActive(false);
             GameUI.Instance.SetRotateButtonActive(false);
             GameUI.Instance.SetSkipTurnButtonActive(false);
             GameUI.Instance.SetSpectatingDeckContainer(true);
+            
+            PhaseStarted phaseStarted = new PhaseStarted().SetData(_sessionContext.Board);
+            _currentPhase = phaseStarted;
+            OnPhaseStarted(phaseStarted);
+        }
+        
+        private void OnPhaseStarted(PhaseStarted phaseStarted)
+        {
+            CustomLogger.LogObject(phaseStarted, "OnPhaseStarted");
+            
+            if (phaseStarted.Phase == SessionPhase.Reveal)
+            {
+                // if it's session start or game creation - invoke reveal action here
+                if (_currentPhase.IsNull || _currentPhase.Phase == SessionPhase.Creating)
+                {
+                    OnRevealPhase(phaseStarted);
+                    _sessionContext.Board.SetData(_currentPhase);
+                    _currentPhase = phaseStarted;
+                }
+                else
+                {
+                    // in this case the reveal phase started is move phase ended and this phase a part of turn end
+                    _turnEndData.OnPhaseStarted(ref phaseStarted);
+                    _currentPhase = phaseStarted;
+                }
+                return;
+            }
+            else if (phaseStarted.Phase == SessionPhase.Move)
+            {
+                // if it's session start or game creation - invoke reveal action here
+                if (!_currentPhase.IsNull && _currentPhase.Phase == SessionPhase.Move)
+                {
+                    _turnEndData.OnPhaseStarted(ref phaseStarted);
+                    _currentPhase = phaseStarted;
+                }
+                else
+                {
+                    // in this case the reveal phase started is move phase ended and this phase a part of turn end
+                    OnMovePhase(phaseStarted);
+                    _sessionContext.Board.SetData(_currentPhase);
+                    _currentPhase = phaseStarted;
+                }
+                return;
+            }
+            
+            switch (phaseStarted.Phase)
+            {
+                case SessionPhase.Creating:
+                    OnGameCreationPhase();
+                    break;
+                case SessionPhase.Request:
+                    OnRequestPhase(phaseStarted);
+                    break;
+                case SessionPhase.Move:
+                    OnMovePhase(phaseStarted);
+                    break;
+                case SessionPhase.Finished:
+                    break;
+            }
+            _currentPhase = phaseStarted;
+            _sessionContext.Board.SetData(_currentPhase);
+        }
+        
+        private void OnRequestPhase(PhaseStarted phaseData)
+        {
+            EventBus.Publish(new TimerEvent(TimerEventType.Requesting, TimerProgressType.Started, GetPhaseStart()));
+            
+            /*
+            // if local player turn - wait for remote player to request tile
+            // if remote player turn - request tile
+            
+            CommitmentsData commitments;
+            GeneralAccount account;
+            if (_sessionContext.IsGameWithBot)
+            {
+                if (_sessionContext.IsLocalPlayerTurn)
+                {
+                    commitments = _sessionContext.BotCommitments;
+                    account = DojoGameManager.Instance.LocalBot.Account;
+                }
+                else
+                {
+                    commitments = _sessionContext.Commitments;
+                    account = DojoGameManager.Instance.LocalAccount;
+                }
+            }
+            else
+            {
+                if (_sessionContext.IsLocalPlayerTurn)
+                {
+                    return;
+                }
+                else
+                {
+                    commitments = _sessionContext.Commitments;
+                    account = DojoGameManager.Instance.LocalAccount;
+                }
+            }
+            
+            if (!phaseData.TopTileIndex.HasValue)
+            {
+                CustomLogger.LogError("GameLoopManager: CommitedTileIndex is null in OnRequestPhase.");
+                return;
+            }
+
+            byte commitedTileIndex = phaseData.TopTileIndex.Value;*/
+        }
+        
+        private void OnGameCreationPhase()
+        {
+            EventBus.Publish(new TimerEvent(TimerEventType.GameCreation, TimerProgressType.Started, GetPhaseStart()));
+
+            CommitmentsData commitmentsData = _sessionContext.Commitments;
+            uint[] hashes = commitmentsData.GetAllHashes();
+            DojoConnector.CommitTiles(DojoGameManager.Instance.LocalAccount, hashes);
+            CustomLogger.LogDojoLoop("OnGameCreationPhase: Local player - sending commitments to server.");
+
+            if (_sessionContext.IsGameWithBot)
+            {
+                commitmentsData = _sessionContext.BotCommitments;
+                hashes = commitmentsData.GetAllHashes();
+                DojoConnector.CommitTiles(DojoGameManager.Instance.LocalBot.Account, hashes);
+                CustomLogger.LogDojoLoop("OnGameCreationPhase: Bot player - sending commitments to server.");
+            }
         }
         
         private void OnRevealPhase(PhaseStarted phaseData)
         {
             EventBus.Publish(new TimerEvent(TimerEventType.Revealing, TimerProgressType.Started, GetPhaseStart()));
 
-            CommitmentsData commitments;
+            /*CommitmentsData commitments;
             GeneralAccount account;
             if (_sessionContext.IsGameWithBot)
             {
@@ -104,14 +224,14 @@ namespace TerritoryWars.Managers.SessionComponents
             {
                 CustomLogger.LogError("GameLoopManager: CommitedTileIndex is null in OnRevealPhase.");
                 return;
-            }
+            }*/
 
-            byte commitedTileIndex = commitments.GetIndex(phaseData.CommitedTile.Value);
-            FieldElement nonce = commitments.Nonce[commitedTileIndex];
-            byte c = commitments.Permutations[commitedTileIndex];
-            CustomLogger.LogDojoLoop(
-                $"CommitedTile: {phaseData.CommitedTile.Value} Index: {commitedTileIndex}, NonceHex: {nonce.Hex()}, C: {c}");
-            DojoConnector.RevealTile(account, commitedTileIndex, nonce, c);
+            // byte commitedTileIndex = commitments.GetIndex(phaseData.CommitedTile.Value);
+            // FieldElement nonce = commitments.Nonce[commitedTileIndex];
+            // byte c = commitments.Permutations[commitedTileIndex];
+            // CustomLogger.LogDojoLoop(
+            //     $"CommitedTile: {phaseData.CommitedTile.Value} Index: {commitedTileIndex}, NonceHex: {nonce.Hex()}, C: {c}");
+            // DojoConnector.RevealTile(account, commitedTileIndex, nonce, c);
         }
 
         private void OnMovePhase(PhaseStarted phaseStarted)
@@ -119,16 +239,18 @@ namespace TerritoryWars.Managers.SessionComponents
             _sessionContext.Board.TopTileIndex = phaseStarted.TopTileIndex;
 
             EventBus.Publish(new TimerEvent(TimerEventType.Moving, TimerProgressType.Started, GetPhaseStart()));
+            
+            StartMoving();
 
-            // regular case
+            /*// regular case
             if (phaseStarted.TopTileIndex.HasValue && phaseStarted.CommitedTile.HasValue)
             {
-                if (!_sessionContext.IsLocalPlayerTurn)
+                /*if (!_sessionContext.IsLocalPlayerTurn)
                 {
                     byte commitedTile = _sessionContext.Commitments.GetIndex(phaseStarted.CommitedTile.Value, false);
-                    byte c = _sessionContext.Commitments.Permutations[commitedTile];
-                    string tileType = _sessionContext.Board.AvailableTilesInDeck[commitedTile];
-                    TileData tileData = new TileData(tileType, Vector2Int.zero, _localPlayer.PlayerSide);
+                    // byte c = _sessionContext.Commitments.Permutations[commitedTile];
+                    // string tileType = _sessionContext.Board.AvailableTilesInDeck[commitedTile];
+                    // TileData tileData = new TileData(tileType, Vector2Int.zero, _localPlayer.PlayerSide);
 
                     GameUI.Instance.ShowNextTileAnimation.DropCurrentTile(() =>
                     {
@@ -180,6 +302,7 @@ namespace TerritoryWars.Managers.SessionComponents
                     else SkipLocalTurn();
                 }
             }
+            */
 
         }
 
@@ -193,17 +316,11 @@ namespace TerritoryWars.Managers.SessionComponents
         private void StartMoving()
         {
             GameUI.Instance.InitialDeckContainerActivation();
-            if (!IsGameStillActual())
-            {
-                FinishGame();
-                return;
-            }
 
             ShowCurrentTile();
             CustomLogger.LogDojoLoop("StartTurn");
 
-            if (_currentPlayer == _localPlayer) StartLocalTurn();
-            if (_currentPlayer == _remotePlayer) StartRemoteTurn();
+            StartRemoteTurn();
         }
 
         public void ShowCurrentTile()
@@ -382,15 +499,15 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void OnTimerEvent(TimerEvent timerEvent)
         {
-            if (timerEvent.Type == TimerEventType.Moving && timerEvent.ProgressType == TimerProgressType.Elapsed 
-                                                         && _sessionContext.IsLocalPlayerTurn)
-            {
-                SkipLocalTurn();
-            }
-            else if (timerEvent.ProgressType == TimerProgressType.Elapsed)
-            {
-                FinishGame();
-            }
+            // if (timerEvent.Type == TimerEventType.Moving && timerEvent.ProgressType == TimerProgressType.Elapsed 
+            //                                              && _sessionContext.IsLocalPlayerTurn)
+            // {
+            //     SkipLocalTurn();
+            // }
+            // else if (timerEvent.ProgressType == TimerProgressType.Elapsed)
+            // {
+            //     FinishGame();
+            // }
             // else if (timerEvent.Type == TimerEventType.PassingTimeElapsed && !_sessionContext.IsLocalPlayerTurn)
             // {
             //     SkipOpponentTurnLocally();
@@ -420,8 +537,6 @@ namespace TerritoryWars.Managers.SessionComponents
             _currentPlayer.EndTurnAnimation();
             byte nextTurnSide = (byte)((_currentPlayer.PlayerSide + 1) % 2);
             _currentPlayer = _sessionContext.Players[nextTurnSide];
-            SessionManager.Instance.TileSelector.SetCurrentTile(GetCurrentTile());
-            GameUI.Instance.UpdateUI();
 
             PhaseStarted phaseStarted = _turnEndData.PhaseStarted;
             turnEndData.Reset();
@@ -503,7 +618,7 @@ namespace TerritoryWars.Managers.SessionComponents
             return true;
         }
 
-        private async Task<byte> WhoseTurn()
+        public override async Task<byte> WhoseTurn()
         {
             Board board = _sessionContext.Board;
             string lastMoveId = board.LastMoveId;
@@ -541,6 +656,7 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Unsubscribe<GameFinished>(OnEndGame);
             EventBus.Unsubscribe<ErrorOccured>(OnError);
             EventBus.Unsubscribe<GameCanceled>(OnGameCanceled);
+            EventBus.Unsubscribe<PhaseStarted>(OnPhaseStarted);
             EventBus.Unsubscribe<TilePlaced>(OnTilePlaced);
         }
     }

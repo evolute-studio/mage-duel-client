@@ -1,6 +1,7 @@
 ﻿using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
+using TerritoryWars.Managers.SessionComponents;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,7 +22,10 @@ namespace TerritoryWars.UI
 
         private void CancelGame()
         {
-            DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount);
+            if (!SessionManager.Instance.SessionContext.IsSpectatingGame)
+            {
+                DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount);
+            }
             CustomSceneManager.Instance.LoadLobby();
         }
         
