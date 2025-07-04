@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using TerritoryWars;
+using TerritoryWars.DataModels.ClientEvents;
 using TerritoryWars.Dojo;
 using TerritoryWars.ExternalConnections;
 using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.Tools;
+using TerritoryWars.UI.General;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -25,6 +27,7 @@ namespace TerritoryWars.UI
         public TextMeshProUGUI EvoluteCountText;
         public Button ChangeNameButton;
         public Image ControllerIcon;
+        public PlayerAvatar PlayerAvatar;
 
         private bool _isInitialized = false;
 
@@ -54,7 +57,6 @@ namespace TerritoryWars.UI
             CheckNickname(name);
             SetName(name);
             SetEvoluteBalance(profile.balance);
-            ControllerIcon.gameObject.SetActive(ApplicationState.IsController);
         }
 
         private void CreateModelForNewPlayer()
@@ -96,6 +98,7 @@ namespace TerritoryWars.UI
         {
             PlayerNameText.text = name;
             OnNameChanged?.Invoke(name);
+            PlayerAvatar.SetAvatar(name);
         }
 
         public void SetEvoluteBalance(uint value)

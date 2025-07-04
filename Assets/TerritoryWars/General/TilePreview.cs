@@ -11,6 +11,8 @@ using TerritoryWars.Dojo;
 using TerritoryWars.Managers.SessionComponents;
 using TerritoryWars.Tools;
 using TerritoryWars.UI;
+using TMPro;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace TerritoryWars.General
@@ -42,9 +44,17 @@ namespace TerritoryWars.General
 
         public List<Sprite> HouseSprites = new List<Sprite>();
 
+        public RectTransform TilePointsParent;
+        public CanvasGroup TilePointsParentCanvasGroup;
+        public TilePointsUI CityPointsUI;
+        public TilePointsUI RoadPointsUI;
+        private Vector2 _startTilePointsPosition;
+
         private void Awake()
         {
             _mainCamera = Camera.main;
+            _startTilePointsPosition = TilePointsParent.anchoredPosition;
+            TilePointsAnimation();
             SetInitialPosition();
             SetupSortingLayers();
 
@@ -132,6 +142,10 @@ namespace TerritoryWars.General
                 gameObject.SetActive(true);
                 tileGenerator.Generate(currentTile);
                 tileGeneratorForUI.Generate(currentTile);
+                
+                CityPointsUI.ShowScore(currentTile.GetPoints(true), currentTile.PlayerSide);
+                RoadPointsUI.ShowScore(currentTile.GetPoints(false), currentTile.PlayerSide);
+                
                 if (tileGenerator.CurrentTileGO != null)
                 {
                     TileParts tileParts = tileGenerator.CurrentTileGO.GetComponent<TileParts>();
@@ -333,7 +347,8 @@ namespace TerritoryWars.General
                 ResetPosition();
             });
             sequence.Play();
-
+            
+            HideTilePoints();
         }
 
         
@@ -350,6 +365,44 @@ namespace TerritoryWars.General
             
             transform.position = _initialPosition;
         }
+        
+        public void TilePointsAnimation()
+        {
+            TilePointsParent.DOKill();
+            TilePointsParent.anchoredPosition = _startTilePointsPosition;
+            TilePointsParentCanvasGroup.alpha = 1f;
+            
+            
+            // position Y
+            Vector2 targetPosition = _startTilePointsPosition;
+            targetPosition.y += 0.12f;
+            TilePointsParent
+                .DOAnchorPos(targetPosition, 2f)
+                .SetEase(Ease.InOutSine)
+                .SetLoops(-1, LoopType.Yoyo);
+
+        }
+
+        public void HideTilePoints()
+        {
+            TilePointsParent.DOKill();
+            
+            float targetOpacity = 0f;
+            Vector2 targetPosition = new Vector2(_startTilePointsPosition.x, -0.78f);
+            TilePointsParent
+                .DOAnchorPos(targetPosition, moveDuration)
+                .SetEase(Ease.InOutSine);
+            
+            TilePointsParentCanvasGroup.DOFade(targetOpacity, moveDuration)
+                .OnComplete(() =>
+                {
+                    CityPointsUI.SetActive(false);
+                    RoadPointsUI.SetActive(false);
+                    TilePointsAnimation();
+                });
+            
+            
+        }
 
         private void OnDestroy()
         {
@@ -360,5 +413,33 @@ namespace TerritoryWars.General
             EventBus.Unsubscribe<ClientInput>(OnClientInput);
             EventBus.Unsubscribe<TilePlaced>(ResetPosition);
         }
+
+        [Serializable]
+        public struct TilePointsUI
+        {
+            public GameObject PointsParent;
+            public TextMeshProUGUI PointsText;
+            public Image PointsImage;
+            public Sprite[] SpritePerSide;
+
+            public void SetActive(bool active)
+            {
+                PointsParent.SetActive(active);
+            }
+
+            public void ShowScore(int score, int playerSide)
+            {
+                SetActive(score > 0);
+                if (playerSide < 0)
+                {
+                    SetActive(false); 
+                    return;
+                }
+                PointsText.text = score.ToString();
+                PointsImage.sprite = SpritePerSide[playerSide];
+            }
+        }
     }
+    
+    
 }
