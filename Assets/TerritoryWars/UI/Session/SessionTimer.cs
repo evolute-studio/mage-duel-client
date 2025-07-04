@@ -28,6 +28,15 @@ namespace TerritoryWars.UI.Session
         public string OpponentPlayerTurnText = "Waiting for opponent's turn";
         public string PassingTurnText = "Passing the turn";
 
+        public string SpectatorTurnsText
+        {
+            get
+            {
+                return $"Waiting for {SessionManager.Instance.SessionContext.PlayersData[SessionManager.Instance.SessionContext.CurrentTurnPlayer.PlayerSide].Username} turn";
+            }
+        }
+
+
         [Header("Hourglass")]
         public SpriteAnimator SpriteAnimator;
         public Sprite[] IdleAnimationSprites;
@@ -46,6 +55,8 @@ namespace TerritoryWars.UI.Session
         private ulong _startTurnTimestamp;
         private float _timeGone => GetTurnTime();
         private Coroutine _timerCoroutine;
+        
+        
 
         public void Awake()
         {
@@ -168,7 +179,7 @@ namespace TerritoryWars.UI.Session
                 case TimerEventType.Requesting:
                     return GameRequestText;
                 case TimerEventType.Moving:
-                    return _isLocalPlayerTurn ? LocalPlayerTurnText : OpponentPlayerTurnText;
+                    return SessionManager.Instance.SessionContext.IsSpectatingGame ? SpectatorTurnsText : _isLocalPlayerTurn ? LocalPlayerTurnText : OpponentPlayerTurnText;
                 default:
                     return "";
             }

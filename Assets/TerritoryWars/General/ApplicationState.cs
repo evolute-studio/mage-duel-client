@@ -8,6 +8,8 @@ namespace TerritoryWars.General
         SnapshotTab,
         Session,
         Leaderboard,
+        SpectatorTab,
+        Spectating,
     }
     
     public static class ApplicationState

@@ -158,6 +158,50 @@ namespace Dojo
                     return true;
                 });
         }
+        
+        public IEnumerable<T> EntityModels<T>(Dictionary<string, object> filters) where T : ModelInstance
+        {
+            return transform.Cast<Transform>()
+                .Select(t => t.gameObject)
+                .Select(g => g.GetComponent<T>())
+                .Where(c => c != null)
+                .Where(c => 
+                {
+                    foreach (var filter in filters)
+                    {
+                        var field = c.GetType().GetField(filter.Key);
+                        if (field == null)
+                        {
+                            Debug.LogWarning($"Field {filter.Key} not found in component {typeof(T).Name}");
+                            return false;
+                        }
+
+                        var value = field.GetValue(c);
+                        if (value == null)
+                        {
+                            Debug.LogWarning($"Field {filter.Key} has null value in component {typeof(T).Name}");
+                            return false;
+                        }
+
+                        var filterValue = filter.Value;
+                        if (value is FieldElement fieldElement)
+                        {
+                            value = fieldElement.Hex();
+                            if (filterValue is FieldElement filterFieldElement)
+                            {
+                                filterValue = filterFieldElement.Hex();
+                            }
+                        }
+
+                        if (!value.Equals(filterValue))
+                        {
+                            Debug.LogWarning($"Field {filter.Key} with value {value} does not match filter value {filterValue} in component {typeof(T).Name}");
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+        }
 
         // Add a new entity game object as a child of the WorldManager game object.
         public GameObject AddEntity(string key)

@@ -18,7 +18,6 @@ namespace TerritoryWars.UI.Windows.MatchTab
         public bool IsOnline => OnlineStatus.IsOnline;
 
         public TextMeshProUGUI PlayerNameText;
-        public TextMeshProUGUI AddressText;
         //private TextMeshProUGUI _gameIdText;
         public TextMeshProUGUI EvoluteCountText;
         public TextMeshProUGUI MoveNumberText;
@@ -32,8 +31,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
             HostPlayer = hostPlayer;
 
             PlayerNameText.text = PlayerName;
-            AddressText.text = hostPlayer;
-            EvoluteCountText.text = " x " + EvoluteCount.ToString();
+            EvoluteCountText.text = EvoluteCount.ToString() + ")";
             MoveNumberText.gameObject.SetActive(moveNumber > 0);
             MoveNumberText.text = "Moves: " + moveNumber;
             //_gameIdText.text = GameId;

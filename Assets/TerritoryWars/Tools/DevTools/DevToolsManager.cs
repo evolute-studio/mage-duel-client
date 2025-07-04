@@ -25,7 +25,7 @@ namespace TerritoryWars.Tools.DevTools
 
         private void OnGUI()
         {
-            if (!Application.isEditor) return;
+            // if (!Application.isEditor) return;
 
             InitializeStyles();
 

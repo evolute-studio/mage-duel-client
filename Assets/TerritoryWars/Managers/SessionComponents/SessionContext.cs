@@ -26,11 +26,12 @@ namespace TerritoryWars.Managers.SessionComponents
         public Player RemotePlayer;
         public Player CurrentTurnPlayer;
 
-        public bool IsLocalPlayerHost => LocalPlayer.PlayerId == Board.Player1.PlayerId;
+        public bool IsLocalPlayerHost => IsSpectatingGame || LocalPlayer.PlayerId == Board.Player1.PlayerId;
         public bool IsLocalPlayerTurn => CurrentTurnPlayer.PlayerId == LocalPlayer.PlayerId;
 
         public bool IsGameWithBot;
         public bool IsGameWithBotAsPlayer;
+        public bool IsSpectatingGame;
 
 
         [Header("Session Settings")]
@@ -50,6 +51,11 @@ namespace TerritoryWars.Managers.SessionComponents
         public bool IsPlayerInSession(string playerId)
         {
             return PlayersData[0].PlayerId == playerId || PlayersData[1].PlayerId == playerId;
+        }
+
+        public bool IsPlayerSpectatingSession(string boardId)
+        {
+            return Board.Id == boardId;
         }
 
         public Player GetPlayerById(string playerId)

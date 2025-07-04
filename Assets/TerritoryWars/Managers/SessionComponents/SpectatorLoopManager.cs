@@ -1,10 +1,8 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
-using DG.Tweening;
 using Dojo.Starknet;
 using TerritoryWars.ConnectorLayers.Dojo;
-using TerritoryWars.ConnectorLayers.WebSocketLayer;
 using TerritoryWars.DataModels;
 using TerritoryWars.DataModels.ClientEvents;
 using TerritoryWars.DataModels.Events;
@@ -21,7 +19,7 @@ using UnityEngine;
 
 namespace TerritoryWars.Managers.SessionComponents
 {
-    public class GameLoopManager : LoopManager, ISessionComponent
+    public class SpectatorLoopManager : LoopManager, ISessionComponent
     {
         private SessionManagerContext _managerContext;
         private SessionContext _sessionContext => _managerContext.SessionContext;
@@ -32,10 +30,10 @@ namespace TerritoryWars.Managers.SessionComponents
             get { return _sessionContext.CurrentTurnPlayer; }
             set { _sessionContext.CurrentTurnPlayer = value; }
         }
-
+        
         private Player _localPlayer => _sessionContext.LocalPlayer;
         private Player _remotePlayer => _sessionContext.RemotePlayer;
-
+        
         private PhaseStarted _currentPhase;
 
         public override void Initialize(SessionManagerContext managerContext)
@@ -54,24 +52,26 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Subscribe<TilePlaced>(OnTilePlaced);
             EventBus.Subscribe<TurnEndData>(OnTurnEnd);
         }
-
+        
         public override async void StartGame()
         {
             byte whoseTurnSide = await WhoseTurn();
             _currentPlayer = _sessionContext.Players[whoseTurnSide];
-
-            if (!IsGameStillActual())
-            {
-                FinishGame();
-                return;
-            }
-
+            
+            GameUI.Instance.SetEndTurnButtonActive(false);
+            GameUI.Instance.SetRotateButtonActive(false);
+            GameUI.Instance.SetSkipTurnButtonActive(false);
+            GameUI.Instance.SetSpectatingDeckContainer(true);
+            
             PhaseStarted phaseStarted = new PhaseStarted().SetData(_sessionContext.Board);
+            _currentPhase = phaseStarted;
             OnPhaseStarted(phaseStarted);
         }
-
+        
         private void OnPhaseStarted(PhaseStarted phaseStarted)
         {
+            CustomLogger.LogObject(phaseStarted, "OnPhaseStarted");
+            
             if (phaseStarted.Phase == SessionPhase.Reveal)
             {
                 // if it's session start or game creation - invoke reveal action here
@@ -124,74 +124,12 @@ namespace TerritoryWars.Managers.SessionComponents
             _currentPhase = phaseStarted;
             _sessionContext.Board.SetData(_currentPhase);
         }
-
-        private void OnGameCreationPhase()
-        {
-            EventBus.Publish(new TimerEvent(TimerEventType.GameCreation, TimerProgressType.Started, GetPhaseStart()));
-
-            CommitmentsData commitmentsData = _sessionContext.Commitments;
-            uint[] hashes = commitmentsData.GetAllHashes();
-            DojoConnector.CommitTiles(DojoGameManager.Instance.LocalAccount, hashes);
-            CustomLogger.LogDojoLoop("OnGameCreationPhase: Local player - sending commitments to server.");
-
-            if (_sessionContext.IsGameWithBot)
-            {
-                commitmentsData = _sessionContext.BotCommitments;
-                hashes = commitmentsData.GetAllHashes();
-                DojoConnector.CommitTiles(DojoGameManager.Instance.LocalBot.Account, hashes);
-                CustomLogger.LogDojoLoop("OnGameCreationPhase: Bot player - sending commitments to server.");
-            }
-        }
-
-        private void OnRevealPhase(PhaseStarted phaseData)
-        {
-            EventBus.Publish(new TimerEvent(TimerEventType.Revealing, TimerProgressType.Started, GetPhaseStart()));
-
-            CommitmentsData commitments;
-            GeneralAccount account;
-            if (_sessionContext.IsGameWithBot)
-            {
-                if (_sessionContext.IsLocalPlayerTurn)
-                {
-                    commitments = _sessionContext.Commitments;
-                    account = DojoGameManager.Instance.LocalAccount;
-                }
-                else
-                {
-                    commitments = _sessionContext.BotCommitments;
-                    account = DojoGameManager.Instance.LocalBot.Account;
-                }
-            }
-            else
-            {
-                if (_sessionContext.IsLocalPlayerTurn)
-                {
-                    commitments = _sessionContext.Commitments;
-                    account = DojoGameManager.Instance.LocalAccount;
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-            if (!phaseData.CommitedTile.HasValue)
-            {
-                CustomLogger.LogError("GameLoopManager: CommitedTileIndex is null in OnRevealPhase.");
-                return;
-            }
-            
-            byte commitedTileIndex = commitments.GetIndex(phaseData.CommitedTile.Value);
-            FieldElement nonce = commitments.Nonce[commitedTileIndex];
-            byte c = commitments.Permutations[commitedTileIndex];
-            CustomLogger.LogDojoLoop($"CommitedTile: {phaseData.CommitedTile.Value} Index: {commitedTileIndex}, NonceHex: {nonce.Hex()}, C: {c}");
-            DojoConnector.RevealTile(account, commitedTileIndex, nonce, c);
-        }
-
-    private void OnRequestPhase(PhaseStarted phaseData)
+        
+        private void OnRequestPhase(PhaseStarted phaseData)
         {
             EventBus.Publish(new TimerEvent(TimerEventType.Requesting, TimerProgressType.Started, GetPhaseStart()));
             
+            /*
             // if local player turn - wait for remote player to request tile
             // if remote player turn - request tile
             
@@ -229,39 +167,102 @@ namespace TerritoryWars.Managers.SessionComponents
                 return;
             }
 
-            byte commitedTileIndex = phaseData.TopTileIndex.Value;
-            FieldElement nonce = commitments.Nonce[commitedTileIndex];
-            byte c = commitments.Permutations[commitedTileIndex];
-            CustomLogger.LogDojoLoop($"Requesting tile: {phaseData.TopTileIndex}, Index: {commitedTileIndex}, NonceHex: {nonce.Hex()}, C: {c}");
-            DojoConnector.RequestNextTile(account, commitedTileIndex, nonce, c);
+            byte commitedTileIndex = phaseData.TopTileIndex.Value;*/
         }
         
+        private void OnGameCreationPhase()
+        {
+            EventBus.Publish(new TimerEvent(TimerEventType.GameCreation, TimerProgressType.Started, GetPhaseStart()));
+
+            CommitmentsData commitmentsData = _sessionContext.Commitments;
+            uint[] hashes = commitmentsData.GetAllHashes();
+            DojoConnector.CommitTiles(DojoGameManager.Instance.LocalAccount, hashes);
+            CustomLogger.LogDojoLoop("OnGameCreationPhase: Local player - sending commitments to server.");
+
+            if (_sessionContext.IsGameWithBot)
+            {
+                commitmentsData = _sessionContext.BotCommitments;
+                hashes = commitmentsData.GetAllHashes();
+                DojoConnector.CommitTiles(DojoGameManager.Instance.LocalBot.Account, hashes);
+                CustomLogger.LogDojoLoop("OnGameCreationPhase: Bot player - sending commitments to server.");
+            }
+        }
+        
+        private void OnRevealPhase(PhaseStarted phaseData)
+        {
+            EventBus.Publish(new TimerEvent(TimerEventType.Revealing, TimerProgressType.Started, GetPhaseStart()));
+
+            /*CommitmentsData commitments;
+            GeneralAccount account;
+            if (_sessionContext.IsGameWithBot)
+            {
+                if (_sessionContext.IsLocalPlayerTurn)
+                {
+                    commitments = _sessionContext.Commitments;
+                    account = DojoGameManager.Instance.LocalAccount;
+                }
+                else
+                {
+                    commitments = _sessionContext.BotCommitments;
+                    account = DojoGameManager.Instance.LocalBot.Account;
+                }
+            }
+            else
+            {
+                if (_sessionContext.IsLocalPlayerTurn)
+                {
+                    commitments = _sessionContext.Commitments;
+                    account = DojoGameManager.Instance.LocalAccount;
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            if (!phaseData.CommitedTile.HasValue)
+            {
+                CustomLogger.LogError("GameLoopManager: CommitedTileIndex is null in OnRevealPhase.");
+                return;
+            }*/
+
+            // byte commitedTileIndex = commitments.GetIndex(phaseData.CommitedTile.Value);
+            // FieldElement nonce = commitments.Nonce[commitedTileIndex];
+            // byte c = commitments.Permutations[commitedTileIndex];
+            // CustomLogger.LogDojoLoop(
+            //     $"CommitedTile: {phaseData.CommitedTile.Value} Index: {commitedTileIndex}, NonceHex: {nonce.Hex()}, C: {c}");
+            // DojoConnector.RevealTile(account, commitedTileIndex, nonce, c);
+        }
+
         private void OnMovePhase(PhaseStarted phaseStarted)
         {
             _sessionContext.Board.TopTileIndex = phaseStarted.TopTileIndex;
-            
-            EventBus.Publish(new TimerEvent(TimerEventType.Moving, TimerProgressType.Started, GetPhaseStart()));
 
-            // regular case
+            EventBus.Publish(new TimerEvent(TimerEventType.Moving, TimerProgressType.Started, GetPhaseStart()));
+            
+            StartMoving();
+
+            /*// regular case
             if (phaseStarted.TopTileIndex.HasValue && phaseStarted.CommitedTile.HasValue)
             {
-                if (!_sessionContext.IsLocalPlayerTurn)
+                /*if (!_sessionContext.IsLocalPlayerTurn)
                 {
                     byte commitedTile = _sessionContext.Commitments.GetIndex(phaseStarted.CommitedTile.Value, false);
-                    byte c = _sessionContext.Commitments.Permutations[commitedTile];
-                    string tileType = _sessionContext.Board.AvailableTilesInDeck[commitedTile];
-                    TileData tileData = new TileData(tileType, Vector2Int.zero, _localPlayer.PlayerSide);
+                    // byte c = _sessionContext.Commitments.Permutations[commitedTile];
+                    // string tileType = _sessionContext.Board.AvailableTilesInDeck[commitedTile];
+                    // TileData tileData = new TileData(tileType, Vector2Int.zero, _localPlayer.PlayerSide);
 
-                    GameUI.Instance.ShowNextTileAnimation.DropCurrentTile(() => { 
+                    GameUI.Instance.ShowNextTileAnimation.DropCurrentTile(() =>
+                    {
                         ShowCurrentTile();
                         GameUI.Instance.ShowNextTileAnimation.NextTileFogReveal(() =>
                         {
                             StartMoving();
                             GameUI.Instance.ShowNextTileActive(true, null, tileData);
                         });
-                        
+
                     });
-                    
+
                 }
                 else
                 {
@@ -286,7 +287,7 @@ namespace TerritoryWars.Managers.SessionComponents
                 {
                     StartMoving();
                 }
-                
+
             }
             // case when there is no top tile and no commited tile. But we can still use joker or skip
             else
@@ -297,43 +298,29 @@ namespace TerritoryWars.Managers.SessionComponents
                 }
                 else
                 {
-                    if(_currentPlayer.JokerCount > 0) StartMoving();
+                    if (_currentPlayer.JokerCount > 0) StartMoving();
                     else SkipLocalTurn();
                 }
             }
-            
+            */
+
         }
 
-        
+
 
         private void FinishGame()
         {
             DojoConnector.FinishGame(DojoGameManager.Instance.LocalAccount, new FieldElement(_sessionContext.Board.Id));
-            WSLayer.Instance.UnsubscribeSessionChannel();
-        }
-
-        private void CancelGame()
-        {
-            DojoConnector.CancelGame(DojoGameManager.Instance.LocalAccount);
-            WSLayer.Instance.UnsubscribeSessionChannel();
-            SimpleStorage.ClearCurrentBoardId();
-            CustomSceneManager.Instance.LoadLobby();
         }
 
         private void StartMoving()
         {
             GameUI.Instance.InitialDeckContainerActivation();
-            GameUI.Instance.SetJokerMode(false);
-            if (!IsGameStillActual())
-            {
-                FinishGame();
-                return;
-            }
+
             ShowCurrentTile();
             CustomLogger.LogDojoLoop("StartTurn");
-            
-            if (_currentPlayer == _localPlayer) StartLocalTurn();
-            if (_currentPlayer == _remotePlayer) StartRemoteTurn();
+
+            StartRemoteTurn();
         }
 
         public void ShowCurrentTile()
@@ -341,8 +328,8 @@ namespace TerritoryWars.Managers.SessionComponents
             TileData currentTile = GetCurrentTile();
             if (currentTile == null)
             {
-                 _managerContext.TileSelector.tilePreview.SetActivePreview(_sessionContext.IsLocalPlayerTurn);
-                 //_managerContext.TileSelector.tilePreview.UpdatePreview(null);
+                _managerContext.TileSelector.tilePreview.SetActivePreview(_sessionContext.IsLocalPlayerTurn);
+                //_managerContext.TileSelector.tilePreview.UpdatePreview(null);
             }
             else
             {
@@ -378,7 +365,7 @@ namespace TerritoryWars.Managers.SessionComponents
             {
                 TileData tileData = new TileData(currentTile, Vector2Int.zero, _localPlayer.PlayerSide);
                 _managerContext.TileSelector.StartTilePlacement(tileData);
-                
+
                 if (_managerContext.TileSelector.IsExistValidPlacement(tileData))
                 {
                     _managerContext.TileSelector.StartTilePlacement(tileData);
@@ -393,14 +380,14 @@ namespace TerritoryWars.Managers.SessionComponents
                     DojoGameManager.Instance.LocalBotAsPlayer.MakeMove();
                 }
             }
-            
+
 
             GameUI.Instance.SetEndTurnButtonActive(false);
             GameUI.Instance.SetRotateButtonActive(false);
             GameUI.Instance.SetSkipTurnButtonActive(true);
             GameUI.Instance.SetActiveDeckContainer(true);
 
-            
+
 
             void TryJoker()
             {
@@ -413,9 +400,7 @@ namespace TerritoryWars.Managers.SessionComponents
                     GameUI.Instance.SetActiveSkipButtonPulse(true);
                 }
             }
-    }
-        
-
+        }
         private void StartRemoteTurn()
         {
             CustomLogger.LogDojoLoop("StartRemoteTurn");
@@ -455,17 +440,11 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void OnMoved(Moved data)
         {
-            if (data.PlayerId != _localPlayer.PlayerId)
-            {
-                TileData tileData = new TileData(data.tileModel);
-                //_managerContext.BoardManager.PlaceTile(tileData);
+            TileData tileData = new TileData(data.tileModel);
+            //_managerContext.BoardManager.PlaceTile(tileData);
 
-                Coroutines.StartRoutine(HandleOpponentMoveCoroutine(tileData));
-            }
-            else
-            {
-                _turnEndData.OnTilePlaced();
-            }
+            Coroutines.StartRoutine(HandleOpponentMoveCoroutine(tileData));
+            
 
             _sessionContext.Board.UpdateTimestamp(data.Timestamp);
             _turnEndData.SetMoved(ref data);
@@ -478,11 +457,6 @@ namespace TerritoryWars.Managers.SessionComponents
         
         private IEnumerator HandleOpponentMoveCoroutine(TileData tile)
         {
-            if (_managerContext.BoardManager.IsTilePlaced(tile.Position))
-            {
-                _turnEndData.OnTilePlaced();
-                yield break;
-            }
             _managerContext.TileSelector.SetCurrentTile(tile);
             _managerContext.TileSelector.tilePreview.SetPosition(tile.Position);
             yield return new WaitForSeconds(0.3f);
@@ -525,16 +499,15 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private void OnTimerEvent(TimerEvent timerEvent)
         {
-            if (timerEvent.Type == TimerEventType.Moving && timerEvent.ProgressType == TimerProgressType.Elapsed 
-                                                         && _sessionContext.IsLocalPlayerTurn)
-            {
-                SkipLocalTurn();
-            }
-            else if (timerEvent.ProgressType == TimerProgressType.ElapsedCompletely)
-            {
-                CustomLogger.LogImportant("GameLoopManager: TimerEvent ElapsedCompletely");
-                FinishGame();
-            }
+            // if (timerEvent.Type == TimerEventType.Moving && timerEvent.ProgressType == TimerProgressType.Elapsed 
+            //                                              && _sessionContext.IsLocalPlayerTurn)
+            // {
+            //     SkipLocalTurn();
+            // }
+            // else if (timerEvent.ProgressType == TimerProgressType.Elapsed)
+            // {
+            //     FinishGame();
+            // }
             // else if (timerEvent.Type == TimerEventType.PassingTimeElapsed && !_sessionContext.IsLocalPlayerTurn)
             // {
             //     SkipOpponentTurnLocally();
@@ -555,26 +528,9 @@ namespace TerritoryWars.Managers.SessionComponents
             if (_currentPlayer != _localPlayer) return;
             GameUI.Instance.SetJokerMode(false);
             _managerContext.TileSelector.EndTilePlacement();
-            _managerContext.TileSelector.tilePreview.ResetPosition();
             DojoConnector.SkipMove(DojoGameManager.Instance.LocalAccount);
         }
-
-        private void SkipOpponentTurnLocally()
-        {
-            if (_currentPlayer != _remotePlayer) return;
-            string id = "0x0";
-            string playerId = _remotePlayer.PlayerId;
-            string prevMoveId = _sessionContext.Board.LastMoveId;
-            string boardId = _sessionContext.Board.Id;
-            ulong timestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-            Skipped skipped = new Skipped(id, playerId, prevMoveId, boardId, timestamp);
-            OnSkipped(skipped);
-            BoardUpdated data = new BoardUpdated().SetData(_sessionContext.Board);
-            OnBoardUpdate(data);
-        }
-
-
-
+        
         public void OnTurnEnd(TurnEndData turnEndData)
         {
             CustomLogger.LogDojoLoop("OnTurnEnd");
@@ -622,9 +578,6 @@ namespace TerritoryWars.Managers.SessionComponents
                 case ServerErrorType.NotYourTurn:
                     PopupManager.Instance.NotYourTurnPopup();
                     break;
-                case ServerErrorType.CantFinishGame:
-                    CancelGame();
-                    break;
             }
 
             CustomLogger.LogError($"[{errorType}] | Player: {error.Player}");
@@ -652,9 +605,9 @@ namespace TerritoryWars.Managers.SessionComponents
             int phaseDuration = GameConfiguration.GetPhaseDuration(board.Phase);
             ulong phaseStartedAt = board.PhaseStartedAt;
             ulong currentTimestamp = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-            if (phaseStartedAt == 0)
+            if (phaseStartedAt == 0 || currentTimestamp < phaseStartedAt)
             {
-                CustomLogger.LogError("GameLoopManager: Phase started at is not set");
+                CustomLogger.LogError("GameLoopManager: Phase started at is not set or in the past.");
                 return false;
             }
             int elapsedTime = (int)currentTimestamp - (int)phaseStartedAt;
@@ -705,71 +658,6 @@ namespace TerritoryWars.Managers.SessionComponents
             EventBus.Unsubscribe<GameCanceled>(OnGameCanceled);
             EventBus.Unsubscribe<PhaseStarted>(OnPhaseStarted);
             EventBus.Unsubscribe<TilePlaced>(OnTilePlaced);
-        }
-    }
-
-    public class TurnEndData
-    {
-        public BoardUpdated BoardUpdated;
-        public Moved Moved;
-        public Skipped Skipped;
-        public PhaseStarted PhaseStarted;
-
-        public bool IsMoveDone;
-        public void SetBoardUpdated(ref BoardUpdated boardUpdated)
-        {
-            BoardUpdated = boardUpdated;
-            IsTurnEnded();
-        }
-
-        public void SetMoved(ref Moved moved)
-        {
-            Moved = moved;
-            IsTurnEnded();
-        }
-
-        public void OnTilePlaced()
-        {
-            IsMoveDone = true;
-            IsTurnEnded();
-        }
-        
-        public void OnPhaseStarted(ref PhaseStarted phaseStarted)
-        {
-            PhaseStarted = phaseStarted;
-            IsTurnEnded();
-        }
-
-        public void SetSkipped(ref Skipped skipped)
-        {
-            Skipped = skipped;
-            IsTurnEnded();
-        }
-
-        public void Reset()
-        {
-            BoardUpdated = default;
-            Moved = default;
-            Skipped = default;
-            IsMoveDone = false;
-            PhaseStarted = default;
-        }
-
-        public void IsTurnEnded()
-        {
-            bool isBoardUpdated = !BoardUpdated.IsNull;
-            bool isMoved = !Moved.IsNull;
-            bool isSkipped = !Skipped.IsNull;
-            bool isTilePlaced = isMoved && IsMoveDone;
-            bool isPhaseStarted = !PhaseStarted.IsNull;
-            
-            CustomLogger.LogDojoLoop($"[TurnEndData] isBoardUpdated: {isBoardUpdated}, " + 
-                                      $"isPhaseStarted: {isPhaseStarted}, isSkipped: {isSkipped}, " +
-                                      $"isTilePlaced: {isTilePlaced}, isMoved: {isMoved}, isPhaseStarted: {isPhaseStarted}, ");
-            if (isBoardUpdated && isPhaseStarted && (isSkipped || isTilePlaced))
-            {
-                EventBus.Publish(this);
-            }
         }
     }
 }

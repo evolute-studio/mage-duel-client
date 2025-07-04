@@ -174,6 +174,34 @@ namespace TerritoryWars.ConnectorLayers.Dojo
             return gameModel;
         }
         
+        public static async Task<GameModel[]> GetAllGameInProgress()
+        {
+            Dictionary<string, object> filters = new Dictionary<string, object>()
+            {
+                { "status", new GameStatus.InProgress() }
+            };
+            var games = WorldManager.EntityModels<evolute_duel_Game>(filters);
+            if (games == null)
+            {
+                await SynchronizationMaster.SyncAllGameInProgress();
+                games = WorldManager.EntityModels<evolute_duel_Game>(filters);
+            }
+            if (games == null)
+            {
+                return default;
+            }
+            
+            evolute_duel_Game[] gameModels = games.ToArray();
+            GameModel[] gamesModels = new GameModel[games.Count()];
+
+            for (int i = 0; i < games.Count(); i++)
+            {
+                gamesModels[i] = new GameModel().SetData(gameModels[i]);
+            }
+            
+            return gamesModels;
+        }
+        
         public static async Task<GameModel> GetGameByBoardId(string boardId)
         {
             Dictionary<string, object> filters = new Dictionary<string, object>()

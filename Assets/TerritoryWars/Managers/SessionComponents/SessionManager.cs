@@ -14,7 +14,7 @@ using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
 using Dojo.Starknet;
-using TerritoryWars.ConnectorLayers.WebSocketLayer;
+using TerritoryWars.ConnectorLayers.WebSocketLayer; 
 using TerritoryWars.SaveStorage;
 using TerritoryWars.UI.Session;
 
@@ -62,30 +62,58 @@ namespace TerritoryWars.Managers.SessionComponents
 
         private async void Start()
         {
-            ApplicationState.CurrentState = ApplicationStates.Initializing;
-            Initialize();
-            await SetupData();
-            SetupCommitments();
-            SaveSessionData();
-            ManagerContext.PlayersManager.Initialize(ManagerContext);
-            ManagerContext.ContestManager.Initialize(ManagerContext);
-            InitializeBoard();
-            ManagerContext.GameLoopManager.Initialize(ManagerContext);
-            ManagerContext.JokerManager.Initialize(ManagerContext);
-            
+            if (DojoGameManager.Instance.GlobalContext.JoinBySpectator)
+            {
+                ApplicationState.CurrentState = ApplicationStates.Initializing;
+                CustomLogger.LogDojoLoop("[Initializing Spectate Session]");
+                InitializeSpectator();
+                await SetupSpectatorData();
+                ManagerContext.PlayersManager.Initialize(ManagerContext);
+                ManagerContext.ContestManager.Initialize(ManagerContext);
+                InitializeBoard();
+                ManagerContext.GameLoopManager.Initialize(ManagerContext);
+                ManagerContext.JokerManager.Initialize(ManagerContext);
+                ManagerContext.GameLoopManager.StartGame();
+                
+                GameUI.Instance.Initialize();
+                GameUI.Instance.playerInfoUI.Initialize();
+                GameUI.Instance.playerInfoUI.UpdateData(SessionContext.PlayersData);
+                GameUI.Instance.playerInfoUI.SetDeckCount(SessionContext.Board.GetTilesInDeck());
 
-            GameUI.Instance.Initialize();
-            GameUI.Instance.playerInfoUI.Initialize();
-            GameUI.Instance.playerInfoUI.UpdateData(SessionContext.PlayersData);
-            GameUI.Instance.playerInfoUI.SetDeckCount(SessionContext.Board.GetTilesInDeck());
+                CustomSceneManager.Instance.LoadingScreen.SetActive(false);
+                
+                DojoGameManager.Instance.GlobalContext.JoinBySpectator = false;
+                ApplicationState.CurrentState = ApplicationStates.Spectating;
+                IsInitialized = true;
+            }
+            else
+            {
+                ApplicationState.CurrentState = ApplicationStates.Initializing;
+                CustomLogger.LogDojoLoop("[Initializing Game Session]");
+                Initialize();
+                await SetupData();
+                SetupCommitments();
+                SaveSessionData();
+                ManagerContext.PlayersManager.Initialize(ManagerContext);
+                ManagerContext.ContestManager.Initialize(ManagerContext);
+                InitializeBoard();
+                ManagerContext.GameLoopManager.Initialize(ManagerContext);
+                ManagerContext.JokerManager.Initialize(ManagerContext);
 
-            CustomSceneManager.Instance.LoadingScreen.SetActive(false);
+
+                GameUI.Instance.Initialize();
+                GameUI.Instance.playerInfoUI.Initialize();
+                GameUI.Instance.playerInfoUI.UpdateData(SessionContext.PlayersData);
+                GameUI.Instance.playerInfoUI.SetDeckCount(SessionContext.Board.GetTilesInDeck());
+
+                CustomSceneManager.Instance.LoadingScreen.SetActive(false);
 
 
 
-            ManagerContext.GameLoopManager.StartGame();
-            ApplicationState.CurrentState = ApplicationStates.Session;
-            IsInitialized = true;
+                ManagerContext.GameLoopManager.StartGame();
+                ApplicationState.CurrentState = ApplicationStates.Session;
+                IsInitialized = true;
+            }
         }
 
         private void Initialize()
@@ -108,6 +136,30 @@ namespace TerritoryWars.Managers.SessionComponents
 
             _components.Add(playersManager);
             _components.Add(gameLoopManager);
+            _components.Add(jokerManager);
+            _components.Add(contestManager);
+        }
+
+        private void InitializeSpectator()
+        {
+            ManagerContext = new SessionManagerContext();
+            _components = new List<ISessionComponent>();
+
+            var playersManager = new PlayersManager();
+            var spectatorManager = new SpectatorLoopManager();
+            var jokerManager = new JokerManager();
+            var contestManager = new ContestManager();
+
+
+            ManagerContext.SessionContext = SessionContext;
+            ManagerContext.SessionManager = this;
+            ManagerContext.PlayersManager = playersManager;
+            ManagerContext.GameLoopManager = spectatorManager;
+            ManagerContext.JokerManager = jokerManager;
+            ManagerContext.ContestManager = contestManager;
+
+            _components.Add(playersManager);
+            _components.Add(spectatorManager);
             _components.Add(jokerManager);
             _components.Add(contestManager);
         }
@@ -173,6 +225,59 @@ namespace TerritoryWars.Managers.SessionComponents
 
             DojoGameManager.Instance.GlobalContext.SessionContext = SessionContext;
             CustomLogger.LogDojoLoop("[SessionManager.SetupData] - SessionContext initialized successfully");
+        }
+        
+        public async Task SetupSpectatorData()
+        {
+            CustomLogger.LogDojoLoop("[SessionManager.SetupSpectatorData] - Starting SetupSpectatingData");
+            //GameModel fromGlobalContext = DojoGameManager.Instance.GlobalContext.GameInProgress;
+            Board boardForLoad = DojoGameManager.Instance.GlobalContext.BoardForLoad;
+            if (boardForLoad.IsNull)
+            {
+                CustomLogger.LogDojoLoop("[SessionManager.SetupData] - Game is still null or BoardId is null after retry. Redirecting to menu.");
+                CustomSceneManager.Instance.ForceLoadScene(CustomSceneManager.Instance.Menu);
+            }
+            else
+            {
+                DojoGameManager.Instance.GlobalContext.BoardForLoad = default;
+            }
+            
+            CustomLogger.LogDojoLoop("[SessionManager.SetupSpectatorData] - Game retrieved successfully");
+            Board board = boardForLoad.IsNull ? await DojoModels.GetBoard(SessionContext.Game.BoardId) : boardForLoad;
+            //IncomingModelsFilter.AllowedBoards.Add("0x0000000000000000000000000000000000000000000000000000000000000038");
+            //Board board = await DojoLayer.Instance.GetBoard("0x0000000000000000000000000000000000000000000000000000000000000038");
+            if (board.IsNull)
+            {
+                CustomLogger.LogDojoLoop("[SessionManager.SetupSpectatorData] - Board is null. Redirecting to menu.");
+                CustomSceneManager.Instance.ForceLoadScene(CustomSceneManager.Instance.Menu);
+                return;
+            }
+            CustomLogger.LogDojoLoop("[SessionManager.SetupSpectatorData] - Board retrieved successfully");
+            UnionFind unionFind = await DojoModels.GetUnionFind(board.Id);
+            CustomLogger.LogDojoLoop("[SessionManager.SetupSpectatorData] - Union Find retrieved successfully");
+            
+            SessionContext.IsSpectatingGame = true;
+            SessionContext.LocalPlayerAddress = board.Player1.PlayerId;
+
+            SessionContext.Board = board;
+            SessionContext.UnionFind = unionFind;
+            SimpleStorage.SaveCurrentBoardId(board.Id);
+            SessionContext.PlayersData[0] = board.Player1;
+            SessionContext.PlayersData[1] = board.Player2;
+            PlayerProfile player1 = await DojoModels.GetPlayerProfile(board.Player1.PlayerId);
+            CustomLogger.LogDojoLoop("[SessionManager.SetupSpectatorData] - Player 1 retrieved successfully");
+            PlayerProfile player2 = await DojoModels.GetPlayerProfile(board.Player2.PlayerId);
+            CustomLogger.LogDojoLoop("[SessionManager.SetupSpectatorData] - Player 2 retrieved successfully");
+            SessionContext.PlayersData[0].SetData(player1);
+            SessionContext.PlayersData[1].SetData(player2);
+
+            SessionContext.IsGameWithBot = DojoGameManager.Instance.DojoSessionManager.IsGameWithBot;
+            SessionContext.IsGameWithBotAsPlayer = DojoGameManager.Instance.DojoSessionManager.IsGameWithBotAsPlayer;
+            
+            IsLocalPlayerHost = SessionContext.LocalPlayerAddress == board.Player1.PlayerId;
+
+            DojoGameManager.Instance.GlobalContext.SessionContext = SessionContext;
+            CustomLogger.LogDojoLoop("[SessionManager.SetupSpectatorData] - SessionContext initialized successfully");
         }
 
         private void SaveSessionData()

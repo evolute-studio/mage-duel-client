@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Linq;
 using Dojo;
 using Dojo.Starknet;
+using NUnit.Framework;
 using TerritoryWars.ConnectorLayers.Dojo;
 using TerritoryWars.ConnectorLayers.WebSocketLayer;
 using TerritoryWars.DataModels;
@@ -13,6 +16,7 @@ using TerritoryWars.General;
 using TerritoryWars.ModelsDataConverters;
 using TerritoryWars.SaveStorage;
 using TerritoryWars.Tools;
+using TerritoryWars.UI.Windows.Spectator;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,6 +30,10 @@ namespace TerritoryWars.UI.Windows.MatchTab
         [SerializeField] private Button createBotMatchButton;
         [SerializeField] private CanvasGroup itemsParentCanvasGroup;
 
+        [SerializeField] private GameObject spectatorListItemPrefab;
+        
+        
+        
         private int _createdMatchesCount = 0;
 
         // public GameObject PanelGameObject;
@@ -67,8 +75,7 @@ namespace TerritoryWars.UI.Windows.MatchTab
                 .LocalAccount.Address);
             DojoGameManager.Instance.CustomSynchronizationMaster.DestroyAllGames();
             DojoGameManager.Instance.WorldManager.synchronizationMaster.OnEventMessage.RemoveListener(OnEventMessage);
-            EventBus.Unsubscribe<WebSocketClient.OnlinePlayers>(OnOnlinePlayers);
-            EventBus.Unsubscribe<OnlineStatusChanged>(OnOnlineStatusChanged);
+
         }
 
         // Network Window Methods
@@ -82,6 +89,15 @@ namespace TerritoryWars.UI.Windows.MatchTab
                 case evolute_duel_GameCanceled gameCanceled:
                     CancelGame(gameCanceled);
                     break;
+                case evolute_duel_GameFinished gameFinished:
+                    FinishGame(gameFinished);
+                    break;
+                case evolute_duel_GameStarted gameStarted:
+                    GameStarted(gameStarted);
+                    FetchData();
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -89,7 +105,10 @@ namespace TerritoryWars.UI.Windows.MatchTab
         {
             Dictionary<string, bool> onlinePlayers = players.ToDictionary();
             CustomLogger.LogImportant($"[WebSocketClient] Online players received: {onlinePlayers.Count}");
-            foreach (MatchListItem matchListItem in listItems)
+            
+            List<MatchListItem> matchListItems = listItems.OfType<MatchListItem>().ToList();
+            
+            foreach (MatchListItem matchListItem in matchListItems)
             {
                 if (onlinePlayers.TryGetValue(matchListItem.HostPlayer, out bool isOnline))
                 {
@@ -109,16 +128,30 @@ namespace TerritoryWars.UI.Windows.MatchTab
 
         private void OnOnlineStatusChanged(OnlineStatusChanged onlineStatusChanged)
         {
-            MatchListItem matchListItem = listItems.Find(item => ((MatchListItem)item).HostPlayer == onlineStatusChanged.Address) as MatchListItem;
+            List<MatchListItem> matchListItems = listItems.OfType<MatchListItem>().ToList();
+            MatchListItem matchListItem = matchListItems.Find(item => ((MatchListItem)item).HostPlayer == onlineStatusChanged.Address) as MatchListItem;
+            int createdGamesCount = matchListItems.Count - 1;
             if(onlineStatusChanged.IsOnline)
                 matchListItem?.transform.SetAsFirstSibling();
             else
-                matchListItem?.transform.SetAsLastSibling();
+                matchListItem?.transform.SetSiblingIndex(createdGamesCount);
         }
         
         private void SortItems()
         {
             listItems.Sort((a, b) =>
+            {
+                bool aIsMatch = a is MatchListItem;
+                bool bIsMatch = b is MatchListItem;
+    
+                if (aIsMatch && !bIsMatch) return -1;
+                if (!aIsMatch && bIsMatch) return 1;
+                return 0;
+            });
+            
+            List<MatchListItem> matchListItems = listItems.OfType<MatchListItem>().ToList();
+            
+            matchListItems.Sort((a, b) =>
                 ((MatchListItem)a).IsOnline.CompareTo(((MatchListItem)b).IsOnline) * -1);
         }
         
@@ -203,7 +236,50 @@ namespace TerritoryWars.UI.Windows.MatchTab
                         listItems.Remove(matchListItem);
                     }
                 }
+                
+                
+                
+                await DojoGameManager.Instance.SyncInProgressGames();
+                GameModel[] allGameInProgress = await DojoModels.GetAllGameInProgress();
 
+                foreach (var gameModel in allGameInProgress)
+                {
+                    if (IsGameInProgressExist(gameModel.BoardId)) continue;
+                    string status = gameModel.Status switch
+                    {
+                        TerritoryWars.DataModels.GameStatus.Created => "Created",
+                        TerritoryWars.DataModels.GameStatus.InProgress => "In Progress",
+                        TerritoryWars.DataModels.GameStatus.Finished => "Finished",
+                        TerritoryWars.DataModels.GameStatus.Canceled => "Canceled",
+                        _ => "Unknown"
+                    };
+                    
+                    switch (status)
+                    {
+                        case "In Progress": 
+                        SpectatorListItem spectatorListItem = CreateListItem<SpectatorListItem>(spectatorListItemPrefab);
+                        _createdMatchesCount++;
+                        string boardId = gameModel.BoardId;
+                        Board board = await DojoModels.GetBoard(boardId);
+                        PlayerProfile firstPlayer = await DojoModels.GetPlayerProfile(board.Player1.PlayerId);
+                        PlayerProfile secondPlayer = await DojoModels.GetPlayerProfile(board.Player2.PlayerId);
+                        string firstPlayerName = firstPlayer.Username;
+                        string secondPlayerName = secondPlayer.Username;
+                        uint firstPlayerScore = board.Player1.Score.TotalScore;
+                        uint secondPlayerScore = board.Player2.Score.TotalScore;
+                        uint firstPlayerEvoluteCount = firstPlayer.Balance;
+                        uint secondPlayerEvoluteCount = secondPlayer.Balance;
+                        
+                        spectatorListItem.UpdateItem(firstPlayerName, secondPlayerName, status, firstPlayerScore,
+                            secondPlayerScore, firstPlayerEvoluteCount, secondPlayerEvoluteCount, boardId, () =>
+                            {
+                                DojoGameManager.Instance.GlobalContext.JoinBySpectator = true;
+                                LoadBoard(boardId);
+                            });
+                        break;
+                    }
+                }
+                
                 SetBackgroundPlaceholder(_createdMatchesCount == 0);
                 SortItems();
             }
@@ -215,9 +291,38 @@ namespace TerritoryWars.UI.Windows.MatchTab
         
         // Specific Methods
         
+        public async void LoadBoard(string boardId)
+        {
+            Board board = await DojoModels.GetBoard(boardId);
+            if (board.IsNull)
+            {
+                CustomLogger.LogError("Board is null");
+                return;
+            }
+
+            DojoGameManager.Instance.GlobalContext.BoardForLoad = board;
+            DojoGameManager.Instance.LoadSession();
+        }
+
+        public bool IsGameInProgressExist(string boardId)
+        {
+            List<SpectatorListItem> spectatorListItems = listItems.OfType<SpectatorListItem>().ToList();
+            
+            foreach (SpectatorListItem spectatorListItem in spectatorListItems)
+            {
+                if (spectatorListItem.BoardId == boardId)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
         private bool IsMatchListItemExists(string hostPlayer)
         {
-            foreach (MatchListItem matchListItem in listItems)
+            List<MatchListItem> matchListItems = listItems.OfType<MatchListItem>().ToList();
+            
+            foreach (MatchListItem matchListItem in matchListItems)
             {
                 if (matchListItem.HostPlayer == hostPlayer)
                 {
@@ -246,7 +351,9 @@ namespace TerritoryWars.UI.Windows.MatchTab
         
         private void CancelGame(evolute_duel_GameCanceled gameCanceled)
         {
-            foreach (MatchListItem matchListItem in listItems)
+            List<MatchListItem> matchListItems = listItems.OfType<MatchListItem>().ToList();
+            
+            foreach (MatchListItem matchListItem in matchListItems)
             {
                 if (matchListItem.HostPlayer == gameCanceled.host_player.Hex())
                 {
@@ -257,6 +364,34 @@ namespace TerritoryWars.UI.Windows.MatchTab
             }
         }
         
-        
+        private void GameStarted(evolute_duel_GameStarted gameStarted)
+        {
+            List<MatchListItem> matchListItems = listItems.OfType<MatchListItem>().ToList();
+            
+            foreach (MatchListItem matchListItem in matchListItems)
+            {
+                if (matchListItem.HostPlayer == gameStarted.host_player.Hex())
+                {
+                    Destroy(matchListItem.ListItem);
+                    listItems.Remove(matchListItem);
+                    break;
+                }
+            }
+        }
+
+        private void FinishGame(evolute_duel_GameFinished gameFinished)
+        {
+            List<SpectatorListItem> spectatorListItems = listItems.OfType<SpectatorListItem>().ToList();
+
+            foreach (SpectatorListItem spectatorListItem in spectatorListItems)
+            {
+                if (spectatorListItem.BoardId == gameFinished.board_id.Hex())
+                {
+                    Destroy(spectatorListItem.ListItem);
+                    listItems.Remove(spectatorListItem);
+                    break;
+                }
+            }
+        }
     }
 }

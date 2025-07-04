@@ -296,7 +296,16 @@ namespace TerritoryWars.Dojo
                 return;
             }
             await SyncPlayerModelsForGames();
-            
+        }
+
+        public async Task SyncInProgressGames()
+        {
+            int count = await CustomSynchronizationMaster.SyncAllGameInProgress();
+            if (count == 0)
+            {
+                CustomLogger.LogInfo("No created games found"); 
+                return;
+            }
         }
 
         public async Task SyncPlayerModelsForGames()

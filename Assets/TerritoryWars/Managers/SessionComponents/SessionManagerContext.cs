@@ -8,7 +8,8 @@ namespace TerritoryWars.Managers.SessionComponents
         public SessionContext SessionContext { get; set; }
         public SessionManager SessionManager;
         public PlayersManager PlayersManager { get; set; }
-        public GameLoopManager GameLoopManager { get; set; }
+        public LoopManager GameLoopManager { get; set; }
+        
         public JokerManager JokerManager { get; set; }
         public ContestManager ContestManager { get; set; }
         
