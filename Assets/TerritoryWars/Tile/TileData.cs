@@ -83,6 +83,18 @@ namespace TerritoryWars.Tile
             return roadSides;
         }
 
+        public int GetPoints(bool isCity)
+        {
+            if (isCity)
+            {
+                return GameConfiguration.CityPointsPerSide * RotatedConfig.Count(c => c == 'C');
+            }
+            else
+            {
+                return GameConfiguration.RoadPointsPerSide * RotatedConfig.Count(c => c == 'R');
+            }
+        }
+
         // public void SetConfig(string config)
         // {
         //     id = config;

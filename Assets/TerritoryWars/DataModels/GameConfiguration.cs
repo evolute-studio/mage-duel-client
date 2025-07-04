@@ -34,6 +34,9 @@ namespace TerritoryWars.DataModels
         };
 
         public static char[] EdgeTypes = { 'C', 'R', 'M', 'F' };
+        
+        public static int CityPointsPerSide = 2; // Number of points per 1 city side
+        public static int RoadPointsPerSide = 1; // Number of points per 1 road side
 
         public static Vector2Int GetClientPosition(byte col, byte row)
         {
